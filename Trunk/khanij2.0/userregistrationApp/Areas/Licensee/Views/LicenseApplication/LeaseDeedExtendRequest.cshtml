@@ -1,0 +1,217 @@
+﻿@*// *********************************************************************************************************
+    //  View Name                : LicenseRegisteredList
+    //  Desciption               : Registered License Information
+    //  Created By               : Akshaya Dalei
+    //  Created On               : 24 July 2021
+    // ********************************************************************************************************
+*@
+
+
+@{
+    ViewBag.Title = "Storage License Applications";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+@model IEnumerable<userregistrationEF.LicenseApplication>
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        @Html.Partial("_CMSnavigation")
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="javascript:void(0)">
+                                Lease Deeed Extend Request
+                            </a>
+                        </li>
+                    </ul>
+                    @Html.Partial("_CMSutil")
+                </div>
+
+                <section class="box form-container">
+                    <div class="content-body">
+                        <div class="row">
+                            <div class="col-sm-12">
+
+                                <table id="table-exports" class="table table-sm table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>Sr.No</th>
+                                            <th>Registration Number</th>
+                                            <th>Date of Application</th>
+                                            <th>Applicant's Details</th>
+                                            <th>Application Payment Details</th>
+                                            <th>Storage Capacity</th>
+                                            <th>Mineral/Product Name</th>
+                                            <th>Period for which applied</th>
+                                            <th>Remarks,if any</th>
+                                            <th>Status</th>
+                                            <th>Grant Order No and Date</th>
+                                            <th>Security Payment Details</th>
+                                            <th>Security Payment Treasury Details</th>
+                                            <th>LeaseDeed Fine Details</th>
+                                            <th>LeaseUpload LastDate</th>
+                                            <th>LeaseDeed Extend Request For</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+
+                                        @{
+                                            var count = 0;
+                                            foreach (var item in Model)
+                                            {
+                                                count++;
+                                                <tr>
+                                                    <td>@count</td>
+                                                    <td>@item.LICENSE_APP_CODE</td>
+                                                    <td>@item.SubmissionDate</td>
+                                                    <td>
+                                                        <strong>Applicant Name : </strong> @item.ApplicantName<br />
+                                                        <strong>Address : </strong> @item.CompleteAddress <br />
+                                                        <strong>Ph No : </strong> @item.MobileNo <br />
+                                                        <strong>Email : </strong> @item.EmailAddress<br />
+                                                    </td>
+                                                    <td>
+                                                        <strong>Payment Reciept ID : </strong> @item.PAYMENTID <br />
+                                                        <strong>Payment Bank : </strong> @item.PaymentBank <br />
+                                                        <strong>Application Fees : </strong> @item.TotalPayment
+                                                    </td>
+                                                    <td>@item.StorageCapicity</td>
+                                                    <td>@item.MINERAL_NAME</td>
+                                                    <td>@item.Period</td>
+                                                    <td>@item.ApplicantName</td>
+                                                    <td>@item.Status</td>
+                                                    <td>
+                                                        <strong>Grant Order No : </strong> @item.GrantOrderNo<br />
+                                                        <strong>Grant Order Date : </strong>@item.GrantOrderDate
+                                                    </td>
+                                                    <td>
+                                                        <strong>Security No : </strong>@item.SecurityReceipteNo<br />
+                                                        <strong>Date : </strong>@item.SecurityDate<br />
+                                                        <strong>Security Amount : </strong>@item.SecurityAmount<br />
+                                                        <strong>Bank : </strong>@item.SecurityBank
+                                                    </td>
+                                                    <td>
+                                                        <strong>Security Treasury No : </strong> @item.SecurityAmountTreasuryNumber<br />
+                                                        <strong>Security Treasury Date : </strong>@item.SecurityAmountTreasuryDate
+                                                    </td>
+                                                    <td>
+                                                        <strong>LeaseDeed Payment Receipt Id : </strong>@item.DeedReceiptNo<br />
+                                                        <strong>Date : </strong>@item.DeedAmountDate<br />
+                                                        <strong>LeaseDeed Amount : </strong>@item.DeedFineAmountPaid<br />
+                                                        <strong>Bank : </strong>@item.DeedBankName
+                                                    </td>
+                                                    <td>@item.LeaseUploadLastDate</td>
+                                                    <td>
+                                                        @{
+                                                            if (item.ExtendDeedNoOfDays != null && item.ExtendDeedNoOfDays != 0)
+                                                            {
+                                                                <strong>
+                                                                    @item.ExtendDeedNoOfDays day(s)
+                                                                </strong>
+                                                            }
+                                                            else
+                                                            {
+                                                                <strong>
+                                                                    @item.ExtendDeedNoOfDays
+                                                                </strong>
+                                                            }
+                                                        }
+
+
+                                                    </td>
+
+                                                    <td>
+                                                        <a class="btn btn-success" id="@item.LicenseAppId" onclick='ExtendDeed(this.id);'><span class='command'>Approve</span></a>
+
+                                                    </td>
+                                                </tr>
+                                            }
+
+                                        }
+                                    </tbody>
+                                </table>
+
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+    $(document).ready(function () {
+        debugger;
+        $(document).ready(function () { loadNavigation('Storage License Applications Register', 'ql', 'pl', 'tl', 'License', 'License Lease Deed Extend Request', ' '); });
+    });
+
+    function ExtendDeed(par) {
+        if (par != null && par != "") {
+            if (confirm("Are you confirmed to approved Extend LeaseDeed Request for this license application?")) {
+
+                var Postdata = 'action=signdoc' + "\n" + 'datatosign=Digital Signature Required' + "\n" + 'signaction=sign' + "\n" + 'filepath=' + "\n" + 'panNumberParam=' + "\n" + 'expirycheck=false' + "\n" + 'issuername=' + "\n" + 'certclass=1|2|3' + "\n" + 'certtype=ALL';
+                connection.send(Postdata);
+
+                connection.onerror = function (error) {
+                    alert('Please check the server connection: ' + error);
+                    alert(error);
+                };
+
+                connection.onmessage = function (e) { // when DSC is success then following function executed.
+                    if (e.data.indexOf("subProtocol") == -1) {
+                        $.ajax({
+                            url: "/Licensee/LicenseApplication/ApproveLeaseDeedExtendRequest",
+                            data: { "LicId": par },
+                            dataType: 'json',
+                            type: 'post',
+                            success: function (data) {
+                                if (data == "Lease Deed Extended Successfully") {
+                                    swal("", data, "success");
+                                    window.location.href = "/Licensee/LicenseApplication/LeaseDeedExtendRequest";
+                                }
+                                else {
+                                    swal("", data, "warning");
+                                }
+                            },
+                            error: function (err) { }
+                        });
+                    }
+                    else {
+                        alert(e.data);
+                    }
+
+
+                };
+            }
+            else {
+                return false;
+            }
+
+        }
+    }
+
+    //following code is for DSC Signature
+    try {
+        var connection = new WebSocket('wss://localhost.emudhra.com:8080');
+
+        connection.onopen = function () {
+            console.log('Connection Opened');
+        };
+        connection.onerror = function (error) {
+            //  alert('Please check the DSC connection: ' + error);
+        };
+        connection.onmessage = function (e) {
+            if (e.data.indexOf("subProtocol") == -1) {
+                //  alert(e.data);
+            }
+        };
+    }
+    catch (e) {
+        alert("No DSC Connection Found");
+    }
+    //-----------------------------
+</script>

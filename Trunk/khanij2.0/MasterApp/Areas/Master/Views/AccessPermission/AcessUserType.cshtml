@@ -1,0 +1,239 @@
+﻿@model MasterEF.AcessUserTypeEF;
+@{
+    ViewData["Title"] = "AcessUserType";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+<style>
+    #panel {
+        height: 300px;
+        background-color: #fff;
+        border: 1px solid #ddd;
+        overflow-y: auto;
+        padding: 1rem;
+    }
+</style>
+<script>
+    $('document').ready(function () {
+        loadNavigation('Add', 'glRoleRes', 'plUser', 'tl', 'Master', 'Access Permission', ' ');
+        $.ajax({
+            url: '/Master/AccessPermission/getTreeValue',
+            async: false,
+            dataType: 'json',
+            type: 'post',
+
+            success: function (data) {
+                var data2 = data;
+                debugger;
+                $.each(data, function (item) {
+                    var menu = "";
+                    if (data[item]["parentId"] == "0") {
+
+                        menu = menu + "<div class='panel-heading'>";
+                        menu = menu + "<a role='button' data-toggle='collapse' href='#d" + data[item]["menuId"] + "' aria-expanded='true' aria-controls='collapseOne' class='panel-title trigger'></a>";
+                        menu = menu + "<div class='font-weight-bold'>";
+                        menu = menu + "<input type='checkbox' ID='v" + data[item]["menuId"] + "' CssClass='form-check-input' value='" + data[item]["menuId"] + "' name='checkedFiles' onclick='CheckParentData(this)'/>";
+                        menu = menu + "<label class='form-check-label pl-1' for='defaultCheck1'>";
+                        menu = menu + " " + data[item]["menuName"];
+                        menu = menu + "</label></div ></div >";
+                        $.each(data2, function (item1) {
+                            if (data[item]["menuId"] == data[item1]["parentId"]) {
+
+                                menu = menu + "<div id='d" + data[item]["menuId"] + "' class='panel-collapse collapse show' role='tabpanel'>";
+                                menu = menu + "<div class='panel-body'>";
+                                menu = menu + "<div class='form-check'>";
+                                menu = menu + "<div class='panel-heading>";
+                                menu = menu + "<div class='font-weight-bold'>";
+                                menu = menu + "<input type=checkbox name='checkedFiles' CssClass='form-check-input' value='" + data2[item1]["menuId"] + "'   ID='" + data[item]["menuId"] + "'  onclick='CheckChildData(this)' />";
+                                menu = menu + "<label class='form-check-label pl-1' for='defaultCheck1'>";
+                                menu = menu + " " + data2[item1]["menuName"];
+                                menu = menu + "</label>";
+                                menu = menu + "</div>";
+                                menu = menu + "</div>";
+                                menu = menu + "</div>";
+                                menu = menu + "</div>";
+                                menu = menu + "</div>";
+
+                            }
+                        });
+
+                        $('#panel').append(menu);
+
+                    }
+                });
+                bind();
+                //console.log(data);
+
+            },
+            error: function (err) {
+
+            }
+        });
+
+        $("#UserTypeid").change(function () {
+            bind();
+        });
+    });
+
+    function CheckParentData(v) {
+        if (v.checked) {
+            var name = v.value;
+
+            $("input[name=checkedFiles]").each(function () {
+
+                if ($(this).attr("id") == name) {
+                    $(this).prop('checked', true);
+                }
+            });
+        }
+        else {
+            var name = v.value;
+
+            $("input[name=checkedFiles]").each(function () {
+
+                if ($(this).attr("id") == name) {
+                    $(this).prop('checked', false);
+                }
+            });
+        }
+    }
+    function CheckChildData(v) {
+        var check = true;
+        if (v.checked) {
+            var id = v.id
+            $("input[name=checkedFiles]").each(function () {
+
+                if ($(this).val() == v.id) {
+                    $(this).prop('checked', true);
+                }
+
+            });
+        }
+        else {
+            check = true;
+            $("input[name=checkedFiles]").each(function () {
+
+                if ($(this).attr("id") == v.id) {
+
+                    if ($(this).prop("checked") == true) {
+                        /*alert('fgjfj');*/
+                        check = false;
+                    }
+                }
+            });
+            //alert(check);
+            if (check) {
+                $("input[name=checkedFiles]").each(function () {
+
+                    if ($(this).val() == v.id) {
+                        //alert('dfdss');
+                        $(this).prop('checked', false);
+                    }
+                });
+            }
+        }
+    }
+
+    function bind() {
+        if ($('#UserTypeid') == '' || $('#UserTypeid').val() == '0' || $('#UserTypeid').val() == '0' || $('#UserTypeid').val() == '---Select---') {
+            return false;
+        }
+        else {
+            $.ajax({
+                url: '/Master/AccessPermission/BindUserTypeData',
+                data: { 'usertypeid': $('#UserTypeid').val() },
+                dataType: 'json',
+                async: false,
+                type: 'post',
+
+                success: function (data) {
+                    debugger;
+
+                    $("input[name=checkedFiles]").each(function () {
+                        $(this).prop('checked', false);
+
+                    });
+                    $.each(data, function (item) {
+
+                        $("input[name=checkedFiles]").each(function () {
+
+                            if (data[item]['menuId'] == $(this).val()) {
+                                $(this).prop('checked', true);
+                            }
+                        });
+                    });
+                },
+                error: function (err) {
+
+                }
+            });
+        }
+    }
+</script>
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        @Html.Partial("_CMSnavigation")
+        <div class="button-links text-right">
+            <a href="@Url.Content("~/Master/AccessPermission/ViewUserAccess")" class="btn btn-primary btn-sm">User Wise Access Permission</a>
+            <a href="#" class="btn btn-primary btn-sm active">User Type Wise Menu Assignment</a>
+        </div>
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="javascript:void(0);">
+                                Assign Rights
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="@Url.Content("~/Master/AccessPermission/ViewUserTypeAcess")">
+                                View
+                            </a>
+                        </li>
+                    </ul>
+                    @Html.Partial("_CMSutil")
+                </div>
+
+                <section class="box form-container">
+                    <div class="content-body">
+                        @using (Html.BeginForm("AcessUserType", "AccessPermission", FormMethod.Post, new { AUTOCOMPLETE = "Off", id = "form1" }))
+                        {
+                            @Html.AntiForgeryToken()
+                            <div class="row">
+
+                                <div class="col-sm-12">
+                                    <div class="form-group row">
+                                        <label for="dropdownUserType" class="col-sm-2 col-form-label">User Type <span class="text-danger">*</span></label>
+                                        <div class="col-sm-4">
+
+                                            @Html.DropDownListFor(m => m.UserTypeid, ViewBag.UserTYpe as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control searchableselect" })
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-12">
+                                    <div class="rights-accordion">
+                                        <div class="form-group row">
+                                            <label for="dropdownDesign" class="col-sm-2 col-form-label">Rights </label>
+                                            <div class="col-lg-5">
+                                                <div class="panel" id="panel">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6 offset-sm-2">
+                                    <input type="submit" class="btn btn-primary btn-md ml-0" value="Submit" />
+                                    <input type="reset" name="Reset" value="Reset" class="btn btn-danger btn-md" />
+                                </div>
+
+                            </div>
+                        }
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+    <!-- MAIN CONTENT AREA ENDS -->
+</section>

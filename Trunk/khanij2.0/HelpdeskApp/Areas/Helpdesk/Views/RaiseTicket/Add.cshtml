@@ -1,0 +1,1141 @@
+﻿@*// ***********************************************************************
+    //  View Name                : Add
+    //  Desciption               : Used to generate Raise Ticket
+    //  Created By               : Suroj Kumar Pradhan
+    //  Created On               : 23-mar-2021
+    // ************************************************************************@
+@model HelpDeskEF.RaiseTicket
+@{
+    ViewData["Title"] = "Add";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+@if (TempData["Message"] != null)
+{
+<div class="modal modal-success fade" id="confirmModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-confirm">
+        <div class="modal-content">
+            <div class="modal-header justify-content-center">
+                <div class="icon-box">
+                    <i class="fas fa-check"></i>
+                </div>
+            </div>
+            <div class="modal-body text-center">
+                <h4>Thank You!</h4>
+                <p>Your Ticket No- <strong class="text-brown">@TempData["Message"]</strong> has been created successfully.</p>
+                <button class="btn btn-success mb-3" data-dismiss="modal"><span>Start Exploring</span> </button>
+                <div class="separator separator-dashed"></div>
+                <p class="mb-1">For more details contact with Helpdesk Officer </p>
+                <p class="mb-0">Contact No: <strong class="text-dark">5241237123</strong></p>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    $("#confirmModal").modal('show');
+</script>
+}
+<script type="text/javascript">
+    indicateMe = "yes"
+    $(document).ready(function () {
+        loadNavigation('Add', 'glhelpdesk', 'plraiseticket', 'tl', 'Helpdesk', 'Raise Ticket', ' ');
+        $('.searchableselect').searchableselect();
+        /******************FILE UPLOAD********************************/
+        $('.custom-file-input').on("change", function () {
+            debugger;
+            $("input[type='Submit']").attr('disabled', false);
+            var label = $(this).siblings('.custom-file-label');
+            var files = $(this)[0].files;
+            var filesize = this.files[0].size;
+            var val = $(this).val().toLowerCase(),
+                regex = new RegExp("(.*?)\.(jpeg|jpg|png|pdf|tif)$");
+            if (!(regex.test(val))) {
+                swal("", "docx,xlsx,csv type is not an allowed file type. You can use only jpg, jpeg, png, pdf, tif types of file(s). ", "warning");
+                this.value = '';
+                $("input[name='Submit']").attr('disabled', true);
+                return false;
+            }
+            else if (filesize > 2048000) {
+                swal("", "File size must be 2 MB !", "warning");
+                $("input[type='Submit']").attr('disabled', true);
+                return false;
+            }
+            else if (files.length > 0) {
+                label.html(files.length + ' Files Selected');
+            }
+            else if (files.length == 0) { label.html(files[0].name); }
+        });
+        /***************END*************************/
+        if (parseInt($('#TicketID').val()) > 0) {//for edit
+            $('#div_non_user').css("display", "none");
+            $('#div_other_than_non_user').css("display", "none");
+            $('#div_for_Lessee_Licensee_endUser_Transporter_etc').css("display", "block");
+            var SelectedValue = $('#OnBehalfOfName').val();
+            if (SelectedValue == 'undefined' || SelectedValue == ' ') {
+                $('#OnBehalfOf').hide();
+            }
+            $('.pointer').css("pointer-events", "none");
+        }
+        if ($('#OtherThenNonUser_StateName2id').val() != "") {
+            DistrictBindNonuser();
+        }
+        if ($('#OtherThenNonUser_DistrictName2id').val() != "") {
+            BindComplainerData();
+        }
+        if ($('#OtherThenNonUser_ComplainerName2').val() != "") {
+            ComplainerNameChange();
+        }
+        //---------------
+        $('#ddlOnBehalfOfName').change(function () {
+            debugger;
+            $("#OnBehalfOfName").val($("#ddlOnBehalfOfName option:selected").text());
+            drpChange();
+        });
+        //---------------
+        $('#OtherThenNonUser_StateName2id').change(function () {
+            debugger;
+            $("#OtherThenNonUser_StateName2").val($("#OtherThenNonUser_StateName2id option:selected").text());
+            DistrictBindNonuser();
+        });
+        //---------------
+        $('#OtherThenNonUser_DistrictName2id').change(function () {
+            debugger;
+            $("#OtherThenNonUser_DistrictName2").val($("#OtherThenNonUser_DistrictName2id option:selected").text());
+            BindComplainerData();
+        });
+         //---------------
+        $('#OtherThenNonUser_ComplainerName2').change(function () {
+            debugger;
+            $("#OtherThenNonUser_ComplainerName2id").val($("#OtherThenNonUser_ComplainerName2 option:selected").text());
+            ComplainerNameChange();
+        });
+        if ('@ViewBag.userType' == "HELPDESK USER") {
+            drpChange();
+        }
+        //----------------
+        if ($('#hdnItemID').val() != "") {
+            $('#ItemID').val($('#hdnItemID').val());
+        }
+    });
+    $(function () {
+        debugger;
+        helpdesk_userModuleChange();
+        $("#ItemID").val('@ViewBag.itemid');
+    });
+    $(function () {
+        $("#UserType").change(function () {
+            debugger;
+            var usertype = $("#Usertype").val();
+            var optionSelected = $("option:selected", this);
+            var valueSelected = this.value;
+            if (valueSelected == "18") {
+                $("#divdistrict").hide();
+                $("#divfms").hide();
+                $("#divosu").show();
+                $.ajax({
+                    type: "POST",
+                    url: "/Helpdesk/RaiseTicket/GetFMSUsersList",
+                    data: {
+                        "Usertype": usertype,
+                        "Districtid": 0,
+                        "type": "2",
+                    },
+                    cache: false,
+                    datatype: "JSON",
+                    success: function (SList) {
+                        $("#Osuuser").append($("<option>Select</option>"));
+                        $.each(SList, function (i, item) {
+                            $("#Osuuser").append($("<option></option>").val(item.userid).html(item.applicantName));
+                        });
+                    },
+                    failure: function (response) {
+                        console.log(response.responseText);
+                    },
+                    error: function (jqxhr, status, exception) {
+                        /*swal("", 'Exception:' + exception.alert + '', "warning");*/
+                    }
+                });
+            }
+            else {
+                $("#divdistrict").show();
+                $("#divfms").show();
+                $("#divosu").hide();
+            }
+        });
+        $("#ForwardDistrictName").change(function () {
+            $("#divfms").show();
+            var usertype = $("#Usertype").val();
+            var optionSelected = $("option:selected", this);
+            var valueSelected = this.value;
+            $('#Fmsuser').empty();
+            var did = valueSelected;
+            $.ajax({
+                type: "POST",
+                url: "/Helpdesk/RaiseTicket/GetFMSUsersList",
+                data: {
+                    "Usertype": usertype,
+                    "Districtid": did,
+                    "type": "1"
+                    ,
+                },
+                cache: false,
+                datatype: "JSON",
+                success: function (SList) {
+                    $("#Fmsuser").append($("<option>Select</option>"));
+                    $.each(SList, function (i, item) {
+                        $("#Fmsuser").append($("<option></option>").val(item.userid).html(item.applicantName));
+                    });
+                },
+                failure: function (response) {
+                    console.log(response.responseText);
+                },
+                error: function (jqxhr, status, exception) {
+                    /*swal("", 'Exception:' + exception.alert + '', "warning");*/
+                }
+            });
+        });
+    });
+    function helpdesk_userModuleChange() {
+        debugger;
+        var mid = $("#ModuleID").val();
+        var catid = $("#CategoryID").val();
+        $.ajax({
+            type: "POST",
+            url: "/Helpdesk/RaiseTicket/Itembind",
+            data: {'Moduleid': mid, 'Categoryid': catid},
+            cache: false,
+            datatype: "JSON",
+            success: function (item) {
+                $('#ItemID').html('');
+                $('#ItemID').append("<option value=''>Select</option>");
+                $.each(item, function (i, item) {
+                    debugger;
+                    $("#ItemID").append($("<option>Select</option>").val(item.itemID).html(item.itemName));
+                });
+                //if ($('#OtherThenNonUser_DistrictName2id').val() != "") {
+                //    $('#OtherThenNonUser_DistrictName2id').val($('#ItemID').val());
+                //}
+                if ($('#hdnItemID').val() != "") {
+                    $('#ItemID').val($('#hdnItemID').val());
+                }
+                if ($('#ItemID').val() == null) {
+                    $('#ItemID').html('');
+                    $('#ItemID').append("<option value=''>Select</option>");
+                    $.each(data, function (ind, item) {
+                        $('#ItemID').append("<option value='" + item.itemID + "'>" + item.itemName + "</option>");
+                    });
+                }
+            },
+            failure: function (response) {
+                console.log(response.responseText);
+            },
+            error: function (jqxhr, status, exception) {
+                /*swal("", 'Exception:' + exception.alert + '', "warning");*/
+            }
+        });
+    }
+    /*Ftech User details*/
+    function fetchData() {
+        debugger;
+        $.ajax({
+            url: '@Url.Action("GetUserDetailsByUserCode", "RaiseTicket")',
+            type: 'POST',
+            data: {
+                UserCode: $("#FetchUserCode").val()
+            },
+            success: function (Data) {
+                if (Data[0] != null) {
+                    debugger;
+                    $('#div_non_user').css("display", "none");
+                    $('#div_other_than_non_user').css("display", "none");
+                    $('#div_for_Lessee_Licensee_endUser_Transporter_etc').css("display", "block");
+                    $("#OnBehalfOfId").val(Data[0].userid)
+                    $("#ddlOnBehalfOfName option[value='" + Data[0].userType + "']").attr('selected', 'selected');
+                    $("#OnBehalfOfName").val(Data[0].userType);
+                    $("#StateName").val(Data[0].stateName)
+                    $("#DistrictName").val(Data[0].districtName)
+                    $("#ComplainerName").val(Data[0].applicantName)
+                    $("#ComplainerMobileNumber").val(Data[0].complainerMobileNumber)
+                    $("#ComplainerEmailID").val(Data[0].complainerEmailID)
+                    $("#ComplainerUserName").val(Data[0].fetchUserCode)
+                }
+                else {
+                    swal("",'User details not found please enter correct UserCode',"warning");
+                }
+            }
+        })
+    }
+    /*Bind District details*/
+    function DistrictBindNonuser() {
+        debugger;
+        if ($("#OtherThenNonUser_StateName2id").val() != "") {
+            $.ajax({
+                type: "POST",
+                url: "/Helpdesk/RaiseTicket/DistrictBind",
+                data: { 'sid': $("#OtherThenNonUser_StateName2id").val() },
+                cache: false,
+                datatype: "JSON",
+                success: function (data) {
+                    debugger;
+                    $('#OtherThenNonUser_DistrictName2id').html('');
+                    $('#OtherThenNonUser_DistrictName2id').append("<option value=''>Select</option>");
+                    $.each(data, function (ind, item) {
+                        $('#OtherThenNonUser_DistrictName2id').append("<option value='" + item.otherThenNonUser_DistrictName2id + "'>" + item.otherThenNonUser_DistrictName2 + "</option>");
+                    });
+                    if ($('#OtherThenNonUser_DistrictName2id').val() != "") {
+                        $('#OtherThenNonUser_DistrictName2id').val($('#OtherThenNonUser_DistrictName2id').val());
+                    }
+                    if ($('#OtherThenNonUser_DistrictName2id').val() == null) {
+                        $('#OtherThenNonUser_DistrictName2id').html('');
+                        $('#OtherThenNonUser_DistrictName2id').append("<option value=''>Select</option>");
+                        $.each(data, function (ind, item) {
+                            $('#OtherThenNonUser_DistrictName2id').append("<option value='" + item.otherThenNonUser_DistrictName2id + "'>" + item.otherThenNonUser_DistrictName2 + "</option>");
+                        });
+                    }
+                    BindComplainerData();
+                },
+                error: function (err) {
+                    swal("", 'Exception:' + err.responseText + '', "warning");
+                }
+            });
+        }
+        else {
+            $('#OtherThenNonUser_DistrictName2').html('');
+            $('#OtherThenNonUser_DistrictName2').append("<option value=''>Select</option>");
+            $('#OtherThenNonUser_ComplainerUserName2').html('');
+            $('#OtherThenNonUser_ComplainerUserName2').append("<option value=''>Select</option>");
+        }
+    }
+    $(document).ready(function () {
+        $("#DistrictID").append($("<option>Select</option>").val('@ViewBag.did').html('@ViewBag.dname'));
+    });
+    $('input[name="filesupport"]').bind('change', function () {
+        debugger;
+        filesize = this.files[0].size;
+        var filess = this.files;
+
+        var val = $(this).val().toLowerCase(),
+            regex = new RegExp("(.*?)\.(pdf|jpeg|jpg|png|tif)$");
+        var extension = val.substr((val.lastIndexOf('.') + 1));
+        if (!(regex.test(val))) {
+            debugger;
+            swal("", " " + extension + "  type is not an allowed file type. You can use only jpg, jpeg, png, pdf, tif types of file(s). ", "warning");
+            this.value = '';
+            // $("input[name='Submit']").attr('disabled', true);
+            return false;
+        }
+        return false;
+
+    });
+    function CountAddress() {
+        $("#lblRemarks").text(500 - (document.getElementById("ProblemDescription").value.length));
+    }
+    /*Bind Complainer details*/
+    function BindComplainerData() {
+        debugger;
+        $("#OnBehalfOfId").val('');
+        $("#OtherThenNonUser_ComplainerMobileNumber2").val('');
+        $("#OtherThenNonUser_ComplainerEmailID2").val('');
+        $("#OtherThenNonUser_ComplainerUserName2").val('');
+        if ($('#OtherThenNonUser_DistrictName2id').val() != "") {
+            $.ajax({
+                url: '/Helpdesk/RaiseTicket/GetUserByDistrictAndType',
+                data: { 'DistrictName': $("#OtherThenNonUser_DistrictName2id option:selected").text(), 'UserType': $('#ddlOnBehalfOfName').val() },
+                dataType: 'json',
+                type: 'post',
+                success: function (data) {
+                    debugger;
+                    $('#OtherThenNonUser_ComplainerName2').html('');
+                    $('#OtherThenNonUser_ComplainerName2').append("<option value=''>Select</option>");
+                    $.each(data, function (ind, item) {
+                        $('#OtherThenNonUser_ComplainerName2').append("<option value='" + item.userid + "'>" + item.applicantName + "</option>");
+                    });
+                    if ($('#OtherThenNonUser_ComplainerName2').val() != "") {
+                        $('#OtherThenNonUser_ComplainerName2').val($('#OtherThenNonUser_ComplainerName2').val());
+                        ComplainerNameChange();
+                    }
+                    if ($('#OtherThenNonUser_ComplainerName2').val() == null) {
+                        $('#OtherThenNonUser_ComplainerName2').html('');
+                        $('#OtherThenNonUser_ComplainerName2').append("<option value=''>Select</option>");
+                        $.each(data, function (ind, item) {
+                            $('#OtherThenNonUser_ComplainerName2').append("<option value='" + item.userid + "'>" + item.applicantName + "</option>");
+                        });
+                    }
+                },
+                error: function (err) {
+                    swal("", 'Exception:' + err.responseText + '', "warning");
+                }
+            });
+        }
+        else {
+            $('#OtherThenNonUser_ComplainerName2').html('');
+            $('#OtherThenNonUser_ComplainerName2').append("<option value=''>Select</option>");
+        }
+    }
+    /*Bind Complainer Name details*/
+    function ComplainerNameChange() {
+        debugger;
+        $.ajax({
+            url: '/Helpdesk/RaiseTicket/GetUserDetails',
+            type: 'POST',
+            data: {
+                ApplicantName: $("#OtherThenNonUser_ComplainerName2 option:selected").text()
+            },
+            success: function (Data) {
+                debugger;
+                $("#OnBehalfOfId").val(Data[0].userid)
+                $("#OtherThenNonUser_ComplainerMobileNumber2").val(Data[0].complainerMobileNumber)
+                $("#OtherThenNonUser_ComplainerEmailID2").val(Data[0].complainerEmailID)
+                $("#OtherThenNonUser_ComplainerUserName2").val(Data[0].fetchUserCode)
+            }
+        })
+    }
+    function onBtnForwardSubmit() {
+        debugger;
+        var _remarks = $('#Remark').val();
+        var _UserTypeId = $("#UserType").val();
+        var _DistrictId = $("#ForwardDistrictName").val();
+        var _FMSUserId = $("#Fmsuser option:selected").val();
+        var _OSUUserId = $("#Osuuser").val();
+        var _TicketId = $("#hidticket").val();
+        if (_UserTypeId == null || _UserTypeId == "0") {
+            swal("", "User Type Required !", "warning");
+            return false;
+        }
+        if (_UserTypeId == "14") {
+            if (_DistrictId == null || _DistrictId == "") {
+                swal("", "District Required !", "warning");
+                return false;
+            }
+            else {
+                if (_FMSUserId == null || _FMSUserId == "") {
+                    swal("", "FMS Users Required !", "warning");
+                    return false;
+                }
+                else {
+                    $.ajax({
+                        type: "POST",
+                        url: "/Helpdesk/RaiseTicket/Update",
+                        data: {
+                            "TicketId": parseInt(_TicketId),
+                            "UserTypeId": _UserTypeId,
+                            "DistrictId": _DistrictId,
+                            "remarks": _remarks,
+                            "FMSUserId": _FMSUserId,
+                            "OSUUserId": _OSUUserId
+                        },
+                        dataType: "json",
+                        success: function (result) {
+                            if (result != null) {
+                                if (result == "1") {
+                                    swal("", "Request forwarded to FMS User Successfully.", "success");
+                                }
+                                else if (result == "3" || result == "4") {
+                                    swal("", "This ticket has been forwarded by HelpDesk User to any (OSU/FMS User)", "warning");
+                                }
+
+                                else {
+                                    swal("", "Request not forwarded ! Please try again later.", "error");
+                                }
+                            }
+                        }
+                    });
+                }
+            }
+        }
+        else {
+            if (_OSUUserId == null || _OSUUserId == "") {
+                swal("", "OSU Users Required !", "warning");
+                return false;
+            }
+            else {
+                $.ajax({
+                    type: "POST",
+                    url: "/Helpdesk/RaiseTicket/Update",
+                    data: {
+                        "TicketId": parseInt(_TicketId),
+                        "UserTypeId": _UserTypeId,
+                        "DistrictId": _DistrictId,
+                        "remarks": _remarks,
+                        "FMSUserId": _FMSUserId,
+                        "OSUUserId": _OSUUserId
+                    },
+                    dataType: "json",
+                    success: function (result) {
+                        if (result != null) {
+                            if (result == "1") {
+                                swal("", "Request forwarded to OSU User Successfully.", "success");
+                            }
+                            else if (result == "3" || result == "4") {
+                                swal("", "This ticket has been forwarded by HelpDesk User to any (OSU/FMS User)", "warning");
+                            }
+                            else {
+                                swal("", "Request not forwarded ! Please try again later.", "error");
+                            }
+                        }
+                    }
+                });
+            }
+        }
+    }
+    function onforward(tid) {
+        debugger;
+        $('#FetchUserlist').modal('show');
+        $('#ForwardDistrictName').empty();
+        var v = "";
+        $("#divfms").hide();
+        $("#divosu").hide();
+        $.ajax({
+            type: "POST",
+            url: "/Helpdesk/RaiseTicket/GetDistrictDataForUser",
+            cache: false,
+            datatype: "JSON",
+            success: function (SList) {
+                $("#ForwardDistrictName").append($("<option>Select</option>"));
+                $.each(SList, function (i, item) {
+                    debugger;
+                    $("#ForwardDistrictName").append($("<option></option>").val(item.districtID).html(item.districtName));
+                });
+            },
+            failure: function (response) {
+                console.log(response.responseText);
+            },
+            error: function (jqxhr, status, exception) {
+                /*swal("", 'Exception:' + exception.alert + '', "warning");*/
+            }
+        });
+
+    }
+    function drpChange() {
+        debugger;
+        $("#FetchUserCode").val('');
+        var SelectedValue = $('#ddlOnBehalfOfName').val();
+        if (SelectedValue == "undefined" || SelectedValue == "") {
+            $('#div_non_user').css("display", "none");
+            $('#div_other_than_non_user').css("display", "none");
+            $('#div_for_Lessee_Licensee_endUser_Transporter_etc').css("display", "block");
+        }
+        else if (SelectedValue == 'Non User') {
+            $('#div_other_than_non_user').css("display", "none");
+            $('#div_for_Lessee_Licensee_endUser_Transporter_etc').css("display", "none");
+            $('#div_non_user').css("display", "block")
+        }
+        else {
+            $('#div_for_Lessee_Licensee_endUser_Transporter_etc').css("display", "none");
+            $('#div_non_user').css("display", "none");
+            $('#div_other_than_non_user').css("display", "block")
+        }
+        BindComplainerData();
+    }
+    function onSubmit() {
+        @*if ('@ViewBag.UserType' == "HELPDESK USER") {*@
+     if (!parseInt($('#TicketID').val()) > 0) {
+            debugger;
+            if ('@ViewBag.userType'=="HELPDESK USER") {
+                if ($("#ddlOnBehalfOfName").val() == null || $("#ddlOnBehalfOfName").val() == "") {
+                   swal("","On Behalf of Required !", "warning");
+                    $("#ddlOnBehalfOfName").focus();
+                    return false;
+                }
+                if ($("#ddlOnBehalfOfName").val() != "Non User") {
+                    //if ($("#StateName").val() == '' && $("#DistrictName").val() == '' && $("#ComplainerName").val() == '' && $("#ComplainerMobileNumber").val() == '' && $("#ComplainerEmailID1").val() == '' && $("#ComplainerUserName").val() == '')
+                    if($('#FetchUserCode').val()=="")
+                    {
+                        if ($("#OtherThenNonUser_StateName2id").val() == null || $("#OtherThenNonUser_StateName2id").val() == "") {
+                            swal("","Please select State !","warning");
+                            $("#StateID").focus();
+                            return false;
+                        }
+                        else if ($("#OtherThenNonUser_DistrictName2id").val() == null || $("#OtherThenNonUser_DistrictName2id").val() == "") {
+                            swal("","Please select District !","warning");
+                            $("#DistrictID").focus();
+                            return false;
+                        }
+                        else if ($("#OtherThenNonUser_ComplainerUserName2").val() == null || $("#OtherThenNonUser_ComplainerUserName2").val() == "") {
+                            swal("","Please select Complainer Name !","warning");
+                            $("#OtherThenNonUser_ComplainerUserName2").focus();
+                            return false;
+                        }
+                    }
+                }
+                else {
+
+                    if ($("#NonUser_StateName1").val() == null || $("#NonUser_StateName1").val() == "") {
+                        swal("","Please enter State !", "warning");
+                        $("#NonUser_StateName1").focus();
+                        return false;
+                    }
+                    else if ($("#NonUser_DistrictName1").val() == null || $("#NonUser_DistrictName1").val() == "") {
+                        swal("","Please enter District !","warning");
+                        $("#NonUser_DistrictName1").focus();
+                        return false;
+                    }
+                    else if ($("#NonUser_ComplainerName1").val() == null || $("#NonUser_ComplainerName1").val() == "") {
+                        swal("","Please enter Complainer Name !", "warning");
+                        $("#NonUser_ComplainerName1").focus();
+                        return false;
+                    }
+
+                    else if ($("#NonUser_ComplainerMobileNumber1").val() == null || $("#NonUser_ComplainerMobileNumber1").val() == "") {
+                        swal("","Please enter Complainer Mobile Number !", "warning");
+                        $("#NonUser_ComplainerMobileNumber1").focus();
+                        return false;
+                    }
+                    else if ($("#NonUser_ComplainerEmailID1").val() == null || $("#NonUser_ComplainerEmailID1").val() == "") {
+                       swal("","Please enter Complainer EmailID !", "warning");
+                        $("#NonUser_ComplainerEmailID1").focus();
+                        return false;
+                    }
+                    else if ($("#NonUser_ComplainerUserName1").val() == null || $("#NonUser_ComplainerUserName1").val() == "") {
+                        swal("","Please enter User Name !", "warning");
+                        $("#NonUser_ComplainerUserName1").focus();
+                        return false;
+                    }
+                }
+            }
+            else {
+                if ($("#StateName").val() == null || $("#StateName").val() == "") {
+                    swal("","State Required !", "warning");
+                    return false;
+                }
+                else if ($("#DistrictName").val() == null || $("#DistrictName").val() == "") {
+                    swal("","District Required !", "warning");
+                    return false;
+                }
+                else if ($("#ComplainerName").val() == null || $("#ComplainerName").val() == "") {
+                    swal("","Complainer Name Required !", "warning");
+                    return false;
+                }
+                else if ($("#ComplainerMobileNumber").val() == null || $("#ComplainerMobileNumber").val() == "") {
+                    swal("","Complainer Mobile Number Required !", "warning");
+                    return false;
+                }
+                else if ($("#ComplainerEmailID").val() == null || $("#ComplainerEmailID").val() == "") {
+                    swal("","Complainer EmailID Required !", "warning");
+                    return false;
+                }
+                else if ($("#ComplainerUserName").val() == null || $("#ComplainerUserName").val() == "") {
+                   swal("","Complainer User Name Required !", "warning");
+                    return false;
+                }
+            }
+            if ('@ViewBag.userType' ==  "HELPDESK USER") {
+                if ($("#CategoryID").val() == null || $("#CategoryID").val() == "") {
+                    swal("","Category Required !", "warning");
+                    return false;
+                }
+                if ($("#ModuleID").val() == null || $("#ModuleID").val() == "") {
+                    swal("","Module Required !", "warning");
+                    return false;
+                }
+                if ($("#ItemID").val() == null || $("#ItemID").val() == "") {
+                    swal("","Item Required !","warning");
+                    return false;
+                }
+            }
+            else {
+                if ($("#OtherThanHelpdesk_ModuleID").val() == null || $("#OtherThanHelpdesk_ModuleID").val() == "") {
+                    swal("", 'Module Required !', "warning");
+                    return false;
+                }
+            }
+
+
+         if ($("#PriorityID").val() == null || $("#PriorityID").val() == "") {
+             swal("", 'Priority Required !', "warning");
+
+                return false;
+            }
+
+         if ($("#ProblemDescription").val() == null || $("#ProblemDescription").val() == "") {
+             swal("", 'Problem Description Required !', "warning");
+
+                return false;
+         }
+         //if ((".custom-file-label").html == "") {
+
+         //    swal("", 'Supporting Files Required !', "warning");
+
+         //    return false;
+         //}
+
+        }
+        return true;
+
+    }
+    function clearData() {
+        $("#FetchUserCode").val('');
+    }
+</script>
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        @Html.Partial("_CMSnavigation")
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="javascript:void(0);">
+                                Add
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link " href="~/Helpdesk/RaiseTicket/Nxtview">
+                                View
+                            </a>
+                        </li>
+                    </ul>
+                    @Html.Partial("_CMSutil")
+                </div>
+                <section class="box form-container">
+                    <div class="content-body">
+                        @if (ViewBag.userType == "HELPDESK USER")
+                        {
+                            <div class="">
+                                <div class="row" id="OnBehalfOf">
+                                    <label class="col-md-2 col-form-label ">On Behalf of <span class="text-danger">*</span></label>
+                                    <div class="col-md-3">
+                                        <div class="form-group ">
+                                            @Html.DropDownListFor(model => model.OnBehalfOfName,
+                                                      new SelectList(new List<SelectListItem> {
+                                                                     new SelectListItem { Text = "Select", Value = ""},
+                                                                     new SelectListItem { Text = "Check Post In-Charge", Value = "Check Post In-Charge"},
+                                                                     new SelectListItem { Text = "End User", Value = "End User"},
+                                                                     new SelectListItem { Text = "Lessee", Value = "Lessee"},
+                                                                     new SelectListItem { Text = "Licensee", Value = "Licensee"},
+                                                                     new SelectListItem { Text = "Non User", Value = "Non User"},
+                                                                     new SelectListItem { Text = "Vehicle Owner", Value = "Vehicle Owner"},
+                                                     }, "Value", "Text"),
+                                                     new { @class = "form-control pointer", @id = "ddlOnBehalfOfName" })
+                                        </div>
+                                    </div>
+                                    <label class="col-md-2 col-form-label ">Enter User Code </label>
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            @Html.TextBoxFor(m => m.FetchUserCode, new { @class = "form-control pointer", autocomplete = "off" })
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <div class="form-group row">
+                                            <input type="submit" value="Show" class="btn btn-primary btn-md " onclick="return fetchData();" name="Submit" id="btnFetch" />
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="separator separator-dashed "></div>
+                        }
+                        @using (Html.BeginForm("Add", "RaiseTicket", FormMethod.Post, new { AUTOCOMPLETE = "Off", id = "form1", enctype = "multipart/form-data" }))
+                        {
+                            @Html.HiddenFor(e => e.TicketID)
+                            <input type="hidden" name="OnBehalfOfNamevalue" id="OnBehalfOfName" value="" />
+                            <input type="hidden" name="OnBehalfOfId" id="OnBehalfOfId" value="" />
+                            <div id="div_other_than_non_user" style="display: none;">
+                                <div class="form-group row">
+                                    <label class="col-lg-2 col-md-3 col-sm-12 col-form-label">State <span class="text-danger">*</span></label>
+                                    <div class="col-lg-3 col-md-7 col-sm-12">
+                                        @Html.DropDownListFor(m => m.OtherThenNonUser_StateName2id, ViewBag.Statelist2 as IEnumerable<SelectListItem>, "Select", new { @class = "form-control searchableselect", autofocus = "autofocus" })
+                                        <input type="hidden" name="OtherThenNonUserStateName2" id="OtherThenNonUser_StateName2" value="" />
+                                    </div>
+
+                                    <label for="inputName" class="col-lg-2 col-md-3 col-sm-12 col-form-label">District <span class="text-danger">*</span></label>
+                                    <div class="col-lg-3 col-md-7 col-sm-12">
+                                        <select id="OtherThenNonUser_DistrictName2id" name="OtherThenNonUser_DistrictName2id" Class="form-control searchableselect">
+                                            <option value="">Select</option>
+                                        </select>
+                                        @Html.HiddenFor(x => x.OtherThenNonUser_DistrictName2id)
+                                        <input type="hidden" name="OtherThenNonUserDistrictName2" id="OtherThenNonUser_DistrictName2" value="" />
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label for="dropdownUserType" class="col-lg-2 col-md-3 col-sm-12 col-form-label">Complainer Name <span class="text-danger">*</span></label>
+                                    <div class="col-lg-3 col-md-7 col-sm-12">
+                                        <select id="OtherThenNonUser_ComplainerName2" name="OtherThenNonUser_ComplainerName2" Class="form-control searchableselect">
+                                            <option value="">Select</option>
+                                        </select>
+                                        <input type="hidden" name="OtherThenNonUserComplainerName2" id="OtherThenNonUser_ComplainerName2id" value="" />
+                                    </div>
+
+                                    <label for="dropdownDepart" class="col-lg-2 col-md-3 col-sm-12 col-form-label">Complainer Mobile Number </label>
+                                    <div class="col-lg-3 col-md-7 col-sm-12">
+                                        @(Html.TextBox("OtherThenNonUser_ComplainerMobileNumber2", null, new { @class = "form-control pointer", id = "OtherThenNonUser_ComplainerMobileNumber2", @readonly = "readonly" }))
+                                        @Html.HiddenFor(x => x.OtherThenNonUser_ComplainerMobileNumber2)
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label for="dropdownDesign" class="col-lg-2 col-md-3 col-sm-12 col-form-label">Complainer Email-ID </label>
+                                    <div class="col-lg-3 col-md-7 col-sm-12">
+                                        @(Html.TextBox("OtherThenNonUser_ComplainerEmailID2", null, new { @class = "form-control pointer", id = "OtherThenNonUser_ComplainerEmailID2", @readonly = "readonly" }))
+                                        @Html.HiddenFor(x => x.OtherThenNonUser_ComplainerEmailID2)
+                                    </div>
+                                    <label for="inputPassword" class="col-lg-2 col-md-3 col-sm-12 col-form-label">User Name </label>
+                                    <div class="col-lg-3 col-md-7 col-sm-12">
+                                        @(Html.TextBox("OtherThenNonUser_ComplainerUserName2", null, new { @class = "form-control pointer",@readonly = "readonly"  }))
+                                        @Html.HiddenFor(x => x.OtherThenNonUser_ComplainerUserName2)
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="div_non_user" style="display: none">
+                                <div class="row">
+                                    <div class="col-lg-6 col-md-12 col-sm-12">
+                                        <div class="form-group row">
+                                            <label class="col-lg-4 col-md-3 col-sm-12 col-form-label">State <span class="text-danger">*</span></label>
+                                            <div class="col-lg-7 col-md-7 col-sm-12">
+                                                @(Html.TextBox("NonUser_StateName1", null, new { @class = "form-control pointer" }))
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-6 col-md-12 col-sm-12">
+                                        <div class="form-group row">
+                                            <label for="inputName" class="col-lg-4 col-md-3 col-sm-12 col-form-label">District <span class="text-danger">*</span></label>
+                                            <div class="col-lg-7 col-md-7 col-sm-12">
+                                                @(Html.TextBox("NonUser_DistrictName1", null, new { @class = "form-control pointer" }))
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-6 col-md-12 col-sm-12">
+                                        <div class="form-group row">
+                                            <label for="dropdownUserType" class="col-lg-4 col-md-3 col-sm-12 col-form-label">Complainer Name <span class="text-danger">*</span></label>
+                                            <div class="col-lg-7 col-md-7 col-sm-12">
+                                                @(Html.TextBox("NonUser_ComplainerName1", null, new { @class = "form-control pointer" }))
+                                                @Html.HiddenFor(x => x.NonUser_ComplainerName1)
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-6 col-md-12 col-sm-12">
+                                        <div class="form-group row">
+                                            <label for="dropdownDepart" class="col-lg-4 col-md-3 col-sm-12 col-form-label">Complainer Mobile Number <span class="text-danger">*</span></label>
+                                            <div class="col-lg-7 col-md-7 col-sm-12">
+                                                @(Html.TextBox("NonUser_ComplainerMobileNumber1", null, new { @class = "form-control pointer", @maxlength = "10" }))
+                                                @Html.HiddenFor(x => x.NonUser_ComplainerMobileNumber1)
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-6 col-md-12 col-sm-12">
+                                        <div class="form-group row">
+                                            <label for="dropdownDesign" class="col-lg-4 col-md-3 col-sm-12 col-form-label">Complainer Email-ID<span class="text-danger">*</span></label>
+                                            <div class="col-lg-7 col-md-7 col-sm-12">
+                                                @(Html.TextBox("NonUser_ComplainerEmailID1", null, new { @class = "form-control pointer", @type = "email" }))
+                                                @Html.HiddenFor(x => x.NonUser_ComplainerEmailID1)
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-6 col-md-12 col-sm-12">
+                                        <div class="form-group row">
+                                            <label for="inputPassword" class="col-lg-4 col-md-3 col-sm-12 col-form-label">User Name <span class="text-danger">*</span></label>
+                                            <div class="col-lg-7 col-md-7 col-sm-12">
+                                                @(Html.TextBox("NonUser_ComplainerUserName1", null, new { @class = "form-control pointer" }))
+                                                @Html.HiddenFor(x => x.NonUser_ComplainerUserName1)
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="div_for_Lessee_Licensee_endUser_Transporter_etc" class="mb-5" style="display:none;">
+                                <div class="form-group row ">
+                                    <label class="col-lg-2 col-md-3 col-sm-12 col-form-label">State</label>
+                                    <div class="col-lg-3 col-md-7 col-sm-12">
+                                        @(Html.TextBoxFor(model => model.StateName, new { @class = "form-control pointer", @readonly = "readonly" }))
+                                        @Html.ValidationMessageFor(x => x.StateName, "", new { @class = "text-danger", @maxlength = 50 })
+                                    </div>
+                                    <label for="inputName" class="col-lg-2 col-md-3 col-sm-12 col-form-label">District</label>
+                                    <div class="col-lg-3 col-md-7 col-sm-12">
+                                        @(Html.TextBoxFor(model => model.DistrictName, new { @class = "form-control pointer", @readonly = "readonly" }))
+                                        @Html.HiddenFor(x => x.DistrictName)
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label for="dropdownUserType" class="col-lg-2 col-md-3 col-sm-12 col-form-label">Complainer Name</label>
+                                    <div class="col-lg-3 col-md-7 col-sm-12">
+                                        @(Html.TextAreaFor(model => model.ComplainerName, new { @class = "form-control pointer", @readonly = "readonly" }))
+                                        @Html.HiddenFor(x => x.ComplainerName)
+                                    </div>
+                                    <label for="dropdownDepart" class="col-lg-2 col-md-3 col-sm-12 col-form-label">Complainer Mobile Number</label>
+                                    <div class="col-lg-3 col-md-7 col-sm-12">
+                                        @(Html.TextBoxFor(model => model.ComplainerMobileNumber, new { @class = "form-control pointer", @readonly = "readonly" }))
+                                        @Html.HiddenFor(x => x.ComplainerMobileNumber)
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label for="dropdownDesign" class="col-lg-2 col-md-3 col-sm-12 col-form-label">Complainer Email-ID </label>
+                                    <div class="col-lg-3 col-md-7 col-sm-12">
+                                        @(Html.TextBoxFor(model => model.ComplainerEmailID, new { @class = "form-control pointer", @readonly = "readonly" }))
+                                        @Html.HiddenFor(x => x.ComplainerEmailID)
+                                    </div>
+                                    <label for="inputPassword" class="col-lg-2 col-md-3 col-sm-12 col-form-label">User Name</label>
+                                    <div class="col-lg-3 col-md-7 col-sm-12">
+                                        @(Html.TextBoxFor(model => model.ComplainerUserName, new { @class = "form-control pointer", @readonly = "readonly" }))
+                                        @Html.HiddenFor(x => x.ComplainerUserName)
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-5">
+                                    <div class="user-info-detilas">
+                                        <h4>Complainer Details</h4>
+                                        <div class="row">
+                                            <label class="col-md-5 col-form-label">User Code</label>
+                                            <div class="col-md-7">
+                                                <label class="form-control-plaintext"><span class="colon">:</span><span class="font-weight-bold text-warning">@Model.ComplainerUserName</span></label>
+                                            </div>
+                                            <label class="col-md-5 col-form-label"> Name</label>
+                                            <div class="col-md-7">
+                                                <label class="form-control-plaintext"><span class="colon">:</span>@Model.ComplainerName</label>
+                                            </div>
+                                            <label class="col-md-5 col-form-label">State</label>
+                                            <div class="col-md-7">
+                                                <label class="form-control-plaintext"><span class="colon">:</span>@Model.StateName</label>
+                                            </div>
+                                            <label class="col-md-5 col-form-label">District</label>
+                                            <div class="col-md-7">
+                                                <label class="form-control-plaintext"><span class="colon">:</span>@Model.DistrictName</label>
+                                            </div>
+                                            <label class="col-md-5 col-form-label">Mobile Number</label>
+                                            <div class="col-md-7">
+                                                <label class="form-control-plaintext"><span class="colon">:</span>@Model.ComplainerMobileNumber</label>
+                                            </div>
+                                            <label class="col-md-5 col-form-label">Email-ID</label>
+                                            <div class="col-md-7">
+                                                <label class="form-control-plaintext"><span class="colon">:</span>@Model.ComplainerEmailID</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-7">
+                                    <h6>Raise Ticket</h6>
+                                    @if (ViewBag.userType == "HELPDESK USER")
+                                    {
+                                        <div id="forHelpDesk">
+                                            <div class="row">
+                                                <label class="col-lg-4 col-md-3 col-sm-12 col-form-label">Category <span class="text-danger">*</span></label>
+                                                <div class="col-lg-7 col-md-7 col-sm-12">
+                                                    <div class="form-group">
+                                                        @Html.DropDownListFor(model => model.CategoryID, ViewBag.Categorylist as IEnumerable<SelectListItem>, "Select", new { @class = "form-control searchableselect", autofocus = "autofocus" })
+                                                        @Html.HiddenFor(x => x.CategoryID)
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <label class="col-lg-4 col-md-3 col-sm-12 col-form-label">Module <span class="text-danger">*</span></label>
+                                                <div class="col-lg-7 col-md-7 col-sm-12">
+                                                    <div class="form-group">
+                                                        @Html.DropDownListFor(model => model.ModuleID, ViewBag.ModuleList as IEnumerable<SelectListItem>, "Select", new { @class = "form-control searchableselect ", autofocus = "autofocus", onchange = "helpdesk_userModuleChange();" })
+                                                        @Html.HiddenFor(x => x.ModuleID)
+                                                        @Html.ValidationMessageFor(m => m.ModuleID, "", new { @class = "text-danger" })
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <label class="col-lg-4 col-md-3 col-sm-12 col-form-label">Item <span class="text-danger">*</span></label>
+                                                <div class="col-lg-7 col-md-7 col-sm-12">
+                                                    <div class="form-group">
+                                                        <select id="ItemID" name="ItemID" Class="form-control searchableselect">
+                                                            <option value="">Select</option>
+                                                        </select>
+                                                        @Html.HiddenFor(x => x.ItemID, new { @id = "hdnItemID" })
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <div id="forotherhelpdesk">
+                                            <div class="row">
+                                                <label for="dropdownState" class="col-lg-4 col-md-3 col-sm-12 col-form-label">Module <span class="text-danger">*</span></label>
+                                                <div class="col-lg-7 col-md-7 col-sm-12">
+                                                    <div class="form-group">
+                                                        @Html.DropDownListFor(model => model.OtherThanHelpdesk_ModuleID, ViewBag.ModuleListNonuser as IEnumerable<SelectListItem>, "Select", new
+                                                   {
+                                                       @class = "form-control searchableselect",
+                                                            autofocus = "autofocus",
+
+                                                        })
+
+                                                        @Html.HiddenFor(x => x.OtherThanHelpdesk_ModuleID)
+                                                        @Html.ValidationMessageFor(x => x.OtherThanHelpdesk_ModuleID, "", new { @class = "text-danger", @maxlength = 50 })
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                    <div class="form-group row">
+                                        <label for="dropdownDist" class="col-lg-4 col-md-3 col-sm-12 col-form-label">Priority  <span class="text-danger">*</span></label>
+                                        <div class="col-lg-7 col-md-7 col-sm-12">
+                                            <div class="form-group">
+                                                @Html.DropDownListFor(model => model.PriorityID, ViewBag.PriorityList as IEnumerable<SelectListItem>, "Select", new { @class = "form-control searchableselect", autofocus = "autofocus" })
+                                                @Html.HiddenFor(x => x.PriorityID)
+                                                @Html.ValidationMessageFor(x => x.PriorityID, "", new { @class = "text-danger", @maxlength = 50 })
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <label for="inputMobile" class="col-lg-4 col-md-3 col-sm-12 col-form-label">Problem Description <span class="text-danger">*</span></label>
+                                        <div class="col-lg-7 col-md-7 col-sm-12">
+                                            <div class="form-group">
+                                                @Html.TextAreaFor(m => m.ProblemDescription, new { @class = "form-control", rows = 5, cols = "30", @onkeyup = "CountAddress()" })
+                                                <small class="text-danger">Maximum <strong><label id="lblRemarks" class="col-form-label">500</label></strong> characters</small>
+                                                <br />
+                                                @Html.ValidationMessageFor(x => x.ProblemDescription, "", new { @class = "text-danger" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <label for="inputMail" class="col-lg-3 col-md-3 col-sm-12 col-form-label">Supporting Documents </label>
+                                <div class="col-lg-5 col-md-7 col-sm-12">
+                                    <div class="form-group">
+                                        <div class="custom-file">
+                                            @if (Model == null || Model.TicketID == null || Model.TicketID < 1)
+                                            {
+                                                <input type="file" class="custom-file-input" id="filesupport" name="@Html.NameFor(Model => Model.Photo)" multiple>
+                                                <label class="custom-file-label" for="customFile">Choose Files</label>
+                                                <small class="text-danger">Only <strong class="font-weight-bold"> jpg, jpeg, png, pdf, tif</strong> file types with size less than <strong>2 MB </strong> are allowed.</small>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                                @if (Model.attachments != null)
+                                {
+                                    <div class="col-12">
+                                        <div class="table-responsive">
+                                            <table class="table table-bordered">
+                                                <thead>
+                                                    <tr>
+                                                        <th width="30px">Sl#</th>
+                                                        <th>Supporting Documents</th>
+                                                        <th></th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    @{
+                                                        var count = 0;
+                                                        foreach (var item in Model.attachments)
+                                                        {
+                                                            count++;
+                                                            <tr>
+                                                                <td>@count</td>
+                                                                <td>@item.FileName</td>
+                                                                <td><a href="@Url.Action("DownloadFiles", "RaiseTicket", new { filename = @item.FileName, foldername = "HepldeskFile" })" title="Download"><i class="icon-download-solid text-danger h4"></i></a></td>
+                                                            </tr>
+                                                        }
+                                                    }
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    @if (Model == null || Model.TicketID == null || Model.TicketID < 1)
+                                    {
+                                        <input type="submit" value='@ViewBag.Button' onclick="return onSubmit();" class="btn btn-primary btn-md" name="Submit" id="Submit" />
+                                    }
+                                    else
+                                    {
+                                        <input type="submit" title="Update" onclick="return onSubmit();" id="btnUpdate" value="Update" class="btn btn-dark btn-md" />
+                                        if (Model != null && Model.Ticketstatus != null && (Model.Ticketstatus == "1" || Model.Ticketstatus == "9"))
+                                        {
+                                            <input type="button" id="BtnForward" onclick="return onforward(@Model.TicketID);" value="Forward" class="btn btn-warning btn-md" />
+                                        }
+                                    }
+                                    <a href="~/Helpdesk/RaiseTicket/Add" class="btn btn-danger btn-md ml-0 waves-effect waves-light btncancel">Reset</a>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+    <!-- MAIN CONTENT AREA ENDS -->
+</section>
+<div class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true" id="FetchUserlist">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="Comp_MHDR"></h5>
+                <button type="button" class="close" aria-label="Close" id="CloseMeeting" data-dismiss="modal">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="modal-body">
+                    <div class="form-group row">
+                        <label class="col-sm-3 control-label" for="demo-text-input">User Type </label>
+                        <div class="col-sm-2">
+                            <span class="colon">:</span>
+                        </div>
+                        <div class="col-sm-7">
+                            @Html.Hidden("hidticket", "", new { @class = "hiddenid" })
+                            @Html.DropDownList("UserType", new List<SelectListItem>
+                            {
+                           new SelectListItem{ Text="Select", Value = "0" },
+                           new SelectListItem{ Text="Fms User", Value = "14" },
+                           new SelectListItem{ Text="OSU User", Value = "18" },
+                           }, new { @class = "form-control searchableselect", autofocus = "autofocus" })
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group row" id="divdistrict" style="display:none">
+                    <label class="col-sm-3 control-label" for="demo-text-input">District</label>
+                    <div class="col-sm-2">
+                        <span class="colon">:</span>
+                    </div>
+                    <div class="col-sm-7">
+                        <select asp-for="ForwardDistrictName"
+                                class="form-control searchableselect"
+                                asp-items="@(new SelectList(Enumerable.Empty<SelectListItem>(),"Value", "Text"))">
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group row" id="divfms">
+                    <label class="col-sm-3 control-label" for="demo-text-input">Fms User</label>
+                    <div class="col-sm-2">
+                        <span class="colon">:</span>
+                    </div>
+                    <div class="col-sm-7">
+                        <select asp-for="Fmsuser"
+                                class="form-control searchableselect"
+                                asp-items="@(new SelectList(Enumerable.Empty<SelectListItem>(),"Value", "Text"))">
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group row" id="divosu">
+                    <label class="col-sm-3 control-label" for="demo-text-input">OSU User</label>
+                    <div class="col-sm-2">
+                        <span class="colon">:</span>
+                    </div>
+                    <div class="col-sm-7">
+                        <select asp-for="Osuuser"
+                                class="form-control searchableselect"
+                                asp-items="@(new SelectList(Enumerable.Empty<SelectListItem>(),"Value", "Text"))">
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label class="col-sm-3 control-label" for="demo-text-input">Remarks</label>
+                    <div class="col-sm-2">
+                        <span class="colon">:</span>
+                    </div>
+                    <div class="col-sm-7">
+                        @Html.TextAreaFor(m => m.Remark, new { @class = "form-control", rows = 3, cols = "20" })
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label class="col-12 col-md-4 control-label" for="demo-email-input"></label>
+                    <div class="col-12 col-md-8 col-xl-8">
+                        <button class="btn btn-success mb-1" id="btnForward" onclick="onBtnForwardSubmit();">Forward</button>
+                        <button type="button" class="btn btn-danger mb-1" data-dismiss="modal">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        @*<div class="modal-footer">
+
+            </div>*@
+    </div>
+</div>
+

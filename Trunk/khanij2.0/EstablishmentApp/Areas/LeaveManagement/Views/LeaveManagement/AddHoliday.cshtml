@@ -1,0 +1,166 @@
+﻿@*// *********************************************************************************************************
+    //  View Name                : Add Holiday 
+    //  Desciption               : To Holiday  Details
+    //  Created By               : Suresh kumar behera
+    //  Created On               : 13-july-2021
+    // ********************************************************************************************************
+*@
+@model EstablishmentEf.HolidayMasterEF
+@{
+    ViewData["Title"] = "AddHoliday";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+
+@if (TempData["msg"] != null)
+{
+    <script>
+        var vv = '@TempData["msg"]';
+        if (vv == 1) {
+            swal("", "Holiday Details Saved Successfully", "success");
+        }
+        else if (vv == 2) {
+            swal("", "Holiday Details allready exists.", "warning");
+        }
+        else if (vv == 3) {
+            swal("", "Holiday Details updated sucessfully", "success");
+        }
+        else if (vv == 4) {
+            swal("", "Holiday Details  deleted sucessfully", "success");
+        }
+        else {
+            swal("", "Something Errror occured. Please Try After Sometime!!", "error");
+        }
+    </script>
+
+    TempData["msg"] = null;
+
+}
+<script>
+    $(document).ready(function () {
+        loadNavigation('AddHoliday', 'glempprofile', 'plofficetype', 'tl', 'Leave Management', 'Add Holiday', ' ');
+
+        $("#Submit").click(function () {
+
+            if (!blankFieldValidation("HolidayName", "Holiday Name")) {
+                return false;
+            }
+            if (!DropDownValidation("HolidayType", "Holiday Type")) {
+                return false;
+            }
+            if (!blankFieldValidation("HolidayDate", "Select the holiday date")) {
+                return false;
+            }
+
+        });
+
+        $("#Reset").click(function () {
+            window.location ="@Url.Content("~/LeaveManagement/LeaveManagement/AddHoliday/")"
+        });
+
+
+    });
+</script>
+
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+
+        @*@Html.Partial("_navigation")*@
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="javascript:void(0);">
+                                Add Holiday
+                            </a>
+                        </li>
+                        <li class="nav-item">
+
+                            <a class="nav-link " href="@Url.Content("~/LeaveManagement/LeaveManagement/ViewHoliday")">
+                                View Holiday
+                            </a>
+                        </li>
+                    </ul>
+
+                    @*@Html.Partial("_util")*@
+                </div>
+
+                <section class="box form-container">
+                    <div class="content-body">
+
+                        @using (Html.BeginForm("AddHoliday", "LeaveManagement", FormMethod.Post, new { AUTOCOMPLETE = "Off", id = "form1" }))
+                        {
+                            @Html.AntiForgeryToken();
+                            <div class="row">
+
+                                <div class="col-lg-12 col-md-12 col-sm-12">
+                                    <div class="form-group row">
+                                        <label class="col-lg-2 col-md-4 col-sm-12 col-form-label font-weight-bolder">Holiday Name<span class="text-danger">*</span></label>
+                                        <div class="col-lg-4 col-md-6 col-sm-12">
+                                            @Html.TextBoxFor(m => m.HolidayName, new { @class = "form-control", @maxlength = 200, Onkeypress = "return inputLimiter(event,'NameCharactersAndNumbers')" })
+                                            @Html.HiddenFor(m => m.HolidayId)
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-12 col-md-12 col-sm-12">
+                                    <div class="form-group row">
+                                        <label class="col-lg-2 col-md-4 col-sm-12 col-form-label font-weight-bolder">Holiday Type<span class="text-danger">*</span></label>
+                                        <div class="col-lg-4 col-md-6 col-sm-12">
+                                            <div class="py-2">
+                                                @Html.DropDownListFor(m => m.HolidayTypeId, ViewBag.HolidayType as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control form-control-sm searchableselect" })
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-12 col-md-12 col-sm-12">
+                                    <div class="form-group row">
+                                        <label class="col-lg-2 col-md-4 col-sm-12 col-form-label font-weight-bolder">Holiday Date<span class="text-danger">*</span></label>
+                                        <div class="col-lg-4 col-md-6 col-sm-12">
+                                            <div class="input-group">
+
+                                                @Html.TextBoxFor(m => m.HolidayDate, new { @class = "form-control datepicker", @maxlength = 12 })
+
+                                                <div class="input-group-prepend">
+                                                    <label class="input-group-text" for="HolidayDate"><i class="icon-calendar-alt-solid"></i></label>
+                                                </div>
+                                                <input type="hidden" id="hidHolidayDate" value="@Model.HolidayDate" />
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-6  offset-lg-2 offset-md-4">
+                                    <input type="submit" value='@ViewBag.Button' class="btn btn-primary btn-md ml-0" name="Submit" id="Submit" />
+                                    <input type="reset" id="Reset" name="Reset" class="btn btn-danger btn-md" value="Reset" />
+                                </div>
+                            </div>
+                        }
+
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+    <!-- MAIN CONTENT AREA ENDS -->
+</section>
+
+<script>
+    $(document).ready(function () {
+
+        $('.datepicker').datetimepicker({
+            format: 'LT',
+            format: 'DD-MM-YYYY',
+            //daysOfWeekDisabled: [0, 6],
+        });
+
+
+        if ($("#hidHolidayDate").val() != "") {
+            $("#HolidayDate").val($("#hidHolidayDate").val());
+        }
+
+
+    });
+</script>

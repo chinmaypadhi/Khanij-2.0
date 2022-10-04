@@ -1,0 +1,237 @@
+﻿@*// *********************************************************************************************************
+    //  View Name                : Add
+    //  Desciption               : To Add,Edit,Update Inspection Report Details
+    //  Created By               : Lingaraj Dalai
+    //  Created On               : 01 March 2021
+    // ********************************************************************************************************
+*@
+@model GeologyEF.InspectionReportmaster
+@{
+    ViewData["Title"] = "Add";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+@if (@TempData["msg"] != null)
+{
+<script>
+         var vv = '@TempData["msg"]';
+        if (vv == 1) {
+            swal("","Inspection Report inserted successfully.","success");
+        }
+        else if (vv == 4) {
+            swal("","Inspection Report updated successfully.","success");
+        }
+        else if (vv == 2) {
+            swal("","Inspection Report already exists.","warning");
+        }
+        else {
+            swal("",vv,"error");
+        }
+</script>
+}
+<script>
+    indicateMe = "yes"
+    $(document).ready(function () {
+        debugger;
+        loadNavigation('Add', 'glgeology', 'plsubinsrep', 'tl', 'Geology', 'Inspection Report', ' ');
+        $('.datepicker').datetimepicker({
+            format: 'LT',
+            format: 'DD/MM/YYYY',
+        }).keyup(false);
+        $("#txtReport_MY").datetimepicker({
+            format: 'MMMM YYYY',
+        }).keyup(false);
+        $('.searchableselect').searchableselect();
+        $('input[name="Attachment"]').bind('change', function () {
+            $("input[name='Submit']").attr('disabled', false);
+            filesize = this.files[0].size;
+            var val = $(this).val().toLowerCase(),
+                regex = new RegExp("(.*?)\.(pdf|jpeg|jpg|png|xls|tif)$");
+            if (!(regex.test(val))) {
+                swal("", ".docx  type is not an allowed file type. You can use only jpg, jpeg, png, pdf, tif types of file(s). ", "warning");
+                this.value = '';
+                $("input[name='Submit']").attr('disabled', true);
+                return false;
+            }
+            return false;
+
+        });
+    });
+    /*Validation*/
+    function Validate() {
+        if (!DropDownValidation("FPO_Id", "FPO Code")) {
+            return false;
+        }
+        else if ($("#hdnFPOFile").val() == "") {
+            if (!FileUploadValidation("Photo", "Inspection Report")) {
+                return false;
+            }
+        }
+    }
+    /*Bind FPO details*/
+    function BindFPOData() {
+        debugger;
+        if ($('#FPO_Id').val() != "") {
+            $.ajax({
+                url: '/Geology/MPRCreator/GetFPOdetailsByFPOCode',
+                data: { 'FPOId': $('#FPO_Id').val() },
+                dataType: 'json',
+                type: 'post',
+                success: function (data) {
+                    debugger;
+                    $('#txtFPOdate').val(data.dateOfIssuance);
+                    $('#txtFieldSeason').val(data.explorationSeason);
+                    $('#txtFPOName').val(data.fpO_Name);
+                },
+                error: function (err) {
+                }
+            });
+        }
+        else {
+            $('#txtFPOdate').val('');
+            $('#txtFieldSeason').val('');
+            $('#txtFPOName').val('');
+        }
+    }
+</script>
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        <!-- MAIN CONTENT AREA STARTS -->
+        @Html.Partial("_CMSnavigation")
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link active">
+                                Add
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="~/Geology/InspectionReport/ViewList">
+                                View
+                            </a>
+                        </li>
+                    </ul>
+                    @Html.Partial("_CMSutil")
+                </div>
+                <section class="box form-container">
+                    <div class="content-body">
+                        @using (Html.BeginForm("Add", "InspectionReport", FormMethod.Post, new { AUTOCOMPLETE = "Off", id = "form1", enctype = "multipart/form-data" }))
+                        {
+                            @Html.AntiForgeryToken()
+                            @Html.HiddenFor(m => m.MPR_ID)
+                            <div class="row">
+                                <div class="col-lg-6 col-md-12 col-sm-12">
+                                    <div class="form-group row">
+                                        <label for="dropdownDist" class="col-sm-4 col-form-label">FPO Code <span class="text-danger">*</span></label>
+                                        <div class="col-sm-7">
+                                            @Html.DropDownListFor(m => m.FPO_Id, ViewBag.FPOcode as IEnumerable<SelectListItem>, "Select", new { @class = "form-control form-control-sm searchableselect", autofocus = "autofocus", @onchange = "BindFPOData()" })
+                                            @Html.ValidationMessageFor(m => m.FPO_Id, "", new { @class = "text-danger" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 col-md-12 col-sm-12">
+                                    <div class="form-group row">
+                                        <label class="col-sm-4 col-form-label">FPO Date</label>
+                                        <div class="col-sm-7">
+                                            <div class="input-group">
+                                                <input type="text" class="form-control" value="@Model.dateofissuance" name="DateOfIssuance" id="txtFPOdate" disabled />
+                                                <div class="input-group-prepend">
+                                                    <label class="input-group-text" for="inputDate2"><i class="icon-calendar-alt-solid"></i></label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 col-md-12 col-sm-12">
+                                    <div class="form-group row">
+                                        <label class="col-sm-4 col-form-label">FPO Name</label>
+                                        <div class="col-sm-7">
+                                            @Html.TextBoxFor(m => m.FPO_Name, new { @class = "form-control", @autofocus = "autofocus", disabled = "true", @id = "txtFPOName" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 col-md-12 col-sm-12">
+                                    <div class="form-group row">
+                                        <label class="col-sm-4 col-form-label">Field Season</label>
+                                        <div class="col-sm-7">
+                                            @Html.TextBoxFor(m => m.season, new { @class = "form-control", @autofocus = "autofocus", disabled = "true", @id = "txtFieldSeason" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 col-md-12 col-sm-12">
+                                    <div class="form-group row">
+                                        <label class="col-sm-4 col-form-label">Inspecting Officer's Name</label>
+                                        <div class="col-sm-7">
+                                            <input type="text" class="form-control" name="applicantname" value="@Model.ApplicantName" readonly>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 col-md-12 col-sm-12">
+                                    <div class="form-group row">
+                                        <label class="col-sm-4 col-form-label">Inspecting Officer's Designation</label>
+                                        <div class="col-sm-7">
+                                            <input type="text" class="form-control" name="OfficerDesignation" value="@Model.OfficerDesignation" readonly>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 col-md-12 col-sm-12">
+                                    <div class="form-group row">
+                                        <label class="col-sm-4 col-form-label">Inspecting Officer's Mobile No.</label>
+                                        <div class="col-sm-7">
+                                            <input type="text" class="form-control" name="OfficerMobileNo" value="@Model.OfficerMobileNo" readonly>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 col-md-12 col-sm-12">
+                                    <div class="form-group row">
+                                        <label class="col-sm-4 col-form-label">Inspecting Officer's Email Id</label>
+                                        <div class="col-sm-7">
+                                            <input type="text" class="form-control" name="EmailId" value="@Model.EmailId" readonly>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 col-md-12 col-sm-12">
+                                    <div class="form-group row">
+                                        <label class="col-sm-4 col-form-label">Date of Inspection</label>
+                                        <div class="col-sm-7">
+                                            <div class="input-group">
+                                                <input type="text" class="form-control datepicker" name="SubmissionDate" id="inputDate2" value="@Model.SubmissionDate @ViewBag.SubmissionDate @Model.DateOfInspection">
+                                                <div class="input-group-prepend">
+                                                    <label class="input-group-text" for="inputDate2"><i class="icon-calendar-alt-solid"></i></label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 col-md-12 col-sm-12">
+                                    <div class="form-group row">
+                                        <label class="col-sm-4 col-form-label">Upload Inspection Report <span class="text-danger">*</span></label>
+                                        <div class="col-sm-7">
+                                            <div class="custom-file">
+                                                <input type="file" class="custom-file-input" id="Photo" name="Attachment">
+                                                <label class="custom-file-label" for="customFile">Choose Files</label>
+                                            </div>
+                                            @Html.ValidationMessageFor(m => m.Attachment, "", new { @class = "text-danger" })
+                                            @if (Model.FileName != null && Model.FileName != "")
+                                            {
+                                                <label class="form-control-plaintext">@(Model.FileName) <a href='~/@Model.FilePath' title="" class="ml-2" data-original-title="Download Inspection Report" target="_blank"><i class="icon-file-pdf-solid h5 text-danger"></i></a></label>
+                                            }
+                                            @Html.HiddenFor(m => m.FileName, new { @id = "hdnFPOFile" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6 offset-lg-2 offset-md-4">
+                                    <input type="submit" value='@ViewBag.Button' class="btn btn-primary btn-md ml-0" name="Submit" id="Submit" onclick="return Validate()" />
+                                    <a href="@Url.Content("~/Geology/InspectionReport/Add")" class="btn btn-danger btn-md" title="Rest">Reset</a>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+    <!-- MAIN CONTENT AREA ENDS -->
+</section>
+

@@ -1,0 +1,302 @@
+﻿@model MasterEF.UserInformationEF
+@{
+    ViewData["Title"] = "AssessmentReport";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        @Html.Partial("_navigation")
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="javascript:void(0);">
+                                Assessment Report
+                            </a>
+                        </li>
+                    </ul>
+                    @Html.Partial("_util")
+                </div>
+                @{ string UserType = "Lessee";}
+                <section class="box form-container">
+                    <div class="content-body">
+                        <h5 class="text-brown font-weight-bold mt-0">Assessment Report</h5>
+                        @using (Html.BeginForm("AssessmentReport", "UserInformation", FormMethod.Post, new { enctype = "multipart/form-data", AUTOCOMPLETE = "Off", id = "form1" }))
+                        {
+                            <div class="row">
+                                <div class="col-lg-6 col-md-6 col-sm-12 form-group">
+                                    <label class="col-form-label pt-0 font-weight-bolder">Date Of Revenue Recovery Assessment <span class="text-danger">*</span></label>
+                                    <div class="input-group">
+                                        @Html.HiddenFor(x => x.AssessmentID)
+                                        @Html.TextBoxFor(m => m.Assessmentdate, new { @class = "form-control datepicker", id = "dt_Assessmentdate" })
+                                        <div class="input-group-prepend">
+                                            <label class="input-group-text" for="dt_Assessmentdate"><i class="far fa-calendar"></i></label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 col-md-6 col-sm-12 form-group">
+                                    <label class="col-form-label pt-0 font-weight-bolder">Copy Of Revenue Recovery Assessment<span class="text-danger">*</span></label>
+                                    <div class="custom-file">
+                                        <input type="file" class="custom-file-input" id="flRRAssessment" name="flRRAssessment">
+                                        <label class="custom-file-label" for="customFile">Choose Files</label>
+                                    </div>
+                                    <a href="@Url.Action("Download", "UserInformation", new { name = Model.RecoveryReportFileName, path = Model.RecoveryReportFilePath })" target="_blank" class="file-download-licensee">@((Model.RecoveryReportFileName != null) ? Model.RecoveryReportFileName : "")</a>
+                                </div>
+                                <div class="col-lg-6 col-md-6 col-sm-12 form-group">
+                                    <label class="col-form-label pt-0 font-weight-bolder">Date Of Half Yearly Assessment<span class="text-danger">*</span></label>
+                                    <div class="custom-file">
+                                        <div class="input-group">
+                                            @Html.TextBoxFor(m => m.HalfYearAssesmentDate, new { @class = "form-control datepicker", id = "dt_HalfYearAssesmentDate" })
+                                            <div class="input-group-prepend">
+                                                <label class="input-group-text" for="dt_HalfYearAssesmentDate "><i class="far fa-calendar"></i></label>
+                                            </div>
+                                            
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-6 col-md-6 col-sm-12 form-group">
+                                    <label class="col-form-label font-weight-bolder">Copy Of Half Yearly Assessment <span class="text-danger">*</span></label>
+                                    <div class="custom-file">
+                                        <input type="file" class="custom-file-input" id="flHYAssessment" name="flHYAssessment">
+                                        <label class="custom-file-label" for="customFile">Choose Files</label>
+                                    </div>
+                                    <a href="@Url.Action("Download", "UserInformation", new { fileName = Model.HalfyearassesmentFileName, path = Model.HalfyearassesmentFilePath })" target="_blank" class="file-download-licensee">@((Model.HalfyearassesmentFileName != null) ? Model.HalfyearassesmentFileName : "")</a>
+                                </div>
+
+                                <div class="col-lg-6 col-md-6 col-sm-12 form-group">
+                                    <label for="inputLoginId" class="col-form-label font-weight-bolder">Remarks<span class="text-danger">*</span></label>
+                                    @Html.TextAreaFor(x => x.Remarks, new { @class = "form-control", @style = "Resize:none", @maxlength = "500" })
+                                </div>
+                            </div>
+
+                            @if (Model.STATUS != 5)
+                            {
+                                <div class="row" style="position: absolute; bottom: 20px; right: 30px;">
+                                    <div class="col-md-12 col-sm-12">
+                                        @if (UserType.ToUpper() == "LESSEE")
+                                        {
+                                            <input type="submit" value="Save & Update" class="btn btn-success btn-md ml-0 waves-effect waves-light ">
+                                            <input type="button" title="Forward to DD" value="Forward To DD" name="cmd" class="btn btn-warning text-dark btn-md waves-effect waves-light ml-0" onclick="return OnForwarding('Forward To DD');" />
+                                        }
+                                        <input type="button" value="Approve" class="btn btnsave DMO-Button" id="approve" name="approve" onclick="return OnForwarding('Approve');" style="display: none;">
+                                        <input type="button" value="Reject" class="btn btnsave DMO-Button" id="reject" name="reject" onclick="return OnForwarding('Reject');" style="display: none;">
+
+
+                                    </div>
+                                </div>
+                            }
+                        }
+
+
+
+
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+    <!-- MAIN CONTENT AREA ENDS -->
+</section>
+<uc1:footer runat="server" ID="footer" />
+<link href="../css/bootstrap-datetimepicker.min.css" rel="stylesheet">
+<script src="../js/moment.min.js"></script>
+<script src="../js/bootstrap-datetimepicker.min.js"></script>
+
+<script>
+    indicateMe = "yes"
+    backMe = "yes"
+    $(document).ready(function () {
+        loadNavigation('AssessmentReport', 'glRoleRes', 'pllesseprof', 'tl', 'Roles and Responsibity', 'Lessee Profile', ' ');
+    });
+</script>
+
+<script>
+    $(document).ready(function () {
+        $('.datepicker').datetimepicker({
+            format: 'LT',
+            format: 'DD-MM-YYYY',
+
+        });
+    });
+</script>
+<script type="text/javascript">
+    $("input[name='lesseeProfile']").css('pointer-events', 'none')
+
+    //Profile Percentage
+    var gauge1 = loadLiquidFillGauge("fillgauge1", new Number(@ViewBag.completionCount));
+    var config1 = liquidFillGaugeDefaultSettings();
+
+
+    //Slide js
+    $(document).on('ready', function () {
+        var leftpart = $('#left-part-Lessee').height($('#right-part-Lessee').height()).height();
+        var sliderHeight = $('#slider-height-page').height();
+        $('.panel').height(leftpart - 18);
+
+        //Slide js
+
+        $(".regular").slick({
+            dots: true,
+            infinite: true,
+            /*autoplay: true,
+            autoplaySpeed: 2000,*/
+            slidesToShow: 5,
+            slidesToScroll: 1
+        });
+
+        $("#reject").click(function () {
+            $("#Assessment_Remarks").prop('required', true);
+        });
+        $("#approve").click(function () {
+            $('#Assessment_Remarks').prop('required', false);
+        });
+    });
+
+    //MEssage
+    @if (TempData["Message"] != null)
+    {
+        <Text>
+    alert('@TempData["Message"]')
+    </Text>
+    }
+
+    @if (UserType != "District User")
+    {
+        //For Disabling all DOM if  is  Forwarded to DD/DMO and Approval is Pending
+        if (Model.STATUS == 1)
+        {
+                         <Text>
+
+    $('.pointer').css("pointer-events", "none");
+    $('.btnsave').hide();
+                </Text>
+        }
+        else if (Model.CORPORATE_STATUS == 2)
+        {
+
+        }
+            <Text>   $('#Assessment_Remarks').attr('readonly', 'readonly');   </Text>
+    }
+    else  // While Approving or Rejectiong By DG/DMO
+    {
+        <text> $("#Assessment_Remarks").removeAttr("readonly");
+    $('.slider').css("pointer-events", "none");
+    </text>
+        if (Model.STATUS == 1)
+        {
+
+                    <Text>
+    $('.btnsave').hide();
+    $('.DMO-Button').show();
+    $('.pointer').css("pointer-events", "none");
+                </Text>
+        }
+        else
+        {
+                     <Text>
+    $('.pointer').css("pointer-events", "none");
+    $('.btnsave').hide();
+    $('.DMO-Button').hide();   </Text>
+        }
+    }
+
+    $(function () {
+        return { "__RequestVerificationToken": $('input[name=__RequestVerificationToken]').val() }
+    });
+
+
+</script>
+
+<script>
+
+    //create By Kavita
+    function OnForwarding(btnAction) {
+        //var checkdata = checkFields();
+        //if (checkdata == 1) {
+
+        var Type;
+        if (btnAction == 'Forward To DD') {
+            Type = 'forward';
+        }
+        else if (btnAction == 'Approve') {
+            Type = 'Approve';
+            $("#Assessment_Remarks").prop('required', false);
+        }
+        if (btnAction == 'Reject') {
+            Type = 'Reject';
+            $("#Assessment_Remarks").prop('required', true);
+
+            if ($("#Assessment_Remarks").val() == "") {
+                $("#Assessment_Remarks").focus();
+                alert('Remarks is required!')
+                return;
+            }
+        }
+
+        if (confirm("Before " + Type + " you need to apply your Digital Signature. Are you confirmed to " + Type + " Profile??")) {
+
+            var Postdata = 'action=signdoc' + "\n" + 'datatosign=Digital Signature Required' + "\n" + 'signaction=sign' + "\n" + 'filepath=' + "\n" + 'panNumberParam=' + "\n" + 'expirycheck=false' + "\n" + 'issuername=' + "\n" + 'certclass=1|2|3' + "\n" + 'certtype=ALL';
+            connection.send(Postdata);
+
+            connection.onerror = function (error) {
+                alert('Please check the server connection: ' + error);
+                alert(error);
+            };
+
+            connection.onmessage = function (e) { // when DSC is success then following function executed.
+                if (e.data.indexOf("subProtocol") == -1) {
+                    //debugger;
+                    //alert(e.data);
+                    $("#DSCResponse").val(e.data).change();
+                    $.ajax(
+                    {
+
+                        url: '@Url.Action("CheckVerifyResponse", "ForwardingNote", new { Area = "Transit" })',
+                        type: "POST",
+                        data: { contentType: "pkcs7", signDataBase64Encoded: e.data, responseType: "plain" },
+                        success: function (msg) {
+                            if (msg == "SUCCESS") {
+                                //  debugger;
+
+                                if (btnAction == "Forward To DD") {
+                                    $("#SubResion").val("Forward To DD");
+                                }
+                                else if (btnAction == "Approve") {
+                                    $("#SubApprove").val("Approve");
+                                }
+                                else if (btnAction == "Reject") {
+                                    $("#SubReject").val("Reject");
+                                }
+                                $("#frmAssessment").submit();
+                            }
+                        }
+                    });
+
+
+
+                }
+                else {
+                    alert(e.data);
+                }
+
+
+            };
+        }
+        else {
+            return false;
+        }
+
+        //}
+        //else {
+        //    return false;
+        //}
+    }
+
+
+
+
+</script>

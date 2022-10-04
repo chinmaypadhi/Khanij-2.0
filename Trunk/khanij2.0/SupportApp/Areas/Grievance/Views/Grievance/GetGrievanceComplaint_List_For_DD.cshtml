@@ -1,0 +1,467 @@
+﻿@*// *********************************************************************************************************
+    //  View Name                : GetGrievanceComplaint_List_For_DD
+    //  Desciption               : Show all grievance complaint list for DD Approval
+    //  Created By               : Debaraj Swain
+    //  Created On               : 20 May 2021
+    // ********************************************************************************************************
+*@
+@using SupportApp.Web;
+@model SupportEF.PublicGrievanceModel
+@{
+    ViewData["Title"] = "Grievance Requests";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+@if (!String.IsNullOrEmpty(ViewBag.ResponseMessageDD))
+{
+    <script>
+    if (@ViewBag.ResponseMessageDD== "6")
+    {
+        swal("", "Complaint Closed Successfully", "success");
+    }
+    else if (@ViewBag.ResponseMessageDD== "3")
+    {
+        swal("", "Complaint request not forwarded !", "warning");
+    }
+      else if (@ViewBag.ResponseMessageDD== "4")
+    {
+        swal("", "Please fill all mandatory fields", "warning");
+    }
+    </script>
+}
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        @Html.Partial("_CMSnavigation")
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item mr-md-1">
+                            <a class="nav-link active" href="@Url.Action("GetGrievanceComplaint_List_For_DD", "Grievance")">
+                                Generated Complaints
+                            </a>
+                        </li>
+                    </ul>
+                    @Html.Partial("_CMSutil")
+                </div>
+                <section class="box form-container">
+                    @using (Html.BeginForm("GetGrievanceComplaint_List_For_DD", "Grievance", FormMethod.Post, new { AUTOCOMPLETE = "Off", id = "form1" }))
+                    {
+                        <div class="search-box">
+                            <div class="searchform px-3 pt-3">
+                                <div class="row">
+                                    <div class="col-sm-4">
+                                        <div class="form-group row">
+                                            <label for="inputText" class="col-sm-3 col-form-label">
+                                                From Date
+                                            </label>
+                                            <div class="col-sm-8">
+                                                <div class="input-group-prepend">
+                                                    <input type="text" class="form-control datetime" name="FromDate" value="@ViewBag.fromdate" />
+                                                    <label class="input-group-text" for="FromDate"><i class="icon-calendar-alt-solid"></i></label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <div class="form-group row">
+                                            <label for="inputText" class="col-sm-3 col-form-label">
+                                                To Date
+                                            </label>
+                                            <div class="col-sm-8">
+                                                <div class="input-group-prepend">
+                                                    <input type="text" class="form-control datetime" name="ToDate" value="@ViewBag.todate" />
+                                                    <label class="input-group-text" for="ToDate"><i class="icon-calendar-alt-solid"></i></label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-1">
+                                        <div class="form-group row ">
+                                            <div class="col-sm-9 offset-md-3">
+                                                <input type="submit" value="Show" class="btn btn-primary btn-md ml-0" name="Show1" id="Show1" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                    <div class="content-body pt-0">
+                        <div class="legend-box">
+                            <ul class="d-flex mb-1 justify-content-end list-unstyled">
+                                <li><span class="bg-success"></span> Active</li>
+                                <li><span class="bg-warning"></span> Inactive</li>
+                            </ul>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <table id="table-exports" class="table table-sm table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>Complaint No.</th>
+                                            <th>Subject of Complaint</th>
+                                            <th>Name of Complainer</th>
+                                            <th>Complain related to Person</th>
+                                            <th>Date of Complaint</th>
+                                            <th>District Name</th>
+                                            <th>Status</th>
+                                            <th>Remarks</th>
+                                            <th>MI / AMO Attachment</th>
+                                            <th>Complaint Attachment</th>
+                                            <th>View Details</th>
+                                            <th width="100px" class="noprint">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+
+                                        @foreach (var b in ViewBag.AllReport)
+                                        {
+                                            <tr class="active-row">
+
+                                                @*<td ><p class="m-0">@b.EndUserId</p> </td>*@
+                                                <td><p class="m-0">@b.ComplaintNumber <input type="hidden" id="hfComplaindID" name="ComplainedID" value=@b.GRIEVANCE_COMPLAINT_ID /></p> </td>
+                                                <td><p class="m-0">@b.SUBJECT_OF_COMPLAINT</p> </td>
+                                                <td><p class="m-0">@b.NAME_OF_COMPLAINER</p> </td>
+                                                <td><p class="m-0">@b.TO_WHOM_AGAINST_COMPLAINT</p> </td>
+                                                <td><p class="m-0">@b.Date</p> </td>
+                                                <td><p class="m-0">@b.DISTRICT_NAME</p> </td>
+                                                <td><p class="m-0">@b.Complaint_Status</p> </td>
+                                                <td><p class="m-0">@b.MINING_INSPECTER_REMARKS</p> </td>
+                                                <td>
+                                                    <p class="m-0">
+                                                        @if (!string.Equals(@b.MIResultFile, ""))
+                                                        {
+                                                            <a href="@CustomQueryStringHelper.EncryptString("Grievance","DownloadFiles","Grievance",new {filename=@b.MIResultFile,foldername = "MIUpload" })">
+                                                                @*<a href="@Url.Action("DownloadFiles", "Grievance", new { filename = @b.MIResultFile, foldername = "MIUpload" })">*@
+                                                                <i class="icon-download-solid"></i>
+                                                            </a>
+                                                        }
+                                                        else
+                                                        {
+                                                            <a href="#">
+
+                                                                No files
+                                                            </a>
+                                                        }
+
+                                                    </p>
+                                                </td>
+                                                <td>
+                                                    <p class="m-0">
+                                                        @if (!string.Equals(@b.ATTACHMENT_FILE_NAME, null))
+                                                        {
+                                                            @*<a href="@Url.Action("DownloadFiles", "Grievance", new { filename = @b.ATTACHMENT_FILE_NAME, foldername = "Register" })">*@
+                                                            <a href="@CustomQueryStringHelper.EncryptString("Grievance","DownloadFiles","Grievance",new {filename=@b.ATTACHMENT_FILE_NAME,foldername = "Register" })">
+                                                                <i class="icon-download-solid"></i>
+                                                            </a>
+                                                        }
+                                                    </p>
+                                                </td>
+                                                <td>
+                                                    <p class="m-0">
+                                                        @*<a href="@Url.Content("~/Grievance/Grievance/Register/")@b.GRIEVANCE_COMPLAINT_ID" class="btn btn-primary btn-md ml-0" title="View Details">View Details</a>*@
+                                                        <a href="@CustomQueryStringHelper.EncryptString("Grievance","Register","Grievance",new {id=@b.GRIEVANCE_COMPLAINT_ID })" class="btn btn-primary btn-md ml-0" title="View Details">View Details</a>
+                                                    </p>
+                                                </td>
+                                                <td class="noprint">
+                                                    @if (@b.ACTIVE_STATUS == 2)
+                                                    {
+                                                        <div id="divForward">
+                                                            <a href="javascript:void(0);" class="btn btn-primary btn-md ml-0" data-target="#Pullticket" data-toggle="modal"
+                                                               data-target=".alert-modal" onclick="Edituser1(@b.GRIEVANCE_COMPLAINT_ID,@b.ACTIVE_STATUS)">Forward</a>
+                                                        </div>
+                                                    }
+                                                    else
+                                                    {
+                                                        <div id="divClose">
+                                                            <a href="javascript:void(0);" class="btn btn-primary btn-md ml-0" data-target="#Pullticket_Close" data-toggle="modal"
+                                                               data-target=".alert-modal" onclick="Edituser(@b.GRIEVANCE_COMPLAINT_ID,@b.ACTIVE_STATUS)">Close</a>
+                                                        </div>
+                                                    }
+                                                </td>
+                                            </tr>
+                                        }
+
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+</section>
+<div class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true" id="Pullticket">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="Comp_MHDR"></h5>
+                <button type="button" class="close" aria-label="Close" id="CloseMeeting" data-dismiss="modal">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group row">
+                    <label class="col-12 col-md-4 control-label" for="demo-text-input">User Type <span class="text-danger">*</span></label>
+                    <div class="col-12 col-md-8 col-xl-8">
+                        @Html.Hidden("hidupdate1", "", new { @class = "hiddenid" })
+                        @Html.Hidden("ACTIVE_STATUS1", "", new { @class = "hiddenid" })
+                        @Html.DropDownListFor(model => model.UserType, ViewBag.ViewUTypeList as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control", autofocus = "autofocus" })
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label class="col-12 col-md-4 control-label" for="demo-text-input">MI (Mining Inspector) / AMO (Asistant Mining Officer) <span class="text-danger">*</span></label>
+                    <div class="col-12 col-md-8 col-xl-8">
+
+                        <select name="MINING_INSPECTER_ID" id="MINING_INSPECTER_ID" class="form-control"></select>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label class="col-12 col-md-4 control-label" for="demo-text-input">Category of Complaint</label>
+                    <div class="col-12 col-md-8 col-xl-8">
+
+                        @Html.DropDownListFor(model => model.COC, ViewBag.CComplaint as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control", autofocus = "autofocus" })
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label class="col-12 col-md-4 control-label" for="demo-text-input">Remarks <span class="text-danger">*</span></label>
+                    <div class="col-12 col-md-8 col-xl-8">
+
+                        @Html.TextAreaFor(model => model.DD_DMO_REMARKS, new { @class = "form-control", @maxlength = "500" })
+                    </div>
+                </div>
+
+                <div class="form-group row">
+                    <label class="col-12 col-md-4 control-label" for="demo-email-input"></label>
+                    <div class="col-12 col-md-8 col-xl-8">
+                        <button class="btn btn-success mb-1" id="btnForward" onclick="onBtnForwardSubmit();">Forward</button>
+                        <button type="button" class="btn btn-danger mb-1" data-dismiss="modal">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true" id="Pullticket_Close">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="Comp_MHDR"></h5>
+                <button type="button" class="close" aria-label="Close" id="CloseMeeting" data-dismiss="modal">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            @using (Html.BeginForm("CloseGrievance", "Grievance", FormMethod.Post, new { AUTOCOMPLETE = "Off", id = "form2", enctype = "multipart/form-data" }))
+            {
+                @Html.Hidden("GRIEVANCE_COMPLAINT_ID", "", new { @class = "hiddenid" })
+                @Html.Hidden("hidupdate", "", new { @class = "hiddenid" })
+                @Html.Hidden("ACTIVE_STATUS", "", new { @class = "hiddenid" })
+
+                <div class="modal-body">
+                    <div class="form-group row">
+                        <label class="col-12 col-md-4 control-label" for="demo-text-input">Final Action Taken Report</label>
+                        <div class="col-12 col-md-8 col-xl-8">
+                            <input name="ATTACHMENT" type="file" class="form-control custom-file-input" id="ATTACHMENT">
+                            <label class="custom-file-label">Choose Files</label>
+                            <small class="text-danger">Only <strong> jpg, jpeg, png, pdf, tif</strong> file types with size less than <strong>2 MB </strong> are allowed.</small>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-12 col-md-4 control-label" for="demo-email-input"></label>
+                        <div class="col-12 col-md-8 col-xl-8">
+                            <input type="submit" value="Submit" class="btn btn-primary btn-md ml-0" onclick="return onBtnCloseSubmit()" />
+                            <button type="button" class="btn btn-primary btn-md ml-0" data-dismiss="modal">Cancel</button>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    function Edituser1(id, EStatus) {
+        debugger;
+        $("#hidupdate1").val(id);
+        $("#ACTIVE_STATUS1").val(EStatus);
+    }
+    function Edituser(id, EStatus) {
+        debugger;
+        $("#GRIEVANCE_COMPLAINT_ID").val(id);
+        $("#hidupdate").val(id);
+        $("#ACTIVE_STATUS").val(EStatus);
+    }
+    $(document).ready(function () {
+        $('.datetime').datetimepicker({
+            format: 'LT',
+            format: "DD/MM/YYYY",
+        });
+        $("#UserType").change(function () {
+            var UTypeID = $('#UserType').val();
+            if (UTypeID == "") {
+                UTypeID = 0;
+            }
+            $('#MINING_INSPECTER_ID').empty();
+            var v = "";
+            if (UTypeID != "0") {
+                $.ajax({
+                    type: "POST",
+                    url: "/Grievance/Grievance/GetNameList",
+                    data: { 'UTypeID': UTypeID },
+                    cache: false,
+
+                    datatype: "JSON",
+                    success: function (SList) {
+                        $.each(SList, function (i, item) {
+                            $('#MINING_INSPECTER_ID').append('<option value="' + item.intUserId + '">' + item.namE_OF_COMPLAINER + '</option>');
+
+                        });
+                    }
+                });
+            }
+            else {
+                swal("", 'Select Grade', "warning");
+            }
+        });
+    });
+</script>
+<script>
+    $(document).ready(function () {
+        $('#ATTACHMENT').on("change", function () {
+            debugger;
+            var label = $(this).siblings('.custom-file-label');
+            var files = $(this)[0].files;
+            var Size = files[0].size;
+            if (Size < 2048000) {
+                label.html(files[0].name);
+                Aadhaar_FileSize = files.length;
+            }
+            else {
+                swal("", "Please make sure your Doc is less than 2 MB!", "warning");
+                $('#doc').focus();
+            }
+        });
+    });
+</script>
+<script>
+    indicateMe = "yes"
+    $(document).ready(function () {
+        loadNavigation('AddUser', 'glRoleRes', 'plUser', 'tl', 'EndUser', 'All New Requests', ' ');
+        if (@ViewBag.tablerecordconnt != 0) {
+            $('#btnSubmit').show();
+        }
+        else
+        {
+             $('#btnSubmit').hide();
+        }
+    });
+</script>
+<script type="text/javascript">
+    function onBtnForwardSubmit() {
+
+        var _UserType =$("#UserType option:selected").val();
+
+        var _MINING_INSPECTER_ID = $("#MINING_INSPECTER_ID option:selected").val();
+        var _COC =  $("#COC option:selected").val();
+        var _DD_DMO_REMARKS = $("#DD_DMO_REMARKS").val();
+
+         if (_UserType == null || _UserType == 0 || _UserType == "") {
+          alert("User Type Required !");
+          return false;
+        }
+        //if (!blankFieldValidation("_UserType", "User Type Required !")) {
+        //    return false;
+        //}
+        if (_MINING_INSPECTER_ID == null || _MINING_INSPECTER_ID == 0 || _MINING_INSPECTER_ID == "") {
+            alert("MI (Mining Inspector) / AMO (Asistant Mining Officer) Required !");
+            return false;
+        }
+        //if (!blankFieldValidation("_UserType","MI (Mining Inspector) / AMO (Asistant Mining Officer) Required !")) {
+        //    return false;
+        //}
+        if (_DD_DMO_REMARKS == null || _DD_DMO_REMARKS == 0 || _DD_DMO_REMARKS == "") {
+            alert("Remarks Required !");
+            return false;
+        }
+        //if (!blankFieldValidation("_DD_DMO_REMARKS", "Remarks Required !")) {
+        //    return false;
+        //}
+                $.ajax({
+                    type: "POST",
+
+                    url: "/Grievance/Grievance/SendGrievanceComplaintToMiningInspector",
+
+
+                    data: {
+                        "GRIEVANCE_COMPLAINT_ID": $("#hidupdate1").val(),
+                        "ACTIVE_STATUS": $("#ACTIVE_STATUS1").val(),
+                        "DD_DMO_REMARKS": _DD_DMO_REMARKS,
+                        "MINING_INSPECTER_ID": _MINING_INSPECTER_ID,
+                        "UserType": _UserType,
+                        "COC": _COC
+                    },
+                    dataType: "json",
+                    success: function (result) {
+                        if (result != null) {
+                            if (result == "1") {
+                                alert("Complaint request forwarded successfully");
+                               // swal("", "Complaint request forwarded successfully", "success");
+                                window.location.href = '@Url.Action("GetGrievanceComplaint_List_For_DD", "Grievance")';
+                            }
+                            else if ( result == "4") {
+                               alert("Enter all required fields !");
+                               // swal("", "Enter all required fields !", "warning");
+                                window.location.href = '@Url.Action("GetGrievanceComplaint_List_For_DD", "Grievance")';
+                            }
+
+                            else {
+                                alert("Complaint request not forwarded !");
+                               // swal("", "Complaint request not forwarded !", "warning");
+                                window.location.href = '@Url.Action("GetGrievanceComplaint_List_For_DD", "Grievance")';
+                            }
+                        }
+
+                    }
+                });
+
+    }
+
+      function onBtnCloseSubmit() {
+
+          var _Attachment = $("#ATTACHMENT").val();
+
+          if (_Attachment == null || _Attachment == 0 || _Attachment == "") {
+            alert("User Type Required !");
+            return false;
+        }
+
+          return true;
+
+    }
+</script>
+
+<script>
+    $(document).ready(function () {
+        loadNavigation('ViewPaymentHead', 'glTMng', 'plpaymenthead', 'tl', 'Grievance', 'Generated Complaints', ' ');
+        $('.searchableselect').searchableselect();
+        $('.shorting-lnk').click(function () {
+            $('.shorting-lnk i').toggleClass('fa-sort-amount-up-alt fa-sort-amount-down-alt ');
+        });
+        $('.filter-dropdown').hide();
+        $('.filter-lnk').click(function () {
+            $(this).toggleClass('active');
+            $(this).siblings('.filter-dropdown').slideToggle();
+        });
+        $('.filter-btn').click(function () {
+            $(this).parent('.shorting-cell .filter-dropdown').slideUp();
+            if ($(this).parent().parent('.shorting-cell').find('.filter-lnk').hasClass('active')) {
+                $(this).parent().siblings('.filter-lnk').removeClass('active');
+            }
+
+        });
+    });
+</script>
+
+
+

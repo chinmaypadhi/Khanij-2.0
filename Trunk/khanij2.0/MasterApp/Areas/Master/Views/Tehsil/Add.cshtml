@@ -1,0 +1,268 @@
+﻿@model MasterEF.TehsilModel
+@using MasterEF
+@{
+    ViewData["Title"] = "Add";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+@if (ViewBag.msg != null)
+{
+    <script>
+
+ swal("",'@ViewBag.msg',"success");
+    </script>
+}
+@if (TempData["msg"] != null)
+{
+    <script>
+        swal("",'@TempData["msg"]',"success");
+    </script>
+}
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        @Html.Partial("_CMSnavigation")
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item"><a class="nav-link active" href="/Master/Tehsil/Add">Add</a></li>
+                        <li class="nav-item"><a class="nav-link" href="/Master/Tehsil/ViewList">View</a></li>
+                    </ul>
+                    @Html.Partial("_CMSutil")
+                </div>
+                <section class="box form-container">
+                    <div class="content-body">
+                        <form action="Add" method="post" id="form1" autocomplete="off">
+                            @Html.AntiForgeryToken()
+                            <div class="row">
+                                <div class="col-lg-6 col-12">
+                                    <div class="form-group row">
+                                        <label for="inputLoginId" class="col-sm-4 col-form-label">State Name<span class="text-danger">*</span></label>
+                                        <div class="col-sm-7">
+                                            <select id="ddlState" name="StateID" Class="form-control searchableselect" title="State Name">
+                                                <option value="">Select</option>
+                                                @{
+                                                    List<RegionalModel> lstregionalModels = (List<RegionalModel>)ViewData["State"];
+                                                    if (lstregionalModels != null)
+                                                    {
+                                                        foreach (var item in lstregionalModels)
+                                                        {
+                                                            if (item.StateID == Model.StateID)
+                                                            {
+                                                                <option selected="selected" value="@item.StateID">@item.StateName</option>
+                                                            }
+                                                            else
+                                                            {
+                                                                <option value="@item.StateID">@item.StateName</option>
+                                                            }
+
+                                                        }
+                                                    }
+                                                }
+                                            </select>
+                                            <span class="text-danger">@Html.ValidationMessageFor(m => m.StateID)</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 col-12">
+                                    <div class="form-group row">
+                                        <label for="inputName" class="col-sm-4 col-form-label">Division Name <span class="text-danger">*</span></label>
+                                        <div class="col-sm-7">
+                                            <select id="ddlDivision" name="RegionalID" Class="form-control searchableselect" title="Division Name">
+                                                <option value="">Select</option>
+                                                @{
+                                                    List<RegionalModel> lstDivision = (List<RegionalModel>)ViewData["Division"];
+                                                    if (lstDivision != null)
+                                                    {
+                                                        foreach (var item in lstDivision)
+                                                        {
+                                                            if (item.RegionalID == Model.RegionalID)
+                                                            {
+                                                                <option selected="selected" value="@item.RegionalID">@item.RegionalName</option>
+                                                            }
+                                                            else
+                                                            {
+                                                                <option value="@item.RegionalID">@item.RegionalName</option>
+                                                            }
+
+                                                        }
+                                                    }
+                                                }
+                                            </select>
+                                            <span class="text-danger">@Html.ValidationMessageFor(m => m.RegionalID)</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 col-12">
+                                    <div class="form-group row">
+                                        <label for="dropdownUserType" class="col-sm-4 col-form-label">District Name <span class="text-danger">*</span></label>
+                                        <div class="col-sm-7">
+                                            <select id="ddlDistrict" name="DistrictID" Class="form-control searchableselect" title="District Name">
+                                                <option value="">Select</option>
+                                                @{
+                                                    List<DistrictModel> lstdistrictModels = (List<DistrictModel>)ViewData["District"];
+                                                    if (lstdistrictModels != null)
+                                                    {
+                                                        foreach (var item in lstdistrictModels)
+                                                        {
+                                                            if (item.DistrictID == Model.DistrictID)
+                                                            {
+                                                                <option selected="selected" value="@item.DistrictID">@item.DistrictName</option>
+                                                            }
+                                                            else
+                                                            {
+                                                                <option value="@item.DistrictID">@item.DistrictName</option>
+                                                            }
+
+                                                        }
+                                                    }
+                                                }
+                                            </select>
+                                            <span class="text-danger">@Html.ValidationMessageFor(m => m.DistrictID)</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 col-12">
+                                    <div class="form-group row">
+                                        <label for="dropdownDepart" class="col-sm-4 col-form-label">Tehsil Name <span class="text-danger">*</span></label>
+                                        <div class="col-sm-7">
+                                            <input type="text" maxlength="50" id="txtTehsilName" name="TehsilName" title="Tehsil Name" value="@Model.TehsilName" class="form-control" Onkeypress="return inputLimiter(event,'NameCharacters')" />
+                                            <input type="hidden" id="hdnTehsilId" name="TehsilID" value="@Model.TehsilID" />
+                                            <span class="text-danger">@Html.ValidationMessageFor(m => m.TehsilName)</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 col-12">
+                                    <div class="form-group row">
+                                        <label for="inputName" class="col-sm-4 col-form-label">Status <span class="text-danger">*</span></label>
+                                        <div class="col-sm-7">
+                                            <div class="py-2">
+                                                @Html.RadioButtonFor(n => n.IsActive, true, new { @checked = true, @class = "custom-radio", id = "Rdbtn_Active" })
+                                                <label class="radio-label">Active</label>
+                                                @Html.RadioButtonFor(n => n.IsActive, false, new { @class = "custom-radio", id = "Rdbtn_Inactive" })
+                                                <label class="radio-label">Inactive</label>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6 offset-lg-2 offset-md-4">
+                                    <input type="submit" value='@ViewBag.Button' class="btn btn-primary btn-md ml-0" name="Submit" id="Submit" />
+                                    <a href="/Master/Tehsil/Add" class="btn btn-danger btn-md">Reset</a>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+    <!-- MAIN CONTENT AREA ENDS -->
+</section>
+<input type="hidden" id="hdnStateId" value="@Model.StateID" />
+<input type="hidden" id="hdnDivisionId" value="@Model.RegionalID" />
+<input type="hidden" id="hdnDistrictId" value="@Model.DistrictID" />
+<script>
+    indicateMe = "yes"
+    $(document).ready(function () {
+        $('.searchableselect').searchableselect();
+        debugger;
+        loadNavigation('Add', 'glRoleRes', 'plUser', 'tl', 'Master', 'Tehsil', ' ');
+        //--------------
+        if ($('#hdnStateId').val() != "") {
+            $('#ddlState').val($('#hdnStateId').val());
+        }
+
+        if ($('#hdnDivisionId').val() != "") {
+            $('#ddlDivision').val($('#hdnDivisionId').val());
+        }
+
+        if ($('#hdnDistrictId').val() != "") {
+            $('#ddlDistrict').val($('#hdnDistrictId').val());
+        }
+        //---------------
+        $("#Submit").click(function () {
+            debugger;
+            if ($('#ddlState').val() == "") {
+                swal("", "Please Select State", "warning");
+                $("#ddlState").focus();
+                return false;
+            }
+
+            if ($('#ddlDivision').val() == "") {
+                swal("", "Please Select Division", "warning");
+                $("#ddlDivision").focus();
+                return false;
+            }
+            if ($('#ddlDistrict').val() == "") {
+                swal("", "Please Select District", "warning");
+                $("#ddlDistrict").focus();
+                return false;
+            }
+            if ($('#txtTehsilName').val() == "") {
+                swal("", "Please Enter Tehsil Name", "warning");
+                $("#txtTehsilName").focus();
+                return false;
+            }
+        });
+        //-----------------------------------
+        $('#ddlState').change(function () {
+            debugger;
+            if ($('#ddlState').val() != "") {
+                $.ajax({
+                    url: '/Master/District/GetDivisionByStateID',
+                    data: { 'StateID': $('#ddlState').val() },
+                    dataType: 'json',
+                    type: 'post',
+                    success: function (data) {
+                        debugger;
+                        $('#ddlDivision').html('');
+                        $('#ddlDivision').append("<option value=''>Select Division</option>");
+                        $.each(data, function (ind, item) {
+                            $('#ddlDivision').append("<option value='" + item.regionalID + "'>" + item.regionalName + "</option>");
+                        });
+
+                    },
+                    error: function (err) {
+                    }
+                });
+            }
+            else {
+                $('#ddlDivision').html('');
+                $('#ddlDivision').append("<option value=''>Select Division</option>");
+
+                $('#ddlDistrict').html('');
+                $('#ddlDistrict').append("<option value=''>Select District</option>");
+            }
+
+        });
+        //-----------------------------------
+        $('#ddlDivision').change(function () {
+            debugger;
+            if ($('#ddlDivision').val() != "") {
+                $.ajax({
+                    url: '/Master/Tehsil/GetDistrictByDivisionID',
+                    data: { 'DivisionID': $('#ddlDivision').val() },
+                    dataType: 'json',
+                    type: 'post',
+                    success: function (data) {
+                        debugger;
+                        $('#ddlDistrict').html('');
+                        $('#ddlDistrict').append("<option value=''>Select District</option>");
+                        $.each(data, function (ind, item) {
+                            $('#ddlDistrict').append("<option value='" + item.districtID + "'>" + item.districtName + "</option>");
+                        });
+                    },
+                    error: function (err) {
+                    }
+                });
+            }
+            else {
+                $('#ddlDistrict').html('');
+                $('#ddlDistrict').append("<option value=''>Select District</option>");
+            }
+        });
+        //------------------------------------
+    });
+
+</script>

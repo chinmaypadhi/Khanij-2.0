@@ -1,0 +1,170 @@
+﻿@model IEnumerable<userregistrationEF.CommonRailwaySidingInboxEF_Query>
+@{
+    ViewData["Title"] = "CommonRailwaySidingInboxView";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer localizer
+@using userregistrationApp.Helper;
+
+@if (TempData["msg"] != null)
+{
+    <script>
+        var vv = '@TempData["msg"]';
+        if (vv == 1) {
+            swal("", "Railway siding saved successfully.", "success");
+        }
+        else if (vv == 2) {
+            swal("", "Railway siding   allready exists.", "warning");
+        }
+        else if (vv == 3) {
+            swal("", "Railway siding  updated sucessfully", "success");
+        }
+        else if (vv == 4) {
+            swal("", "Railway siding   deleted sucessfully", "success");
+        }
+        else {
+            swal("", "Something Errror occured. Please Try After Sometime!!", "error");
+        }
+    </script>
+
+    TempData["msg"] = null;
+
+}
+
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        @Html.Partial("_CMSnavigation")
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link" href="@Url.Content("~/CommonRailwaySiding/CommonRailwaySiding/CommonRailwaySidingInbox")">
+                                @localizer["Common Railway Siding Inbox"]
+                            </a>
+
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="javascript:void(0);">
+                                @localizer["View Common Railway Siding Inbox"]
+                            </a>
+
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="@Url.Content("~/CommonRailwaySiding/CommonRailwaySiding/Fileupload")">
+                                @localizer["File Upload"]
+                            </a>
+
+                        </li>
+                        @Html.Partial("_CMSutil")
+                    </ul>
+                </div>
+
+                <div class="util-group d-flex align-items-center float-right">
+                    <a href="javascript:void(0);" id="backIcon" onclick="goBack();" data-toggle="tooltip" data-placement="top" data-original-title="Back" style=""><i class="icon-arrow-left-solid"></i></a>
+                </div>
+                <section class="box form-container">
+                    <div class="content-body pt-0">
+
+                        <div class="row">
+                            <div class="col-sm-12">
+
+                                <table id="table-landscape" class="table table-sm table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th width="30px">  @localizer["Sl#"]</th>
+                                            <th>  @localizer["Area"]</th>
+                                            <th>  @localizer["District Name"]</th>
+                                            <th>  @localizer["Representative Name"]</th>
+                                            <th>  @localizer["Railway Zone"]</th>
+                                            <th>  @localizer["Railway Siding"]</th>
+                                            <th>  @localizer["RSAddress"]</th>
+                                            <th>  @localizer["RS Latitute"]</th>
+                                            <th>  @localizer["RS Longitute"]</th>
+                                            <th>  @localizer["Mineral Grade"]</th>
+                                            <th>  @localizer["Lessee"]</th>
+                                            <th>  @localizer["Mobile Number"]</th>
+                                            <th>  @localizer["Email Id"]</th>
+                                            <th>  @localizer["Created By"]</th>
+                                            <th>  @localizer["Created On"]</th>
+                                            <th>  @localizer["Doc DownLoad"]</th>
+                                            <th>  @localizer["Status"]</th>
+
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @{
+                                            var count = 0;
+                                            foreach (var item in Model)
+                                            {
+                                                count++;
+
+                                                <tr class="active-row">
+                                                    <td>@count</td>
+                                                    <td>@item.Area</td>
+                                                    <td>@item.DistrictName</td>
+                                                    <td>@item.RepresentitiveName</td>
+                                                    <td>@item.RailwayZone</td>
+                                                    <td>@item.RailwaySiding</td>
+                                                    <td>@item.RSAddress</td>
+                                                    <td>@item.RSLatitute</td>
+                                                    <td>@item.RSLongitute</td>
+                                                    <td>@item.MineralGrade</td>
+                                                    <td>@item.LesseeList</td>
+                                                    <td>@item.MobileNo</td>
+                                                    <td>@item.EmailId</td>
+                                                    <td>@item.CreatedBy</td>
+                                                    <td>@item.CreatedOn</td>
+                                                    <td>
+                                                        <label class="form-control-plaintext">
+                                                            @item.RSGradeDoc
+                                                            @if (item.RSGradeDoc != null && item.RSGradeDoc.Trim() != "")
+                                                            {
+                                                                <a href='~/@item.RsGradeDocPath' title="" class="ml-2" data-original-title="Download Document" target="_blank"><i class="icon-file-pdf-solid h5 text-danger"></i></a>
+                                                            }
+                                                        </label>
+
+                                                    </td>
+                                                    <td>@item.Status</td>
+
+                                                </tr>
+                                            }
+                                        }
+                                    </tbody>
+                                </table>
+
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+        </div>
+    </div>
+    <!-- MAIN CONTENT AREA ENDS -->
+</section>
+
+<script>
+
+    $(document).ready(function () {
+       
+        backIcon = "yes";
+        loadNavigation('CommonRailwaySiding Inbox View', 'glholiday', 'plappleav', 'tl', 'CommonRailwaySiding', 'CommonRailwaySiding Inbox View', ' ');
+
+        $('.searchableselect').searchableselect();
+
+        $('.shorting-lnk').click(function () {
+            $('.shorting-lnk i').toggleClass('fa-sort-amount-up-alt fa-sort-amount-down-alt ');
+        });
+
+
+
+    });
+
+
+
+</script>
+
+

@@ -1,0 +1,214 @@
+﻿@model MasterEF.Menumaster;
+@{
+    ViewData["Title"] = "Add";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+
+@if (ViewBag.msg != null)
+{
+    <script>
+         var msg = '@ViewBag.msg'
+        if (msg == "1") {
+            alert("Menu Added Successfully");
+            var url = '@Url.Action("Add", "Menu", new { Area = "master" })';
+            window.location.href = url;
+        }
+        else if (msg == "2") {
+            alert("Menu Already Exist !");
+            var url = '@Url.Action("Add", "Menu", new { Area = "master" })';
+            window.location.href = url;
+        }
+        else {
+             alert("Menu add failure !");
+            var url = '@Url.Action("Add", "Menu", new { Area = "master" })';
+            window.location.href = url;
+        }
+    </script>
+}
+@if (TempData["msg"] != null)
+{
+    <script>
+        alert('@TempData["msg"]');
+    </script>
+}
+
+
+<script>
+    $(document).ready(function () {
+        $("#Update").click(function () {
+            debugger;
+            if ($('#MenuName').val() == "") {
+                swal("", "Please Enter Menu Name", "warning");
+                $('#MenuName').focus();
+                return false;
+            }
+            else if ($('#MenuId').val() == "") {
+                swal("", "Please Select Root Master", "warning");
+                $('#MenuId').focus();
+                return false;
+            }
+            else if ($('#Area').val() == "") {
+                swal("", "Please Enter Area", "warning");
+                $('#Area').focus();
+                return false;
+            }
+            else if ($('#Controller').val() == "") {
+                swal("", "Please Enter Controller", "warning");
+                $('#Controller').focus();
+                return false;
+            }
+            else if ($('#ActionName').val() == "") {
+                swal("", "Please Enter Action Name", "warning");
+                $('#ActionName').focus();
+                return false;
+            }
+            else if ($('#Description').val() == "") {
+                swal("", "Please Enter Description", "warning");
+                $('#Description').focus();
+                return false;
+            }
+        });
+    });
+</script>
+
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        <!-- MAIN CONTENT AREA STARTS -->
+        @Html.Partial("_CMSnavigation")
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="javascript:void(0);">
+                                Add
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="~/Master/Menu/ViewList">
+                                View
+                            </a>
+                        </li>
+                    </ul>
+                    @Html.Partial("_CMSutil")
+                    @*<uc1:util runat="server" ID="util" />*@
+                </div>
+
+                <section class="box form-container">
+                    <div class="content-body">
+                        @using (Html.BeginForm("Add", "Menu", FormMethod.Post, new { AUTOCOMPLETE = "Off", id = "form1" }))
+                        {
+
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <div class="form-group row">
+
+                                        <label for="inputLoginId" class="col-sm-4 col-form-label">Menu Name <span class="text-danger">*</span></label>
+                                        <div class="col-sm-7">
+                                            @Html.TextBoxFor(m => m.MenuName, new { @class = "form-control", @autofocus = "autofocus", @width = "400" })
+                                            @Html.HiddenFor(m => m.MenuId)
+                                        </div>
+
+                                    </div>
+
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <div class="form-group row">
+                                        <label for="inputLoginId" class="col-sm-4 col-form-label">Root Master <span class="text-danger">*</span></label>
+                                        <div class="col-sm-7">
+                                            @Html.DropDownList("MenuId", ViewBag.Parentmenu as IEnumerable<SelectListItem>, "Select Parent Menu", new { @class = "form-control", autofocus = "autofocus", required = "required" })
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <div class="form-group row">
+                                        <label for="inputLoginId" class="col-sm-4 col-form-label">Area <span class="text-danger">*</span></label>
+                                        <div class="col-sm-7">
+                                            @Html.TextBoxFor(m => m.Area, new { @class = "form-control", @autofocus = "autofocus", @width = "400" })
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <div class="form-group row">
+                                        <label for="inputLoginId" class="col-sm-4 col-form-label">Controller <span class="text-danger">*</span></label>
+                                        <div class="col-sm-7">
+                                            @Html.TextBoxFor(m => m.Controller, new { @class = "form-control", @autofocus = "autofocus", @width = "400" })
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <div class="form-group row">
+                                        <label for="inputLoginId" class="col-sm-4 col-form-label">Action <span class="text-danger">*</span></label>
+                                        <div class="col-sm-7">
+                                            @Html.TextBoxFor(m => m.ActionName, new { @class = "form-control", @autofocus = "autofocus", @width = "400" })
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <div class="form-group row">
+                                        <label for="inputLoginId" class="col-sm-4 col-form-label">Operation <span class="text-danger">*</span></label>
+                                        <div class="col-sm-1">
+                                            @Html.CheckBoxFor(m => m.Operation, new { @class = "form-control", @autofocus = "autofocus", @width = "400" })
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <div class="form-group row">
+                                        <label for="inputLoginId" class="col-sm-4 col-form-label">Description <span class="text-danger">*</span></label>
+                                        <div class="col-sm-1">
+                                            @Html.TextBoxFor(m => m.Description, new { @class = "form-control", @autofocus = "autofocus", @width = "400" })
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <div class="form-group row">
+                                        <label for="inputName" class="col-sm-4 col-form-label">Status <span class="text-danger">*</span></label>
+                                        <div class="col-sm-7">
+                                            <div class="py-2">
+                                                @Html.RadioButtonFor(n => n.IsActive, true, new { @checked = true, @class = "custom-radio", id = "Rdbtn_Active" }) Active
+                                                @Html.RadioButtonFor(n => n.IsActive, false, new { @class = "custom-radio", id = "Rdbtn_Inactive" })Inactive
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-6 offset-sm-2">
+                                    <input type="submit" value='@ViewBag.Button' class="btn btn-primary btn-md ml-0" name="Submit" id="Submit" />
+                                    <input type="reset" name="Reset" class="btn btn-danger btn-md" value="Reset" />
+                                    @*<a href="#" class="btn btn-primary btn-md ml-0">Submit</a>
+                    <a href="#" class="btn btn-danger btn-md">Reset</a>*@
+                                </div>
+                            </div>
+                        }
+                    </div>
+            </div>
+
+        </div>
+
+    </div>
+</section>
+
+
+<script>
+    indicateMe = "yes"
+
+    $(document).ready(function () {
+        loadNavigation('AddUser', 'glRoleRes', 'plUser', 'tl', 'Master', 'Menu', ' ');
+    });
+</script>
+

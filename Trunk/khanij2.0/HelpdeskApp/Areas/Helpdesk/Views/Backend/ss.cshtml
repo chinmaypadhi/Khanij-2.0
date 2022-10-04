@@ -1,0 +1,263 @@
+﻿@model HelpDeskEF.BackendModel
+@{
+    ViewData["Title"] = "Backend Ticket";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+@if (ViewBag.Ticketid != null)
+{
+    <script>
+       
+        $("body").on("change", "#UserTypeId", function () {
+            $("input[name=UserType]").val($(this).find("option:selected").text());
+        });
+    </script>
+}
+<script>
+    $(function () {
+       
+        $("#UserTypeId").change(function () {
+            debugger;
+           var typeselected= $("#UserTypeId option:selected").text();
+           
+                if (typeselected == 'District Office' || typeselected == 'FMS USER') {
+                    $('#divDistrit').css("display", "block");
+                }
+                else {
+                    $('#divDistrit').css("display", "none");
+                }
+            $('#ForwardedId').empty();
+           
+            var Tid=@ViewBag.Ticketid
+            $.ajax({
+                type: "POST",
+                url: "/Helpdesk/Backend/FetchUser",
+                data: {
+                    "ForwardTo": typeselected,
+                    "Ticketid": Tid,
+                    
+                    
+                },
+                cache: false,
+                datatype: "JSON",
+                success: function (SList) {
+                    $.each(SList, function (i, item) {
+
+                        $("#ForwardedId").append($("<option></option>").val(item.userid).html(item.applicantName));
+
+                    });
+
+                },
+                failure: function (response) {
+                    alert("sdfjsdjf2222");
+                    console.log(response.responseText);
+                },
+                error: function (jqxhr, status, exception) {
+                    alert('Exception:', exception.alert);
+                }
+            });
+        });
+    });
+   
+
+</script>
+
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        @Html.Partial("_CMSnavigation")
+
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="javascript:void(0);">
+                                Raise Ticket
+                            </a>
+                        </li>
+                    </ul>
+                   @Html.Partial("_CMSutil")
+
+                </div>
+
+                <section class="box form-container">
+                    <div class="content-body">
+                        @using (Html.BeginForm("BackendTicket", "Backend", FormMethod.Post, new { AUTOCOMPLETE = "Off", id = "form1", enctype = "multipart/form-data" }))
+                        {
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="form-group row">
+                                    <label class="col-sm-4 col-form-label font-weight-bolder">Severity</label>
+                                    <div class="col-sm-7">
+
+
+                                        @Html.DropDownListFor(model => model.id, ViewBag.ModuleList as IEnumerable<SelectListItem>, "Please Select Priority", new { @class = "form-control", autofocus = "autofocus", required = "required" })
+
+                                        @Html.HiddenFor(x => x.id)
+
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-sm-6">
+                                <div class="form-group row">
+                                    <label class="col-sm-4 col-form-label font-weight-bolder">Problem Type</label>
+                                    <div class="col-sm-7">
+
+
+
+                                        @Html.DropDownList("ProblemType", new List<SelectListItem>
+{
+    new SelectListItem{ Text="User Side", Value = "User Side" },
+    new SelectListItem{ Text="Application Side", Value = "Application Side" },
+
+ }, new { @class = "form-control", autofocus = "autofocus" })
+
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-sm-6">
+                                <div class="form-group row">
+                                    <label class="col-sm-4 col-form-label font-weight-bolder">Forwarded To</label>
+                                    <div class="col-sm-7">
+
+
+
+                                        @Html.DropDownListFor(model => model.UserTypeId, ViewBag.Forwardlist as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control", autofocus = "autofocus", required = "required" })
+
+
+                                        @Html.HiddenFor(x => x.UserType)
+                                        @Html.HiddenFor(x => x.TicketID)
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6" id="divDistrit">
+                                <div class="form-group row">
+                                    <label class="col-sm-4 col-form-label font-weight-bolder">District</label>
+                                    <div class="col-sm-7">
+
+
+
+                                        <select asp-for="DistrictId"
+                                                class="form-control"
+                                                asp-items="@(new SelectList(Enumerable.Empty<SelectListItem>(),"Value", "Text"))">
+                                        </select>
+
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group row">
+                                    <label class="col-sm-4 col-form-label font-weight-bolder">Select User</label>
+                                    <div class="col-sm-7">
+
+
+
+                                        <select asp-for="ForwardedId"
+                                                class="form-control"
+                                                asp-items="@(new SelectList(Enumerable.Empty<SelectListItem>(),"Value", "Text"))">
+                                        </select>
+
+                                    </div>
+                                </div>
+                            </div>
+                          
+                            <div class="col-sm-6">
+                                <div class="form-group row">
+                                    <label class="col-sm-4 col-form-label font-weight-bolder">Remarks</label>
+                                    <div class="col-sm-7">
+
+
+
+                                        @Html.TextAreaFor(model => model.ProblemDescription, new { @class = "form-control" })
+
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-sm-6">
+
+                                <div class="form-group row">
+                                    <label class="col-sm-4 col-form-label font-weight-bolder">Supporting Documents</label>
+                                    <div class="col-sm-7">
+                                        <div class="custom-file">
+                                            <input type="file" class="custom-file-input" name="@Html.NameFor(Model =>Model.Photo)" multiple>
+                                            <ul class="attachment">
+                                                @if (ViewBag.attach != null)
+                                                {
+                                                    @foreach (var item in ViewBag.attach)
+                                                    {
+                                                        <li>
+                                                            <a class="title" target="_blank" href="/HepldeskFile/@(item.FileName)">@(item.FileName)</a>
+
+                                                        </li>
+
+                                                    }
+
+                                                }
+                                            </ul>
+                                            <label class="custom-file-label" for="customFile">Choose Files</label>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-sm-6 offset-sm-2">
+                                @if (Model == null || Model.TicketID == null || Model.TicketID < 1)
+                                {
+                                    if (@ViewBag.usertype == "DGM")
+                                    {
+                                        <input type="button" onclick="return onBtnApprove();" id="BtnApprove" value="Approve" class="btn btn-primary" />
+                                        <input type="button" onclick="return onBtnReject();" id="BtnReject" value="Reject" class="btn btn-primary" />
+                                        <input type="button" onclick="return onBtnForward();" id="BtnForward" value="Forward To" class="btn btn-primary" />
+                                    }
+                                    else if (@ViewBag.usertype == "OSU")
+                                    {
+                                        <input type="submit" title="Submit" id="btnForward" onclick="return OnForward();" value="Forward" class="btn btn-primary" />
+                                        <input type="reset" title="Clear" value="Clear" class="btn btn-primary" />
+                                    }
+                                    else if (@ViewBag.usertype == "FMS USER")
+                                    {
+                                        <input type="submit" title="Submit" id="btnForward" onclick="return OnForward();" value="Forward" class="btn btn-primary" />
+                                        <input type="reset" title="Clear" value="Clear" class="btn btn-primary" />
+                                    }
+                                    else if (@ViewBag.usertype.Contains("District"))
+                                    {
+                                        <input type="submit" title="Submit" id="btnForward" onclick="return OnDDForward();" value="Forward" class="btn btn-primary" />
+                                        <input type="reset" title="Clear" value="Clear" class="btn btn-primary" />
+                                    }
+                                    else
+                                    {
+                                        <input type="submit" title="Submit" id="btnSave" onclick="return OnForward();" value="Forward To" class="btn btn-primary" />
+                                        <input type="button" onclick="return onBtnApprove();" id="BtnApproved" value="Approve" class="btn btn-primary" />
+                                        <input type="button" onclick="return onBtnReject();" id="Btn_Reject" value="Reject" class="btn btn-primary" />
+                                        <input type="reset" title="Clear" value="Clear" id="btnPayment" class="btn btn-primary" />
+                                    }
+                                }
+                                else
+                                {
+                                    <input type="submit" title="Update" onclick="return onSubmit();" id="btnUpdate" value="Update" class="btn btn-primary" />@*
+                if (Model != null && Model.Status != null && (Model.Status == "1" || Model.Status == "9"))
+                {
+                <input type="button" onclick="return onBtnForward();" id="BtnForward" value="Forward" class="btn btn-primary" />
+                }*@
+                                }
+
+
+                                <!--<input type="submit" value='@ViewBag.Button' class="btn btn-primary btn-md ml-0" name="Submit" id="Submit" />-->
+                                @*<a href="javascript:void(0);" class="btn btn-primary btn-md ml-0" data-toggle="modal"
+            data-target=".alert-modal" value='@ViewBag.Button'>Submit</a>*@
+                                <!--<a href="#" class="btn btn-danger btn-md">Reset</a>-->
+                            </div>
+                        </div>
+                        }
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+    <!-- MAIN CONTENT AREA ENDS -->
+</section>
+

@@ -1,0 +1,820 @@
+﻿@model PermitEF.ePermitModel
+@{
+    ViewData["Title"] = "Add";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        @Html.Partial("_CMSnavigation")
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="javascript:void(0);">
+                                Add
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="~/Permit/PaymentConfig/DynamicPaymentView">
+
+                                View
+                            </a>
+                        </li>
+                    </ul>
+                    @Html.Partial("_CMSutil")
+                </div>
+                <section class="box form-container">
+                    <div class="content-body">
+                       
+                        @using (Html.BeginForm("DynamicPaymentConfiguration", "PaymentConfig", FormMethod.Post, new { enctype = "multipart/form-data", AUTOCOMPLETE = "Off", id = "form1" }))
+                        {
+                    <div class="row">
+                        <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                            <label class="col-form-label font-weight-bolder">Select Category<span class="text-danger">*</span></label>
+                            <div>
+                                @Html.RadioButtonFor(n => n.RiderType, "1", new { onchange = "onRadioChange()", @class = "" }) Mineral Wise
+                                @Html.RadioButtonFor(n => n.RiderType, "2", new { onchange = "onRadioChange()", @class = "ml-2" })Indivisual
+                                @Html.HiddenFor(s => s.PaymentConfigID)
+                            </div>
+                           
+                        </div>
+                        <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                            <label class="col-form-label  font-weight-bolder">District <span class="text-danger">*</span></label>
+                            @Html.DropDownListFor(model => model.DistrictId, ViewBag.ViewDistrictList as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control form-group" })
+                            @(Html.HiddenFor(model => model.DistrictId))
+                            @(Html.HiddenFor(model => model.CheckListDescription))
+
+                        </div>
+                        <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                            <label class="col-form-label  font-weight-bolder">User Type <span class="text-danger">*</span></label>
+                            @Html.DropDownListFor(model => model.UserTypeId, ViewBag.ViewUserTypeList as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control form-group" })
+                            @(Html.HiddenFor(model => model.UserTypeId))
+                        </div>
+                        <div class="col-lg-4 col-md-6 col-sm-12 form-group" id="DivMineralCat" style="display:none;">
+                            <label class="col-form-label  font-weight-bolder">Mineral Type <span class="text-danger">*</span></label>
+                            @Html.DropDownListFor(model => model.MineralTypeId, ViewBag.ViewMineralCategory as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control form-group", autofocus = "autofocus" })
+                            @(Html.HiddenFor(model => model.MineralTypeId))
+
+                        </div>
+                        <div class="col-lg-4 col-md-6 col-sm-12 form-group" id="DivMineralWise" style="display:none;">
+                            <label class="col-form-label  font-weight-bolder">Mineral Name <span class="text-danger">*</span></label>
+                            @Html.DropDownListFor(model => model.MineralId, ViewBag.ViewMineralList as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control form-group", autofocus = "autofocus" })
+                            @(Html.HiddenFor(model => model.MineralId))
+
+                        </div>
+                        <div class="col-lg-4 col-md-6 col-sm-12 form-group" id="DivUserWise">
+                            <label class="col-form-label  font-weight-bolder">User Name <span class="text-danger">*</span></label>
+                            @Html.DropDownListFor(model => model.LesseeId, ViewBag.ViewUserNameList as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control form-group" })
+                            @(Html.HiddenFor(model => model.UserID))
+                        </div>
+                        <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                            <label class="col-form-label  font-weight-bolder">Lease Type<span class="text-danger">*</span></label>
+                            @Html.DropDownListFor(model => model.LeaseTypeId, ViewBag.ViewLeaseTypeList as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control form-group" })
+                            @(Html.HiddenFor(model => model.LeaseTypeId))
+                        </div>
+                        <div class="col-lg-4 col-md-6 col-sm-12 form-group" style="display:none;">
+                            <label class="col-form-label font-weight-bolder">Lease Grant Date<span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                @Html.TextBoxFor(m => m.DateOfGrant, new { @class = "form-control", @readonly = "readonly" })
+                            </div>
+                        </div>
+                        <div class="col-lg-4 col-md-6 col-sm-12 form-group" style="display:none;">
+                            <label class="col-form-label font-weight-bolder">Location<span class="text-danger">*</span></label>
+                            @Html.TextBoxFor(m => m.Location, new { @class = "form-control", @readonly = "readonly" })
+                        </div>
+                        <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                            <label class="col-form-label  font-weight-bolder">Mines Type<span class="text-danger">*</span></label>
+                            @Html.DropDownList("MinesTypeId", new List<SelectListItem>
+{
+new SelectListItem{ Text="Select Mines Type", Value = "0" },
+new SelectListItem{ Text="Auction Mines", Value = "2" },
+new SelectListItem{ Text="Non-Auction Mines", Value = "3" },
+}, new { @class = "form-control searchableselect" })
+
+                        </div>
+
+                        @*<div class="col-lg-4 col-md-6 col-sm-12 form-group" id="hdnfield">
+                        </div>*@
+
+                        <div class="col-lg-4 col-md-4 col-sm-12 form-group">
+                            <label class="col-form-label  font-weight-bolder">Lease Extend<span class="text-danger">*</span></label>
+                            <div>
+                                @Html.RadioButtonFor(n => n.IsLeaseExtend, "1", new { @class = "" }) Yes
+                                @Html.RadioButtonFor(n => n.IsLeaseExtend, "0", new { @class = "ml-2" })No
+                            </div>
+                           
+                        </div>
+                        <div class="col-lg-4 col-md-4 col-sm-12 form-group">
+                            <label class="col-form-label  font-weight-bolder">Captive<span class="text-danger">*</span></label>
+                            <div>
+                                @Html.RadioButtonFor(n => n.IsCaptive, "1", new { @class = "" }) Yes
+                                @Html.RadioButtonFor(n => n.IsCaptive, "0", new { @class = "ml-2" })No
+                            </div>
+                            </div>
+                            <div class="col-lg-4 col-md-4 col-sm-12 form-group">
+                                <label class="col-form-label  font-weight-bolder">ML Granted Before 12/01/2015<span class="text-danger">*</span></label>
+                                <div>
+                                    @Html.RadioButtonFor(n => n.MLGrantedDate, "1", new { @class = "" }) Yes
+                                    @Html.RadioButtonFor(n => n.MLGrantedDate, "0", new { @class = "ml-2" })No
+                                </div>
+                                
+                            </div>
+                            <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                <label class="col-form-label  font-weight-bolder">Payment Head<span class="text-danger">*</span></label>
+                                @Html.DropDownListFor(model => model.PaymentTypeId, ViewBag.ViewPayHeadTypeList as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control form-group", autofocus = "autofocus" })
+                                @(Html.HiddenFor(model => model.PaymentTypeId))
+
+                            </div>
+                            <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                <label class="col-form-label  font-weight-bolder">Applicable<span class="text-danger">*</span></label>
+                                @Html.DropDownList("Applicable", new List<SelectListItem>
+         {
+         new SelectListItem{ Text="Yes", Value = "1" },
+         new SelectListItem{ Text="No", Value = "0" },
+         }, new { @class = "form-control searchableselect" })
+                            </div>
+                            <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                <label class="col-form-label  font-weight-bolder">Schedule<span class="text-danger">*</span></label>
+                                @Html.DropDownListFor(model => model.ScheduleId, ViewBag.ViewScheduleTypeList as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control form-group", autofocus = "autofocus" })
+                                @(Html.HiddenFor(model => model.ScheduleId))
+                            </div>
+                            <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                <label class="col-form-label  font-weight-bolder">Calculation Type<span class="text-danger">*</span></label>
+                                @Html.DropDownList("CalTypeId", new List<SelectListItem>
+    {
+    new SelectListItem{ Text="Select Cal Type", Value = "0" },
+    new SelectListItem{ Text="%", Value = "1" },
+    new SelectListItem{ Text="Rs. / Unit", Value = "2" },
+    }, new { @class = "form-control searchableselect" })
+                            </div>
+                            <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                <label class="col-form-label  font-weight-bolder">Calculation Rate<span class="text-danger">*</span></label>
+                                @Html.TextBoxFor(x => x.PaymentPercent, new { @class = "form-control digit", @type = "decimal", @maxlength = "10" })
+                            </div>
+                            <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                <label class="col-form-label  font-weight-bolder">Make Payment<span class="text-danger">*</span></label>
+                                @Html.DropDownList("MakePayment", new List<SelectListItem>
+        {
+        new SelectListItem{ Text="Yes", Value = "1" },
+        new SelectListItem{ Text="No", Value = "0" },
+        }, new { @class = "form-control searchableselect" })
+                            </div>
+                            @*<div class="col-lg-3 col-md-6 col-sm-12 form-group">
+                                <label class="col-form-label pt-0 font-weight-bolder">Payment Type<span class="text-danger">*</span></label>
+                                @Html.DropDownList("PaymentTo", new List<SelectListItem>
+        {
+        new SelectListItem{ Text="Yes", Value = "1" },
+        new SelectListItem{ Text="No", Value = "0" },
+        }, new { @class = "form-control searchableselect" })
+                            </div>*@
+                            <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                <label class="col-form-label  font-weight-bolder">Collecting Department<span class="text-danger">*</span></label>
+                                @Html.DropDownListFor(model => model.PayDeptId, ViewBag.ViewpayDeptList as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control form-group", autofocus = "autofocus" })
+                                @(Html.HiddenFor(model => model.PayDeptId))
+                            </div>
+                            <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                <label class="col-form-label  font-weight-bolder">Adjustable<span class="text-danger">*</span></label>
+                                @Html.DropDownList("Adjustable", new List<SelectListItem>
+        {
+        new SelectListItem{ Text="Yes", Value = "1" },
+        new SelectListItem{ Text="No", Value = "0" },
+        }, new { @class = "form-control searchableselect" })
+                            </div>
+                            <div class="col-lg-12 col-md-12 col-sm-12 form-group">
+                                <input type="button" value="Add More" name="AddMore" class="btn btn-success btn-md  btnsave" id="AddMore">
+                            </div>
+
+
+                        </div>
+                            <div class="row">
+                                <div class="col-lg-12 col-md-12 col-sm-12">
+                                    <h5 class="text-brown font-weight-bold mt-0">Payment Application</h5>
+                                </div>
+                                <div class="col-sm-12">
+                                    <div class="table-responsive" id="viewtable">
+                                        <table id="datatable1" class="table table-sm table-bordered">
+                                            <thead>
+                                                <tr>
+                                                   
+                                                    @*<th width="30"> Sl#</th>*@
+                                                    <th>Payment Head</th>
+                                                    <th>Applicable</th>
+                                                    <th>Schedule</th>
+                                                    <th>Calculation Type</th>
+                                                    <th>Calculation Rate </th>
+                                                    <th>Make Payment</th>
+
+                                                    <th>Payment Dept</th>
+                                                    <th>Adjustable</th>
+                                                    <th>Action</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="tblbody">
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12 col-sm-12">
+                                    <input type="button" value="@ViewBag.Button" name="Submit" class="btn btn-success btn-md  btnsave" id="Submit">
+                                    @if(ViewBag.Button=="Update"){
+                                    <a href="@Url.Content("~/Permit/PaymentConfig/DynamicPaymentView")"
+                                       class="btn btn-danger  btncancel"
+                                       title="Cancel">Cancel</a>
+                                       }
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+    <input type="hidden" id="editbtn" value="@ViewBag.Button" />
+    <input type="hidden" id="editStatus" value="@ViewBag.PcId" />
+    <!-- MAIN CONTENT AREA ENDS -->
+</section>
+@*<uc1:footer runat="server" ID="footer" />*@
+<script>
+    indicateMe = "yes"
+    backMe="yes"
+    $(document).ready(function () {
+        loadNavigation('Add', 'glhelpdesk', 'plraiseticket', 'tl', 'E-Permit', 'Dynamic Payment', ' ');
+        $('.datetime').datetimepicker({
+            format: "DD/MM/YYYY"
+        }).keydown(false);
+
+
+    });
+</script>
+<script type="text/javascript">
+    $(document).ready(function () {
+        if ($('#editbtn').val() == 'Update') {
+
+            var SelectedRadioVal = $("input[name='RiderType']:checked").val();
+            if (SelectedRadioVal == 1) {
+                $("#DivUserWise").hide();
+                $("#DivMineralWise").show();
+                $("#DivMineralCat").show();
+               /* $("#hdnfield").hide();*/
+            }
+            else {
+                $("#DivUserWise").show();
+                $("#DivMineralWise").hide();
+                $("#DivMineralCat").hide();
+               /* $("#hdnfield").show();*/
+            }
+            debugger;
+            var sId = $('#editStatus').val();
+            if (sId != '') {
+                $.ajax({
+                    type: "POST",
+                    url: "/Permit/PaymentConfig/DetailsPayment",
+                    //  contentType: "application/json; charset=utf-8",
+                    data: { 'id': sId },
+
+                    dataType: "json",
+
+                    success: function (result) {
+
+                        if (result != null) {
+                            resultdata = result;
+
+                            $('#datatable1 tbody').empty();
+                            //$.each(result, function (i) {
+
+                            //    /*$('table[id="datatable1 tbody"]')*/
+                            //    //$("#datatable1 tbody")
+                            //    //    .append("<tr>" +
+                            //    //    "<td>" + result[i].PaymentType + "</td ><td>" + result[i].Applicable + "</td><td>" + result[i].ScheduleName + "</td><td>" + result[i].CalType + "</td><td>" + result[i].PaymentPercent + "</td><td>" + result[i].MakePayment + "</td><td>" + result[i].PaymentDept + "</td>"
+                            //    //    + "<td>" + result[i].Adjustable + "</td>"
+                            //    //        + "</tr>");
+                            //    var row = "<tr>" +
+                            //        "<td>" + result[i].PaymentType + "</td ><td>" + result[i].Applicable + "</td><td>" + result[i].ScheduleName + "</td><td>" + result[i].CalType + "</td><td>" + result[i].PaymentPercent + "</td><td>" + result[i].MakePayment + "</td><td>" + result[i].PaymentDept + "</td>"
+                            //        + "<td>" + result[i].Adjustable + "</td>"
+                            //        + "</tr>";
+                            //    $('table[id="datatable1"]').append(row);
+
+                            //})
+                            var html = '';
+                            for (var x = 0; x < resultdata.length; x++) {
+                                html += '<tr data-PaymentTypeID=' + resultdata[x].PaymentTypeId + ' data-IsApplicable=' + resultdata[x].IsPaymentApplicable + ' data-IsSchedule=' + resultdata[x].IsSchedule + ' data-IsCallType=' + resultdata[x].CalTypeId + ' data-PaymentPercent=' + resultdata[x].PaymentPercent + ' data-IsMakePayment=' + resultdata[x].IsMakePayment + ' data-PayDeptId=' + resultdata[x].PayDeptId + ' data-AdjustableId=' + resultdata[x].IsAdjustable + '>';
+                                html += '<td>' + resultdata[x].PaymentType + '</td>';
+                                html += '<td>' + resultdata[x].Applicable + '</td>';
+                                html += '<td>' + resultdata[x].ScheduleName + '</td>';
+                                html += '<td>' + resultdata[x].CalType + '</td>';
+                                html += '<td>' + resultdata[x].PaymentPercent + '</td>';
+                                html += '<td>' + resultdata[x].MakePayment + '</td>';
+                                html += '<td>' + resultdata[x].PaymentDept + '</td>';
+                                html += '<td>' + resultdata[x].Adjustable + '</td>';
+                                html += "<td><input type='button' value='Edit' class='btn btn-info btn-xs btn-editpayment'><i class='fa fa-pencil' aria-hidden='true'></i><input type='button' value='Delete' class='btn btn-danger btn-xs btn-deletepayment'><i class='fa fa-trash' aria-hidden='true'></td> ";
+
+                            }
+                            $('#tblbody').html(html);
+                        }
+
+                    }
+                });
+
+            }
+        }
+        else {
+            $('#PaymentConfigID').val(null);
+        }
+         if ('@TempData["SuccMessage"]' != '' && '@TempData["SuccMessage"]' != null) {
+
+    swal("",'@TempData["SuccMessage"]',"success");
+    }
+        $('input:radio[name="IsAdditionalAmt"]').change(function () {
+            if ($(this).val() == '0') {
+                $('#ScheType').hide();
+                $('#Schedule').hide();
+            }
+            else {
+                $('#ScheType').show();
+                $('#Schedule').show();
+            }
+        });
+        $('input:radio[name="IsPremium"]').change(function () {
+            if ($(this).val() == '0') {
+                $('#CalType').hide();
+                $('#CalValue').hide();
+            }
+            else {
+                $('#CalType').show();
+                $('#CalValue').show();
+            }
+        });
+        $('input:radio[name="IsSchedule"]').change(function () {
+            if ($(this).val() == '0') {
+                $('#FifthSchedule').show();
+                $('#SixthSchedule').hide();
+
+            }
+            else {
+                $('#FifthSchedule').hide();
+                $('#SixthSchedule').show();
+
+            }
+        });
+
+    });
+</script>
+<script>
+    $(document).ready(function () {
+        $(".digit").keypress(function (e) {
+            if (e.which != 8 && e.which != 0 && e.which != 46 && (e.which < 48 || e.which > 57)) {
+                swal("", 'Digits Only', "success");
+                return false;
+            }
+        });
+        $("#UserTypeId").change(function () {
+
+            var UserTypeId = $('#UserTypeId').val();
+            var DistrictId = $('#DistrictId').val();
+            var Configtype = $("input[name='RiderType']:checked").val();
+            if (UserTypeId == "") {
+                UserTypeId = 0;
+            }
+            //alert(RoleTypeId.toString());
+            $('#LesseeId').empty();
+            var v = "";
+            if (UserTypeId != 0) {
+
+                $.ajax({
+                    type: "POST",
+                    url: "/Permit/PaymentConfig/GetUserName",
+                    data: { 'UserTypeId': UserTypeId, 'DistrictId': DistrictId, 'Configtype': Configtype},
+                    cache: false,
+                    //contentType: "application/json",
+                    datatype: "JSON",
+                    success: function (SList) {
+                        var opt = new Option('--Select--', 0);
+                        $('#LesseeId').append(opt).selectpicker('refresh');
+                        $.each(SList, function (i, item) {
+
+                            // console.log(item);
+                            var opt = new Option(item.ApplicantName + '/UserId-' + item.LesseeId, item.LesseeId);
+                            $('#LesseeId').append(opt).selectpicker('refresh');
+                        });
+
+                    }
+                });
+            }
+            else {
+                $('#LesseeId').val("");
+                alert('Select User type');
+            }
+
+        });
+
+        $("#LesseeId").change(function () {
+
+            var UserID = $('#LesseeId').val();
+            if (UserID == "") {
+                UserID = 0;
+            }
+            //alert(RoleTypeId.toString());
+            //$('#userID').empty();
+            var v = "";
+            if (UserID != 0) {
+
+                $.ajax({
+                    type: "POST",
+                    url: "/Permit/PaymentConfig/GetLesseeDetails",
+                    data: { 'intUserID': UserID },
+                    cache: false,
+                    //contentType: "application/json",
+                    datatype: "JSON",
+                    success: function (SList) {
+
+                        //var opt = new Option('--Select--', 0);
+                        //$('#userID').append(opt).selectpicker('refresh');
+                        $.each(SList, function (i, item) {
+                            //$("input[name=IsCaptive][value=" + item.IsCaptive + "]").prop('checked', true);
+                            //$("input[name=IsLeaseExtend][value=" + item.IsLeaseExtend + "]").prop('checked', true);
+                            if (item.IsCaptive == 0) {
+                                $('#IsCaptive').prop('checked', false);
+                            }
+                            else {
+                                $('#IsCaptive').prop('checked', true);
+                            }
+                            if (item.IsLeaseExtend == 0) {
+                                $('#IsLeaseExtend').prop('checked', false);
+                            }
+                            else {
+                                $('#IsLeaseExtend').prop('checked', true);
+                            }
+                            if (item.DateOfGrant == "") {
+                                $('#DateOfGrant').val("");
+                            }
+                            else {
+                                $('#DateOfGrant').val(item.DateOfGrant);
+                            }
+                        });
+
+                    }
+                });
+            }
+            else {
+                $('#LesseeId').val("");
+                alert('Select User type');
+            }
+
+        });
+
+        $("#MineralTypeId").change(function () {
+            debugger;
+            var MineralTypeId = $('#MineralTypeId').val();
+            //alert(RoleTypeId.toString());
+            $('#MineralId').empty();
+            if (MineralTypeId != null) {
+
+                $.ajax({
+                    type: "POST",
+                    url: "/Permit/PaymentConfig/GetMineral",
+                    data: { 'MineralTypeId': MineralTypeId},
+                    cache: false,
+                    //contentType: "application/json",
+                    datatype: "JSON",
+                    success: function (SList) {
+                        var opt = new Option('--Select--', null);
+                        $('#MineralId').append(opt).selectpicker('refresh');
+                        $.each(SList, function (i, item) {
+
+                            // console.log(item);
+                            var opt = new Option(item.MineralName, item.MineralId);
+                            $('#MineralId').append(opt).selectpicker('refresh');
+                        });
+
+                    }
+                });
+            }
+            else {
+                $('#MineralId').val("");
+                alert('Select Mineral Name');
+            }
+
+        });
+
+        $("#Applicable").change(function () {
+            debugger;
+            if ($("#Applicable").val() == 1) {
+                $("#MakePayment").prop('disabled', false);
+               
+            }
+            else {
+                $("#MakePayment").val(0);
+                $("#MakePayment").prop('disabled', true);
+            }
+        });
+
+        $("#PaymentTypeId").change(function () {
+            debugger;
+            if ($("#PaymentTypeId option:selected").text() == "DMF") {
+                if ($('input[name="MLGrantedDate"]:checked').val() == 0) {
+                    $("#PaymentPercent").val(10);
+                    $("#PaymentPercent").prop('disabled', true);
+                }
+                else {
+                    $("#PaymentPercent").val(30);
+                    $("#PaymentPercent").prop('disabled', true);
+                }
+                
+
+            }
+            else {
+                $("#PaymentPercent").val('');
+                $("#PaymentPercent").prop('disabled', false);
+            }
+        });
+
+    });
+</script>
+<script>
+    function onRadioChange() {
+        var SelectedRadioVal = $("input[name='RiderType']:checked").val();
+        if (SelectedRadioVal == '1') {
+            $("#DivUserWise").hide();
+            $("#DivMineralWise").show();
+            $("#DivMineralCat").show();
+            /*$("#hdnfield").hide();*/
+        }
+        else {
+            $("#DivUserWise").show();
+            $("#DivMineralWise").hide();
+            $("#DivMineralCat").hide();
+           /* $("#hdnfield").show();*/
+        }
+
+    }
+
+    $(document).ready(function () {
+
+        $("#Submit").click(function () {
+            var SelectedRadioVal = $("input[name='RiderType']:checked").val();
+            let status = true;
+            if (SelectedRadioVal == '1') {
+                if ($('#DistrictId').val() == "") {
+                    swal("", "Please Select District", "warning");
+                    $("#DistrictId").focus();
+                    status = false;
+                    return false;
+                }
+                if (!DropDownValidation("UserTypeId", "User Type")) {
+                    status = false;
+                    return false;
+                }
+                if (!DropDownValidation("MineralTypeId", "Mineral Type")) {
+                    status = false;
+                    return false;
+                }
+                if (!DropDownValidation("MineralId", "Mineral Name")) {
+                    status = false;
+                    return false;
+                }
+                if (!DropDownValidation("LeaseTypeId", "Lease Type")) {
+                    status = false;
+                    return false;
+                }
+                if (!DropDownValidation("MinesTypeId", "Mines Type")) {
+                    status = false;
+                    return false;
+                }
+            }
+            else {
+
+                if ($('#DistrictId').val() == "") {
+                    swal("", "Please Select District", "warning");
+                    $("#DistrictId").focus();
+                    status = false;
+                    return false;
+                }
+                if (!DropDownValidation("UserTypeId", "User Type")) {
+                    status = false;
+                    return false;
+                }
+                if (!DropDownValidation("LesseeId", "User Name")) {
+                    status = false;
+                    return false;
+                }
+                if (!DropDownValidation("LeaseTypeId", "Lease Type")) {
+                    status = false;
+                    return false;
+                }
+                if (!DropDownValidation("MinesTypeId", "Mines Type")) {
+                    status = false;
+                    return false;
+                }
+            }
+
+
+
+            if ($('[name="IsAdditionalAmt"]:checked').val() == "1" && $('[name="IsSchedule"]:checked').val() == '0') {
+                //var result = $('[name="IsSchedule"]:checked').val();
+                //alert(result);
+                if (!DropDownValidation("FifthSchId", "Fifth Schedule")) {
+                    status = false;
+                    return false;
+                }
+            }
+            if ($('[name="IsAdditionalAmt"]:checked').val() == "1" && $('[name="IsSchedule"]:checked').val() == '1') {
+                //var result = $('[name="IsSchedule"]:checked').val();
+                //alert(result);
+                if (!DropDownValidation("SixthSchId", "Sixth Schedule")) {
+                    status = false;
+                    return false;
+                }
+            }
+            if ($('input:radio[name="IsPremium"]').val() == "1") {
+                if (!DropDownValidation("Captive", "Captive")) {
+                    status = false;
+                    return false;
+                }
+            }
+            if (!blankFieldValidation("CalculationValue", "Calculation")) {
+                status = false;
+                return false;
+            }
+            $('#CheckListDescription').val('');
+            $("#datatable1 tr").each(function () {
+                //var currentRow = $(this);
+                var PaymentTypeID = $(this).attr('data-PaymentTypeID');
+                var IsApplicable = $(this).attr('data-IsApplicable');
+                var IsSchedule = $(this).attr('data-IsSchedule');
+                var IsCallType = $(this).attr('data-IsCallType');
+                var PaymentPercent = $(this).attr('data-PaymentPercent');
+                var IsMakePayment = $(this).attr('data-IsMakePayment');
+                var PayDeptId = $(this).attr('data-PayDeptId');
+                var AdjustableId = $(this).attr('data-AdjustableId');
+
+                //alert($(this).attr('data-PaymentTypeID'));
+
+                var final = $('#CheckListDescription').val() + '/' + PaymentTypeID + ',' + IsApplicable + ',' + IsSchedule + ',' + IsCallType + ',' + PaymentPercent + ',' + IsMakePayment + ',' + PayDeptId + ',' + AdjustableId
+                $('#CheckListDescription').val(final);
+            });
+            var rowCount = $('#datatable1 >tbody >tr').length;
+            if (rowCount == 0) {
+                swal("", 'Please enter atleast one payment type.', "success");
+                status = false;
+                return false;
+            }
+
+            if (status) {
+                swal({
+                    title: "Are you sure ??",
+                    icon: "warning",
+                    buttons: ["No", "Yes"],
+                })
+                    .then((submit) => {
+                        if (submit) {
+                            $("#form1").submit();
+                        }
+                    });
+            }
+            else { return false };
+
+        });
+        $("#AddMore").click(function () {
+            if (!DropDownValidation("PaymentTypeId", "Payment Type")) {
+                return false;
+
+            }
+            if (!DropDownValidation("ScheduleId", "Schedule")) {
+                return false;
+            }
+            if (!DropDownValidation("CalTypeId", "Cal Type")) {
+                return false;
+            }
+            if (!blankFieldValidation("PaymentPercent", "Payment Percent")) {
+                return false;
+            }
+            if (!DropDownValidation("PayDeptId", "Payment Department")) {
+                return false;
+            }
+            
+            var k = 0;
+            var PaymentType = $('#PaymentTypeId option:selected').text();
+            var PaymentTypeID = $('#PaymentTypeId').val();
+            var Applicable = $('#Applicable option:selected').text();
+            var IsApplicable = $('#Applicable').val();
+            var Schedule = $('#ScheduleId option:selected').text();
+            var IsSchedule = $('#ScheduleId').val();
+            var CalType = $('#CalTypeId option:selected').text();
+            var IsCallType = $('#CalTypeId').val();
+            var PaymentPercent = $('#PaymentPercent').val();
+            var MakePayment = $('#MakePayment option:selected').text();
+            var IsMakePayment = $('#MakePayment').val();
+            //var PaymentTo = $('#PaymentTo option:selected').text();
+            //var IsPaymentTo = $('#PaymentTo').val();
+            var PayDept = $('#PayDeptId option:selected').text();
+            var PayDeptId = $('#PayDeptId').val();
+            var Adjustable = $('#Adjustable option:selected').text();
+            var AdjustableId = $('#Adjustable').val();
+
+            $("#datatable1 tr").each(function () {
+                var currentRow = $(this);
+
+                var PaymentTypeT = currentRow.find("td:eq(0)").text();
+                if (PaymentType == PaymentTypeT) {
+                    k = 1;
+                }
+            });
+            if (k == 0) {
+                //var final = $('#CheckListDescription').val() + '/' + PaymentTypeID + ',' + IsApplicable + ',' + IsSchedule + ',' + IsCallType + ',' + PaymentPercent + ',' + IsMakePayment + ',' + PayDeptId + ',' + AdjustableId
+                //$('#CheckListDescription').val(final);
+
+                $('table[id="datatable1"]')
+                    .append("<tr data-PaymentTypeID='" + PaymentTypeID + "' data-IsApplicable='" + IsApplicable + "' data-IsSchedule='" + IsSchedule + "' data-IsCallType='" + IsCallType + "' data-PaymentPercent='" + PaymentPercent + "' data-IsMakePayment='" + IsMakePayment + "' data-PayDeptId='" + PayDeptId + "' data-AdjustableId='" + AdjustableId + "'>" +
+                        "<td>" + PaymentType + "</td ><td>" + Applicable + "</td><td>" + Schedule + "</td><td>" + CalType + "</td><td>" + PaymentPercent + "</td><td>" + MakePayment + "</td><td>" + PayDept + "</td>"
+                        + "<td>" + Adjustable + "</td>"
+                        + "<td>" +
+                        "<input type='button' value='Edit' class='btn btn-success btn-sm btn-editpayment'><i class='fa fa-pencil' aria-hidden='true'></i>" +
+                        "<input type='button' value='Delete' class='btn btn-danger btn-sm ml-2 btn-deletepayment '><i class='fa fa-trash' aria-hidden='true'>" +
+                        "</td> " +
+                        "</tr>");
+            }
+            else {
+                swal("", 'Duplicate payment type not allowed.', "success");
+            }
+        });
+
+    });
+
+    
+
+</script>
+<script type="text/javascript">
+    //delete row from the table
+    $("#tblbody").on("click", ".btn-deletepayment", function () {
+        $(this).parents("tr").remove();
+    });
+    if ($('#editbtn').val() != 'Update') {
+        $("#tblbody").on("click", ".btn-editpayment", function () {
+            var PaymentTypeID = $(this).parents("tr").attr('data-PaymentTypeID');
+            var IsApplicable = $(this).parents("tr").attr('data-IsApplicable');
+            var IsSchedule = $(this).parents("tr").attr('data-IsSchedule');
+            var IsCallType = $(this).parents("tr").attr('data-IsCallType');
+            var PaymentPercent = $(this).parents("tr").attr('data-PaymentPercent');
+            var IsMakePayment = $(this).parents("tr").attr('data-IsMakePayment');
+            var PayDeptId = $(this).parents("tr").attr('data-PayDeptId');
+            var AdjustableId = $(this).parents("tr").attr('data-AdjustableId');
+            $('#PaymentTypeId').val(PaymentTypeID);
+            $('#Applicable').val(IsApplicable);
+            $('#ScheduleId').val(IsSchedule);
+            $('#CalTypeId').val(IsCallType);
+            $('#PaymentPercent').val(PaymentPercent).change();
+            $('#MakePayment').val(IsMakePayment);
+            $('#PayDeptId').val(PayDeptId);
+            $('#Adjustable').val(AdjustableId);
+            if (IsApplicable == 0) {
+                $("#MakePayment").prop('disabled', true);
+            }
+            $(this).parents("tr").remove();
+        });
+    }
+    else {
+
+        debugger;
+        $("#tblbody").on("click", ".btn-editpayment", function () {
+            debugger;
+            let tr = $(this).closest('tr');
+            //var PaymentHead = $(tr).find('td:nth-child(1)')[0].innerText;
+            //var Applicable = $(tr).find('td:nth-child(2)')[0].innerText;
+            //var Schedule = $(tr).find('td:nth-child(3)')[0].innerText;
+            //var CalculationType = $(tr).find('td:nth-child(4)')[0].innerText;
+           /* var CalculationRate = $(tr).find('td:nth-child(5)')[0].innerText;*/
+            //var MakePayment = $(tr).find('td:nth-child(6)')[0].innerText;
+            //var PaymentDept = $(tr).find('td:nth-child(7)')[0].innerText;
+            //var Adjustable = $(tr).find('td:nth-child(8)')[0].innerText;
+
+            //for dropdown value
+
+            var PaymentTypeID = $(this).parents("tr").attr('data-PaymentTypeID');
+            var IsApplicable = $(this).parents("tr").attr('data-IsApplicable');
+            var IsSchedule = $(this).parents("tr").attr('data-IsSchedule');
+            var IsCallType = $(this).parents("tr").attr('data-IsCallType');
+            var PaymentPercent = $(this).parents("tr").attr('data-PaymentPercent');
+            var IsMakePayment = $(this).parents("tr").attr('data-IsMakePayment');
+            var PayDeptId = $(this).parents("tr").attr('data-PayDeptId');
+            var AdjustableId = $(this).parents("tr").attr('data-AdjustableId');
+
+
+            $('#PaymentTypeId').val(PaymentTypeID);
+            $('#Applicable').val(IsApplicable);
+            $('#PayDeptId').val(PayDeptId);
+            $('#CalTypeId').val(IsCallType);
+            $('#MakePayment').val(IsMakePayment);
+            $('#ScheduleId').val(IsSchedule);
+            $('#Adjustable').val(AdjustableId);
+            $('#PaymentPercent').val(PaymentPercent);
+            $(this).parents("tr").remove();
+            /*$(this).parents("tr").css("background-color", "yellow");*/
+
+        });
+    }
+</script>
+

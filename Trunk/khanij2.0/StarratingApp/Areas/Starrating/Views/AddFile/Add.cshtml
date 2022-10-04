@@ -1,0 +1,124 @@
+﻿@*// *********************************************************************************************************
+    //  View Name                : Add
+    //  Desciption               : Add Other File view
+    //  Created By               : Lingaraj Dalai
+    //  Created On               : 30 April 2021
+    // ********************************************************************************************************
+*@
+@model StarratingEF.UploadDocument
+@using StarratingEF;
+@{
+    ViewData["Title"] = "Add";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+@if (ViewBag.msg != null)
+{
+    <script>
+        swal("", '@ViewBag.msg',"success");
+    </script>
+}
+<script>
+    indicateMe = "yes"
+    $(document).ready(function () {
+        debugger;
+        loadNavigation('Add', 'glStar', 'pl', 'tl', 'Starrating', 'Additional File', '');
+        $('.custom-file-input').on("change", function () {
+            debugger;
+            var label = $(this).siblings('.custom-file-label');
+            var files = $(this)[0].files;
+            if (files.length > 0) {
+                label.html(files.length + ' files selected');
+            }
+            else if (files.length == 0) { label.html(files[0].name); }
+        });
+        $('.searchableselect').searchableselect();
+        $('input[name="file"]').bind('change', function () {
+            $("input[name='Upload File']").attr('disabled', false);
+            filesize = this.files[0].size;
+            var val = $(this).val().toLowerCase(),
+                regex = new RegExp("(.*?)\.(pdf|jpeg|jpg|png|xls|tif)$");
+            if (!(regex.test(val))) {
+                swal("", ".docx  type is not an allowed file type. You can use only jpg, jpeg, png, pdf, tif types of file(s). ", "warning");
+                this.value = '';
+                $("input[name='Upload File']").attr('disabled', true);
+                return false;
+            }
+            return false;
+        });
+        /*Validation*/
+        $("#Submit").click(function () {
+            if (!blankFieldValidation("txtFileName", "Title Name")) {
+                return false;
+            }
+            if (!FileUploadValidation("Photo", "File")) {
+                return false;
+            }
+        });
+    });
+
+</script>
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        <!-- MAIN CONTENT AREA STARTS -->
+        @Html.Partial("_CMSnavigation")
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link active">
+                                Add
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="~/Starrating/AddFile/ViewList/@ViewBag.AssesmentID">
+                                View
+                            </a>
+                        </li>
+                    </ul>
+                    @Html.Partial("_CMSutil")
+                </div>
+                <section class="box form-container">
+                    <div class="content-body">
+                        @using (Html.BeginForm("Add", "AddFile", FormMethod.Post, new { AUTOCOMPLETE = "Off", id = "form1", enctype = "multipart/form-data" }))
+                        {
+                            @Html.AntiForgeryToken()
+                            @Html.HiddenFor(m => m.AssesmentID)
+                            <div class="row">
+                                <div class="col-lg-6 col-md-12 col-sm-12">
+                                    <div class="form-group row">
+                                        <label class="col-sm-4 col-form-label">Title Name <span class="text-danger">*</span></label>
+                                        <div class="col-sm-7">
+                                            @Html.TextBoxFor(m => m.OtherName, new { @class = "form-control", @autofocus = "autofocus", @id = "txtFileName" })
+                                            @Html.ValidationMessageFor(m => m.OtherName, "", new { @class = "text-danger" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 col-md-12 col-sm-12"></div>
+                                <div class="col-lg-6 col-md-12 col-sm-12">
+                                    <div class="form-group row">
+                                        <label class="col-sm-4 col-form-label">Upload file <span class="text-danger">*</span></label>
+                                        <div class="col-sm-7">
+                                            <div class="custom-file">
+                                                <input name="file" type="file" id="Photo" class="form-control custom-file-input" multiple>
+                                                <label class="custom-file-label">Choose Files</label>
+                                                @Html.ValidationMessageFor(m => m.file, "", new { @class = "text-danger" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6 offset-lg-2">
+                                    <input type="submit" value="Upload File" class="btn btn-primary btn-md ml-0" name="Upload File" id="Submit" />
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+    <!-- MAIN CONTENT AREA ENDS -->
+</section>
+
+
+

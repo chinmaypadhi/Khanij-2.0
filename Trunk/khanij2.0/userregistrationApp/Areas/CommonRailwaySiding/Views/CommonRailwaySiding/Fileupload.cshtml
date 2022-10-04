@@ -1,0 +1,158 @@
+﻿
+@{
+    ViewData["Title"] = "Upload Data";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer localizer
+
+
+
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        @Html.Partial("_CMSnavigation")
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+
+                        <li class="nav-item">
+                            <a class="nav-link " href="@Url.Content("~/CommonRailwaySiding/CommonRailwaySiding/CommonRailwaySidingInbox")">
+                                @localizer["Common Railway Siding Inbox"]
+                            </a>
+
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="@Url.Content("~/CommonRailwaySiding/CommonRailwaySiding/CommonRailwaySidingInboxView")">
+                                @localizer["View Common Railway Siding Inbox"]
+                            </a>
+
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="javascript:void(0);">
+                                @localizer["File Upload"]
+                            </a>
+
+                        </li>
+                        @Html.Partial("_CMSutil")
+                    </ul>
+                </div>
+                <div class="util-group d-flex align-items-center float-right">
+                    <a href="javascript:void(0);" id="backIcon" onclick="goBack();" data-toggle="tooltip" data-placement="top" data-original-title="Back" style=""><i class="icon-arrow-left-solid"></i></a>
+                </div>
+                <section class="box form-container">
+                    <div class="content-body pt-0">
+                        <div class="form-group row">
+                            <label for="inputPassword" class="col-lg-4 col-form-label">  @localizer["Upload Document"]</label>
+                            <div class="col-lg-5">
+                                <div class="custom-file">
+                                    <input type="file" id="inputGroupFile" onchange="bindfile(this);" name="postedFile" class="custom-file-input">
+                                    <label class="custom-file-label" id="filedirect" for="inputGroupFile"></label>
+                                </div>
+
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-lg-4 col-form-label text-primary"></label>
+                            <div class="col-lg-5">
+                                <input type="submit" value="Submit" id="message" name="postedFile" onclick="onSubmit();" class="btn btn-success btn-md ml-0">
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+
+</section>
+<script>
+    $(document).ready(function () {
+
+
+    });
+</script>
+
+<script>
+    function onSubmit()
+    {
+
+        if ($("#inputGroupFile").val() == "") {
+             alert("Please choose a file.");
+         }
+        else {
+
+             var formData = new FormData();
+             var $file2 = document.getElementById('inputGroupFile');
+             formData.append("postedFile", $file2.files[0]);
+             $.ajax({
+                 type: "POST",
+                 url: '@Url.Action("Fileupload")',
+                 data: formData,
+                 dataType: "json",
+                 cache: false,
+                 async: false,
+                 contentType: false,
+                 processData: false,
+                 success: function (data) {
+
+                     var result = data;
+
+
+
+                     if (result.satus == "SUCCESS")
+                     {
+
+                         swal({
+                             title: "Messege!",
+                             text: "File Updated successfully.!",
+                             type: "success"
+                         }).then(function () {
+                             location.reload();
+                         });
+
+
+                     }
+                     else
+                     {
+                         swal("", "File not Updated successfully.", "warning");
+                     }
+
+                 },
+                 failure: function (response) {
+                   /*  alert(response.responseText);*/
+                 },
+                 error: function (response) {
+                     /*alert(response.responseText);*/
+                 }
+             });
+         }
+
+    }
+
+
+
+
+
+    function bindfile(input) {
+
+
+        var fileName = input.files[0].name;
+        $('#filedirect').html(fileName);
+
+    }
+
+
+    $(document).ready(function ()
+    {
+
+       
+        backIcon = "yes";
+
+
+
+    });
+
+
+
+</script>

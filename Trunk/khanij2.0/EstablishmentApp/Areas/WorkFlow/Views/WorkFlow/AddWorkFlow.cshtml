@@ -1,0 +1,910 @@
+﻿@*// *********************************************************************************************************
+    //  View Name                : Add workflow activity
+    //  Desciption               : To Add work flow activity
+    //  Created By               : Suresh kumar behera
+    //  Created On               : 15-feb-2021
+    // ********************************************************************************************************
+*@
+@model EstablishmentEf.WorkFlowEF
+@{
+    ViewData["Title"] = "AddWorkFlow";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+@inject EstablishmentApp.KhanijSecurity.KhanijIDataProtection protector;
+
+@if (TempData["msg"] != null)
+{
+<script>
+        var vv = '@TempData["msg"]';
+        if (vv == 1) {
+            swal("", "WorkFlow saved successfully.", "success");
+        }
+        else if (vv == 2) {
+            swal("", "WorkFlow allready exists.", "warning");
+        }
+        else if (vv == 3) {
+            swal("", "WorkFlow updated sucessfully", "success");
+        }
+        else if (vv == 4) {
+            swal("", "WorkFlow  deleted sucessfully", "success");
+        }
+        else {
+            swal("", "Something Errror occured. Please Try After Sometime!!", "error");
+        }
+</script>
+
+    TempData["msg"] = null;
+
+}
+<script>
+    $(document).ready(function () {
+        indicateMe = "yes"
+        loadNavigation('AddWorkFlow', 'glholiday', 'plappleav', 'tl', 'Work Flow', 'Add WorkFlow', ' ');
+
+
+        //$("#divEscalation *").hide();
+        //$("#divNotificationType *").hide();
+
+
+        //---bind submodule----
+        $("#intModuleId").change(function () {
+            debugger;
+            $.ajax({
+                type: "POST",
+                url: '@Url.Content("~/WorkFlow/WorkFlowActivity/BindSubMudule")',
+
+                data: {
+                    "ModuleId": $('#intModuleId').val()
+                },
+                dataType: "json",
+                success: function (data) {
+
+                    $("#intSubModuleId").empty();
+
+                    var ops = '<option value="">--Select--</option>';
+                    for (var i = 0; i < data.length; i++) {
+                        ops += '<option value="' + data[i].value + '">' + data[i].text + '</option>';
+                    }
+
+                    $("#intSubModuleId").html(ops);
+
+                },
+                error: function () {
+                    alert('Error');
+
+                }
+            });
+
+        });
+
+        //---bind activity
+        $("#intSubModuleId").change(function () {
+            $.ajax({
+                type: "POST",
+                url: '@Url.Content("~/WorkFlow/WorkFlow/BindActivity")',
+
+                data: {
+                    "SubModuleId": $('#intSubModuleId').val()
+                },
+                dataType: "json",
+                success: function (data) {
+
+                    $("#intActivityId").empty();
+
+                    var ops = '<option value="">--Select--</option>';
+                    for (var i = 0; i < data.length; i++) {
+                        ops += '<option value="' + data[i].value + '">' + data[i].text + '</option>';
+                    }
+
+                    $("#intActivityId").html(ops);
+
+                },
+                error: function () {
+                    alert('Error');
+
+                }
+            });
+
+        });
+
+
+        //---bind step
+        $("#intActivityId").change(function () {
+            $.ajax({
+                type: "POST",
+                url: '@Url.Content("~/WorkFlow/WorkFlow/BindStep")',
+
+                data: {
+                    "ActivityId": $('#intActivityId').val()
+                },
+                dataType: "json",
+                success: function (data) {
+
+                    $("#intStep").empty();
+
+                    var ops = '<option value="">--Select--</option>';
+                    for (var i = 0; i < data.length; i++) {
+                        ops += '<option value="' + data[i].value + '">' + data[i].text + '</option>';
+                    }
+
+                    $("#intStep").html(ops);
+
+                },
+                error: function () {
+                    alert('Error');
+
+                }
+            });
+
+        });
+
+        //---if primary and secondary user is same----
+        $('#IsSameUser').on('change', function () {
+            var val = this.checked ? this.value : 'false';
+            if (val == 'true') {
+
+                var PrimarryOfficeLevel = $('#intPrimaryOfficeLevelId  option:selected').val();
+                var PrimarryDesignation = $('#intPrimaryDesignationId  option:selected').val();
+                var PrimaryAuthority = $('#intPrimaryAuthorityUserId  option:selected').val();
+
+                //----bind secondary office level
+                $.ajax({
+                    type: "POST",
+                    url: '@Url.Content("~/LeaveManagement/LeaveManagement/BindOfficeLevelById")',
+
+                    data: {
+                        "id": PrimarryOfficeLevel
+
+                    },
+                    dataType: "json",
+                    success: function (data) {
+
+                        $("#intSecondaryOfficeLevelid").empty();
+
+                        var ops = '';
+                        for (var i = 0; i < data.length; i++) {
+                            ops += '<option value="' + data[i].value + '">' + data[i].text + '</option>';
+                        }
+
+                        $("#intSecondaryOfficeLevelid").html(ops);
+
+                    },
+                    error: function () {
+                        alert('Error');
+
+                    }
+                });
+
+                //----bind secondary designation
+                $.ajax({
+                    type: "POST",
+                    url: '@Url.Content("~/LeaveManagement/LeaveManagement/BindDesignationById")',
+
+                    data: {
+                        "id": PrimarryDesignation
+
+                    },
+                    dataType: "json",
+                    success: function (data) {
+
+                        $("#intSecondaryDesignationId").empty();
+
+                        var ops = '';
+                        for (var i = 0; i < data.length; i++) {
+                            ops += '<option value="' + data[i].value + '">' + data[i].text + '</option>';
+                        }
+
+                        $("#intSecondaryDesignationId").html(ops);
+
+                    },
+                    error: function () {
+                        alert('Error');
+
+                    }
+                });
+
+                //----bind secondary authority
+                $.ajax({
+                    type: "POST",
+                    url: '@Url.Content("~/LeaveManagement/LeaveManagement/BindEmployeeIdWise")',
+
+                    data: {
+                        "OfficeLevelId": PrimarryOfficeLevel,
+                        "UserTypeId": PrimarryDesignation,
+                        "EmployeeId": PrimaryAuthority
+                    },
+                    dataType: "json",
+                    success: function (data) {
+
+                        $("#intSecondaryAuthorityUserId").empty();
+
+                        var ops = '';
+                        for (var i = 0; i < data.length; i++) {
+                            ops += '<option value="' + data[i].value + '">' + data[i].text + '</option>';
+                        }
+
+                        $("#intSecondaryAuthorityUserId").html(ops);
+
+                    },
+                    error: function () {
+                        alert('Error');
+
+                    }
+                });
+
+
+            }
+            else {
+
+                //----bind secondary office level
+                $.ajax({
+                    type: "POST",
+                    url: '@Url.Content("~/LeaveManagement/LeaveManagement/BindOfficeLevelById")',
+
+                    data: {
+                        "id": 0
+
+                    },
+                    dataType: "json",
+                    success: function (data) {
+
+                        $("#intSecondaryOfficeLevelid").empty();
+
+                        var ops = '<option value="">--Select--</option>';
+                        for (var i = 0; i < data.length; i++) {
+                            ops += '<option value="' + data[i].value + '">' + data[i].text + '</option>';
+                        }
+
+                        $("#intSecondaryOfficeLevelid").html(ops);
+
+                    },
+                    error: function () {
+                        alert('Error');
+
+                    }
+                });
+
+                //----bind secondary designation
+                $.ajax({
+                    type: "POST",
+                    url: '@Url.Content("~/LeaveManagement/LeaveManagement/BindDesignationById")',
+
+                    data: {
+                        "id": 0
+
+                    },
+                    dataType: "json",
+                    success: function (data) {
+
+                        $("#intSecondaryDesignationId").empty();
+
+                        var ops = '<option value="">--Select--</option>';
+                        for (var i = 0; i < data.length; i++) {
+                            ops += '<option value="' + data[i].value + '">' + data[i].text + '</option>';
+                        }
+
+                        $("#intSecondaryDesignationId").html(ops);
+
+                    },
+                    error: function () {
+                        alert('Error');
+
+                    }
+                });
+
+                //----bind secondary authority
+
+                $("#intSecondaryAuthorityUserId").empty();
+                var ops = '<option value="">--Select--</option>';
+                $("#intSecondaryAuthorityUserId").html(ops);
+
+            }
+
+        });
+
+        //----multiple user--
+
+        if ($("#bitAuthorityMultiple").val() == 'True') {
+            $("#divMultiple *").show();
+        }
+        else {
+            $("#divMultiple *").hide();
+        }
+
+        $('input[type=radio][name=bitAuthorityMultiple]').change(function () {
+            if (this.value == 'True') {
+                $("#divMultiple *").show();
+                $("#divSecondaryAuthority *").hide();
+            }
+            else if (this.value == 'False') {
+                $("#divMultiple *").hide();
+                $("#intNoofMultipleAuthority").val('');
+                $("#divSecondaryAuthority *").show();
+            }
+        });
+        //----end multiple user----
+
+
+
+        //----notification--
+
+        if ($("#bitNotification").val() == 'True') {
+            $("#divNotificationType *").show();
+        }
+        else {
+            $("#divNotificationType *").hide();
+        }
+
+        $('input[type=radio][name=bitNotification]').change(function () {
+            if (this.value == 'True') {
+                $("#divNotificationType *").show();
+
+            }
+            else if (this.value == 'False') {
+                $("#divNotificationType *").hide();
+                $("select#intNotificationType").prop('selectedIndex', 0);
+            }
+        });
+
+        //----escalation---
+
+        if ($("#bitEscalation").val() == 'True') {
+            $("#divEscalation *").show();
+        }
+        else {
+            $("#divEscalation *").hide();
+        }
+
+
+        $('input[type=radio][name=bitEscalation]').change(function () {
+            if (this.value == 'True') {
+                $("#divEscalation *").show();
+
+            }
+            else if (this.value == 'False') {
+                $("#divEscalation *").hide();
+                $("#intEscalationinDays").val('');
+            }
+        });
+
+        $("#intPrimaryOfficeLevelId").change(function () {
+            //if ($("#hidChild").val() != "1") {
+            var PrimarryOfficeLevel = $('#intPrimaryOfficeLevelId  option:selected').val();
+            var PrimarryDesignation = $('#intPrimaryDesignationId  option:selected').val();
+            var PrimaryAuthority = "intPrimaryAuthorityUserId";
+            BindEmployee(PrimarryOfficeLevel, PrimarryDesignation, PrimaryAuthority);
+            //}
+        });
+
+        $("#intPrimaryDesignationId").change(function () {
+            //if ($("#hidChild").val() != "1") {
+            var PrimarryOfficeLevel = $('#intPrimaryOfficeLevelId  option:selected').val();
+            var PrimarryDesignation = $('#intPrimaryDesignationId  option:selected').val();
+            var PrimaryAuthority = "intPrimaryAuthorityUserId";
+            BindEmployee(PrimarryOfficeLevel, PrimarryDesignation, PrimaryAuthority);
+            //}
+        });
+
+        $("#intSecondaryOfficeLevelid").change(function () {
+
+            var SecondaryOfficeLevel = $('#intSecondaryOfficeLevelid  option:selected').val();
+            var SecondaryDesignation = $('#intSecondaryDesignationId  option:selected').val();
+            var SecondaryAuthority = "intSecondaryAuthorityUserId";
+            BindEmployee(SecondaryOfficeLevel, SecondaryDesignation, SecondaryAuthority);
+
+        });
+        $("#intSecondaryDesignationId").change(function () {
+
+            var SecondaryOfficeLevel = $('#intSecondaryOfficeLevelid  option:selected').val();
+            var SecondaryDesignation = $('#intSecondaryDesignationId  option:selected').val();
+            var SecondaryAuthority = "intSecondaryAuthorityUserId";
+            BindEmployee(SecondaryOfficeLevel, SecondaryDesignation, SecondaryAuthority);
+        });
+
+        //---add more
+        $("#Submit").click(function () {
+
+            //--check no of authority
+            if ($("#Rdbtn_Multiple").is(":checked")) {
+                if (!blankFieldValidation("intNoofMultipleAuthority", "No. of Action Taking Authority")) {
+                    return false;
+                }
+                else {
+                    var rowCount = $('#datatable tr').length;
+                    var noOfAuthority = $("#intNoofMultipleAuthority").val();
+                    if (parseInt(rowCount) > parseInt(noOfAuthority)) {
+                        swal("", "You are try to add more than no of authority. ", "warning");
+                        return false;
+                    }
+                }
+            }
+
+            if ($("#Rdbtn_Single").is(":checked")) {
+                
+                    var rowCount = $('#datatable tr').length;
+                    if (parseInt(rowCount) > 1) {
+                        swal("", "You can not add more than one record for Action taking authority type 'Single'delete from grid view and add new one", "warning");
+                        return false;
+                    
+                }
+            }
+
+            EnableMaster();
+           
+            if (!DropDownValidation("intModuleId", "Module")) {
+                return false;
+            }
+            if (!DropDownValidation("intSubModuleId", "SubModule")) {
+                return false;
+            }
+            if (!DropDownValidation("intEmpOfficeLevelId", "Office Level")) {
+                return false;
+            }
+            if (!DropDownValidation("intActivityId", "Activity")) {
+                return false;
+            }
+            if (!DropDownValidation("intStep", "Step")) {
+                return false;
+            }
+
+            if ($("#Rdbtn_Single").is(":checked")) {
+
+                if (!DropDownValidation("intSecondaryOfficeLevelid", "Secondary Office Level")) {
+                    return false;
+                }
+                if (!DropDownValidation("intSecondaryDesignationId", "Secondary Designation")) {
+                    return false;
+                }
+                if (!DropDownValidation("intSecondaryAuthorityUserId", "secondary Authority")) {
+                    return false;
+                }
+            }
+            if ($("#Rdbtn_Multiple").is(":checked")) {
+                if (!blankFieldValidation("intNoofMultipleAuthority", "No. of Action Taking Authority")) {
+                    return false;
+                }
+            }
+
+            if ($("#Rdbtn_EscalationYes").is(":checked")) {
+
+                if (!blankFieldValidation("intEscalationinDays", "Escalation in Days")) {
+                    return false;
+                }
+                if (parseInt($("#intEscalationinDays").val()) <= 0) {
+                    swal("", "Escalation in Days", "warning");
+                    return false;
+                }
+            }
+            if ($("#Rdbtn_NotificationYes").is(":checked")) {
+
+                if (!DropDownValidation("intNotificationType", "NotificationType")) {
+                    return false;
+                }
+            }
+
+
+            if (!DropDownValidation("intPrimaryOfficeLevelId", "Primary Office Level")) {
+                return false;
+            }
+            if (!DropDownValidation("intPrimaryDesignationId", "primary Designation")) {
+                return false;
+            }
+            if (!DropDownValidation("intPrimaryAuthorityUserId", "Primary Authority")) {
+                return false;
+            }
+
+     
+
+        });
+
+        $("#Reset").click(function () {
+            window.location = "@Url.Content("~/WorkFlow/WorkFlow/AddWorkFlow/")"
+        });
+
+        if (parseInt($("#hidintWorkFlowId").val()) > 0) {
+          
+
+            //--multiple user
+            if ($("#Rdbtn_Multiple").is(":checked")) {
+                $("#divMultiple *").show();
+                $("#divSecondaryAuthority *").hide();
+            }
+            else {
+                $("#divMultiple *").hide();
+                $("#intNoofMultipleAuthority").val('');
+                $("#divSecondaryAuthority *").show();
+            }
+            //--end multiple user
+
+            //----escalation---
+
+            if ($("#Rdbtn_EscalationYes").is(":checked")) {
+                $("#divEscalation *").show();
+                //$("#intEscalationinDays").val();
+            }
+            else {
+                $("#divEscalation *").hide();
+            }
+            //---end escalation
+
+            //----notification--
+
+            if ($("#Rdbtn_NotificationYes").is(":checked")) {
+                $("#divNotificationType *").show();
+                //$("#intNotificationType").val();
+            }
+            else {
+                $("#divNotificationType *").hide();
+            }
+            //---end notification
+            
+            DisableMaster();
+            //$("#divWork *").prop('disabled', true);
+            //$("#hidintWorkFlowId").val('0');
+
+        }
+    });
+    function DisableMaster() {
+        $("#intModuleId").attr('disabled', true);
+        $("#intSubModuleId").attr('disabled', true);
+        $("#intActivityId").attr('disabled', true);
+        $("#intStep").attr('disabled', true);
+        //$("#bitAuthorityMultiple").attr('disabled', true);
+        $("#Rdbtn_Multiple").attr('disabled', true);
+        $("#Rdbtn_Single").attr('disabled', true);
+        $("#intNoofMultipleAuthority").attr('disabled', true);
+
+        //$("#bitEscalation").attr('disabled', true);
+        $("#Rdbtn_EscalationYes").attr('disabled', true);
+        $("#Rdbtn_EscalationNo").attr('disabled', true);
+        $("#intEscalationinDays").attr('disabled', true);
+
+        //$("#bitNotification").attr('disabled', true);
+        $("#Rdbtn_NotificationYes").attr('disabled', true);
+        $("#Rdbtn_NotificationNo").attr('disabled', true);
+        $("#intNotificationType").attr('disabled', true);
+
+    }
+
+    function EnableMaster() {
+        $("#intModuleId").attr('disabled', false);
+        $("#intSubModuleId").attr('disabled', false);
+        $("#intActivityId").attr('disabled', false);
+        $("#intStep").attr('disabled', false);
+
+        $("#Rdbtn_Multiple").attr('disabled', false);
+        $("#Rdbtn_Single").attr('disabled', false);
+        $("#intNoofMultipleAuthority").attr('disabled', false);
+
+        $("#Rdbtn_EscalationYes").attr('disabled', false);
+        $("#Rdbtn_EscalationNo").attr('disabled', false);
+        $("#intEscalationinDays").attr('disabled', false);
+
+        $("#Rdbtn_NotificationYes").attr('disabled', false);
+        $("#Rdbtn_NotificationNo").attr('disabled', false);
+        $("#intNotificationType").attr('disabled', false);
+
+    }
+    //---bind employee---
+    function BindEmployee(OfficeId, DesignationId, drpEmployee) {
+        $.ajax({
+            type: "POST",
+            url: '@Url.Content("~/LeaveManagement/LeaveManagement/BindEmployeeOfficeLevelWise")',
+
+            data: {
+                "OfficeLevelId": OfficeId,
+                "UserTypeId": DesignationId
+            },
+            dataType: "json",
+            success: function (data) {
+
+                $("#" + drpEmployee).empty();
+
+                var ops = '<option value="">--Select--</option>';
+                for (var i = 0; i < data.length; i++) {
+                    ops += '<option value="' + data[i].value + '">' + data[i].text + '</option>';
+                }
+
+                $("#" + drpEmployee).html(ops);
+
+            },
+            error: function () {
+                alert('Error');
+
+            }
+        });
+
+    }
+
+    function EditPrimarySecondaryAuthority(intChildId, intPrimaryOfficeLevelId, intPrimaryDesignationId, intPrimaryAuthorityUserId, intSecondaryOfficeLevelid, intSecondaryDesignationId, intSecondaryAuthorityUserId) {
+
+        $("#hidChild").val("1");
+        //$("#intStep").val(intStep);
+
+        $("#intPrimaryOfficeLevelId").val(intPrimaryOfficeLevelId).change();
+        $("#intPrimaryDesignationId").val(intPrimaryDesignationId).change();
+        $("#intPrimaryAuthorityUserId").val(intPrimaryAuthorityUserId).change();
+
+        $("#intSecondaryOfficeLevelid").val(intSecondaryOfficeLevelid).change();
+        $("#intSecondaryDesignationId").val(intSecondaryDesignationId).change();
+        $("#intSecondaryAuthorityUserId").val(intSecondaryAuthorityUserId).change();
+
+        $("#hidChild").val("0");
+    };
+
+</script>
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="javascript:void(0);">
+                                Add WorkFlow
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="@Url.Content("~/WorkFlow/WorkFlow/ViewWorkFlow")">
+                                View WorkFlow
+                            </a>
+                        </li>
+                    </ul>
+
+                </div>
+
+                <section class="box form-container">
+                    <div class="content-body">
+                        @using (Html.BeginForm("AddWorkFlow", "WorkFlow", FormMethod.Post, new { AUTOCOMPLETE = "Off", id = "form1" }))
+                        {
+                        @Html.AntiForgeryToken();
+                        <div class="row">
+
+                            <div class="col-xl-12">
+                                <div class="p-4  border mb-3">
+                                    <h6>Work Flow Details </h6>
+
+                                    <div class="row" id="divWork">
+                                        <div class="col-lg-3 col-md-6 col-sm-12">
+                                            <label class="col-form-label font-weight-bolder pt-0">Module<span class="text-danger">*</span></label>
+                                            <div class="form-group">
+                                                @*@Html.DropDownListFor(m => m.intModuleId, ViewBag.Module as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control  searchableselect" })*@
+
+                                                @Html.DropDownListFor(m => m.intModuleId, ViewBag.Module as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control" })
+                                                @Html.HiddenFor(m => m.intWorkFlowId, new { @id = "hidintWorkFlowId" })
+
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-3 col-md-6 col-sm-12">
+                                            <label class="col-form-label font-weight-bolder pt-0">Sub Module<span class="text-danger">*</span></label>
+                                            <div class="form-group">
+                                                @Html.DropDownListFor(m => m.intSubModuleId, ViewBag.SubModule as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control  searchableselect" })
+                                            </div>
+
+                                        </div>
+                                        <div class="col-lg-3 col-md-6 col-sm-12">
+                                            <label class="col-form-label font-weight-bolder pt-0">Activity<span class="text-danger">*</span></label>
+                                            <div class="form-group">
+                                                @Html.DropDownListFor(m => m.intActivityId, ViewBag.Activity as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control  searchableselect" })
+                                            </div>
+
+                                        </div>
+
+                                        <div class="col-lg-3 col-md-6 col-sm-12">
+                                            <label class="col-form-label font-weight-bolder pt-0">Step<span class="text-danger">*</span></label>
+                                            <div class="form-group">
+                                                @Html.DropDownListFor(m => m.intStep, ViewBag.Step as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control  searchableselect" })
+                                                @Html.HiddenFor(m => m.intStep, new { @id = "hidStep" })
+                                            </div>
+                                        </div>
+
+                                        <div class="col-lg-3 col-md-6 col-sm-12">
+                                            <label class="col-form-label">Action taking Authority Type<span class="text-danger">*</span></label>
+                                            <div class="form-group">
+
+                                                @Html.RadioButtonFor(n => n.bitAuthorityMultiple, true, new { @checked = true, @class = "custom-radio", id = "Rdbtn_Multiple" }) Multiple
+                                                @Html.RadioButtonFor(n => n.bitAuthorityMultiple, false, new { @class = "custom-radio", id = "Rdbtn_Single" }) Single
+                                                @Html.HiddenFor(m => m.bitAuthorityMultiple, new { @id = "hidbitAuthorityMultiple" })
+                                            </div>
+                                        </div>
+                                        <div id="divMultiple" class="col-lg-3 col-md-6 col-sm-12">
+
+                                            <label class="col-form-label">No of Action Taking Authority<span class="text-danger">*</span></label>
+                                            <div class="form-group">
+                                                @Html.TextBoxFor(m => m.intNoofMultipleAuthority, new { @class = "form-control", @type = "number", @maxlength = 1, Onkeypress = "return inputLimiter(event,'Numbers')" })
+                                            </div>
+
+                                        </div>
+
+                                        <div class="col-lg-3 col-md-6 col-sm-12">
+                                            <label class="col-form-label">Excellation in Day<span class="text-danger">*</span></label>
+                                            <div class="form-group">
+
+                                                @Html.RadioButtonFor(n => n.bitEscalation, true, new { @checked = true, @class = "custom-radio", id = "Rdbtn_EscalationYes" }) Yes
+                                                @Html.RadioButtonFor(n => n.bitEscalation, false, new { @class = "custom-radio", id = "Rdbtn_EscalationNo" })No
+                                            </div>
+                                        </div>
+                                        <div id="divEscalation" class="col-lg-3 col-md-6 col-sm-12">
+
+                                            <label class="col-form-label">Enter Day<span class="text-danger">*</span></label>
+                                            <div class="form-group">
+                                                @Html.TextBoxFor(m => m.intEscalationinDays, new { @class = "form-control", @type = "number", @maxlength = 2, Onkeypress = "return inputLimiter(event,'Numbers')" })
+                                            </div>
+
+                                        </div>
+
+                                        <div class="col-lg-3 col-md-6 col-sm-12">
+
+                                            <label class="col-form-label">Required Notification <span class="text-danger">*</span></label>
+                                            <div class="form-group">
+                                                @Html.RadioButtonFor(n => n.bitNotification, true, new { @checked = true, @class = "custom-radio", id = "Rdbtn_NotificationYes" }) Yes
+                                                @Html.RadioButtonFor(n => n.bitNotification, false, new { @class = "custom-radio", id = "Rdbtn_NotificationNo" })No
+                                            </div>
+                                        </div>
+                                        <div id="divNotificationType" class="col-lg-3 col-md-6 col-sm-12">
+                                            <label class="col-form-label">Notification Type<span class="text-danger">*</span></label>
+                                            <div class="form-group">
+                                                @Html.DropDownListFor(m => m.intNotificationType, ViewBag.NotificationType as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control  searchableselect" })
+
+                                            </div>
+                                        </div>
+
+                                    </div>
+
+                                </div>
+                          </div>
+
+                            <div class="col-xl-12">
+                                <div class="p-4 border mb-3">
+                                    <table id="FaqsTable">
+                                        <tr>
+                                            <td>
+                                                <div class="row">
+ 
+                                                    <div class="col-lg-12 col-md-12 col-sm-12">
+                                                        <h6>Primary Action Taking Authority</h6>
+
+                                                    </div>
+
+                                                    <div class="col-xl-12">
+
+                                                        <div class="row">
+
+                                                            <div class="col-lg-3 col-md-6 col-sm-12">
+
+                                                                <label class="col-form-label">Office Level<span class="text-danger">*</span></label>
+                                                                <div class="form-group">
+                                                                    @Html.DropDownListFor(m => m.intPrimaryOfficeLevelId, ViewBag.PrimaryOfficeLevel as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control  searchableselect" })
+
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-lg-3 col-md-6 col-sm-12">
+
+                                                                <label class="col-form-label">Designation<span class="text-danger">*</span></label>
+                                                                <div class="form-group">
+
+                                                                    @Html.DropDownListFor(m => m.intPrimaryDesignationId, ViewBag.PrimaryDesignation as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control  searchableselect" })
+
+
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-lg-3 col-md-6 col-sm-12">
+
+                                                                <label class="col-form-label">User<span class="text-danger">*</span></label>
+                                                                <div class="form-group">
+                                                                    @Html.DropDownListFor(m => m.intPrimaryAuthorityUserId, ViewBag.PrimaryAuthority as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control  searchableselect" })
+
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <div id="divSecondaryAuthority" class="col-xl-12">
+                                                        <div class="col-lg-12 col-md-12 col-sm-12">
+                                                            <p>
+                                                                Is Primary User Act as Secondary User ? @Html.CheckBoxFor(m => m.IsSameUser)
+                                                            </p>
+                                                            <h6>Secondary Action Taking Authority</h6>
+                                                        </div>
+
+                                                        <div class="col-xl-12">
+                                                            <div class="row">
+                                                                <div class="col-lg-3 col-md-6 col-sm-12">
+
+                                                                    <label class="col-form-label">Office Level<span class="text-danger">*</span></label>
+                                                                    <div class="form-group">
+                                                                        @Html.DropDownListFor(m => m.intSecondaryOfficeLevelid, ViewBag.SecondaryOfficeLevel as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control  searchableselect" })
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-lg-3 col-md-6 col-sm-12">
+                                                                    <label class="col-form-label">Designation<span class="text-danger">*</span></label>
+                                                                    <div class="form-group">
+                                                                        @Html.DropDownListFor(m => m.intSecondaryDesignationId, ViewBag.SecondaryDesignation as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control  searchableselect" })
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-lg-3 col-md-6 col-sm-12">
+
+                                                                    <label class="col-form-label">User<span class="text-danger">*</span></label>
+                                                                    <div class="form-group">
+                                                                        @Html.DropDownListFor(m => m.intSecondaryAuthorityUserId, ViewBag.SecondaryAuthority as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control  searchableselect" })
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                    </div>
+                                                   
+                                                    <div class="col-sm-12 mt-3">
+                                                        @*<input type="submit" id="Submit" name="Submit" value='@ViewBag.Button' class="btn btn-primary btn-md ml-0" />*@
+                                                        <button type="submit" class="btn btn-outline-success mr-3" id="Submit"><i class="icon-plus-solid"></i>Add More</button>
+                                                        <input type="reset" id="Reset" value="Reset" class="btn btn-danger btn-md" />
+
+                                                        @*<button type="button" class="btn btn-outline-danger"><i class="icon-times-solid"></i>Remove</button>*@
+                                                    </div>
+                                                </div>
+</td>
+                                        </tr>
+
+                                    </table>
+
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-12">
+                                 <div id="viewtable">
+                                    <table id="datatable" class="table table-sm table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th width="30px">Sl#</th>
+                                                <th>Authority Type</th>
+                                                <th>Office Level</th>
+                                                <th>Designation</th>
+                                                <th>Authority</th>
+                                                <th width="60px" class="noprint">Action</th>
+
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @{
+
+                                                var count = 0;
+                                                foreach (var item in Model.WorkFlowtransaction)
+                                                {
+                                                    count++;
+
+                        <tr class="active-row">
+
+                            <td>@count</td>
+                            <td>@item.AuthorityType</td>
+                            <td>@item.PrimaryOfficeLevel</td>
+                            <td>@item.PrimaryDesignation</td>
+                            <td>@item.PrimaryAuthorityUser</td>
+
+                            <td width="15%" class="noprint">
+                                <input type="hidden" id="hidChild" value="0" />
+                                @*<a class="btn-outline-primary btn-sm" onclick="EditPrimarySecondaryAuthority(@item.intId,  @item.intPrimaryOfficeLevelId, @item.intPrimaryDesignationId, @item.intPrimaryAuthorityUserId, @item.intSecondaryOfficeLevelid, @item.intSecondaryDesignationId, @item.intSecondaryAuthorityUserId);"><i class="icon-pencil-alt-solid"></i></a>*@
+                                <a href="@Url.Content("~/WorkFlow/WorkFlow/RemoveWorkFlowTransaction/")@protector.Decode(Convert.ToString(@item.intId))" class="btn-outline-danger btn-sm" onclick="return confirm('Are you sure to Delete?')"><i class="icon-trash-alt-solid"></i></a>
+
+                            </td>
+                        </tr>
+
+                                                }
+                                                }
+
+                </tbody>
+            </table>
+        </div>
+                            </div>
+                        </div>
+                                                }
+                    </div>
+                </section>
+            </div>
+        </div>
+</div>
+    <!-- MAIN CONTENT AREA ENDS -->
+</section>
+

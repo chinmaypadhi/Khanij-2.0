@@ -1,0 +1,248 @@
+﻿@model PermitEF.ePermitModel
+@using PermitApp.Helper;
+@{
+    ViewData["Title"] = "EPermit List";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+
+<section class="wrapper main-wrapper row">
+    <div class="col-12" id="mainDiv">
+        @Html.Partial("_CMSnavigation")
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+
+                        <li class="nav-item">
+                            <a class="nav-link " href="@Url.Content("~/Permit/CoalEPermit/CoalEPermit")">
+                                Apply e-permit
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="#">
+                                Saved Permit
+                            </a>
+                        </li>
+
+                    </ul>
+                    @Html.Partial("_CMSutil")
+                </div>
+
+                <section class="box form-container">
+                    @using (Html.BeginForm("CoalSavedEPermit", "CoalEPermit", FormMethod.Post, new { AUTOCOMPLETE = "Off", id = "form1" }))
+                    {
+                        @*<div class="search-box">
+                                <div class="searchform px-3 py-3">
+                                    <div class="row">
+
+
+                                        <div class="col-sm-4">
+                                            <div class="form-group row">
+                                                <label for="inputText" class="col-sm-4 col-form-label">
+                                                    Mineral Grade
+                                                </label>
+                                                <div class="col-sm-8">
+                                                    <div class="input-group">
+
+                                                        <div class="input-group-prepend">
+                                                            @Html.DropDownListFor(model => model.MineralGradeId, ViewBag.MineralGradeLst as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control form-group", autofocus = "autofocus", required = "required" })
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-2">
+                                            <button type="submit" class="btn btn-sm btn-success m-0 waves-effect waves-light" id="btnSubmit" onclick="GetDataByParameter()">Search</button>
+                                        </div>
+
+
+
+
+                                        <div class="col-sm-2">
+                                            <button type="button" id="btnMergeEPermit" class="btn btn-sm btn-success m-0 waves-effect waves-light" style="margin-right: 10px; width: 150px;">Merge e-Permit</button>
+                                        </div>
+
+
+                                    </div>
+
+
+
+
+                                </div>
+                            </div>*@
+
+                        <div class="content-body">
+
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <table id="table-exports" class="table table-sm table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th width="30">Sl#</th>
+                                                <th>Transaction Reference ID</th>
+                                                <th>Date of Saved Application</th>
+                                                <th>Mineral Name</th>
+                                                <th>Mineral Form</th>
+                                                <th>Mineral Grade</th>
+                                                <th>Proposed Qty</th>
+                                                <th>Status</th>
+                                                <th width="50">Draft Form</th>
+                                                <th>Action</th>
+                                                <th style="display:none;"></th>
+                                                <th style="display:none;"></th>
+                                                <th style="display:none;"></th>
+
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach (var b in ViewBag.ViewList)
+                                            {
+                                                <tr class="active-row">
+                                                    <td>@b.SrNo</td>
+
+                                                    @if (b.MergeEPermitCount == "0")
+                                                    {
+                                                        <td class="noprint">
+                                                            <a class="text-primary" href="@CustomQueryStringHelper.EncryptString("Permit","CoalEPermit","CoalEPermit",new {BulkpermitId=@b.BulkPermitId })">@b.TransactionId</a>
+                                                           @* <a class="text-primary" href="@Url.Content("~/Permit/CoalEPermit/CoalEPermit/?BulkpermitId=")@b.BulkPermitId">@b.TransactionId</a>*@
+                                                        </td>
+                                                    }
+                                                    else
+                                                    {
+                                                <td class="noprint">
+                                                    <a class="text-primary" href="@CustomQueryStringHelper.EncryptString("Permit","MergeEPermit","ePermit",new {BulkpermitId=@b.BulkPermitId })">@b.TransactionId</a>
+                                                    @*<a class="text-primary" href="@Url.Content("~/Permit/ePermit/MergeEPermit/?BulkpermitId=")@b.BulkPermitId">@b.TransactionalID</a>*@
+                                                </td>
+                                                    }
+                                                    <td><p class="m-0" id="MineralName">@b.DateOfApplication</p> </td>
+                                                    <td><p class="m-0" id="MineralName">@b.MineralName</p> </td>
+                                                    <td><p class="m-0" id="MineralNature">@b.MineralNature</p> </td>
+                                                    <td><p class="m-0" id="MineralGradeName">@b.MineralGrade</p> </td>
+                                                    <td><p class="m-0">@b.ProposedQty</p> </td>
+
+                                                    <td><p class="m-0">@b.Status</p> </td>
+                                                    <td class="noprint">
+                                                        <a class="text-primary"  data-toggle="tooltip" data-placement="top" title="Download " href="@CustomQueryStringHelper.EncryptString("Permit","ePermitViewWithoutDSC","CoalEPermit",new {id=@b.BulkPermitId })">
+                                                        <i class="icon-download-solid h4"></i> </a>
+                                                        @*<a class="text-primary" href="@Url.Content("~/Permit/CoalEPermit/ePermitViewWithoutDSC/?id=")@b.BulkPermitId">Download Draft Application</a>*@
+                                                    </td>
+                                                    <td class="noprint">
+                                                        <a class="btn btn-outline-danger btn-sm" 
+data-toggle="tooltip" data-placement="top" title="Delete" href="@CustomQueryStringHelper.EncryptString("Permit","DeleteData","CoalEPermit",new {id=@b.BulkPermitId })" onclick="return confirm('Are you sure you want to delete this record?')"><i class="icon-trash-alt-solid"></i></a>
+                                                       @* <a class="text-primary" href="@Url.Content("~/Permit/CoalEPermit/DeleteData/?id=" )@b.BulkPermitId" onclick="return confirm('Are you sure you want to delete this record?')" )>Delete</a>*@
+                                                    </td>
+                                                    <td style="display:none;">@b.ActiveStatus</td>
+
+                                                    <td style="display:none;">@b.BulkPermitId</td>
+                                                    <td style="display:none;">@b.MergeEPermitCount</td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+
+
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </section>
+            </div>
+        </div>
+    </div>
+    <!-- MAIN CONTENT AREA ENDS -->
+</section>
+<uc1:footer runat="server" ID="footer" />
+<script>
+    backMe = "yes"
+    $(document).ready(function () {
+        loadNavigation('ViewList', 'glhelpdesk', 'plraiseticket', 'tl', 'E-Permit', 'Saved permit', ' ');
+        $('.searchableselect').searchableselect();
+
+        $('.shorting-lnk').click(function () {
+            $('.shorting-lnk i').toggleClass('fa-sort-amount-up-alt fa-sort-amount-down-alt ');
+        });
+        $('.filter-dropdown').hide();
+        $('.filter-lnk').click(function () {
+            $(this).toggleClass('active');
+            $(this).siblings('.filter-dropdown').slideToggle();
+        });
+        $('.filter-btn').click(function () {
+            $(this).parent('.shorting-cell .filter-dropdown').slideUp();
+            if ($(this).parent().parent('.shorting-cell').find('.filter-lnk').hasClass('active')) {
+                $(this).parent().siblings('.filter-lnk').removeClass('active');
+            }
+        });
+       @* $("#excelIcon").click(function () {
+            exportTableToExcel("ePermitList", "text")
+        });*@
+    });
+</script>
+<script>
+    $(document).ready(function () {
+        $('.datepicker').datetimepicker({
+            format: 'LT',
+            format: 'DD-MM-YYYY',
+
+        });
+    });
+</script>
+
+<script>
+    function sendAntiForgery() {
+        return { "__RequestVerificationToken": $('input[name=__RequestVerificationToken]').val() }
+    }
+
+    var exportFlag = false;
+    var columnToHide = 0;
+    function funcPdfExport(e) {
+        $("thead tr th a.k-link").removeAttr("href");
+        var grid = $("#it_clearance").data("kendoGrid");
+        for (i = 0; i <= grid.columns.length - 1; i++) {
+            if (grid.columns[i].command != null) {
+                if (!exportFlag) {
+                    grid.hideColumn(i);
+                    columnToHide = i;
+                    e.preventDefault();
+                    exportFlag = true;
+                    grid.saveAsPDF();
+                    setTimeout(function () {
+                        exportFlag = false;
+                    })
+                }
+            }
+        }
+        e.promise
+            .done(function () {
+                grid.showColumn(columnToHide);
+            });
+    }
+
+
+    function OnRequestEnd(e) {
+        //if ($('tbody').find('tr').length == 0) {
+        //    $('.k-grid-top').children('a').click(function () { return false; });
+        //}
+
+        var MasterTableParameter = "Draft Application";
+        if (e.response.Data[0] == 2) {
+            fn_AlertMessage(e.response.Data[0], "Insert", MasterTableParameter);
+            e.preventDefault();
+        }
+        else {
+            if (e.type == "create" && !e.response.Errors) {
+                fn_AlertMessage(e.response.Data[0], "Insert", MasterTableParameter);
+            }
+            else if (e.type == "update" && !e.response.Errors) {
+                fn_AlertMessage(e.response.Data[0], "Update", MasterTableParameter);
+            }
+            else if (e.type == "destroy" && !e.response.Errors) {
+                fn_AlertMessage(e.response.Data[0], "Delete", MasterTableParameter);
+            }
+            if (e.type != "read") {
+                autosyncData();
+            }
+        }
+    }
+</script>
+

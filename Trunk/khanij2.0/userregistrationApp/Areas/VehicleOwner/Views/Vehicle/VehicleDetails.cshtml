@@ -1,0 +1,275 @@
+﻿@*// *********************************************************************************************************
+    //  View Name                : VehicleDetails
+    //  Desciption               : To View Vehicle Details
+    //  Created By               : Akshaya Dalei
+    //  Created On               : 25 July 2021
+    // ********************************************************************************************************
+*@
+@{
+    ViewBag.Title = "Vehicle Details";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+@using userregistrationApp.Helper;
+@model IEnumerable<userregistrationEF.Vehicle>
+
+<section class="wrapper main-wrapper row">
+    @{
+        if (ViewBag.msg != null)
+        {
+            <script>
+                swal("",'@ViewBag.msg',"success");
+            </script>
+        }
+    }
+    <div class="col-12">
+        @Html.Partial("_CMSnavigation")
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="javascript:void(0);">
+                                Vehicle Details
+                            </a>
+
+                        </li>
+                    </ul>
+                    @Html.Partial("_CMSutil")
+                </div>
+
+                <section class="box form-container">
+                    <div class="content-body">
+
+                        @using (Html.BeginForm("VehiclesPayment", "Vehicle", new { Area = "VehicleOwner" }))
+                        {
+                            <button type="submit" id="btnPayment" class="btn btn-success mb-4">Make Payment</button>
+                        }
+                        <div class="row">
+                            <div class="col-sm-12">
+
+                                <table id="table-exports" class="table table-sm table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>Vehicle Number</th>
+                                            <th>Vehicle Type</th>
+                                            <th>Vehicle Carrying Capacity <small>Unit</small></th>
+                                            <th>Vehicle Tare Weight <small>Unit</small></th>
+                                            <th>Status</th>
+                                            <th>Transaction No</th>
+                                            <th>Payment Status</th>
+                                            <th>Validity From</th>
+                                            <th>Validity To</th>
+                                            <th>Payment Count</th>
+                                            <th>Permit Copy</th>
+                                            <th>RC Copy</th>
+                                            <th>Download</th>
+                                            <th>Sticker</th>
+                                            <th>Actions</th>
+
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+
+                                        @{
+
+                                            foreach (var item in Model)
+                                            {
+
+                                                <tr class="active-row">
+                                                    <td><p class="m-0">@item.VehicleNumber</p></td>
+                                                    <td><p class="m-0">@item.VehicleTypeName</p></td>
+                                                    <td>@item.CarryingCapacity <small>@item.UnitName</small></td>
+                                                    <td>@item.MaxNetWeight <small>@item.CarryingCapacity_UnitName</small> </td>
+                                                    <td><p class="m-0">@(item.ActiveStatus == true ? "Active" : "InActive")</p> </td>
+                                                    <td><p class="m-0">@item.PaymentReqID</p> </td>
+                                                    <td>
+
+                                                        @{
+                                                            if (item.IsPaymentDone == true && item.PaymentStatus == 1 && item.ActiveStatus == true)
+                                                            {
+                                                                <span id=Success class="text-success">SUCCESS</span>
+                                                                <br />
+                                                                <a class="text-primary" href='/VehicleOwner/Vehicle/MakeInActiveVehicle?VehicleID=@item.VehicleID'>(Make Vehicle InActive)</a>
+                                                            }
+                                                            else if (item.IsPaymentDone == true && item.PaymentStatus == 1 && item.ActiveStatus == false)
+                                                            {
+                                                                <span id=Success class="text-success">SUCCESS</span>
+                                                                <br />
+                                                                <a class="text-primary" href='/VehicleOwner/Vehicle/MakeInActiveVehicle?VehicleID=@item.VehicleID'>(Make Vehicle Active)</a>
+                                                            }
+                                                            else if (item.IsPaymentDone == true && item.PaymentStatus == 0)
+                                                            {
+                                                                <a href="javascript: void(0)" class="text-primary" onclick='CheckInsertPaymentStatus(@item.PaymentReqID);'>Check Payment Status</a>
+                                                                <br />
+                                                                <a href="javascript: void(0)" class="text-primary" onclick='CanclePaymentStatus(@item.VehicleID'>(Cancel Previous Payment Transaction)</a>
+                                                            }
+                                                            else if (item.PaymentReqID != "" && item.IsPaymentDone == false && item.PaymentStatus == 0)
+                                                            {
+                                                                <a href="javascript: void(0)" class="text-primary" onclick='CheckInsertPaymentStatus(@item.PaymentReqID);'>Check Payment Status</a>
+                                                                <br />
+                                                                <a href="javascript: void(0)" class="text-primary" onclick='CanclePaymentStatus(@item.PaymentReqID);'>(Cancel Previous Payment Transaction)</a>
+                                                            }
+                                                            else if (item.IsPaymentDone == false && item.PaymentStatus == 2)
+                                                            {
+                                                                <a href="javascript: void(0)" class="text-primary" onclick='CheckPaymentStatus(@item.VehicleID);'>Check Payment Status</a>
+                                                                <br />
+                                                                <a href="javascript: void(0)" class="text-primary" onclick='CanclePaymentStatus(@item.VehicleID);'>(Cancel Previous Payment Transaction)</a>
+                                                            }
+                                                            else
+                                                            {
+                                                                <p class="m-0">Payment Pending</p>
+                                                            }
+                                                        }
+                                                    </td>
+                                                    <td><p class="m-0">@item.VehicleValidFromDate</p> </td>
+                                                    <td><p class="m-0">@item.VehicleValidToDate</p> </td>
+                                                    <td><a target="_blank" href='@CustomQueryStringHelper.EncryptString("VehicleOwner","VehicelRenewal","Vehicle",new {VehicleID=item.VehicleID })'>@item.NoOfPaymentCount</a> </td>
+                                                    <td>
+                                                        @{
+                                                            if (item.PermitFile_Name == "" || item.PermitFile_Name == null) { }
+                                                            else
+                                                            {<a href='@item.PermitFile_Path' target='_blank'><img src='~/img/File_Download.png' height='30' width='30' /></a>}
+                                                        }
+                                                    </td>
+                                                    <td>
+                                                        @{
+                                                            if (item.RcFile_Name == "" || item.RcFile_Name == null) { }
+                                                            else
+                                                            {<a href='@item.RcFile_Path' target='_blank'><img src='~/img/File_Download.png' height='30' width='30' /></a>}
+                                                        }
+                                                    </td>
+                                                    <td>
+                                                        @{
+                                                            if (item.PaymentStatus == 1)
+                                                            {
+                                                                <a href="@CustomQueryStringHelper.EncryptString("VehicleOwner","PrintVehicleDetails","Vehicle",new { VehicleID = item.VehicleID, Type ="Certificate"})">Form</a>
+                                                            }
+                                                        }
+                                                    </td>
+                                                    <td>
+                                                        @{
+                                                            if (item.PaymentStatus == 1)
+                                                            {
+                                                                <a target=_blank href='@CustomQueryStringHelper.EncryptString("VehicleOwner","VehicleSticker","Vehicle",new {id=item.VehicleID,Type="Sticker" })'>Sticker</a>
+                                                            }
+                                                        }
+                                                    </td>
+                                                    <td>
+                                                        <a href="@CustomQueryStringHelper.EncryptString("VehicleOwner","EditVehicle","Vehicle",new{VehicleID=item.VehicleID,Flag="Edit" })" class="btn-floating btn-outline-primary btn-sm"
+                                                           title="Edit"><i class="icon-pencil-alt-solid"></i></a>
+
+                                                        @if (item.PaymentStatus != 1 && item.PaymentStatus != 2)
+                                                        {
+                                                            <a href="@CustomQueryStringHelper.EncryptString("VehicleOwner","DeleteVehicle","Vehicle",new{VehicleID=item.VehicleID})"
+                                                               class="btn-floating btn-outline-danger btn-sm" onclick="return confirm('Are you sure  want to delete this record?')" title="Delete"><i class="icon-trash-alt-solid"></i></a>
+                                                        }
+                                                    </td>
+                                                </tr>
+                                            }
+
+                                        }
+                                    </tbody>
+                                </table>
+
+
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+    $(document).ready(function () {
+        loadNavigation('Vehicle Details', 'ql', 'pl', 'tl', 'Vehicle Owner', 'Vehicle Details', ' ');
+    });
+
+    function CanclePaymentStatus(VehicleId) {
+        if (confirm("We can not revert back your previous transaction. Are you sure you want to reject your previous payment transaction?") == true) {
+
+            var PaymentType = "VPCAN";
+            $.ajax({
+                type: "POST",
+                url: "/VehicleOwner/Vehicle/CancelPaymentTransaction",
+                data: { "paymentReqId": VehicleId, "PaymentType": PaymentType },
+                dataType: "json",
+                success: function (result) {
+                    if (result == 'SUCCESS') {
+                        alert("Your payment transaction have been cancelled successfully.");
+                        window.location.href = "/VehicleOwner/Vehicle/VehicleDetails";
+                    }
+                    else {
+                        alert("Your payment cancellation request is not proceed. Please try after some time.");
+                        window.location.href = "/VehicleOwner/Vehicle/VehicleDetails";
+                    }
+                }
+            });
+        }
+        else {
+            return false;
+        }
+    }
+
+    function CheckInsertPaymentStatus(VehicleId) {
+        var PaymentType = "CVP";
+        $.ajax({
+            type: "POST",
+            url: "/VehicleOwner/Vehicle/CheckPaymentCurrentStatus",
+            data: { "id": VehicleId, "PaymentType": PaymentType },
+            dataType: "json",
+            success: function (result) {
+                if (result != null) {
+                    if (result == 'SUCCESS') {
+                        alert("Your payment status have been credited successfully.");
+                        window.location.href = "/VehicleOwner/Vehicle/VehicleDetails";
+                    }
+                    else if (result == 'AWAITED') {
+                        alert("Your payment is still pending please check after some time for update.");
+                    }
+                    else if (result == 'REVERTED') {
+                        alert("Your Previous Payment Transaction is cancel.Please Select vehicle and make payment again.");
+                    }
+                    else if (result == 'FAILED') {
+                        alert("Your Payment is Failed. Please Select vehicle and make payment again.");
+                    }
+                    else {
+                        window.location.href = result;
+                    }
+
+                }
+            }
+        });
+
+    }
+
+    function CheckPaymentStatus(VehicleId) {
+        var PaymentType = "VP";
+        $.ajax({
+            type: "POST",
+            url: "/VehicleOwner/Vehicle/CheckPaymentCurrentStatus",
+            data: { "id": VehicleId, "PaymentType": PaymentType },
+            dataType: "json",
+            success: function (result) {
+                if (result != null) {
+                    if (result == 'SUCCESS') {
+                        alert("Your payment status have been credited successfully.");
+                        window.location.href = "/VehicleOwner/Vehicle/VehicleDetails";
+                    }
+                    else if (result == 'AWAITED' || result == 'FAILED') {
+                        alert("Your payment is still pending please check after some time for update.");
+                    }
+                    else {
+                        window.location.href = result;
+                    }
+
+                }
+            }
+        });
+
+
+    }
+
+</script>

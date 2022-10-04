@@ -1,0 +1,1031 @@
+﻿@*// *********************************************************************************************************
+    //  View Name                : GeteReturnFormOneDetails
+    //  Desciption               : Print Page of FOrm1 F1
+    //  Created By               : Debaraj Swain
+    //  Created On               : 30 Jun 2021
+    // ********************************************************************************************************
+*@
+@{
+    ViewBag.Title = "Print Form F1";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@model ReturnEF.GetFormF1DetailsModel
+
+<html>
+<head>
+    <title>Monthly eReturn</title>
+    <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.3.3/jspdf.min.js"></script>
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.js"></script>
+    @*<script src='@Url.Content("~/js/sweetalert.min.js")'></script>
+    <script src="~/js/specialChar.js"></script>
+    <script src="~/js/CSMValidation.js"></script>*@
+
+
+
+
+    <style>
+        div, p, table {
+            padding: 0px;
+            margin: 0px;
+        }
+
+
+        .margin {
+            margin: 25px;
+        }
+
+        .size-a4 {
+            width: 8.3in;
+            height: 11.7in;
+        }
+
+        td {
+            width: 50%;
+            padding: 10px;
+            margin: 10px;
+        }
+    </style>
+
+
+
+</head>
+<body class="margin">
+
+
+
+    @using (Html.BeginForm("", "", FormMethod.Post, new { id = "__F1AntiForgeryForm", @class = "form-horizontal bordered-row" }))
+    {
+        @Html.HiddenFor(m => m.Month_Year)
+        @Html.HiddenFor(m => m.Details_Id)
+        <input type="hidden" value="@ViewBag.UserId" name="UserId" id="UserId" />
+
+
+
+        <br />
+        <div id="eReturnMonthly" class="container-fluid  pdf-page size-a4" style="min-height: 5250px">
+
+
+
+
+
+            <p class="text-center"><b>FORM F1</b></p>
+            <p class="text-center">[See rule 45(5) (b) (i)]</p>
+            <p class="text-center">For the month of<b> @Html.DisplayFor(m => m.Month_Year)</b></p>
+            <p class="text-center"><b>MONTHLY RETURN</b></p>
+            <p class="text-center">[To be used for minerals other than Copper, Gold, Lead, Pyrites, Tin, Tungsten, Zinc and precious and semi-precious stones]</p>
+            <p class="text-left">To</p>
+            <p class="text-left">&nbsp;&nbsp;&nbsp;&nbsp;(i) The Regional Controller of Mines</p>
+            <p class="text-left">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Indian Bureau of Mines</p>
+            <p class="text-left">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <b>Raipur</b> &nbsp;&nbsp;Region,</p>
+            <p class="text-left">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;PIN:&nbsp;&nbsp; <b>492001</b> </p>
+            <p>
+                (Please address to Regional Controller of Mines in whose territorial jurisdiction the mines falls as notified from time to
+                time by the Controller General, Indian Bureau of Mines under rule 62 of the Mineral Conservation and Development
+                Rules, 1988)
+            </p>
+
+            <section>
+                @if (ViewBag.usertype == "Lessee")
+                {
+                    if (Model != null && !string.IsNullOrEmpty(Model.DSCFilePath))
+                    {
+                        <span id="lblGenerate">Download FORM</span>
+                        <a target="_blank" class="btn btn-primary" href='@ViewBag.ServerPath@Model.DSCFilePath'>Download</a>
+                    }
+                    else
+                    {
+                        <h1>
+                            Print
+                            <img src="~/img/1475779253_BT_printer.ico" style="height:40px;width:40px;cursor:pointer;" onclick="getPDF()" />
+                        </h1>
+                    }
+                }
+                else
+                {
+                    <h1>
+                        Print
+                        <img src="~/img/1475779253_BT_printer.ico" style="height:40px;width:40px;cursor:pointer;" onclick="getPDF()" />
+                    </h1>
+                }
+            </section>
+            <p class="text-left">&nbsp;&nbsp;&nbsp;&nbsp;(ii) The State Government Chhattisgarh</p>
+            <p class="text-center"><b>PART – I</b></p>
+            <p class="text-center">(General and Labour)</p>
+            <div class="row">
+                <div class="col-sm-12">
+                    <table class="" border="1" style="width: 100%;">
+                        <tbody>
+                            <tr>
+                                <td colspan="2">
+                                    <p><b>1. Details of the Mine:</b></p>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <p>
+                                        (a) Registration number allotted by Indian Bureau of Mines<br />
+                                        (to give registration number of the Lessee/ Owner)
+                                    </p>
+                                </td>
+                                <td>
+                                    <p class="text-center">@Html.DisplayFor(m => m.Registrationnumber)</p>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <p>(b) Mine Code (allotted by Indian Bureau of Mines )</p>
+                                </td>
+                                <td>
+                                    <p class="text-center">@Html.DisplayFor(m => m.MINE_CODE)</p>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <p>(c) Name of the Mineral</p>
+                                </td>
+                                <td>
+                                    <p class="text-center">@Html.DisplayFor(m => m.MineralName)</p>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <p>(d) Name of Mine</p>
+                                </td>
+                                <td>
+                                    <p class="text-center">@Html.DisplayFor(m => m.MineName)</p>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <p>
+                                        (e) Name(s) of other mineral(s),
+                                        if any, produced from the same mine
+                                    </p>
+                                </td>
+                                <td>
+                                    <p class="text-center">@Html.DisplayFor(m => m.OtherMineral)</p>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="2">
+                                    <p><b>(f) Location of the Mine :</b></p>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <p>Village</p>
+                                </td>
+                                <td>
+                                    <p class="text-center">@Html.DisplayFor(m => m.MineVillage)</p>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <p>Post Office</p>
+                                </td>
+                                <td>
+                                    <p class="text-center">@Html.DisplayFor(m => m.MinePostOffice)</p>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <p>Tahsil/Taluk</p>
+                                </td>
+                                <td>
+                                    <p class="text-center">@Html.DisplayFor(m => m.MineTehsil)</p>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <p>District</p>
+                                </td>
+                                <td>
+                                    <p class="text-center">@Html.DisplayFor(m => m.MineDistrict)</p>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <p>State</p>
+                                </td>
+                                <td>
+                                    <p class="text-center">@Html.DisplayFor(m => m.MineState)</p>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <p>PIN Code</p>
+                                </td>
+                                <td>
+                                    <p class="text-center">@Html.DisplayFor(m => m.MinePinCode)</p>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <p>Fax no:&nbsp;&nbsp; @Html.DisplayFor(m => m.MineFaxNo)</p>
+                                </td>
+                                <td>
+                                    <p>E-mail:&nbsp;&nbsp; @Html.DisplayFor(m => m.MineEmailID)</p>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <p>Phone no:&nbsp;&nbsp; @Html.DisplayFor(m => m.MinePhoneNo)</p>
+                                </td>
+                                <td>
+                                    <p>Mobile:&nbsp;&nbsp; @Html.DisplayFor(m => m.MineMobileNo)</p>
+                                </td>
+
+                            </tr>
+
+                            <tr>
+                                <td colspan="2">
+                                    <p><b>2. Name and address of Lessee/Owner (along with fax no. and e-mail):</b></p>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <p>Name of Lessee/Owner</p>
+                                </td>
+                                <td>
+                                    <p class="text-center">@Html.DisplayFor(m => m.LesseeName)</p>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <p>Address</p>
+                                </td>
+                                <td>
+                                    <p class="text-center">@Html.DisplayFor(m => m.LesseeAddress)</p>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <p>District</p>
+                                </td>
+                                <td>
+                                    <p class="text-center">@Html.DisplayFor(m => m.LesseeDistrictName)</p>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <p>State</p>
+                                </td>
+                                <td>
+                                    <p class="text-center">@Html.DisplayFor(m => m.LesseeStateName)</p>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <p>PIN Code</p>
+                                </td>
+                                <td>
+                                    <p class="text-center">@Html.DisplayFor(m => m.LesseePinCode)</p>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <p>Fax no:&nbsp;&nbsp; @Html.DisplayFor(m => m.LesseeFaxNo)</p>
+                                </td>
+                                <td>
+                                    <p>E-mail:&nbsp;&nbsp; @Html.DisplayFor(m => m.LesseeEmailID)</p>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <p>Phone no:&nbsp;&nbsp; @Html.DisplayFor(m => m.LesseePhoneNo)</p>
+                                </td>
+                                <td>
+                                    <p>Mobile:&nbsp;&nbsp; @Html.DisplayFor(m => m.LesseeMobileNo)</p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <br />
+                    <span class="page-break"></span>
+                    <table class="" border="1" style="width: 100%;">
+                        <tbody>
+                            <tr>
+                                <td colspan="2">
+                                    <p><b>3. Details of Rent/ Royalty / Dead Rent/ DMF /NMET amount paid in the month:</b></p>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <p>(i) Rent paid (₹)</p>
+                                </td>
+                                <td>
+                                    <p class="text-center">@Html.DisplayFor(m => m.Rentpaid)</p>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <p>(ii) Royalty paid (₹)</p>
+                                </td>
+                                <td>
+                                    <p class="text-center">@Html.DisplayFor(m => m.Royaltypaid)</p>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <p>(iii) Dead Rent paid (₹)</p>
+                                </td>
+                                <td>
+                                    <p class="text-center">@Html.DisplayFor(m => m.DeadRentpaid)</p>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <p>(iv) Payment made to the DMF (₹)</p>
+                                </td>
+                                <td>
+                                    <p class="text-center">@Html.DisplayFor(m => m.DMFPaid)</p>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <p>(v) Payment made to the NMET (₹)</p>
+                                </td>
+                                <td>
+                                    <p class="text-center">@Html.DisplayFor(m => m.NMETPaid)</p>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="2">
+                                    <p><b>4. Details on working of mine:</b></p>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <p>(i) Number of days the mine worked:</p>
+                                </td>
+                                <td>
+                                    <p class="text-center">@Html.DisplayFor(m => m.NoOfDaysMineWork)</p>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <p>
+                                        (ii) Reasons for work stoppage in the mine during the month (due
+                                        to strike, lockout, heavy rain, non-availability of labour,
+                                        transport bottleneck, lack of demand, uneconomic operations,
+                                        etc.) and the number of days of work stoppage for each reason
+                                        separately
+                                    </p>
+                                </td>
+                                <td>
+                                    <table id="MiningWork" style="width: 100%; border: 1px solid black;">
+                                        <tr>
+                                            <th style="width: 50%; text-align: center; border-bottom: 1px solid #080808;">Reasons</th>
+                                            <th style="width: 50%; text-align: center; border-left: 1px solid #080808; border-bottom: 1px solid #080808;">No Of Days</th>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="2">
+                                    <p><b>5. Average Daily Employment and Total Salary/Wages paid #:</b></p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <table style="width: 100%" border="1">
+                        <tr>
+                            <th rowspan="2">
+                                <center>Work place</center>
+                            </th>
+                            <th colspan="2">
+                                <center>Direct</center>
+                            </th>
+
+                            <th colspan="2">
+                                <center>Contract</center>
+                            </th>
+                            <th colspan="2">
+                                <center>Total Salary/Wages (₹)</center>
+                            </th>
+
+                        </tr>
+                        <tr>
+                            <th>Male</th>
+                            <th>Female</th>
+                            <th>Male</th>
+                            <th>Female</th>
+                            <th>Direct</th>
+                            <th>Contract</th>
+
+                        </tr>
+                        <tr>
+                            <td style="width: 16%;">Below ground</td>
+                            <td style="width: 14%;">@Html.DisplayFor(m => m.DirectMale1)</td>
+                            <td style="width: 14%;">@Html.DisplayFor(m => m.DirectFemale1)</td>
+                            <td style="width: 14%;">@Html.DisplayFor(m => m.ContractMale1)</td>
+                            <td style="width: 14%;">@Html.DisplayFor(m => m.ContractFemale1)</td>
+                            <td style="width: 14%;">@Html.DisplayFor(m => m.TotalWagesMale1)</td>
+                            <td style="width: 14%;">@Html.DisplayFor(m => m.TotalWagesFeMale1)</td>
+                        </tr>
+                        <tr>
+                            <td style="width: 16%;">Opencast</td>
+                            <td style="width: 14%;">@Html.DisplayFor(m => m.DirectMale2)</td>
+                            <td style="width: 14%;">@Html.DisplayFor(m => m.DirectFemale2)</td>
+                            <td style="width: 14%;">@Html.DisplayFor(m => m.ContractMale2)</td>
+                            <td style="width: 14%;">@Html.DisplayFor(m => m.ContractFemale2)</td>
+                            <td style="width: 14%;">@Html.DisplayFor(m => m.TotalWagesMale2)</td>
+                            <td style="width: 14%;">@Html.DisplayFor(m => m.TotalWagesFeMale2)</td>
+                        </tr>
+                        <tr>
+                            <td style="width: 16%;">Above ground</td>
+                            <td style="width: 14%;">@Html.DisplayFor(m => m.DirectMale3)</td>
+                            <td style="width: 14%;">@Html.DisplayFor(m => m.DirectFemale3)</td>
+                            <td style="width: 14%;">@Html.DisplayFor(m => m.ContractMale3)</td>
+                            <td style="width: 14%;">@Html.DisplayFor(m => m.ContractFemale3)</td>
+                            <td style="width: 14%;">@Html.DisplayFor(m => m.TotalWagesMale3)</td>
+                            <td style="width: 14%;">@Html.DisplayFor(m => m.TotalWagesFeMale3)</td>
+                        </tr>
+                        <tr>
+                            <td style="width: 16%;">Total</td>
+                            <td style="width: 14%;">@Html.DisplayFor(m => m.TotalDirectMale)</td>
+                            <td style="width: 14%;">@Html.DisplayFor(m => m.TotalDirectFemale)</td>
+                            <td style="width: 14%;">@Html.DisplayFor(m => m.TotalContractMale)</td>
+                            <td style="width: 14%;">@Html.DisplayFor(m => m.TotalContractFemale)</td>
+                            <td style="width: 14%;">@Html.DisplayFor(m => m.TotalMaleWages)</td>
+                            <td style="width: 14%;">@Html.DisplayFor(m => m.TotalFeMaleWages)</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <p class="text-left">
+                # To include all employees exclusive to the mine and attached factory, workshop or mineral dressing plant at the mine site
+            </p>
+            <br />
+            <span class="page-break"></span>
+            <br />
+            <p class="text-center"><b>PART-II (PRODUCTION, DESPATCHES AND STOCKS)</b></p>
+            <p class="text-center">(To be submitted separately for each mineral)</p>
+            <p class="text-center">(Unit of Quantity in Tonnes)</p>
+            <br />
+            @if (@Model.MineralName == "Iron ore")
+            {
+         
+
+                <p class="text-left"><b>1. Type of ore produced:</b></p>
+                <p class="text-left">(Applicable for Iron ore only; tick mark whichever is applicable)</p>
+                <p class="text-left">(a)@Html.DisplayFor(m => m.TypeOfProduction)</p>
+            }
+            <br />
+            <p class="text-left"><b>2. Production and Stocks of ROM ore at Mine-head</b></p>
+            <table style="width: 100%" border="1">
+                <tr>
+                    <th style="width: 25%;">Category</th>
+                    <th style="width: 25%;">Opening stock</th>
+                    <th style="width: 25%;">Production</th>
+                    <th style="width: 25%;">Closing stock</th>
+                </tr>
+                <tr>
+                    <td style="width: 25%;">(a) Open Cast workings</td>
+                    <td style="width: 25%;">@Html.DisplayFor(m => m.OpeningStockCw)</td>
+                    <td style="width: 25%;">@Html.DisplayFor(m => m.ProductionCW)</td>
+                    <td style="width: 25%;">@Html.DisplayFor(m => m.ClosingStockCW)</td>
+                </tr>
+                <tr>
+                    <td style="width: 25%;">(b) Underground Workings</td>
+                    <td style="width: 25%;">@Html.DisplayFor(m => m.OpeningStockUW)</td>
+                    <td style="width: 25%;">@Html.DisplayFor(m => m.ProductionUW)</td>
+                    <td style="width: 25%;">@Html.DisplayFor(m => m.ClosingStockUW)</td>
+                </tr>
+                <tr>
+                    <td style="width: 25%;">(c) Dump workings</td>
+                    <td style="width: 25%;">@Html.DisplayFor(m => m.OpeningStockDW)</td>
+                    <td style="width: 25%;">@Html.DisplayFor(m => m.ProductionDW)</td>
+                    <td style="width: 25%;">@Html.DisplayFor(m => m.ClosingStockDW)</td>
+                </tr>
+            </table>
+            <br />
+
+            @if (@Model.MineralName == "Iron ore" || @Model.MineralName as string == "Chromite")
+            {
+                <p class="text-left"><b>3(i) Grade-wise ROM ore despatches from mine head ($):</b></p>
+                <table id="tblGradewiseROM" style="width: 100%" border="1">
+                    <tr>
+                        <th>Grade of ROM</th>
+                        <th>Despatches from mine-head</th>
+                        <th>Ex-mine Price (₹)</th>
+                    </tr>
+
+                </table>
+                <br />
+            }
+            <p class="text-left"><b>3(ii) Grade-wise Production, Dispatches, Stocks and Ex-mine prices:</b></p>
+            <table id="tblGradeProduction" style="width: 100%" border="1">
+                <tr>
+                    <th>Grades**</th>
+                    <th>Opening stock at mine- head</th>
+                    <th>Production</th>
+                    <th>Despatches from mine-head</th>
+                    <th>Closing stock at mine-head</th>
+                    <th>Ex-mine price (₹ /Tonne)</th>
+                </tr>
+
+            </table>
+            <br />
+            <p class="text-left"><b>3(iii) In case the mineral is being pulverized in own factory, please give the following particulars (*):</b></p>
+            <table id="tblpulverized" style="width: 100%" border="1">
+                <tr>
+                    <th rowspan="2">Grades**</th>
+                    <th rowspan="2">Total quantity of mineral Pulverized (in tonnes)</th>
+                    <th colspan="2">Total quantity of pulverized mineral produced (for each mesh size)</th>
+                    <th colspan="3">Total Quantity of pulverized mineral sold during the month</th>
+                </tr>
+                <tr>
+                    <th>Mesh size</th>
+                    <th>Quantity (tonne)</th>
+                    <th>Mesh size</th>
+                    <th>Quantity (tonne)</th>
+                    <th>Ex-factory Sale value (₹ )</th>
+                </tr>
+
+            </table>
+
+            <br />
+            <p class="text-left"><b>3(iv) Average cost of pulverization (*)</b> : ₹ <b>@Html.DisplayFor(m => m.Averagecostofpulverization) </b>per tonne.</p>
+            <p class="text-left">(*): Not applicable for Iron ore, Manganese ore, Bauxite and Chromite </p>
+            <br />
+            <span class="page-break"></span>
+            <p class="text-left"><b>4. Details of deductions made from sale value for computation of Ex-mine price (₹ / Tonne)</b></p>
+
+            <table style="width: 100%" border="1">
+                <tr>
+                    <th style="width: 40%;">Deduction claimed #</th>
+                    <th style="width: 30%;">Amount ( in ₹ / Tonne)</th>
+                    <th style="width: 30%;">Remarks</th>
+                </tr>
+                <tr>
+                    <td style="width: 40%;">a) Cost of transportation (indicate loading station and distance from mine in remarks)</td>
+                    <td style="width: 30%;">@Html.DisplayFor(m => m.Amount1)</td>
+                    <td style="width: 30%;">@Html.DisplayFor(m => m.Remarks1)</td>
+                </tr>
+                <tr>
+                    <td style="width: 40%;">b) Loading and unloading charges</td>
+                    <td style="width: 30%;">@Html.DisplayFor(m => m.Amount2)</td>
+                    <td style="width: 30%;">@Html.DisplayFor(m => m.Remarks2)</td>
+                </tr>
+                <tr>
+                    <td style="width: 40%;">c) Railway freight, if applicable (indicate destination and distance)</td>
+                    <td style="width: 30%;">@Html.DisplayFor(m => m.Amount3)</td>
+                    <td style="width: 30%;">@Html.DisplayFor(m => m.Remarks3)</td>
+                </tr>
+                <tr>
+                    <td style="width: 40%;">d) Port handling charges/ export duty (indicate name of port)</td>
+                    <td style="width: 30%;">@Html.DisplayFor(m => m.Amount4)</td>
+                    <td style="width: 30%;">@Html.DisplayFor(m => m.Remarks4)</td>
+                </tr>
+                <tr>
+                    <td style="width: 40%;">e) Charges for sampling and analysis</td>
+                    <td style="width: 30%;">@Html.DisplayFor(m => m.Amount5)</td>
+                    <td style="width: 30%;">@Html.DisplayFor(m => m.Remarks5)</td>
+                </tr>
+                <tr>
+                    <td style="width: 40%;">f) Rent for the plot at Stocking yard</td>
+                    <td style="width: 30%;">@Html.DisplayFor(m => m.Amount6)</td>
+                    <td style="width: 30%;">@Html.DisplayFor(m => m.Remarks6)</td>
+                </tr>
+                <tr>
+                    <td style="width: 40%;">g) Other charges (specify clearly)</td>
+                    <td style="width: 30%;">@Html.DisplayFor(m => m.Amount7)</td>
+                    <td style="width: 30%;">@Html.DisplayFor(m => m.Remarks7)</td>
+                </tr>
+                <tr>
+                    <td style="width: 40%;">Total (a) to (g)</td>
+                    <td style="width: 60%;" colspan="2">@Html.DisplayFor(m => m.TotalAmount)</td>
+                </tr>
+            </table>
+            <br />
+            <p class="text-left"># Not applicable for captive dispatches and ex-mine sales </p>
+            <br />
+            <p class="text-left"><b>5. Sales/ Dispatches effected for Domestic Purposes and for Exports:</b> </p>
+            <table id="tblSaleDispatch" style="width: 100%" border="1">
+                <tr>
+                    <th rowspan="2">
+                        <center>Grade(^)</center>
+                    </th>
+                    <th rowspan="2">Nature of Despatch (indicate whether Domestic Sale or Domestic Transfer or Captive consumption or Export)</th>
+                    <th colspan="4">
+                        <center> For Domestic Purposes </center>
+                    </th>
+                    <th colspan="3">
+                        <center>For export</center>
+                    </th>
+                </tr>
+                <tr>
+                    <th>Registration number as allotted by the Indian Bureau of Mines to the buyer ##</th>
+                    <th>Consignee name ##</th>
+                    <th>Quantity</th>
+                    <th>Sale value (₹)</th>
+                    <th>Country</th>
+                    <th>Quantity</th>
+                    <th>F.O.B Value(₹)</th>
+                </tr>
+
+            </table>
+
+            <br />
+            <p class="text-left">(^): To indicate the grades of ores as mentioned below (see **)</p>
+            <p class="text-left">## To indicate separately if more than one buyer. </p>
+            <p class="text-left">
+                <b>NOTE:-</b> Mine owners are required to substantiate domestic sale value/ FOB value for each grade of ore quoted above
+                with copy of invoices (not to be submitted with the return; to be produced whenever required).
+            </p>
+            <br />
+
+            <p class="text-left">
+                <b>
+                    6. Give reasons for increase/decrease in production/nil production, if any, during the month compared to the
+                    previous month.
+                </b>
+            </p>
+            <p class="text-left">&nbsp;&nbsp;&nbsp;&nbsp; a) @Html.DisplayFor(m => m.productionIncrDecResion)</p>
+            <br />
+            <p class="text-left">
+                <b>
+                    7. Give reasons for increase/decrease in grade wise ex-mine price, if any, during the month compared to the
+                    previous month.
+                </b>
+            </p>
+            <p class="text-left">&nbsp;&nbsp;&nbsp;&nbsp; a)  @Html.DisplayFor(m => m.ex_minepriceIncrDecResion) </p>
+
+            <br />
+            <p>
+                @Html.CheckBoxFor(m => m.certify)
+                I certify that the information furnished above is correct and complete in all respects.
+            </p>
+            <br />
+            <table style="width: 100%">
+                <tr>
+                    <td style="width: 60%;">
+                        <b>Place:</b> @Html.DisplayFor(m => m.LesseeAddress)<br />
+                        <b>Date:</b> @Html.DisplayFor(m => m.SubmitDate)
+                        <br />
+                        <br />
+                        <b>Name in full:</b> @Html.DisplayFor(m => m.LesseeName)<br />
+                        <b>Designation:</b> Owner/Agent/Mining Engineer/Manager<br />
+                    </td>
+                </tr>
+            </table>
+            <input id="fName" type="hidden" />
+            <input id="fid" type="hidden" />
+        </div>
+    }
+</body>
+</html>
+
+
+
+<script>
+    $(document).ready(function () {
+        getGradewise_ROM();
+        getGradewise_Production();
+        getMineral_Pulverized();
+        getSaleDispatch();
+        getMineWork();
+    });
+
+
+    function getMineWork() {
+        try {
+            var MY = $("#Month_Year").val();
+            var Uid = $("#UserId").val();
+            $.ajax({
+                type: "GET",
+                url: '@Url.Action("GetMineWorkDetails", "eReturnProcess", new { Area = "eReturn_NonCoal" })',
+                data: {
+                    MonthYear: MY, UserId: Uid
+                },
+
+                dataType: "json",
+                success: function (result) {
+                    for (i = 0; i < result.length; i++) {
+                        $('#MiningWork tbody').append('<tr><td style="width: 50%; text-align: center;">'
+                              + result[i].reason + '</td><td style="width: 50%; text-align: center; border-left: 1px solid #080808;">'
+                              + result[i].noOfDaysWorkStop + '</td></tr>');
+                    }
+                }
+            });
+        }
+        catch (e)
+        { }
+    }
+
+    function getGradewise_ROM() {
+        try {
+
+            var MY = $("#Month_Year").val();
+            var Uid = $("#UserId").val();
+            $.ajax({
+                type: "GET",
+                url: '@Url.Action("GetGradewise_ROM", "eReturnProcess", new { Area = "eReturn_NonCoal" })',
+                data: {
+                    MonthYear: MY, UserId: Uid
+                },
+
+                dataType: "json",
+                success: function (result) {
+
+                    if (result != null) {
+                        for (i = 0; i < result.length; i++) {
+                            $('#tblGradewiseROM tbody').append('<tr><td style="width: 40%;">'
+                                + result[i].mineralGrade + '</td><td style="width: 30%; text-align: left; border-left: 1px solid #70ADD6;">'
+                                + result[i].despatches_minehead + '</td><td style="width: 30%; text-align: left; border-left: 1px solid #70ADD6;">'
+                                + result[i].ex_mine_Price + '</td></tr>');
+                        }
+                    }
+                    else {
+                        swal("", "No Data Available", "warning");
+                    }
+                }
+            });
+        }
+        catch (e)
+        { }
+    }
+
+    function getGradewise_Production() {
+        try {
+
+            var MY = $("#Month_Year").val();
+            var Uid = $("#UserId").val();
+            $.ajax({
+                type: "GET",
+                url: '@Url.Action("GetGrade_WiseProduction", "eReturnProcess", new { Area = "eReturn_NonCoal" })',
+                data: {
+                    MonthYear: MY, UserId: Uid
+                },
+
+                dataType: "json",
+                success: function (result) {
+
+                    if (result != null) {
+
+                        for (i = 0; i < result.length; i++) {
+
+                            $('#tblGradeProduction tbody').append('<tr><td style="width: 25%;">'
+                                + result[i].mineralGrade + '</td><td style="width: 15%; text-align: left; border-left: 1px solid #70ADD6;">'
+                                + result[i].openingStock_MineHead + '</td><td style="width: 15%; text-align: left; border-left: 1px solid #70ADD6;">'
+                                + result[i].production + '</td><td style="width: 15%; text-align: left; border-left: 1px solid #70ADD6;">'
+                                + result[i].dispatch_MineHead + '</td><td style="width: 15%; text-align: left; border-left: 1px solid #70ADD6;">'
+                                + result[i].closingStock_MineHead + '</td><td style="width: 15%; text-align: left; border-left: 1px solid #70ADD6;">'
+                                + result[i].ex_MinePrice + '</td>'
+                              + '</tr>');
+                        }
+                    }
+                    else {
+                        swal("", "No Data Available", "warning");
+                    }
+                }
+            });
+        }
+        catch (e)
+        { }
+    }
+
+
+    // GetMineral_PulverizedForPrint
+
+
+    function getMineral_Pulverized() {
+        try {
+
+            var MY = $("#Month_Year").val();
+            var Uid = $("#UserId").val();
+            $.ajax({
+                type: "GET",
+                url: '@Url.Action("GetMineral_Pulverized", "eReturnProcess", new { Area = "eReturn_NonCoal" })',
+                data: {
+                    MonthYear: MY, UserId: Uid
+                },
+
+                dataType: "json",
+                success: function (result) {
+
+                    if (result != null && result.length > 0) {
+                        for (i = 0; i < result.length; i++) {
+                            $('#tblpulverized tbody').append('<tr><td style="width: 16%;">'
+                                + result[i].mineralGrade + '</td><td style="width: 14%; text-align: left; border-left: 1px solid #70ADD6;">'
+                                + result[i].total_Qty_Mineral_Pulverization + '</td><td style="width: 14%; text-align: left; border-left: 1px solid #70ADD6;">'
+                                + result[i].pulverized_MeshSize + '</td><td style="width: 14%; text-align: left; border-left: 1px solid #70ADD6;">'
+                                + result[i].pulverized_Qty + '</td><td style="width: 14%; text-align: left; border-left: 1px solid #70ADD6;">'
+                                + result[i].produced_MeshSize + '</td><td style="width: 14%; text-align: left; border-left: 1px solid #70ADD6;">'
+                                + result[i].produced_Qty + '</td><td style="width: 14%; text-align: left; border-left: 1px solid #70ADD6;">'
+                                + result[i].produced_Ex_factory_Sale_value + '</td></tr>');
+                        }
+                    }
+                    else {
+                        $('#tblpulverized tbody').append('<tr><td style="width: 16%;">N / A </td><td style="width: 14%; text-align: left; border-left: 1px solid #70ADD6;">' + ' N / A ' +
+                               '</td><td style="width: 14%; text-align: left; border-left: 1px solid #70ADD6;">'
+                            + ' N/A ' + '</td><td style="width: 14%; text-align: left; border-left: 1px solid #70ADD6;">'
+                            + ' N/A ' + '</td><td style="width: 14%; text-align: left; border-left: 1px solid #70ADD6;">'
+                            + ' N/A ' + '</td><td style="width: 14%; text-align: left; border-left: 1px solid #70ADD6;">'
+                            + ' N/A ' + ' </td><td style="width: 14%; text-align: left; border-left: 1px solid #70ADD6;">'
+                            + ' N/A ' + '</td></tr>');
+                    }
+                }
+            });
+        }
+        catch (e)
+        { }
+    }
+
+
+
+    function getSaleDispatch() {
+        try {
+
+            var MY = $("#Month_Year").val();
+            var Uid = $("#UserId").val();
+            $.ajax({
+                type: "GET",
+                url: '@Url.Action("GetSalesDespatch", "eReturnProcess", new { Area = "eReturn_NonCoal" })',
+                data: {
+                    MonthYear: MY, UserId: Uid
+                },
+
+                dataType: "json",
+                success: function (result) {
+
+                    if (result != null) {
+                        for (i = 0; i < result.length; i++) {
+                            $('#tblSaleDispatch tbody').append('<tr><td style="width: 10%;">'
+                                + result[i].mineralGrade + '</td><td style="width: 20%; text-align: left; border-left: 1px solid #70ADD6;">'
+                                + result[i].natureofDispatch + '</td><td style="width: 8%; text-align: left; border-left: 1px solid #70ADD6;">'
+                                + result[i].registrationNo + '</td><td style="width: 30%; text-align: left; border-left: 1px solid #70ADD6;">'
+                                + result[i].purchaserConsinee + '</td><td style="width: 10%; text-align: left; border-left: 1px solid #70ADD6;">'
+                                + result[i].domesticPurposes_Quantity + '</td><td style="width: 5%; text-align: left; border-left: 1px solid #70ADD6;">'
+                                + result[i].saleValue + '</td><td style="width: 10%; text-align: left; border-left: 1px solid #70ADD6;">'
+                                + result[i].country + '</td><td style="width: 10%; text-align: left; border-left: 1px solid #70ADD6;">'
+                                + result[i].export_Quantity + '</td><td style="width: 10%; text-align: left; border-left: 1px solid #70ADD6;">'
+                                + result[i].fobValue + '</td></tr>');
+                        }
+                    }
+                    else {
+                        swal("", "No Data Available", "warning");
+                    }
+                }
+            });
+        }
+        catch (e)
+        { }
+    }
+
+     function getPDF() {
+        debugger;
+        var HTML_Width = $("#eReturnMonthly").width();
+        var HTML_Height = $("#eReturnMonthly").height();
+        var top_left_margin = 15;
+        var PDF_Width = HTML_Width + (top_left_margin * 2);
+        var PDF_Height = (PDF_Width * 1.5) + (top_left_margin * 2);
+        var canvas_image_width = HTML_Width;
+        var canvas_image_height = HTML_Height;
+
+        var totalPDFPages = Math.ceil(HTML_Height / PDF_Height) - 1;
+
+
+        html2canvas($("#eReturnMonthly")[0], { allowTaint: true }).then(function (canvas) {
+            debugger;
+            canvas.getContext('2d');
+
+            console.log(canvas.height + "  " + canvas.width);
+
+           // var data = canvas.toDataURL();
+            var data = canvas.toDataURL("image/JPEG", 1.0);
+            var pdf = new jsPDF('p', 'pt', [PDF_Width, PDF_Height]);
+            pdf.addImage(data, 'JPEG', top_left_margin, top_left_margin, canvas_image_width, canvas_image_height);
+
+
+            for (var i = 1; i <= totalPDFPages; i++) {
+                pdf.addPage(PDF_Width, PDF_Height);
+                pdf.addImage(data, 'JPEG', top_left_margin, -(PDF_Height * i) + (top_left_margin * 4), canvas_image_width, canvas_image_height);
+            }
+            //data = data.replace('data:image/png;base64,', '');
+            data = pdf.output("datauristring").replace('data:application/pdf;base64,', '');
+
+             //-----------------
+                     try {
+
+                         var dt = new Date();
+                         var FNID = $("#Details_Id").val();
+                         var FileName = FNID + "_FormF1_" + dt.getDate() + "" + (dt.getMonth() + 1) + "" + dt.getFullYear() + "_" + dt.getHours() + "_" + dt.getMinutes() + "_" + dt.getSeconds() + ".pdf";
+                         $("#fName").val(FileName).change();
+
+
+
+                          $.ajax({
+                              url: "/eReturn_NonCoal/eReturnProcess/SaveNormalPdfFile",
+                              type: "POST",
+                              async: false,
+                              data: { base64BinaryStr: data, fileName: $("#fName").val(), ID: $('#Details_Id').val(), UpdateIn: "Form F1" },
+                              success: function (msg) {
+                                  debugger;
+                                  if (msg == "SUCCESS") {
+
+                                      var FPath = '@ViewBag.DSCReadFilePath' + $("#fName").val();
+                                      var OutPath = "";
+                                      var Postdata = 'action=signpdf' + "\n" + 'datatosign=' + FPath + '' + "\n" + 'signaction=2' + "\n" + 'outputpath=' + OutPath + '' + "\n" + 'signtype=sign' + "\n" + 'expirycheck=true' + "\n" + 'coordinate=400,100,1000,50' + "\n" + 'issuername=' + "\n" + 'certtype=ALL' + "\n" + 'certclass=0';
+                                      connection.send(Postdata);
+                                      connection.onerror = function (error) {
+                                          debugger;
+                                          alert('Please check the server connection: ' + error);
+                                          alert(error);
+                                      };
+
+                                      connection.onmessage = function (e) { // when DSC is success then following function executed.
+                                          debugger;
+                                          if (e.data.indexOf("subProtocol") == -1) {
+                                              $("#DSCResponse").val(e.data).change();
+                                              $.ajax(
+                                              {
+                                                      url: "/eReturn_NonCoal/eReturnProcess/CheckVerifyResponse",
+                                                      type: "POST",
+                                                  data: { contentType: "pkcs7", signDataBase64Encoded: e.data, responseType: "plain" },
+                                                  async: false,
+                                                      success: function (msg) {
+                                                          debugger;
+                                                      if (msg == "SUCCESS") {
+
+                                                          var FNID = $("#fName").val();
+                                                          var Month_Year = $("#Month_Year").val();
+                                                          var LicenseAppId = $("#Details_Id").val();
+                                                          var signData = e.data;
+                                                          $.ajax({
+                                                              url:"/eReturn_NonCoal/eReturnProcess/SavePdfFile",
+                                                              type: "POST",
+                                                              async: false,
+                                                              data: {
+                                                                  base64BinaryStr: e.data, fileName: FNID, ID: LicenseAppId, UpdateIn: "Form F1" },
+                                                              success: function (msg) {
+
+                                                                  if (msg == "SUCCESS") {
+                                                                      // window.location.reload();
+                                                                      window.location.href = "/eReturn_NonCoal/eReturnProcess/GeteReturnFormOneDetails?Month_Year=" + Month_Year;
+
+                                                                  }
+                                                                  else {
+                                                                      alert(msg);
+                                                                  }
+                                                              }
+                                                          });
+                                                      }
+                                                  }
+                                              });
+                                          }
+                                          else {
+                                              alert(e.data);
+                                          }
+                                      };
+                                  }
+                                  else {
+                                      alert(msg);
+
+                                  }
+                              }
+                          });
+                      }
+                      catch (e) {
+                          alert("Your DSC Connection is not working. Please try after some time.");
+                      }
+                    //-------------------------
+           // pdf.save("HTML-Document.pdf");
+        });
+    };
+
+
+    //following code is for DSC Signature
+    try {
+        var connection = new WebSocket('wss://localhost.emudhra.com:8080');
+
+        connection.onopen = function () {
+            console.log('Connection Opened');
+        };
+        connection.onerror = function (error) {
+            //  alert('Please check the DSC connection: ' + error);
+        };
+        connection.onmessage = function (e) {
+            if (e.data.indexOf("subProtocol") == -1) {
+                //  alert(e.data);
+            }
+        };
+    }
+    catch (e) {
+        alert("No DSC Connection Found");
+    }
+    //-----------------------------
+
+</script>
+
+
+
+
+
+
+
+

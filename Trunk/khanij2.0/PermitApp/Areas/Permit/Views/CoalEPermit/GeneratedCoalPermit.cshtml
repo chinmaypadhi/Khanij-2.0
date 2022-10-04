@@ -1,0 +1,435 @@
+﻿@model PermitEF.ePermitModel
+@using PermitApp.Helper;
+@{
+    ViewData["Title"] = "Generate Permit";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+
+<section class="wrapper main-wrapper row">
+    <div class="col-12" id="mainDiv">
+        @Html.Partial("_CMSnavigation")
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+
+                        <li class="nav-item">
+                            <a class="nav-link " href="~/Permit/CoalEPermit/GenerateCoalPermit">
+                                Generate e-Permit
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="#">
+                                Generated Permit
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="~/Permit/CoalEPermit/ArchivedCoalPermit">
+                                Archived Permit
+                            </a>
+                        </li>
+
+                    </ul>
+                    @Html.Partial("_CMSutil")
+                </div>
+
+                <section class="box form-container">
+                    @using (Html.BeginForm("MergeEPermit", "ePermit", FormMethod.Post, new { AUTOCOMPLETE = "Off", id = "form1" }))
+                    {
+                        @*<div class="search-box">
+                                <div class="searchform px-3 py-3">
+                                    <div class="row">
+
+
+                                        <div class="col-sm-4">
+                                            <div class="form-group row">
+                                                <label for="inputText" class="col-sm-4 col-form-label">
+                                                    Mineral Grade
+                                                </label>
+                                                <div class="col-sm-8">
+                                                    <div class="input-group">
+
+                                                        <div class="input-group-prepend">
+                                                            @Html.DropDownListFor(model => model.MineralGradeId, ViewBag.MineralGradeLst as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control form-group", autofocus = "autofocus", required = "required" })
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-2">
+                                            <button type="submit" class="btn btn-sm btn-success m-0 waves-effect waves-light" id="btnSubmit" onclick="GetDataByParameter()">Search</button>
+                                        </div>
+
+
+
+
+                                        <div class="col-sm-2">
+                                            <button type="button" id="btnMergeEPermit" class="btn btn-sm btn-success m-0 waves-effect waves-light" style="margin-right: 10px; width: 150px;">Merge e-Permit</button>
+                                        </div>
+
+
+                                    </div>
+
+
+
+
+                                </div>
+                            </div>*@
+
+                        <div class="content-body">
+
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <table id="ePermitPaymentApplications" class="table table-sm table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th width="100">Sl No.</th>
+                                                @if (ViewBag.ePermitType == "GeneratedPermit")
+                                                {
+                                                    <th>
+                                                        e-Permit No
+                                                    </th>
+                                                }
+                                                <th>Transaction ID</th>
+                                                <th>Payment Receipt ID</th>
+                                                <th>Mineral Name</th>
+                                                <th>Mineral Form</th>
+                                                <th>Mineral Grade</th>
+                                                <th>Quantity</th>
+
+                                                <th>Paid Amount</th>
+                                                <th>Payment Status</th>
+                                                <th>e-Permit</th>
+                                                @if (ViewBag.ePermitType == "GeneratePermit")
+                                                {
+                                                    <th>Archive</th>
+                                                }
+                                                <th style="display:none;"></th>
+                                                <th style="display:none;"> </th>
+                                                <th style="display:none;"></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach (var b in ViewBag.ViewList)
+                                            {
+                                                <tr>
+                                                    <td>@b.SRNumber</td>
+
+                                                    @if (ViewBag.ePermitType == "GeneratedPermit")
+                                                    {
+                                                        <td class="noprint">
+                                                            @b.BulkPermitNo
+                                                        </td>
+                                                    }
+                                                    @if (ViewBag.ePermitType == "GeneratedPermit")
+                                                    {
+                                                        @if (b.MergeEPermitCount == "0")
+                                                        {
+                                                            <td class="noprint">
+                                                                <a class="text-primary" href="@CustomQueryStringHelper.EncryptString("Permit","CoalPayment","CoalEPermit",new {BulkpermitId=@b.BulkPermitId })">@b.TransactionalID</a>
+                                                                @*<a class="text-primary" href="@Url.Content("~/Permit/CoalEPermit/CoalPayment/?BulkpermitId=")@b.BulkPermitId">@b.TransactionalID</a>*@
+                                                            </td>
+                                                        }
+                                                        else
+                                                        {
+                                                <td class="noprint">
+                                                    <a class="text-primary" href="@CustomQueryStringHelper.EncryptString("Permit","MergeEPermitPayment","ePermit",new {BulkpermitId=@b.BulkPermitId })">@b.TransactionalID</a>
+                                                    @*<a class="text-primary" href="@Url.Content("~/Permit/ePermit/MergeEPermitPayment/?BulkpermitId=")@b.BulkPermitId">@b.TransactionalID</a>*@
+                                                </td>
+                                                        }
+
+                                                    }
+                                                    else
+                                                    {
+                                                        <td><p class="m-0" id="MineralName">@b.TransactionalID</p> </td>
+                                                    }
+                                                    <td><p class="m-0">@b.PaymentReceiptID</p> </td>
+                                                    <td><p class="m-0" id="MineralName">@b.MineralName</p> </td>
+                                                    <td><p class="m-0" id="MineralNature">@b.MineralNature</p> </td>
+                                                    <td><p class="m-0" id="MineralGradeName">@b.MineralGradeName</p> </td>
+                                                    <td><p class="m-0">@b.ApprovedQty</p> </td>
+
+                                                    <td><p class="m-0">@b.TotalPayableAmount</p> </td>
+                                                    @if (b.StatusText == "Payment Verification Pending")
+                                                    {
+                                                        <td>
+                                                            <a class='btn-floating btn-outline-danger btn-sm' style='cursor: pointer;' onclick="CheckPaymentStatus(@b.BulkPermitId)">@b.StatusText</a>
+                                                        </td>
+                                                    }
+                                                    else
+                                                    {
+                                                        <td>
+                                                            @b.StatusText
+                                                        </td>
+                                                    }
+                                                    @if (ViewBag.ePermitType == "GeneratedPermit")
+                                                    {
+                                                        @if (b.DSCLesseeFilePath == "")
+                                                        {
+                                                            <td class="noprint">
+                                                                -
+                                                            </td>
+                                                        }
+                                                        else
+                                                        {
+                                                            <td class="noprint">
+                                                                <a class="text-primary" href="@b.DSCLesseeFilePath" target='_blank'>Download e-Permit</a>
+                                                            </td>
+                                                        }
+                                                    }
+                                                    else if (ViewBag.ePermitType == "GeneratePermit")
+                                                    {
+                                                        @if (b.DSCLesseeFilePath == "" && b.StatusText != "Payment Verification Pending")
+                                                        {
+                                                            <td class="noprint">
+                                                                <a class="text-primary" href="@Url.Content("~/Permit/CoalEPermit/ePermitViewWithoutDSC/?id=")@b.BulkPermitId">Generate e-Permit</a>
+                                                            </td>
+                                                        }
+                                                        else if (b.StatusText == "Payment Verification Pending")
+                                                        {
+                                                            <td style="visibility:hidden">Payment Verification Pending</td>
+                                                        }
+                                                        else
+                                                        {
+                                                            <td>
+                                                                <a class="text-primary" href="@b.DSCLesseeFilePath" target='_blank'>Download e-Permit</a>
+                                                            </td>
+
+                                                        }
+                                                        @if (b.DSCLesseeFilePath == "" && b.StatusText != "Payment Verification Pending")
+                                                        {
+                                                            <td>-</td>
+                                                        }
+                                                        else
+                                                        {
+                                                            <td>
+                                                                <a class='btn-floating btn-outline-danger btn-sm' style='cursor: pointer;' onclick="UpdateArchivePrmit(@b.BulkPermitId)">Archive</a>
+                                                            </td>
+                                                        }
+
+                                                    }
+                                                    else if (ViewBag.ePermitType == "ArchivePermit")
+                                                    {
+                                                        <td>
+                                                            <a class='btn-floating btn-outline-danger btn-sm' style='cursor: pointer;' onclick="UpdateUnArchivePrmit(@b.BulkPermitId)" >Un-Archive</a>
+                                                        </td>
+                                                    }
+                                                    <td style="display:none;">@b.ActiveStatus</td>
+
+                                                    <td style="display:none;">@b.BulkPermitId</td>
+                                                    <td style="display:none;">@b.MergeEPermitCount</td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+
+
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </section>
+            </div>
+        </div>
+    </div>
+    <!-- MAIN CONTENT AREA ENDS -->
+</section>
+@*<uc1:footer runat="server" ID="footer" />*@
+<script>
+
+    $(document).ready(function () {
+        loadNavigation('ViewList', 'glhelpdesk', 'plraiseticket', 'tl', 'E-Permit', 'Saved permit', ' ');
+        $('.searchableselect').searchableselect();
+
+        $('.shorting-lnk').click(function () {
+            $('.shorting-lnk i').toggleClass('fa-sort-amount-up-alt fa-sort-amount-down-alt ');
+        });
+        $('.filter-dropdown').hide();
+        $('.filter-lnk').click(function () {
+            $(this).toggleClass('active');
+            $(this).siblings('.filter-dropdown').slideToggle();
+        });
+        $('.filter-btn').click(function () {
+            $(this).parent('.shorting-cell .filter-dropdown').slideUp();
+            if ($(this).parent().parent('.shorting-cell').find('.filter-lnk').hasClass('active')) {
+                $(this).parent().siblings('.filter-lnk').removeClass('active');
+            }
+        });
+       @* $("#excelIcon").click(function () {
+            exportTableToExcel("ePermitList", "text")
+        });*@
+    });
+</script>
+<script>
+    $(document).ready(function () {
+        $('.datepicker').datetimepicker({
+            format: 'LT',
+            format: 'DD-MM-YYYY',
+
+        });
+    });
+</script>
+<script>
+
+    function UpdateArchivePrmit(BulkPermitId) {
+        if (confirm('Are you sure you want to Archive?')) {
+            $.ajax({
+                type: "GET",
+                url: '@Url.Action("ArchivePermit", "ePermit", new { Area = "Permit" })',
+                data: { BulkPermitId: BulkPermitId },
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                async: "false",
+                success: function (result) {
+                    if (result != null) {
+                        alert(result);
+                        window.location.reload();
+                    }
+                }
+            });
+        }
+    }
+    function UpdateUnArchivePrmit(BulkPermitId) {
+        if (confirm('Are you sure you want to Un-Archive?')) {
+            $.ajax({
+                type: "GET",
+                url: '@Url.Action("UnArchivePermit", "ePermit", new { Area = "Permit" })',
+                data: { BulkPermitId: BulkPermitId },
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                async: "false",
+                success: function (result) {
+                    if (result != null) {
+                        alert(result);
+                        window.location.reload();
+                    }
+                }
+            });
+        }
+    }
+
+    function KendoFilterData() {
+        var permittype = '@ViewBag.ePermitType';
+        return {
+            permittype: permittype
+        };
+    }
+
+    function CheckPaymentStatus(BulkPermitId) {
+        var PaymentType = "BP";
+        $.ajax({
+            type: "POST",
+            url: '@Url.Action("CheckPaymentCurrentStatus", "BulkPermit", new { Area = "Lessee" })',
+            data: '{Id: "' + BulkPermitId + '",PaymentType: "' + PaymentType + '"}',
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            async: "false",
+            success: function (result) {
+                if (result != null) {
+                    if (result == 'SUCCESS') {
+                        alert("Your payment has been credited successfully.");
+
+                    }
+                    else if (result == 'AWAITED' || result == 'FAILED') {
+                        alert("Your payment status is still in awaited mode, please check after some time for update.");
+                    }
+                    else {
+                        //alert("Your payment status for e-permit is still pending. Please contact your District officer.");
+                        window.location.href = result;
+
+                    }
+
+                }
+            }
+        });
+
+        $("#ePermitPaymentApplications").data("kendoGrid").dataSource.read();
+        $("#ePermitPaymentApplications").data("kendoGrid").refresh();
+        //  autosyncData(); // for refresh grid.
+
+    }
+
+
+    function sendAntiForgery() {
+        return { "__RequestVerificationToken": $('input[name=__RequestVerificationToken]').val() }
+    }
+
+    //function DataBound(e) {
+    //    var data = this.dataSource.view();
+    //    for (var i = 0; i < data.length; i++) {
+    //        var uid = data[i].uid;
+    //        var row = this.table.find("tr[data-uid='" + uid + "']");
+    //        if (data[i].ActiveStatus == 2 || data[i].ActiveStatus == 4) {
+    //            row.find(".k-i-lock").parent().hide();
+    //        }
+    //        else if (data[i].ActiveStatus == 3) {
+    //            row.find(".k-i-lock").parent().show();
+    //        }
+    //    }
+    //    e.preventDefault();
+    //}
+
+    //function OnRefreshGrid() {
+    //    $("#ePermitPaymentApplications").data("kendoGrid").dataSource.read();
+    //}
+    //function onRequestEnd(e) {
+    //    var MasterTableParameter = "ePermitApplication";
+    //    if (e.response.Data[0] == 2) {
+    //        fn_AlertMessage(e.response.Data[0], "Insert", MasterTableParameter);
+    //        e.preventDefault();
+    //    }
+    //    else {
+    //        if (e.type != "read") {
+    //            OnRefreshGrid();
+    //        }
+    //    }
+    //}
+    //var exportFlag = false;
+    //var columnToHide = 0;
+    //function funcPdfExport(e) {
+    //    $("thead tr th a.k-link").removeAttr("href");
+    //    var grid = $("#ePermitPaymentApplications").data("kendoGrid");
+    //    for (i = 0; i <= grid.columns.length - 1; i++) {
+    //        if (grid.columns[i].command != null) {
+    //            if (!exportFlag) {
+    //                grid.hideColumn(i);
+    //                columnToHide = i;
+    //                e.preventDefault();
+    //                exportFlag = true;
+    //                grid.saveAsPDF();
+    //                setTimeout(function () {
+    //                    exportFlag = false;
+    //                })
+    //            }
+    //        }
+    //    }
+    //}
+
+    function PaymentStatus() {
+        $.ajax({
+            type: "POST",
+            url: '@Url.Action("PaymentStatus", "CoalEPermit", new { Area = "ePermit" })',
+            //  data: '{Id: "' + BulkPermitId + '",PaymentType: "' + PaymentType + '"}',
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            success: function (result) {
+                if (result != null) {
+                    if (result == 'SUCCESS') {
+                        $("#it_clearance").data("kendoGrid").dataSource.read();
+                        $("#it_clearance").data("kendoGrid").refresh();
+                        alert("Your payment has been credited successfully.");
+                    }
+                    else if (result == 'AWAITED') {
+                        alert("Your payment status is still in awaited mode, please check after some time for update.");
+                    }
+                    else {
+                        alert("Your payment status for e-permit is still pending. Please contact your District officer.");
+                    }
+
+                }
+            }
+        });
+    }
+
+</script>

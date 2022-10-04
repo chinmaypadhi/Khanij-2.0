@@ -1,0 +1,524 @@
+﻿@*// *********************************************************************************************************
+    //  View Name                : Add
+    //  Desciption               : To Save,Edit and Update Lab Report Details
+    //  Created By               : Lngaraj Dalai
+    //  Created On               : 24 Feb 2021
+    // ********************************************************************************************************
+*@
+@model GeologyEF.LabReportmaster
+@using  GeologyEF;
+@{
+    ViewData["Title"] = "Add";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+@if (TempData["msg"] != null)
+{
+    <script>
+        var vv = '@TempData["msg"]';
+    /**/
+    if (vv == 1) {
+        swal("", "Lab Report inserted successfully.", "success");
+    }
+    else if (vv == 4) {
+        swal("", "Lab Report updated successfully.", "success");
+    }
+    else if (vv == 2) {
+        swal("", "Lab Report already exists.", "warning");
+    }
+    else {
+        swal("", "Lab Report not Saved Sucessfully!!","error");
+    }
+    </script>
+}
+<script>
+    indicateMe = "yes"
+    $(document).ready(function () {
+        debugger;
+        loadNavigation('AddLabReport', 'glRoleRes', 'plUser', 'tl', 'Geology', 'Lab Report', ' ');
+        $('.datepicker').datetimepicker({
+            format: 'DD/MM/YYYY',
+            daysOfWeekDisabled: [],
+        }).keydown(false);
+        $("#txtReport_MY").datetimepicker({
+            format: 'MMMM YYYY',
+        }).keydown(false);
+        if ($("#hfDistrictId").val() != "") {
+            $("#DistrictID").val($("#hfDistrictId").val());
+        }
+        if ($("#hfTehsilId").val() != "") {
+            $("#TehsilID").val($("#hfTehsilId").val());
+        }
+        if ($("#hfVillageId").val() != "") {
+            $("#VillageID").val($("#hfVillageId").val());
+        }
+        if ($("#hfRegionalOfficeId").val() != "") {
+            $("#RegionalOfficeId").val($("#hfRegionalOfficeId").val());
+        }
+        if ($("#hfStudyAnalysisID").val() != "") {
+            $("#ddlStudyAnalysisID").val($("#hfStudyAnalysisID").val());
+        }
+        $('.searchableselect').searchableselect();
+        $('input[name="Attachment"]').bind('change', function () {
+            $("input[name='Submit']").attr('disabled', false);
+            filesize = this.files[0].size;
+            var val = $(this).val().toLowerCase(),
+                regex = new RegExp("(.*?)\.(pdf|jpeg|jpg|png|xls|tif)$");
+            if (!(regex.test(val))) {
+                swal("", ".docx  type is not an allowed file type. You can use only jpg, jpeg, png, pdf, tif types of file(s). ", "warning");
+                this.value = '';
+                $("input[name='Submit']").attr('disabled', true);
+                return false;
+            }
+            else if (filesize > 2048000) {
+                swal("", "File size must be 2 MB !", "warning");
+                $("input[name='Submit']").attr('disabled', true);
+                return false;
+            }
+            else {
+                var fileName = $(this).val().split("\\").pop();
+                $(this).next('.custom-file-label').html(fileName);
+            }
+            return false;
+
+        });
+    });
+    /*Validation*/
+    function Validate() {
+        if (!DropDownValidation("FPO_Id", "FPO Code")) {
+            return false;
+        }
+        else if (!blankFieldValidation("txtLocation", "Camp name")) {
+            return false;
+        }
+        else if (!blankFieldValidation("txtReport_MY", "Report Month & Year")) {
+            return false;
+        }
+        else if (!DropDownValidation("MineralID", "Mineral")) {
+            return false;
+        }
+        else if (!DropDownValidation("RegionalID", "Division")) {
+            return false;
+        }
+        else if (!DropDownValidation("DistrictID", "District")) {
+            return false;
+        }
+        else if (!DropDownValidation("TehsilID", "Tehsil")) {
+            return false;
+        }
+        else if (!DropDownValidation("VillageID", "Village")) {
+            return false;
+        }
+        else if (!blankFieldValidation("txtType_Of_Sample", "Type of samples")) {
+            return false;
+        }
+        else if (!blankFieldValidation("txtNo_Of_Sample", "No of samples")) {
+            return false;
+        }
+        else if (!DropDownValidation("ddlStudyAnalysisID", "Study analysis type")) {
+            return false;
+        }
+        else if (!DropDownValidation("txtBlock", "Block")) {
+            return false;
+        }
+        else if (!DropDownValidation("RegionalOfficeId", "Regional Office")) {
+            return false;
+        }
+    }
+    /*Bind FPO details*/
+    function BindFPOData() {
+        debugger;
+        if ($('#FPO_Id').val() != "") {
+            $.ajax({
+                url: '/Geology/MPRCreator/GetFPOdetailsByFPOCode',
+                data: { 'FPOId': $('#FPO_Id').val() },
+                dataType: 'json',
+                type: 'post',
+                success: function (data) {
+                    debugger;
+                    $('#txtFPOdate').val(data.dateOfIssuance);
+                    $('#txtFieldSeason').val(data.explorationSeason);
+                    $('#txtFPOName').val(data.fpO_Name);
+                },
+                error: function (err) {
+                }
+            });
+        }
+        else {
+            $('#txtFPOdate').val('');
+            $('#txtFieldSeason').val('');
+            $('#txtFPOName').val('');
+        }
+    }
+    /*Bind District details*/
+    function BindDistrictData() {
+        debugger;
+        if ($('#RegionalID').val() != "") {
+            $.ajax({
+                url: '/Geology/MPRCreator/GetDistrictdetailsByRegionId',
+                data: { 'RegionalID': $('#RegionalID').val() },
+                dataType: 'json',
+                type: 'post',
+                success: function (data) {
+                    debugger;
+                    var row = "";
+                    $('#DistrictID').html('');
+                    row += "<option value=''>Select</option>";
+                    $.each(data, function (ind, item) {
+                        row += "<option value='" + item.districtID + "'>" + item.districtName + "</option>";
+                    });
+                    $('#DistrictID').html(row);
+                },
+                error: function (err) {
+                }
+            });
+        }
+        else {
+            var row = "";
+            $('#DistrictID').html('');
+            row += "<option value=''>Select</option>";
+            $('#DistrictID').html(row);
+        }
+    }
+    /*Bind Tehsil data*/
+    function BindTehsilData() {
+        debugger;
+        if ($('#RegionalID').val() != "") {
+            $.ajax({
+                url: '/Geology/MPRCreator/GetTehsildetailsByDistrictId',
+                data: { 'DistrictID': $('#DistrictID').val() },
+                dataType: 'json',
+                type: 'post',
+                success: function (data) {
+                    debugger;
+                    var row = "";
+                    $('#TehsilID').html('');
+                    row += "<option value=''>Select</option>";
+                    $.each(data, function (ind, item) {
+                        row += "<option value='" + item.tehsilID + "'>" + item.tehsilName + "</option>";
+                    });
+                    $('#TehsilID').html(row);
+                },
+                error: function (err) {
+                }
+            });
+        }
+        else {
+            var row = "";
+            $('#TehsilID').html('');
+            row += "<option value=''>Select</option>";
+            $('#TehsilID').html(row);
+        }
+    }
+    /*Bind Vilage data*/
+    function BindVillageData() {
+        debugger;
+        if ($('#TehsilID').val() != "") {
+            $.ajax({
+                url: '/Geology/MPRCreator/GetVillagedetailsByTehsilId',
+                data: { 'TehsilID': $('#TehsilID').val() },
+                dataType: 'json',
+                type: 'post',
+                success: function (data) {
+                    debugger;
+                    var row = "";
+                    $('#VillageID').html('');
+                    row += "<option value=''>Select</option>";
+                    $.each(data, function (ind, item) {
+                        row += "<option value='" + item.villageID + "'>" + item.villageName + "</option>";
+                    });
+                    $('#VillageID').html(row);
+                },
+                error: function (err) {
+                }
+            });
+        }
+        else {
+            var row = "";
+            $('#VillageID').html('');
+            row += "<option value=''>Select</option>";
+            $('#VillageID').html(row);
+        }
+    }
+</script>
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        <!-- MAIN CONTENT AREA STARTS -->
+        @Html.Partial("_CMSnavigation")
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link active">
+                                Add
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="~/Geology/LabReports/ViewList">
+                                View
+                            </a>
+                        </li>
+                    </ul>
+                    @Html.Partial("_CMSutil")
+                </div>
+                <section class="box form-container">
+                    <div class="content-body">
+                        @using (Html.BeginForm("Add", "LabReports", FormMethod.Post, new { AUTOCOMPLETE = "Off", id = "form1", enctype = "multipart/form-data" }))
+                        {
+                            @Html.AntiForgeryToken()
+                            <div class="row">
+                                <div class="col-lg-6 col-md-12 col-sm-12">
+                                    <div class="form-group row">
+                                        <label for="dropdownDist" class="col-sm-4 col-form-label">FPO Code <span class="text-danger">*</span></label>
+                                        <div class="col-sm-7">
+                                            @Html.DropDownListFor(m => m.FPO_Id, ViewBag.FPOcode as IEnumerable<SelectListItem>, "Select", new { @class = "form-control form-control-sm searchableselect", autofocus = "autofocus", @onchange = "BindFPOData()" })
+                                            @Html.ValidationMessageFor(m => m.FPO_Id, "", new { @class = "text-danger" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 col-md-12 col-sm-12">
+                                    <div class="form-group row">
+                                        <label class="col-sm-4 col-form-label">FPO Date</label>
+                                        <div class="col-sm-7">
+                                            <div class="input-group">
+                                                <input type="text" class="form-control" value="@Model.FPO_AffectiveDate" name="DateOfIssuance" id="txtFPOdate" disabled />
+                                                <div class="input-group-prepend">
+                                                    <label class="input-group-text" for="txtFPOdate"><i class="icon-calendar-alt-solid"></i></label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 col-md-12 col-sm-12">
+                                    <div class="form-group row">
+                                        <label class="col-sm-4 col-form-label">FPO Name</label>
+                                        <div class="col-sm-7">
+                                            @Html.TextBoxFor(m => m.FPO_Name, new { @class = "form-control", @autofocus = "autofocus", disabled = "true", @id = "txtFPOName" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 col-md-12 col-sm-12">
+                                    <div class="form-group row">
+                                        <label class="col-sm-4 col-form-label">Field Season</label>
+                                        <div class="col-sm-7">
+                                            @Html.TextBoxFor(m => m.ExplorationSeason, new { @class = "form-control", @autofocus = "autofocus", disabled = "true", @id = "txtFieldSeason" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 col-md-12 col-sm-12">
+                                    <div class="form-group row">
+                                        <label class="col-sm-4 col-form-label">Name of Camp <span class="text-danger">*</span></label>
+                                        <div class="col-sm-7">
+                                            <input type="text" value="@Model.Location" name="Location" id="txtLocation" class="form-control" maxlength="50">
+                                            @Html.ValidationMessageFor(m => m.Location, "", new { @class = "text-danger" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 col-md-12 col-sm-12">
+                                    <div class="form-group row">
+                                        <label class="col-sm-4 col-form-label">Report for the Month & Year <span class="text-danger">*</span></label>
+                                        <div class="col-sm-7">
+                                            <div class="input-group">
+                                                <input type="text" class="form-control" value="@Model.Report_MY" name="Report_MY" id="txtReport_MY" />
+                                                <div class="input-group-prepend">
+                                                    <label class="input-group-text" for="txtReport_MY"><i class="icon-calendar-alt-solid"></i></label>
+                                                    @Html.ValidationMessageFor(m => m.Report_MY, "", new { @class = "text-danger" })
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 col-md-12 col-sm-12">
+                                    <div class="form-group row">
+                                        <label class="col-sm-4 col-form-label">Name of Mineral <span class="text-danger">*</span></label>
+                                        <div class="col-sm-7">
+                                            @Html.DropDownListFor(m => m.MineralID, ViewBag.Mineralname as IEnumerable<SelectListItem>, "Select", new { @class = "form-control form-control-sm searchableselect", autofocus = "autofocus" })
+                                            @Html.ValidationMessageFor(m => m.MineralID, "", new { @class = "text-danger" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 col-md-12 col-sm-12">
+                                    <div class="form-group row">
+                                        <label class="col-sm-4 col-form-label">Division <span class="text-danger">*</span></label>
+                                        <div class="col-sm-7">
+                                            @Html.DropDownListFor(m => m.RegionalID, ViewBag.Division as IEnumerable<SelectListItem>, "Select", new { @class = "form-control form-control-sm searchableselect", autofocus = "autofocus", onchange = "BindDistrictData()" })
+                                            @Html.ValidationMessageFor(m => m.RegionalID, "", new { @class = "text-danger" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 col-md-12 col-sm-12">
+                                    <div class="form-group row">
+                                        <label class="col-sm-4 col-form-label">District <span class="text-danger">*</span></label>
+                                        <div class="col-sm-7">
+                                            <select id="DistrictID" name="DistrictID" Class="form-control searchableselect" onchange="BindTehsilData()">
+                                                <option value="">Select</option>
+                                                @{
+                                                    List<MPRmaster> listDistrict = (List<MPRmaster>)ViewData["District"];
+                                                    if (listDistrict != null)
+                                                    {
+                                                        foreach (var item in listDistrict)
+                                                        {
+                                                            <option value="@item.DistrictID">@item.DistrictName</option>
+                                                        }
+                                                    }
+                                                }
+                                                @Html.HiddenFor(m => m.DistrictID, new { @id = "hfDistrictId" })
+                                            </select>
+                                            @Html.ValidationMessageFor(m => m.DistrictID, "", new { @class = "text-danger" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 col-md-12 col-sm-12">
+                                    <div class="form-group row">
+                                        <label class="col-sm-4 col-form-label">Tehsil <span class="text-danger">*</span></label>
+                                        <div class="col-sm-7">
+                                            <select id="TehsilID" name="TehsilID" Class="form-control searchableselect" onchange="BindVillageData()">
+                                                <option value="">Select</option>
+                                                @{
+                                                    List<MPRmaster> listTehsil = (List<MPRmaster>)ViewData["Tehsil"];
+                                                    if (listDistrict != null)
+                                                    {
+                                                        foreach (var item in listTehsil)
+                                                        {
+                                                            <option value="@item.TehsilID">@item.TehsilName</option>
+                                                        }
+                                                    }
+                                                }
+                                                @Html.HiddenFor(m => m.TehsilID, new { @id = "hfTehsilId" })
+                                            </select>
+                                            @Html.ValidationMessageFor(m => m.TehsilID, "", new { @class = "text-danger" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 col-md-12 col-sm-12">
+                                    <div class="form-group row">
+                                        <label class="col-sm-4 col-form-label">Village <span class="text-danger">*</span></label>
+                                        <div class="col-sm-7">
+                                            <select id="VillageID" name="VillageID" Class="form-control searchableselect">
+                                                <option value="">Select</option>
+                                                @{
+                                                    List<MPRmaster> listVillage = (List<MPRmaster>)ViewData["Village"];
+                                                    if (listDistrict != null)
+                                                    {
+                                                        foreach (var item in listVillage)
+                                                        {
+                                                            <option value="@item.VillageID">@item.VillageName</option>
+                                                        }
+                                                    }
+                                                }
+                                                @Html.HiddenFor(m => m.VillageID, new { @id = "hfVillageId" })
+                                            </select>
+                                            @Html.ValidationMessageFor(m => m.VillageID, "", new { @class = "text-danger" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 col-md-12 col-sm-12">
+                                    <div class="form-group row">
+                                        <label class="col-sm-4 col-form-label">Type of Samples <span class="text-danger">*</span></label>
+                                        <div class="col-sm-7">
+                                            <input type="text" name="Type_Of_Sample" value="@Model.Type_Of_Sample" id="txtType_Of_Sample" class="form-control" maxlength="50">
+                                            @Html.ValidationMessageFor(m => m.Type_Of_Sample, "", new { @class = "text-danger" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 col-md-12 col-sm-12">
+                                    <div class="form-group row">
+                                        <label class="col-sm-4 col-form-label">No. of Samples <span class="text-danger">*</span></label>
+                                        <div class="col-sm-7">
+                                            <input type="text" name="No_Of_Sample" value="@Model.No_Of_Sample" id="txtNo_Of_Sample" class="form-control" maxlength="50" Onkeypress="return inputLimiter(event,'Numbers')">
+                                            @Html.ValidationMessageFor(m => m.No_Of_Sample, "", new { @class = "text-danger" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 col-md-12 col-sm-12">
+                                    <div class="form-group row">
+                                        <label class="col-sm-4 col-form-label">Type of Study/Analysis <span class="text-danger">*</span></label>
+                                        <div class="col-sm-7">
+                                            @Html.DropDownListFor(m => m.StudyAnalysisID, ViewBag.TypeOfStudyAnalysis as IEnumerable<SelectListItem>, "Select", new { @class = "form-control form-control-sm searchableselect", autofocus = "autofocus", @id = "ddlStudyAnalysisID" })
+                                            @Html.HiddenFor(m => m.Type_Id, new { @id = "hfStudyAnalysisID" })
+                                            @Html.ValidationMessageFor(m => m.StudyAnalysisID, "", new { @class = "text-danger" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 col-md-12 col-sm-12">
+                                    <div class="form-group row">
+                                        <label class="col-sm-4 col-form-label">Block <span class="text-danger">*</span></label>
+                                        <div class="col-sm-7">
+                                            <input type="text" name="Block" value="@Model.Block" id="txtBlock" class="form-control" maxlength="50" Onkeypress="return inputLimiter(event,'NameCharacters')">
+                                            @Html.ValidationMessageFor(m => m.Block, "", new { @class = "text-danger" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 col-md-12 col-sm-12">
+                                    <div class="form-group row">
+                                        <label class="col-sm-4 col-form-label">Date of Submission</label>
+                                        <div class="col-sm-7">
+                                            <div class="input-group">
+                                                <input type="text" class="form-control" name="Date_of_Submission" value="@Convert.ToDateTime(Model.Date_of_Submission).ToString("dd/MM/yyyy")" id="inputDate5" readonly>
+                                                <div class="input-group-prepend">
+                                                    <label class="input-group-text" for="inputDate5"><i class="icon-calendar-alt-solid"></i></label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 col-md-12 col-sm-12">
+                                    <div class="form-group row">
+                                        <label class="col-sm-4 col-form-label">Field Officer</label>
+                                        <div class="col-sm-7">
+                                            <input type="text" class="form-control" name="GeologistName" value="@Model.GeologistName" readonly>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 col-md-12 col-sm-12">
+                                    <div class="form-group row">
+                                        <label class="col-sm-4 col-form-label">Field Officer Designation</label>
+                                        <div class="col-sm-7">
+                                            <input type="text" class="form-control" name="Designation" value="@Model.Designation" readonly>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 col-md-12 col-sm-12">
+                                    <div class="form-group row">
+                                        <label class="col-sm-4 col-form-label">Regional Office <span class="text-danger">*</span></label>
+                                        <div class="col-sm-7">
+                                            @Html.DropDownListFor(m => m.RegionalOfficeId, ViewBag.Regionaloffice as IEnumerable<SelectListItem>, "Select", new { @class = "form-control form-control-sm searchableselect", autofocus = "autofocus" })
+                                            @Html.HiddenFor(m => m.RegionalOfficeName, new { @id = "hfRegionalOfficeId" })
+                                            @Html.ValidationMessageFor(m => m.RegionalOfficeId, "", new { @class = "text-danger" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 col-md-12 col-sm-12">
+                                    <div class="form-group row">
+                                        <label class="col-sm-4 col-form-label">Attachment</label>
+                                        <div class="col-sm-7">
+                                            <div class="custom-file">
+                                                <input type="file" class="custom-file-input" id="File10" name="Attachment">
+                                                <label class="custom-file-label" for="customFile">Choose Files</label>
+                                                <small class="text-danger">Files type <strong>(.jpg , .jpeg , .png)</strong> with maximum <strong>2MB</strong></small>
+                                            </div>
+                                            @if (Model.AttechmentName != null && Model.AttechmentName != "")
+                                            {
+                                                <label class="form-control-plaintext">@(Model.AttechmentName) <a href='~/@Model.Attechment' title="" class="ml-2" data-original-title="Download" target="_blank"><i class="icon-file-pdf-solid h5 text-danger"></i></a></label>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6 offset-lg-2 offset-md-4">
+                                    <input type="submit" value='@ViewBag.Button' class="btn btn-success btn-md ml-0 waves-effect waves-light" name="Submit" id="Submit" onclick="return Validate()" />
+                                    <a href="@Url.Content("~/Geology/LabReports/Add")" class="btn btn-danger btn-md" title="Rest">Reset</a>
+                                </div>
+                            </div>
+                            @Html.HiddenFor(m => m.LabReport_Id)
+                        }
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+    <!-- MAIN CONTENT AREA ENDS -->
+</section>
+
+
+
+

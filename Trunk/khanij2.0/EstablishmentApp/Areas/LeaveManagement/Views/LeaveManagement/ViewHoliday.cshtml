@@ -1,0 +1,150 @@
+﻿@*// *********************************************************************************************************
+    //  View Name                : View ViewHoliday
+    //  Desciption               : To ViewHoliday
+    //  Created By               : Suresh kumar behera
+    //  Created On               : 13-nov-2021
+    // ********************************************************************************************************
+*@
+@model IEnumerable<EstablishmentEf.HolidayMasterEF>;
+@{
+    ViewData["Title"] = "ViewHoliday";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+@using EstablishmentApp.Web;
+@if (TempData["msg"] != null)
+{
+    <script>
+        var vv = '@TempData["msg"]';
+        if (vv == 1) {
+            swal("", "Holiday Details Saved Successfully", "success");
+        }
+        else if (vv == 2) {
+            swal("", "Holiday Details allready exists.", "warning");
+        }
+        else if (vv == 3) {
+            swal("", "Holiday Details updated sucessfully", "success");
+        }
+        else if (vv == 4) {
+            swal("", "Holiday Details  deleted sucessfully", "success");
+        }
+        else {
+            swal("", "Something Errror occured. Please Try After Sometime!!", "error");
+        }
+    </script>
+
+    TempData["msg"] = null;
+
+}
+
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        @*@Html.Partial("_navigation")*@
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link" href="@Url.Content("~/LeaveManagement/LeaveManagement/AddHoliday")">
+                                Add Holiday
+                            </a>
+                        </li>
+                        <li class="nav-item">
+
+                            <a class="nav-link active" href="">
+                                View Holiday
+                            </a>
+                        </li>
+                    </ul>
+
+                    @*@Html.Partial("_util")*@
+                </div>
+
+                <section class="box form-container">
+
+
+                    <div class="content-body pt-0">
+                        <div class="legend-box">
+                            <ul class="d-flex mb-1 justify-content-end list-unstyled">
+                                <li><span class="bg-success"></span> Active</li>
+                                <li><span class="bg-warning"></span> Inactive</li>
+                            </ul>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-12">
+
+                                <table id="table-exports" class="table table-sm table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th width="30px">Sl#</th>
+                                            <th>Holiday</th>
+                                            <th>Holiday Type</th>
+                                            <th>Holiday Date</th>
+                                            <th width="60px" class="noprint">Action</th>
+
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+
+                                        @{
+                                            var count = 0;
+                                            foreach (var item in Model)
+                                            {
+                                                count++;
+                                                <tr class="active-row">
+
+                                                    <td>@count</td>
+                                                    <td>@item.HolidayName</td>
+                                                    <td>@item.HolidayTypeName</td>
+                                                    <td>@item.HolidayDate</td>
+
+                                                    <td class="noprint">
+                                                        <a href="@CustomQueryStringHelper.EncryptString("LeaveManagement","AddHoliday","LeaveManagement",new {id=item.HolidayId })"
+                                                           class="btn-floating btn-outline-primary btn-sm"
+                                                           title="Edit"><i class="icon-pencil-alt-solid"></i></a>
+                                                        <a href="@CustomQueryStringHelper.EncryptString("LeaveManagement","DeleteHoliday","LeaveManagement",new {id=item.HolidayId })"
+                                                           class="btn-floating btn-outline-danger btn-sm"
+                                                           title="Delete" onclick="return confirm('Are you sure to Delete?')"><i class="icon-trash-alt-solid"></i></a>
+
+                                                        @*<a href="@Url.Content("~/LeaveManagement/LeaveManagement/AddHoliday/")@protector.Decode(Convert.ToString(@item.HolidayId))" class="btn-outline-primary btn-sm"><i class="icon-pencil-alt-solid"></i></a>
+                                                        <a href="@Url.Content("~/LeaveManagement/LeaveManagement/DeleteHoliday/")@protector.Decode(Convert.ToString(@item.HolidayId))" class="btn-outline-danger btn-sm" onclick="return confirm('Are you sure to Delete?')"><i class="icon-trash-alt-solid"></i></a>*@
+
+                                                    </td>
+                                                </tr>
+
+                                            }
+                                        }
+
+
+                                    </tbody>
+                                </table>
+
+
+
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+    <!-- MAIN CONTENT AREA ENDS -->
+</section>
+
+<script>
+
+
+    $(document).ready(function () {
+        loadNavigation('ViewHoliday', 'glempprofile', 'plofficetype', 'tl', 'Leave Management', 'View Holiday', ' ');
+
+        $('.searchableselect').searchableselect();
+
+
+
+        $('.shorting-lnk').click(function () {
+            $('.shorting-lnk i').toggleClass('fa-sort-amount-up-alt fa-sort-amount-down-alt ');
+        });
+
+    });
+</script>
+

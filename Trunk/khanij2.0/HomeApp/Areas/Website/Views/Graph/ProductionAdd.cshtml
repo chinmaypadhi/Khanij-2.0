@@ -1,0 +1,229 @@
+﻿
+@model HomeEF.GraphProduction_DespatchModel
+@{
+    ViewData["Title"] = "ProductionEdit";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+@if (TempData["Message"] != null)
+{
+    <script>
+        var vv = '@TempData["Message"]';
+        if (vv == 1) {
+            swal("", "Graph Production saved successfully.", "success");
+        }
+        else if (vv == 2){
+            swal("", "Graph Production updated successfully", "success");
+        }
+        else if (vv == 3) {
+            swal("", "This mineral already exists!!", "error");
+        }
+        else if (vv == 4) {
+            swal("", "Something Errror occured. Please Try After Sometime!!", "error");
+        }
+    </script>
+}
+<script>
+    function Validate() {
+        var Iss = false;
+        if (!DropDownValidation("MineralCategoryID", "Mineral Category")) {
+            return false;
+        }
+        if (!DropDownValidation("MineralID", "Mineral")) {
+            return false;
+        }
+        if (!DropDownValidation("FinancialYear", "Financial Year")) {
+            return false;
+        }
+        else if (!blankFieldValidation("Production", "Production")) {
+            return false;
+        }
+        else if (!blankFieldValidation("Despatch", "Despatch")) {
+            return false;
+        }
+        Iss = true;
+        return Iss;
+    }
+</script>
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        @Html.Partial("_CMSnavigation")
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="javascript:void(0);">
+                                Add
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="~/Website/Graph/ProductionViewEdit">
+                                View
+                            </a>
+                        </li>
+                    </ul>
+                    @Html.Partial("_util")
+                </div>
+                <section class="box form-container">
+                    <div class="content-body">
+                        <h5 class="text-brown font-weight-bold mt-0"> Mineral Production Chart</h5>
+                        <form method="post" action="/Website/Graph/ProductionAdd" autocomplete="off">
+                            <div class="row">
+
+                                <div class="col-lg-12 col-12">
+                                    <div class="form-group row">
+                                        <div class="col-lg-7 col-md-7 col-sm-12">
+                                            <label class="col-florm-label pt-0 font-weight-bolder">Select Category<span class="text-danger">*</span></label>
+                                            <select id="MineralCategoryID" name="MineralCategoryID" class="form-control searchableselect" title="Mineral Category">
+                                                <option value="0">Select Mineral Category</option>
+                                                @{
+                                                    List<HomeEF.MineralGradeModel> listMineralType = (List<HomeEF.MineralGradeModel>)ViewData["MineralCategory"];
+                                                    if (listMineralType != null)
+                                                    {
+                                                        foreach (var item in listMineralType)
+                                                        {
+                                                            if (item.MineralTypeId == Model.MineralCategoryID)
+                                                            {
+                                                                <option selected value="@item.MineralTypeId">@item.MineralTypeName</option>
+                                                            }
+                                                            else
+                                                            {
+                                                                <option value="@item.MineralTypeId">@item.MineralTypeName</option>
+                                                            }
+                                                        }
+                                                    }
+                                                }
+
+                                            </select>
+                                            <span class="text-danger">@Html.ValidationMessageFor(m => m.MineralCategoryID)</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-12 col-12">
+                                    <div class="form-group row">
+                                        <div class="col-lg-7 col-md-7 col-sm-12">
+                                            <label class="col-form-label pt-0 font-weight-bolder">Select Mineral <span class="text-danger">*</span></label>
+                                            <select id="MineralID" name="MineralID" class="form-control searchableselect" title="Mineral Name">
+                                            </select>
+                                            <span class="text-danger">@Html.ValidationMessageFor(m => m.MineralID)</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-12 col-12">
+                                    <div class="form-group row">
+                                        <div class="col-lg-7 col-md-7 col-sm-12">
+                                            <label class="col-florm-label pt-0 font-weight-bolder">Select Financial Year <span class="text-danger">*</span></label>
+                                            <select id="FinancialYear" name="FinancialYear" class="form-control">
+                                                <option value="0">Select</option>
+                                                @{
+                                                    foreach (var str in (List<string>)ViewData["financialyear"])
+                                                    {
+                                                        if (Model.FinancialYear == str)
+                                                        {
+                                                            <option selected value="@str">@str</option>
+                                                        }
+                                                        else
+                                                        {
+                                                            <option value="@str">@str</option>
+                                                        }
+                                                    }
+                                                }
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-12 col-12">
+                                    <div class="form-group row">
+                                        <div class="col-lg-7 col-md-7 col-sm-12">
+                                            <label class="col-form-label pt-0 font-weight-bolder">Production Value(in mt.) <span class="text-danger">*</span></label>
+                                            <input type="text" id="Production" name="Production" class="form-control" value="@Model.Production" Onkeypress="return inputLimiter(event,'Numbers')" />
+                                            <span class="text-danger">@Html.ValidationMessageFor(m => m.Production)</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-12 col-12">
+                                    <div class="form-group row">
+                                        <div class="col-lg-7 col-md-7 col-sm-12">
+                                            <label class="col-form-label pt-0 font-weight-bolder">Despatch Value(in mt.) <span class="text-danger">*</span></label>
+                                            <input type="text" id="Despatch" name="Despatch" class="form-control" value="@Model.Despatch" Onkeypress="return inputLimiter(event,'Numbers')" />
+                                            <span class="text-danger">@Html.ValidationMessageFor(m => m.Despatch)</span>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12 col-sm-12">
+                                    <input type="hidden" id="ID" value="@Model.ID" name="ID" />
+                                    <input type="submit" value='@ViewBag.submit' name="Submit" class="btn btn-success btn-md ml-0 waves-effect waves-light  btnsave" id="Submit" onclick="return Validate()">
+                                    <a href="~/Website/Graph/ProductionAdd" class="btn btn-danger btn-md ml-0 waves-effect waves-light btncancel">Cancel</a>
+                                    <input type="hidden" id="Mineral" value="@Model.Mineral" name="Mineral" />
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+    <!-- MAIN CONTENT AREA ENDS -->
+</section>
+<script>
+
+    $(document).ready(function () {
+        debugger
+        //For Mineral category dropdown fill
+        if ($('#MineralCategoryID').val() != "") {
+            $.ajax({
+                type: "post",
+                url: "/Website/Graph/GetMineralMasterDataByMineralTypeId",
+                data: { 'mineralType': $('#MineralCategoryID').val() },
+                datatype: "json",
+                traditional: true,
+                success: function (data) {
+                    debugger;
+                    $('#MineralID').html('');
+                    $('#MineralID').append('<option value="">Select Mineral Name</option>');
+                    $.each(data, function (ind, item) {
+                        debugger
+                        $('#MineralID').append('<option value="' + item.mineralId + '">' + item.mineralName + '</option>');
+                    });
+                    $('#MineralID').val('@Model.MineralID');
+                }
+            });
+        }
+        debugger;
+        loadNavigation('Add', 'glRoleRes', 'plUser', 'tl', 'Master', 'Mineral Form', ' ');
+        //------------On Mineral Category Change Bind Mineral Name--
+        $('#MineralCategoryID').change(function () {
+            debugger;
+            if ($('#MineralCategoryID').val() != "") {
+                $.ajax({
+                    type: "post",
+                    url: "/Website/Graph/GetMineralMasterDataByMineralTypeId",
+                    data: { 'mineralType': $('#MineralCategoryID').val() },
+                    datatype: "json",
+                    traditional: true,
+                    success: function (data) {
+                        debugger;
+                        $('#MineralID').html('');
+                        $('#MineralID').append('<option value="">Select Mineral Name</option>');
+                        $.each(data, function (ind, item) {
+                            debugger
+                            $('#MineralID').append('<option value="' + item.mineralId + '">' + item.mineralName + '</option>');
+                        });
+                    }
+                });
+            }
+        });
+        //------------On Mineral Dropdown Change setting Mineral hidden field--
+        $('#MineralID').change(function () {
+            $('#Mineral').val($('#MineralID option:selected').text());
+        });
+        //validations
+    });
+</script>
+@section Scripts{
+    <script src="~/CMSjs/specialChar.js"></script>
+}

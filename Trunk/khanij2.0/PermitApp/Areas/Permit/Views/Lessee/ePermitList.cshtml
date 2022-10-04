@@ -1,0 +1,405 @@
+﻿@model PermitEF.ePermitModel
+@using PermitApp.Helper;
+@{
+    ViewData["Title"] = "EPermit List";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+
+<section class="wrapper main-wrapper row">
+    <div class="col-12" id="mainDiv">
+        @Html.Partial("_CMSnavigation")
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link" href="@Url.Content("~/Permit/lessee/ePermitApplication")">
+                                Apply e-permit
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="#">
+                                Saved Permit
+                            </a>
+                        </li>
+
+                    </ul>
+                    @Html.Partial("_CMSutil")
+                </div>
+
+                <section class="box form-container">
+                    @using (Html.BeginForm("MergeEPermit", "ePermit", FormMethod.Post, new { AUTOCOMPLETE = "Off", id = "form1" }))
+                    {
+                        @*<div class="search-box">
+                                                     <div class="searchform px-3 py-3">
+                                                         <div class="row">
+
+
+                                                             <div class="col-sm-4">
+                                                                 <div class="form-group row">
+                                                                     <label for="inputText" class="col-sm-4 col-form-label">
+                                                                         Mineral Grade
+                                                                     </label>
+                                                                     <div class="col-sm-8">
+                                                                         <div class="input-group">
+
+                                                                             <div class="input-group-prepend">
+                                                                                 @Html.DropDownListFor(model => model.MineralGradeId, ViewBag.MineralGradeLst as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control form-group", autofocus = "autofocus", required = "required" })
+                                                                             </div>
+                                                                         </div>
+                                                                     </div>
+                                                                 </div>
+                                                             </div>
+                                                             <div class="col-sm-2">
+                            -2                                     <button type="submit" class="btn btn-sm btn-success m-0 waves-effect waves-light" id="btnSubmit" onclick="GetDataByParameter()">Search</button>
+                                                             </div>
+
+
+
+
+                                                             <div class="col-sm-2">
+                                                                 <button type="button" id="btnMergeEPermit" class="btn btn-sm btn-success m-0 waves-effect waves-light" style="margin-right: 10px; width: 150px;">Merge e-Permit</button>
+                                                             </div>
+
+
+                                                         </div>
+
+
+
+
+                                                     </div>
+                                                 </div>*@
+
+                        <div class="content-body">
+
+                            <div class="row">
+                                <div class="col-sm-12">
+
+                                    <table id="table-exports" class="table table-sm table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th width="30">Sl#</th>
+                                                <th>Transaction ID</th>
+                                                <th>Mineral Name</th>
+                                                <th>Mineral Form</th>
+                                                <th width="150">Mineral Grade</th>
+                                                <th>Quantity</th>
+                                                <th>Status</th>
+                                                <th>Created/Modified On</th>
+                                                <th width="100">Draft Form</th>
+                                                <th style="display:none;"></th>
+                                                <th style="display:none;"> </th>
+                                                <th style="display:none;"></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach (var b in ViewBag.ViewList)
+                                            {
+                                            <tr>
+                                                <td>@b.SRNumber</td>
+
+                                                @if (b.MergeEPermitCount == "0")
+                                                {
+                                                    if (b.CheckoutStatus == 0)
+                                                    {
+                                                        <td class="noprint">
+                                                            @*<a href="@Url.Content("~/Permit/Lessee/RPTPPermit?id=")@b.BulkPermitId">@b.TransactionalID</a>*@
+                                                            <a class="text-primary" href="@CustomQueryStringHelper.EncryptString("Permit", "ePermitApplication", "Lessee", new { id = @b.BulkPermitId })">@b.TransactionalID</a>
+                                                            @*<a href="@Url.Content("~/Permit/Lessee/ePermitApplication?id=")@b.BulkPermitId">@b.TransactionalID</a>*@
+                                                        </td>
+                                                    }
+                                                    else
+                                                    {
+                                                        <td class="noprint">
+                                                            @*<a href="@Url.Content("~/Permit/Lessee/RPTPPermit?id=")@b.BulkPermitId">@b.TransactionalID</a>*@
+                                                            <a class="text-primary" href="@CustomQueryStringHelper.EncryptString("Permit", "ePermitPaymentCheckOut", "Lessee", new { id = @b.BulkPermitId })">@b.TransactionalID</a>
+                                                            @*<a href="@Url.Content("~/Permit/Lessee/ePermitApplication?id=")@b.BulkPermitId">@b.TransactionalID</a>*@
+                                                        </td>
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    <td>
+                                                        <a class="text-primary" href="@CustomQueryStringHelper.EncryptString("Permit","MergeEPermit","ePermit",new {BulkpermitId=@b.BulkPermitId })">@b.TransactionalID</a>
+                                                        @*<a href="@Url.Content("~/Permit/ePermit/MergeEPermit/?BulkpermitId=")@b.BulkPermitId">@b.TransactionalID</a>*@
+                                                    </td>
+                                                }
+
+                                                <td><p class="m-0" id="MineralName">@b.MineralName</p> </td>
+                                                <td><p class="m-0" id="MineralNature">@b.MineralNature</p> </td>
+                                                <td><p class="m-0" id="MineralGradeName">@b.MineralGradeName</p> </td>
+                                                <td>@b.ProposedQty</td>
+
+                                                <td><p class="m-0">@b.StatusText</p> </td>
+                                                <td><p class="m-0">@b.EVSOrder</p> </td>
+                                                <td>
+                                                    <a class="text-primary"  data-toggle="tooltip" data-placement="top" title="Download " href="@CustomQueryStringHelper.EncryptString("Permit","ePermitViewWithoutDSC","Lessee",new {id=@b.BulkPermitId })">
+                                                        <i class="icon-download-solid h4"></i> </a>
+                                                </td>
+                                                <td style="display:none;">@b.ActiveStatus</td>
+
+                                                <td style="display:none;">@b.BulkPermitId</td>
+                                                <td style="display:none;">@b.MergeEPermitCount</td>
+                                            </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+
+
+
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </section>
+            </div>
+        </div>
+    </div>
+    <!-- MAIN CONTENT AREA ENDS -->
+</section>
+
+<script>
+    backMe = "yes"
+    $(document).ready(function () {
+        loadNavigation('ViewList', 'glhelpdesk', 'plraiseticket', 'tl', 'E-Permit', 'Saved permit', ' ');
+        $('.searchableselect').searchableselect();
+
+        $('.shorting-lnk').click(function () {
+            $('.shorting-lnk i').toggleClass('fa-sort-amount-up-alt fa-sort-amount-down-alt ');
+        });
+        $('.filter-dropdown').hide();
+        $('.filter-lnk').click(function () {
+            $(this).toggleClass('active');
+            $(this).siblings('.filter-dropdown').slideToggle();
+        });
+        $('.filter-btn').click(function () {
+            $(this).parent('.shorting-cell .filter-dropdown').slideUp();
+            if ($(this).parent().parent('.shorting-cell').find('.filter-lnk').hasClass('active')) {
+                $(this).parent().siblings('.filter-lnk').removeClass('active');
+            }
+        });
+       @* $("#excelIcon").click(function () {
+            exportTableToExcel("ePermitList", "text")
+        });*@
+    });
+</script>
+
+<script>
+    $(document).ready(function () {
+        $('.datepicker').datetimepicker({
+            format: 'LT',
+            format: 'DD-MM-YYYY',
+
+        });
+    });
+</script>
+
+<script>
+
+    $("#chkSelectAll").change(function () {
+        $("input:checkbox").prop('checked', $(this).prop("checked"));
+    });
+
+    function checkAll(ele) {
+        var state = $(ele).is(':checked');
+        var grid = $('#ePermitList').data('kendoGrid');
+        $.each(grid.dataSource.view(), function () {
+            if (this['IsSelected'] != state)
+                this.dirty = true;
+            this['IsSelected'] = state;
+        });
+
+        var data = $("#ePermitList").data("kendoGrid").dataSource._data;
+        totalAmt = 0;
+        for (i = 0; i < data.length; i++) {
+            if (state == true) {
+                totalAmt += Number(data[0].RegistraionFees);
+            }
+            else {
+                totalAmt = 0;
+            }
+        }
+    }
+
+    function total(ele) {
+        var tr = $(ele).closest('tr');
+        //console.log(tr[0].childNodes[1].innerHTML);
+        //console.log(tr[0].childNodes[7].innerHTML);
+    };
+
+    $("#btnMergeEPermit").click(function () {
+
+        var idsToSend = [];
+        var QtyToSend = [];
+        var GradeToSend = [];
+        var totalQty = 0;
+        var rowCount = $('#ePermitList tr').length;
+       // alert(rowCount);
+        //var grid = $("#ePermitList").data("kendoGrid");
+      //  var grid = $("#ePermitList").DataTable();
+        //var ds = grid.dataSource.view();
+       // var ds = grid.rows().data().toArray();
+
+        var isDiffGrade = false;
+        var PrevGrade = "";
+        var PrevContent = "";
+
+        var $tblrows = $("#ePermitList tbody tr");
+        $tblrows.each(function (index) {
+
+            var row = $(this);
+            var checkbox = $(row).find("#chkData");
+            var MineralName= $(row).find("#MineralName");
+            //alert(checkbox.is(":checked"));
+            //alert(row.children("td:eq(1)").text());
+            //alert(row.childNodes[12].innerHTML);
+            if (checkbox.is(":checked") && row.children("td:eq(11)").text() == 0 && row.children("td:eq(12)").text() == 0) {
+
+                idsToSend.push(row.children("td:eq(13)").text());
+                QtyToSend.push(row.children("td:eq(7)").text());
+                GradeToSend.push(row.children("td:eq(5)").text());
+                totalQty = totalQty + parseFloat(row.children("td:eq(7)").text());
+
+                if (PrevGrade == "") {
+                    PrevGrade = row.children("td:eq(14)").text();
+                }
+                else {
+                    if (PrevGrade == row.children("td:eq(14)").text()) {
+                        PrevGrade = row.children("td:eq(14)").text();
+                    }
+                    else {
+                        alert("You will need to select Same Grade of a particular mineral form for Merge Permit");
+                        return false;
+                       // break;
+                    }
+                }
+
+                if (PrevContent == "") {
+                    PrevContent = row.children("td:eq(9)").text();
+                }
+                else {
+                    if (PrevContent == row.children("td:eq(9)").text()) {
+                        PrevContent = row.children("td:eq(9)").text();
+                    }
+                    else {
+                        alert("You will need to select Same Grade with Same Content of a particular mineral Grade for Merge Permit");
+                        return false;
+                       // break;
+                    }
+                }
+            }
+        });
+            if (idsToSend == null || idsToSend.length == 0) {
+            alert("Select one e-Permit for Merge Permit");
+            return false;
+        }
+
+        $.ajax({
+
+            type: "Get",
+            url: '@Url.Action("requestedMergeEPermit", "ePermit")',
+            data: {
+                arr: JSON.stringify(idsToSend),
+                qty: JSON.stringify(QtyToSend),
+                grade: JSON.stringify(GradeToSend),
+                total: totalQty.toFixed(2)
+            },
+            success: function (response) {
+                debugger;
+                if (response == null) {
+                    alert("Your selection for merge permit failed. Try again.");
+                    return false;
+                }
+                else if (response == true) {
+                    $("#mainDiv").empty();
+                    window.location.href = '@Url.Action("MergeEPermit", "ePermit")';
+                }
+                else if (response == false) {
+                    alert("You will need to select Same Grade of a particular mineral form for Merge Permit");
+                    return false;
+                }
+            },
+            failure: function (response) {
+            }
+        });
+        idsToSend = [];
+
+
+        });
+        //for (var i = 1; i < rowCount; i++) {
+
+        //    //var row = grid.table.find("tr[data-uid='" + ds[i].uid + "']");
+        //    var $tblrows = $("#tblProducts tr:gt(0)");
+        //    var row = grid.find("tr[data-uid='" + ds[i].uid + "']");
+        //    var checkbox = $(row).find("#chkData");
+        //    debugger;
+        //    if (checkbox.is(":checked") && ds[i].ISCessAdjusted == 0 && ds[i].NoOfRunningPass == 0) {
+        //        idsToSend.push(ds[i].BulkPermitId);
+        //        QtyToSend.push(ds[i].PendingQty);
+        //        GradeToSend.push(ds[i].MineralGradeName);
+        //        totalQty = totalQty + ds[i].PendingQty;
+
+        //        if (PrevGrade == "") {
+        //            PrevGrade = ds[i].MineralGradeId;
+        //        }
+        //        else {
+        //            if (PrevGrade == ds[i].MineralGradeId) {
+        //                PrevGrade = ds[i].MineralGradeId;
+        //            }
+        //            else {
+        //                alert("You will need to select Same Grade of a particular mineral form for Merge Permit");
+        //                return false;
+        //                break;
+        //            }
+        //        }
+
+        //        if (PrevContent == "") {
+        //            PrevContent = ds[i].AluminaContent;
+        //        }
+        //        else {
+        //            if (PrevContent == ds[i].AluminaContent) {
+        //                PrevContent = ds[i].AluminaContent;
+        //            }
+        //            else {
+        //                alert("You will need to select Same Grade with Same Content of a particular mineral Grade for Merge Permit");
+        //                return false;
+        //                break;
+        //            }
+        //        }
+        //    }
+        //}
+
+
+function sendAntiForgery() {
+    return { "__RequestVerificationToken": $('input[name=__RequestVerificationToken]').val() }
+}
+
+function DataBound(e) {
+    var data = this.dataSource.view();
+    for (var i = 0; i < data.length; i++) {
+        var uid = data[i].uid;
+        var row = this.table.find("tr[data-uid='" + uid + "']");
+        if (data[i].ActiveStatus == 2 || data[i].ActiveStatus == 4) {
+            row.find(".k-i-lock").parent().hide();
+        }
+        else if (data[i].ActiveStatus == 3) {
+            row.find(".k-i-lock").parent().show();
+        }
+    }
+    e.preventDefault();
+}
+
+function OnRefreshGrid() {
+    $("#ePermitList").data("kendoGrid").dataSource.read();
+}
+function onRequestEnd(e) {
+    var MasterTableParameter = "ePermitList";
+    if (e.type != "read") {
+        OnRefreshGrid();
+    }
+}
+
+
+</script>
+

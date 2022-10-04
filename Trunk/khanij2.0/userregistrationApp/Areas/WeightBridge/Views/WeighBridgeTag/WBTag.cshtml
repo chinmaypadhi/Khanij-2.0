@@ -1,0 +1,319 @@
+﻿@model userregistrationEF.AddWeighBridgeTagModel
+@{
+    ViewData["Title"] = "OutsideRegistrationRequestDD";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+@if (TempData["Status"] != null)
+{
+    <script>
+    var vv = '@TempData["Status"]';
+    if (vv == '1') {
+        swal("", "@TempData["Message"]", "success");
+    }
+    else {
+        swal("", "@TempData["Message"]", "warning");
+    }
+    </script>
+}
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        @Html.Partial("_CMSnavigation")
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="/WeightBridge/WeighBridgeTag/WBTag">
+                                Add
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/WeightBridge/WeighBridgeTag/WBTagView">
+                                View
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/WeightBridge/WeighBridgeTag/TagRequest">
+                                Tag Request
+                            </a>
+                        </li>
+                    </ul>
+                    @Html.Partial("_CMSutil")
+                </div>
+                <section class="box form-container">
+                    <div class="content-body">
+                        <h5 class="text-brown font-weight-bold mt-0">Tag Weighbridge </h5>
+                        <form id="form1" method="post" action="/WeightBridge/WeighBridgeTag/WBTagSave" autocomplete="off">
+                            <input type="hidden" name="WeighBridgeTagID" value="@Model.WeighBridgeTagID" />
+                            <div class="row mb-3">
+                                <label change class="col-lg-4 col-12 col-form-label">@ViewBag.UserType Name</label>
+                                <div class="col-lg-8 col-12">
+                                    <label class="form-control-plaintext font-weight-bold">@ViewBag.ApplicantName</label>
+                                </div>
+                                <label class="col-lg-4 col-12 col-form-label">District</label>
+                                <div class="col-lg-8 col-12">
+                                    <label id="spFormdistrict" class="form-control-plaintext font-weight-bold">
+                                        @ViewBag.DistrictName
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="row">
+
+                                <div class="col-lg-12 col-12">
+                                    <div class="form-group row">
+                                        <div class="col-lg-7 col-md-7 col-sm-12">
+                                            <label class="col-form-label pt-0 font-weight-bolder">Select User Type<span class="text-danger">*</span></label>
+                                            <select id="UserTypeID" name="UserTypeID" class="form-control searchableselect" title="Mineral Category">
+                                                <option value="0">Select</option>
+                                                @{
+                                                    foreach (var item in (List<userregistrationEF.ViewWeighBridgeTagModel>)TempData["UserType"])
+                                                    {
+                                                        if (Model.UserTypeID == item.UserTypeID)
+                                                        {
+                                                            <option value="@item.UserTypeID" selected>@item.UserType</option>
+                                                        }
+                                                        else
+                                                        {
+                                                            <option value="@item.UserTypeID">@item.UserType</option>
+                                                        }
+                                                    }
+                                                }
+                                            </select>
+                                            <span class="text-danger">@Html.ValidationMessageFor(m => m.UserTypeID)</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-12 col-12">
+                                    <div class="form-group row">
+                                        <div class="col-lg-7 col-md-7 col-sm-12">
+                                            <label class="col-form-label pt-0 font-weight-bolder">District<span class="text-danger">*</span></label>
+                                            <select id="DistrictID" name="DistrictID" class="form-control searchableselect" title="Mineral Name">
+                                                <option value="0">Select</option>
+                                            </select>
+                                            <span class="text-danger">@Html.ValidationMessageFor(m => m.DistrictID)</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-12 col-12">
+                                    <div class="form-group row">
+                                        <div class="col-lg-7 col-md-7 col-sm-12">
+                                            <label class="col-form-label pt-0 font-weight-bolder">Select User<span class="text-danger">*</span></label>
+                                            <select id="TagUserID" name="TagUserID" class="form-control searchableselect" title="Mineral Name">
+                                                <option value="0">Select</option>
+                                            </select>
+                                            <span class="text-danger">@Html.ValidationMessageFor(m => m.TagUserID)</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-12 col-12">
+                                    <div class="form-group row">
+                                        <div class="col-lg-7 col-md-7 col-sm-12">
+                                            <label class="col-form-label pt-0 font-weight-bolder">Select Weigh Bridge<span class="text-danger">*</span></label>
+                                            <select id="WeighBridgeID" name="WeighBridgeID" class="form-control searchableselect">
+                                                <option value="0">Select</option>
+                                            </select>
+                                            <span class="text-danger">@Html.ValidationMessageFor(m => m.WeighBridgeID)</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12 col-sm-12">
+                                    <input type="button" value="@ViewBag.submit" class="btn btn-success btn-md ml-0 waves-effect waves-light  btnsave" id="btnsubmit">
+                                    <input type="hidden" value="@ViewBag.submit" name="Submit" />
+                                    <button type="button" class="btn btn-danger ml-2" onclick="cancel('@ViewBag.cancel')">@ViewBag.cancel</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+    <!-- MAIN CONTENT AREA ENDS -->
+</section>
+<script>
+    $(document).ready(function () {
+        loadNavigation('Add', 'glhelpdesk', 'plraiseticket', 'tl', 'Weighbridge', 'Tag Weighbridge', ' ');
+        $('.searchableselect').searchableselect();
+        //loading dropdown of users and setting userr on update
+        var btn = '@ViewBag.submit';
+        if (btn == 'UPDATE') {
+            $.ajax({
+                async: false,
+                type: "post",
+                url: "/WeightBridge/WeighBridgeTag/ViewDistrictByUserType",
+                data: { 'UserTypeID': $('#UserTypeID').val() },
+                datatype: "json",
+                traditional: true,
+                success: function (data) {
+                    debugger;
+                    $('#DistrictID').empty();
+                    $('#DistrictID').append('<option value="0">Select District</option>');
+                    $.each(data, function (ind, item) {
+                        debugger
+                        $('#DistrictID').append('<option value="' + item.districtID + '">' + item.districtName + '</option>');
+                    });
+                    $('#DistrictID').val(@Model.DistrictID);
+                }
+            });
+            $.ajax({
+                async: false,
+                type: "post",
+                url: "/WeightBridge/WeighBridgeTag/ViewUserByDistrict",
+                data: { 'DistrictID': $('#DistrictID').val(), 'UserTypeID': $('#UserTypeID').val() },
+                datatype: "json",
+                traditional: true,
+                success: function (data) {
+                    debugger;
+                    $('#TagUserID').empty();
+                    $('#TagUserID').append('<option value="0">Select User</option>');
+                    $.each(data, function (ind, item) {
+                        debugger
+                        $('#TagUserID').append('<option value="' + item.tagUserID + '">' + item.tagUserName + '</option>');
+                    });
+                    $('#TagUserID').val(@Model.TagUserID);
+                }
+            });
+            //loading dropdown of weighbridge and setting weighbridge on update
+            $.ajax({
+                async: false,
+                type: "post",
+                url: "/WeightBridge/WeighBridgeTag/ViewWeighBridgeByUser",
+                data: { 'TagUserID': $('#TagUserID').val() },
+                datatype: "json",
+                traditional: true,
+                success: function (data) {
+                    debugger;
+                    $('#WeighBridgeID').empty();
+                    $('#WeighBridgeID').append('<option value="0">Select Weigh Bridge</option>');
+                    $.each(data, function (ind, item) {
+                        debugger
+                        $('#WeighBridgeID').append('<option value="' + item.weighBridgeID + '">' + item.weighBridgeName + '</option>');
+                    });
+                    $('#WeighBridgeID').val(@Model.WeighBridgeID);
+                }
+            });
+        }
+    });
+    //loading district dropdown on usertype dropdown change
+    $('#UserTypeID').change(function () {
+        debugger;
+        if ($('#UserTypeID').val() != "0") {
+            $.ajax({
+                type: "post",
+                url: "/WeightBridge/WeighBridgeTag/ViewDistrictByUserType",
+                data: { 'UserTypeID': $('#UserTypeID').val() },
+                datatype: "json",
+                traditional: true,
+                success: function (data) {
+                    debugger;
+                    if (data.length == 0) {
+                        swal('', 'No weighbridge found on selected user type', 'warning');
+                    }
+                    $('#DistrictID').empty();
+                    $('#DistrictID').append('<option value="0">Select District</option>');
+                    $.each(data, function (ind, item) {
+                        debugger
+                        $('#DistrictID').append('<option value="' + item.districtID + '">' + item.districtName + '</option>');
+                    });
+                }
+            });
+        }
+    });
+    //loading users dropdown on district dropdown change
+    $('#DistrictID').change(function () {
+        debugger;
+        if ($('#DistrictID').val() != "0") {
+            $.ajax({
+                type: "post",
+                url: "/WeightBridge/WeighBridgeTag/ViewUserByDistrict",
+                data: { 'DistrictID': $('#DistrictID').val(), 'UserTypeID': $('#UserTypeID').val() },
+                datatype: "json",
+                traditional: true,
+                success: function (data) {
+                    debugger;
+                    $('#TagUserID').empty();
+                    $('#TagUserID').append('<option value="0">Select User</option>');
+                    $.each(data, function (ind, item) {
+                        debugger
+                        $('#TagUserID').append('<option value="' + item.tagUserID + '">' + item.tagUserName + '</option>');
+                    });
+
+                }
+            });
+        }
+    });
+    
+    //loading weighbridge dropdown on user dropdown change
+    $('#TagUserID').change(function () {
+        debugger;
+        if ($('#TagUserID').val() != "0") {
+            $.ajax({
+                type: "post",
+                url: "/WeightBridge/WeighBridgeTag/ViewWeighBridgeByUser",
+                data: { 'TagUserID': $('#TagUserID').val() },
+                datatype: "json",
+                traditional: true,
+                success: function (data) {
+                    debugger;
+                    $('#WeighBridgeID').empty();
+                    $('#WeighBridgeID').append('<option value="0">Select Weigh Bridge</option>');
+                    $.each(data, function (ind, item) {
+                        debugger
+                        $('#WeighBridgeID').append('<option value="' + item.weighBridgeID + '">' + item.weighBridgeName + '</option>');
+                    });
+                }
+            });
+        }
+    });
+    function validate() {
+        debugger
+        if ($('#UserTypeID').val() == '0') {
+            swal('', 'Please select user type', 'warning');
+            return false;
+        }
+        if ($('#DistrictID').val() == '0') {
+            swal('', 'Please select District', 'warning');
+            return false;
+        }
+        if ($('#TagUserID').val() == '0') {
+            swal('', 'Please select User', 'warning');
+            return false;
+        }
+        if ($('#WeighBridgeID').val() == '0') {
+            swal('', 'Please select Weighbridge', 'warning');
+            return false;
+        }
+        return true;
+    };
+    $('#btnsubmit').click(function (e) {
+        if (validate()) {
+            e.preventDefault();
+            swal({
+                title: "Are you sure ??",
+                icon: "warning",
+                buttons: ["No", "Yes"],
+            })
+            .then((submit) => {
+                if (submit) {
+                    $("#form1").submit();
+                }
+            });
+        }
+        else {
+            return false;
+        }
+    });
+    function cancel(type) {
+        if (type == "RESET") {
+            window.location.href = '/WeightBridge/WeighBridgeTag/WBTag';
+        }
+        else {
+            window.location.href = '/WeightBridge/WeighBridgeTag/WBTagView';
+        }
+    }
+
+</script>
+

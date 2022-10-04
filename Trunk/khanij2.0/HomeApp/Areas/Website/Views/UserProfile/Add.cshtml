@@ -1,0 +1,275 @@
+﻿@*// *********************************************************************************************************
+    //  View Name                : Add
+    //  Desciption               : To Add,View,Edit,Update,Delete Website User Profile Details in view
+    //  Created By               : Lingaraj Dalai
+    //  Created On               : 05 Nov 2021
+    // ********************************************************************************************************
+*@
+@model HomeEF.AddUserProfileModel
+@{
+    ViewData["Title"] = "Add";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+@if (TempData["Message"] != null)
+{
+    <script>
+        var vv = '@TempData["Message"]';
+        if (vv == 1) {
+            swal("","User Profile created successfully.","success");
+        }
+        else if (vv == 2) {
+            swal("","User Profile already exists.","warning");
+        }
+        else if (vv == 3) {
+            swal("", "Something Errror occured. Please Try After Sometime!!", "error");
+        }
+    </script>
+}
+<script>
+    indicateMe = "yes"
+    $(document).ready(function () {
+        $('.searchableselect').searchableselect();
+        var filesize = 0;
+        var _URL = window.URL || window.webkitURL;
+        $('input[name="Photo"]').bind('change', function () {
+            $("input[name='Submit']").attr('disabled', false);
+            filesize = this.files[0].size;
+            if ((file = this.files[0])) {
+                img = new Image();
+                img.onload = function () {
+                    var width = this.width;
+                    var height = this.height;
+                    $("#width").html(width);
+                    $("#height").html(height);
+                    if (width > 100 || height > 200) {
+                        swal("", "Width and heigth should not be more than 100X200px ", "warning");
+                        this.value = '';
+                        $("input[name='Submit']").attr('disabled', true);
+                        return false;
+                    }
+                };
+                img.src = _URL.createObjectURL(file);
+            }
+            var val = $(this).val().toLowerCase(),
+                regex = new RegExp("(.*?)\.(jpeg|jpg|png)$");
+            if (!(regex.test(val))) {
+                swal("", ".docx, pdf, tif,xls  type is not an allowed file type. You can use only jpg, jpeg, png types of file(s). ", "warning");
+                this.value = '';
+                $("input[name='Submit']").attr('disabled', true);
+                return false;
+            }
+            else if (filesize > 2048000) {
+                swal("", "File size must be 2 MB !", "warning");
+                $("input[name='Submit']").attr('disabled', true);
+                return false;
+            }
+            else {
+                var fileName = $(this).val().split("\\").pop();
+                $(this).next('.custom-file-label').html(fileName);
+            }
+            return false;
+        });
+        loadNavigation('Add', 'glhelpdesk', 'plraiseticket', 'tl', 'CMS', 'User Profile', ' ');
+        $('.searchableselect').searchableselect();      
+    });
+    function validateEmail(emailid) {
+        var emailReg = /^([\w-\.]+@@([\w-]+\.)+[\w-]{2,4})?$/;
+        return emailReg.test(emailid);
+    }
+    function Validate() {
+        var Iss = false;
+        var mobileNum = $("#VCH_MOBILE_NO").val();
+        var validateMobNum = /^\d*(?:\.\d{1,2})?$/;
+        if (!blankFieldValidation("VCH_NAME", "Name")) {
+            return false;
+        }
+        if (!blankFieldValidation("VCH_DESIGNATION", "Designation")) {
+            return false;
+        }
+        if (!blankFieldValidation("VCH_DEPARTMENT", "Department")) {
+            return false;
+        }
+        //else if ($("#hdnPhoto").val() == "") {
+        //    if (!FileUploadValidation("Photo", "Photo")) {
+        //        return false;
+        //    }
+        //}
+        if ($("#VCH_MOBILE_NO").val() == "" && $("#VCH_OFC_EXTN_NO").val() == "") {
+            swal("", "Enter any one contact detail, Mobile No/Extension No", "warning");
+            return false;
+        }
+        if ($("#VCH_MOBILE_NO").val() != "") {
+            if (validateMobNum.test(mobileNum) && mobileNum.length != 10) {
+                swal("", "Please Enter valid Mobile No", "warning");
+                return false;
+            }
+        }
+        if (!blankFieldValidation("VCH_EMAIL_ID", "Email Id")) {
+            return false;
+        }
+        if (!validateEmail($('#VCH_EMAIL_ID').val())) {
+            swal("", "Please Enter valid Email Id", "warning");
+            return false;
+        }
+        if (!blankFieldValidation("VCH_USER_ID", "User Id")) {
+            return false;
+        }
+        if (!blankFieldValidation("VCH_PASSWORD", "Password")) {
+            return false;
+        }
+        if (!blankFieldValidation("VCH_CONF_PASSWORD", "Confirm Password")) {
+            return false;
+        }
+        if ($("#VCH_PASSWORD").val() != $("#VCH_CONF_PASSWORD").val()) {
+            swal("", "Password & Confirm Password does not match", "warning");
+            return false;
+        }
+        Iss = true;
+        return Iss;
+    }
+</script>
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        @Html.Partial("_CMSnavigation")
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="javascript:void(0);">
+                                Add
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link " href="~/Website/UserProfile/ViewList">
+                                View
+                            </a>
+                        </li>
+                    </ul>
+                    @Html.Partial("_util")
+                </div>
+                <section class="box form-container">
+                    <div class="content-body">
+                        <h5>Personal Details</h5>
+                        @using (Html.BeginForm("Add", "UserProfile", FormMethod.Post, new { enctype = "multipart/form-data", AUTOCOMPLETE = "Off", id = "signup-form" }))
+                        {
+                            <div class="row">
+                                <div class="col-lg-4 col-md-6">
+                                    <label class="col-form-label">Name<span class="text-danger">*</span></label>
+                                    <div class="form-group">
+                                        @Html.TextBoxFor(m => m.VCH_NAME, new { @class = "form-control", @autofocus = "autofocus", @maxlength = "150", @Onkeypress = "return inputLimiter(event,'NameCharacters')" })
+                                        @Html.ValidationMessageFor(m => m.VCH_NAME, "", new { @class = "text-danger" })
+                                        @Html.HiddenFor(m => m.INT_UPROFILE_ID)
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-4 col-md-6">
+                                    <label class="col-form-label">Designation<span class="text-danger">*</span></label>
+                                    <div class="form-group">
+                                        @Html.TextBoxFor(m => m.VCH_DESIGNATION, new { @class = "form-control", @autofocus = "autofocus", @maxlength = "150", @Onkeypress = "return inputLimiter(event,'NameCharacters')" })
+                                        @Html.ValidationMessageFor(m => m.VCH_DESIGNATION, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-4 col-md-6">
+                                    <label class="col-form-label">Department<span class="text-danger">*</span></label>
+                                    <div class="form-group">
+                                        @Html.TextBoxFor(m => m.VCH_DEPARTMENT, new { @class = "form-control", @autofocus = "autofocus", @maxlength = "150", @Onkeypress = "return inputLimiter(event,'NameCharacters')" })
+                                        @Html.ValidationMessageFor(m => m.VCH_DEPARTMENT, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-4 col-md-6">
+                                    <label class="col-form-label">Upload Photo</label>
+                                    <div class="form-group">
+                                        <div class="custom-file">
+                                            <input type="file" class="custom-file-input" id="Photo" name="Photo">
+                                            <label class="custom-file-label" for="customFile">Choose Files</label>
+                                            <small class="text-danger">
+                                                (<strong>.jpeg, .jpg, .png</strong> file only, image size of <strong>100X200</strong>
+                                                and <strong>max file size 100 KB</strong>)
+                                            </small>
+                                        </div>
+                                        @Html.ValidationMessageFor(m => m.Photo, "", new { @class = "text-danger" })
+                                        @if (Model.VCH_PHOTO_PATH != null && Model.VCH_PHOTO_PATH != "")
+                                        {
+                                            @*<label class="form-control-plaintext" id="lblNotificationfile"> <a href='~/@Model.VCH_PHOTO_PATH' title="" class="ml-2" data-original-title="Download Photo Copy" target="_blank"><i class="far fa-file-pdf h5"></i></a></label>*@
+                                            <img src="~/@Model.VCH_PHOTO_PATH" width="50" height="50" />
+                                        }
+                                        @Html.HiddenFor(m => m.VCH_PHOTO_PATH, new { @id = "hdnPhoto" })
+                                    </div>
+                                </div>
+                            </div>
+                            <h5>Contact Details</h5>
+                            <div class="row">
+                                <div class="col-lg-4 col-md-6">
+                                    <label class="col-form-label">Mobile No.</label>
+                                    <div class="form-group">
+                                        @Html.TextBoxFor(m => m.VCH_MOBILE_NO, new { @class = "form-control", @autofocus = "autofocus", @maxlength = "12", @Onkeypress = "return inputLimiter(event,'Numbers')" })
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-4 col-md-6">
+                                    <label class="col-form-label">Office Ext. No.</label>
+                                    <div class="form-group">
+                                        @Html.TextBoxFor(m => m.VCH_OFC_EXTN_NO, new { @class = "form-control", @autofocus = "autofocus", @maxlength = "30" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-4 col-md-6">
+                                    <label class="col-form-label">Email Id<span class="text-danger">*</span></label>
+                                    <div class="form-group">
+                                        @Html.TextBoxFor(m => m.VCH_EMAIL_ID, new { @class = "form-control", @autofocus = "autofocus", @maxlength = "200" })
+                                    </div>
+                                </div>
+                            </div>
+                            <h5>Login Details</h5>
+                            <div class="row">
+                                <div class="col-lg-4 col-md-6">
+                                    <label class="col-form-label">User Id<span class="text-danger">*</span></label>
+                                    <div class="form-group">
+                                        @Html.TextBoxFor(m => m.VCH_USER_ID, new { @class = "form-control", @autofocus = "autofocus", @maxlength = "50" })
+                                    </div>
+                                </div>
+                                <div class="col-lg-4 col-md-6">
+                                    <label class="col-form-label">Password<span class="text-danger">*</span></label>
+                                    <div class="form-group">
+                                        @Html.PasswordFor(model => model.VCH_PASSWORD, new { @class = "form-control", @autofocus = "autofocus", @maxlength = "15",@Value = Model.VCH_PASSWORD })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-4 col-md-6">
+                                    <label class="col-form-label">Confirm Password<span class="text-danger">*</span></label>
+                                    <div class="form-group">
+                                        @Html.PasswordFor(m => m.VCH_CONF_PASSWORD, new { @class = "form-control", @autofocus = "autofocus", @maxlength = "15", @Value = Model.VCH_CONF_PASSWORD })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12 col-sm-12">
+                                    <input type="submit" value='@ViewBag.Button' name="Submit" class="btn btn-success btn-md ml-0 waves-effect waves-light  btnsave" id="Submit" onclick="return Validate()">
+                                    @if (ViewBag.Button == "Update")
+                                    {
+                                        <a href="~/Website/UserProfile/ViewList" class="btn btn-danger btn-md ml-0 waves-effect waves-light btncancel">Cancel</a>
+                                    }
+                                    else
+                                    {
+                                        <a href="~/Website/UserProfile/Add" class="btn btn-danger btn-md ml-0 waves-effect waves-light btncancel">Cancel</a>
+                                    }
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+    <!-- MAIN CONTENT AREA ENDS -->
+</section>
+
+
+

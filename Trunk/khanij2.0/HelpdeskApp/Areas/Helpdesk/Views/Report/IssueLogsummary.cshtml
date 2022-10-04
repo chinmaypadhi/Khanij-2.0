@@ -1,0 +1,229 @@
+﻿@model HelpDeskEF.IssueLogsummaryModel
+@using HelpdeskApp.Web;
+@{
+    ViewData["Title"] = "IssueLogsummary";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+<script>
+    $(document).ready(function () {
+        loadNavigation('IssueLogsummary', 'glTMng', 'plUser', 'tl', 'Helpdesk', 'Ageing Analysis Report', ' ');       
+    });
+
+    //alert($("#hdnFromDate").val());
+    //if ($("#hdnFromDate").val() != "") {
+    //    alert($("#fromdate").val());
+    //    $("#fromdate").val($("#hdnFromDate").val());
+    //    $("#todate").val($("#hdnToDate").val());
+    //    $("#IssueStatus").val($("#hdnIssueStatus").val());
+    //}
+</script>
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        @Html.Partial("_CMSnavigation")
+        @*<uc1:navigation runat="server" ID="navigation" />*@
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a target="_blank"  class="nav-link active" href="javascript:void(0);">
+                                View
+                            </a>
+                        </li>
+                    </ul>
+                    @Html.Partial("_CMSutil")
+                    @*<uc1:util runat="server" ID="util" />*@
+                </div>
+                <section class="box form-container">
+                    <div class="search-box">
+                        <div class="searchform px-3 py-3">
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    @using (Html.BeginForm("IssueLogsummary", "Report", FormMethod.Post, new { AUTOCOMPLETE = "Off", id = "form1" }))
+                                    {
+                                        @Html.AntiForgeryToken()
+                                        @*@Html.HiddenFor(m => m.FromDate, new { @id = "hdnFromDate" })
+                                        @Html.HiddenFor(m => m.ToDate, new { @id = "hdnToDate" })
+                                        @Html.HiddenFor(m => m.IssueStatus, new { @id = "hdnIssueStatus" })*@
+                                        <div class="row align-items-lg-center">
+                                            <label class="col-lg-1 col-md-4 col-sm-12 col-form-label">From Date</label>
+                                            <div class="col-lg-3 col-md-6 col-sm-12 mb-lg-0 mb-3">
+                                                <div class="input-group">
+                                                    <input type="text" class="form-control datetime" name="fromdate" id="fromdate" />
+                                                    <div class="input-group-prepend">
+                                                        <label class="input-group-text" for="fromdate"><i class="icon-calendar-alt-solid"></i></label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <label class="col-lg-1 col-md-4 col-sm-12 col-form-label">To Date</label>
+                                            <div class="col-lg-3 col-md-6 col-sm-12 mb-lg-0 mb-3">
+                                                <div class="input-group">
+                                                    <input type="text" class="form-control datetime" name="todate" id="todate" />
+                                                    <div class="input-group-prepend">
+                                                        <label class="input-group-text" for="todate"><i class="icon-calendar-alt-solid"></i></label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <label class="col-lg-1 col-md-4 col-sm-12 col-form-label">Issue status</label>
+                                            <div class="col-lg-2 col-md-6 col-sm-12 mb-lg-0 mb-3">
+                                                @Html.DropDownListFor(m => m.IssueStatus, new List<SelectListItem>
+                                                {  new SelectListItem{ Text="Select", Value = "" },
+                                                    new SelectListItem{ Text="Pending", Value = "Pending" },
+                                                    new SelectListItem{ Text="Closed", Value = "Closed" },
+                                                    new SelectListItem{ Text="Total Issued", Value = "Total Issued" },
+                                                 }, new { @class = "form-control", autofocus = "autofocus" })
+                                            </div>
+                                            <div class="col-sm-2">
+                                                <button class="btn btn-sm btn-success m-0" id="btnShow" type="submit">Search</button>
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                        <div class="content-body">
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <table id="table-exports" class="table table-sm table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th width="30">Sl#</th>
+                                                <th>Category Name</th>
+                                                <th>Module Name</th>
+                                                <th>Item Name</th>
+                                                <th class="text-right"> <=1 </th>
+                                                <th class="text-right"> <=2 </th>
+                                                <th class="text-right"> <=3 </th>
+                                                <th class="text-right"> <=4 </th>
+                                                <th class="text-right"> <=5 </th>
+                                                <th class="text-right"> >=5 </th>
+                                                <th class="text-right">Total</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @{ int i = 1;
+                                            }
+                                            @foreach (var b in ViewBag.viewlogdata)
+                                            {
+                                            <tr>
+                                                <td>
+
+                                                    @i
+                                                    @{ i++; }
+                                                </td>
+                                                <td>
+                                                    <p class="m-0">
+                                                        @b.CategoryName
+                                                    </p>
+                                                </td>
+                                                <td><p class="m-0">@b.ModuleName</p></td>
+                                                <td><p class="m-0">@b.ItemName</p></td>
+                                                <td>
+                                                    <p class="m-0 text-right">
+                                                        @if (b.LesseThan1 != 0)
+                                                            {
+                                                        <a target="_blank" href="@CustomQueryStringHelper.EncryptString("Helpdesk", "DetailReport", "Report", new { ItemId = b.ItemId, Days = "<=0", Fromdate = b.FromDate, Todate = b.ToDate })">@b.LesseThan1</a>
+                                                            }
+                                                            else
+                                                            {
+                                                        @b.LesseThan1
+                                                            }
+                                                    </p>
+                                                </td>
+                                                <td>
+                                                    <p class="m-0 text-right">
+                                                        @if (b.LesseThan2 != 0)
+                                                            {
+                                                        <a target="_blank"  href="@CustomQueryStringHelper.EncryptString("Helpdesk", "DetailReport", "Report", new { ItemId = b.ItemId, Days = "=1", Fromdate = b.FromDate, Todate = b.ToDate })">@b.LesseThan2</a>
+                                                            }
+                                                            else
+                                                            {
+                                                        @b.LesseThan2
+                                                            }
+                                                    </p>
+                                                </td>
+                                                <td>
+                                                    <p class="m-0 text-right">
+                                                        @if (b.LesseThan3 != 0)
+                                                            {
+                                                        <a target="_blank"  href="@CustomQueryStringHelper.EncryptString("Helpdesk", "DetailReport", "Report", new { ItemId = b.ItemId, Days = "=2", Fromdate = b.FromDate, Todate = b.ToDate })">@b.LesseThan3</a>
+                                                            }
+                                                            else
+                                                            {
+                                                        @b.LesseThan3
+                                                            }
+                                                    </p>
+                                                </td>
+                                                <td>
+                                                    <p class="m-0 text-right">
+                                                        @if (b.LesseThan4 != 0)
+                                                            {
+                                                        <a target="_blank"  href="@CustomQueryStringHelper.EncryptString("Helpdesk", "DetailReport", "Report", new { ItemId = b.ItemId, Days = "=3", Fromdate = b.FromDate, Todate = b.ToDate })">@b.LesseThan4</a>
+                                                            }
+                                                            else
+                                                            {
+                                                        @b.LesseThan4
+                                                            }
+                                                    </p>
+                                                </td>
+                                                <td>
+                                                    <p class="m-0 text-right">
+                                                        @if (b.LesseThan5 != 0)
+                                                            {
+                                                        <a target="_blank"  href="@CustomQueryStringHelper.EncryptString("Helpdesk", "DetailReport", "Report", new { ItemId = b.ItemId, Days = "=4", Fromdate = b.FromDate, Todate = b.ToDate })">@b.LesseThan5</a>
+                                                            }
+                                                            else
+                                                            {
+                                                        @b.LesseThan5
+                                                            }
+                                                    </p>
+                                                </td>
+                                                <td>
+                                                    <p class="m-0 text-right">
+                                                        @if (b.GreaterThan5 != 0)
+                                                            {
+                                                        <a target="_blank"  href="@CustomQueryStringHelper.EncryptString("Helpdesk", "DetailReport", "Report", new { ItemId = b.ItemId, Days = "=5", Fromdate = b.FromDate, Todate = b.ToDate })">@b.GreaterThan5</a>
+                                                            }
+                                                            else
+                                                            {
+                                                        @b.GreaterThan5
+                                                            }
+                                                    </p>
+                                                </td>
+                                                <td>
+                                                    <p class="m-0 text-right">
+                                                        @if (b.Total != 0)
+                                                            {
+                                                        <a target="_blank"  href="@CustomQueryStringHelper.EncryptString("Helpdesk", "DetailReport", "Report", new { ItemId = b.ItemId, Days = "", Fromdate = b.FromDate, Todate = b.ToDate })">@b.Total</a>
+                                                            }
+                                                            else
+                                                            {
+                                                        @b.Total
+                                                            }
+                                                    </p>
+                                                </td>
+                                            </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+</section>
+<script>
+    $('.datetime').datetimepicker({
+        format: 'LT',
+        format: "DD/MM/YYYY",
+        daysOfWeekDisabled: [],
+        widgetPositioning: {
+            horizontal: 'auto',
+            vertical: 'bottom'
+        }
+    }).keydown(false);
+</script>

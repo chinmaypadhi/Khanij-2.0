@@ -1,0 +1,182 @@
+﻿@*// *********************************************************************************************************
+    //  View Name                : AddRiderLeave
+    //  Desciption               : To Save RiderLeave Details
+    //  Created By               : Suresh kumar behera
+    //  Created On               : 13-july-2021
+    // ********************************************************************************************************
+*@
+@model EstablishmentEf.RiderLeave
+@{
+    ViewData["Title"] = "AddRiderLeave";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+
+
+@if (TempData["msg"] != null)
+{
+    <script>
+        var vv = '@TempData["msg"]';
+        if (vv == 1) {
+            swal("", "Rider Leave saved successfully.", "success");
+        }
+        else if (vv == 2) {
+            swal("", "Rider Leave allready exists.", "warning");
+        }
+        else if (vv == 3) {
+            swal("", "Rider Leave updated sucessfully", "success");
+        }
+        else if (vv == 4) {
+            swal("", "Rider Leave deleted sucessfully", "success");
+        }
+        else {
+            swal("", "Something Errror occured. Please Try After Sometime!!", "error");
+        }
+    </script>
+
+    TempData["msg"] = null;
+
+}
+<script>
+    $(document).ready(function () {
+        loadNavigation('AddRiderLeave', 'glempprofile', 'plofficetype', 'tl', 'Leave Management', 'Add Rider Leave', ' ');
+
+        $("#Submit").click(function () {
+            if (!DropDownValidation("DistrictId", "District")) {
+                return false;
+            }
+            if (!DropDownValidation("DesignationId", "Designation")) {
+                return false;
+            }
+            if (!DropDownValidation("LeaveTypeId", "LeaveType")) {
+                return false;
+            }
+            if (!DropDownValidation("NoOfDays", "NoOfDays")) {
+                return false;
+            }
+            if (!blankFieldValidation("Remarks", "Remarks")) {
+                return false;
+            }
+            //if (!isAtleastOneChecked("IsDocumentRequired", "DocumentRequired")) {
+            //    return false;
+            //}
+
+        });
+
+         $("#Reset").click(function () {
+            window.location ="@Url.Content("~/LeaveManagement/LeaveManagement/AddRiderLeave/")"
+        });
+    });
+</script>
+
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+
+        @*@Html.Partial("_navigation")*@
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="javascript:void(0);">
+                                Add Rider Leave
+                            </a>
+                        </li>
+                        <li class="nav-item">
+
+                            <a class="nav-link " href="@Url.Content("~/LeaveManagement/LeaveManagement/ViewRiderLeave")">
+                                View Rider Leave
+                            </a>
+                        </li>
+                    </ul>
+
+                    @*@Html.Partial("_util")*@
+                </div>
+
+                <section class="box form-container">
+                    <div class="content-body">
+
+                        @using (Html.BeginForm("AddRiderLeave", "LeaveManagement", FormMethod.Post, new { AUTOCOMPLETE = "Off", id = "form1" }))
+                        {
+                            @Html.AntiForgeryToken();
+                            <div class="row">
+
+
+                                <div class="col-lg-6 col-md-12 col-sm-12">
+                                    <div class="form-group row">
+                                        <label class="col-lg-4 col-md-4 col-sm-12 col-form-label font-weight-bolder">District<span class="text-danger">*</span></label>
+                                        <div class="col-lg-7 col-md-6 col-sm-12">
+                                            @Html.DropDownListFor(m => m.DistrictId, ViewBag.District as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control form-control-sm searchableselect" })
+                                            @Html.HiddenFor(m => m.RiderLeaveId)
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-6 col-md-12 col-sm-12">
+                                    <div class="form-group row">
+                                        <label class="col-lg-4 col-md-4 col-sm-12 col-form-label font-weight-bolder">Designation<span class="text-danger">*</span></label>
+                                        <div class="col-lg-7 col-md-6 col-sm-12">
+                                            @Html.DropDownListFor(m => m.DesignationId, ViewBag.Designation as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control form-control-sm searchableselect" })
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 col-md-12 col-sm-12">
+                                    <div class="form-group row">
+                                        <label class="col-lg-4 col-md-4 col-sm-12 col-form-label font-weight-bolder">Leave Type<span class="text-danger">*</span></label>
+                                        <div class="col-lg-7 col-md-6 col-sm-12">
+                                            @Html.DropDownListFor(m => m.LeaveTypeId, ViewBag.LeaveType as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control form-control-sm searchableselect" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 col-md-12 col-sm-12">
+                                    <div class="form-group row">
+                                        <label class="col-lg-4 col-md-4 col-sm-12 col-form-label font-weight-bolder">No. of Days<span class="text-danger">*</span></label>
+                                        <div class="col-lg-7 col-md-6 col-sm-12">
+                                            @Html.TextBoxFor(m => m.NoOfDays, new { @class = "form-control", @type = "number", @maxlength = 200, Onkeypress = "return inputLimiter(event,'Numbers')" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 col-md-12 col-sm-12">
+                                    <div class="form-group row">
+                                        <label class="col-lg-4 col-md-4 col-sm-12 col-form-label font-weight-bolder">Remark<span class="text-danger">*</span></label>
+                                        <div class="col-lg-7 col-md-6 col-sm-12">
+                                            @Html.TextAreaFor(m => m.Remarks, new { @class = "form-control", @maxlength = 500, Onkeypress = "return inputLimiter(event,'NameCharactersAndNumbers')" })
+
+                                            <small class="text-danger">Maximum <strong>500</strong> characters</small>
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 col-md-12 col-sm-12">
+                                    <div class="form-group row">
+                                        <label class="col-lg-4 col-md-4 col-sm-12 col-form-label font-weight-bolder">Document Required<span class="text-danger">*</span></label>
+                                        <div class="col-lg-7 col-md-6 col-sm-12">
+                                            <div class="py-2">
+                                                <div class="custom-control custom-radio custom-control-inline">
+                                                    @Html.RadioButtonFor(n => n.IsDocumentRequired, true, new { @checked = true, @class = "custom-radio", id = "Rdbtn_Yes" }) &nbsp;&nbsp;&nbsp;Yes
+                                                </div>
+                                                <div class="custom-control custom-radio custom-control-inline">
+                                                    @Html.RadioButtonFor(n => n.IsDocumentRequired, false, new { @class = "custom-radio", id = "Rdbtn_No" })
+                                                    &nbsp;&nbsp;&nbsp;No
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                                <div class="col-sm-6  offset-lg-2 offset-md-4">
+                                    <input type="submit" value='@ViewBag.Button' class="btn btn-primary btn-md ml-0" name="Submit" id="Submit" />
+                                    <input type="reset" id="Reset" name="Reset" class="btn btn-danger btn-md" value="Reset" />
+                                </div>
+                            </div>
+                        }
+
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+    <!-- MAIN CONTENT AREA ENDS -->
+</section>

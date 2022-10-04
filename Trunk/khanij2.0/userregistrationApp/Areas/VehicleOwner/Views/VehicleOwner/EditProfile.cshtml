@@ -1,0 +1,364 @@
+﻿@*// *********************************************************************************************************
+    //  View Name                : EditProfile
+    //  Desciption               : Edit Prifile
+    //  Created By               : Akshaya Dalei
+    //  Created On               : 24 July 2021
+    // ********************************************************************************************************
+*@
+@{
+    ViewBag.Title = "Edit Profile";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+
+@using userregistrationEF;
+@model userregistrationEF.TransporterModel
+    
+<section class="wrapper main-wrapper row">
+
+    <div class="col-12">
+        @Html.Partial("_CMSnavigation")
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="javascript:void(0);">
+                                Edit Profile
+                            </a>
+                        </li>
+
+                    </ul>
+                    @Html.Partial("_CMSutil")
+                </div>
+                <form id="form1" action="UpdateProfile" method="post">
+                    <section class="box form-container">
+                        <div class="content-body">
+
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <div class="form-group row">
+                                        <label for="inputName" class="col-sm-4 col-form-label font-weight-bolder">Owner Type<span class="text-danger">*</span></label>
+                                        <div class="col-sm-8">
+                                            <div class="py-2">
+                                                <div class="custom-control custom-radio custom-control-inline">
+                                                    <input type="radio" checked="checked" onchange="onRadioChange();" class="custom-control-input" id="Individual" name="TransporterTypeStatus" value="Individual/Proprietor">
+                                                    <label class="custom-control-label" for="Individual">Individual/Proprietor</label>
+                                                </div>
+                                                <div class="custom-control custom-radio custom-control-inline">
+                                                    <input type="radio" class="custom-control-input" onchange="onRadioChange();" id="Firm" name="TransporterTypeStatus" value="Firm">
+                                                    <label class="custom-control-label" for="Firm">Firm</label>
+                                                </div>
+                                                <div class="custom-control custom-radio custom-control-inline">
+                                                    <input type="radio" class="custom-control-input" onchange="onRadioChange();" id="Association" name="TransporterTypeStatus" value="Association">
+                                                    <label class="custom-control-label" for="Association">Association</label>
+                                                </div>
+                                                <div class="custom-control custom-radio custom-control-inline">
+                                                    <input type="radio" class="custom-control-input" onchange="onRadioChange();" id="Company" name="TransporterTypeStatus" value="Company">
+                                                    <label class="custom-control-label" for="Company">Company</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6" id="IdDIVFirmAs">
+                                    <div class="form-group row">
+                                        <label for="inputName" class="col-sm-4 col-form-label font-weight-bolder">Firm as<span class="text-danger">*</span></label>
+                                        <div class="col-sm-7">
+                                            <div class="py-2">
+                                                <div class="custom-control custom-radio custom-control-inline">
+                                                    <input type="radio" class="custom-control-input" id="Partnership" name="Firm" value="Partnership">
+                                                    <label class="custom-control-label" for="Partnership">Partnership</label>
+                                                </div>
+                                                <div class="custom-control custom-radio custom-control-inline">
+                                                    <input type="radio" class="custom-control-input" id="Proprietary" name="Firm" value="Proprietary">
+                                                    <label class="custom-control-label" for="Proprietary">Proprietary</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6" id="IdDIVCompanyAs">
+                                    <div class="form-group row">
+                                        <label for="inputName" class="col-sm-4 col-form-label font-weight-bolder">Company as<span class="text-danger">*</span></label>
+                                        <div class="col-sm-8">
+                                            <div class="py-2">
+                                                <div class="custom-control custom-radio custom-control-inline">
+                                                    <input type="radio" class="custom-control-input" id="Private" name="Company" value="Private">
+                                                    <label class="custom-control-label" for="Private">Private</label>
+                                                </div>
+                                                <div class="custom-control custom-radio custom-control-inline">
+                                                    <input type="radio" class="custom-control-input" id="PublicLimited" name="Company" value="PublicLimited">
+                                                    <label class="custom-control-label" for="PublicLimited">Public Limited</label>
+                                                </div>
+                                                <div class="custom-control custom-radio custom-control-inline">
+                                                    <input type="radio" class="custom-control-input" id="PSU" name="Company" value="PSU">
+                                                    <label class="custom-control-label" for="PSU">PSU</label>
+                                                </div>
+                                                <div class="custom-control custom-radio custom-control-inline">
+                                                    <input type="radio" class="custom-control-input" id="Joint_Venture" name="Company" value="JointVenture">
+                                                    <label class="custom-control-label" for="Joint_Venture">Joint Venture</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6" id="IdDIVAadhar">
+                                    <div class="form-group row">
+                                        <label for="inputMail" class="col-sm-4 col-form-label font-weight-bolder">Aadhaar Card Number <span class="text-danger">*</span></label>
+                                        <div class="col-sm-7">
+                                            <input id="AadhaarNumber" name="AadhaarNumber" readonly type="text" value="@Model.AadhaarNo" class="form-control">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6" id="IdDIVNameOfCompany">
+                                    <div class="form-group row">
+                                        <label for="inputMail" class="col-sm-4 col-form-label font-weight-bolder">Name of Company/Firm/Association<span class="text-danger">*</span></label>
+                                        <div class="col-sm-7">
+                                            <input type="text" id="CompanyName" name="CompanyName" value="@Model.CompanyName" class="form-control">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6" id="IdDIVGSTNo">
+                                    <div class="form-group row">
+                                        <label for="inputMail" class="col-sm-4 col-form-label font-weight-bolder">GST No.<span class="text-danger">*</span></label>
+                                        <div class="col-sm-7">
+                                            <input id="TINNo" name="TINNo" value="@Model.TINNo" type="text" class="form-control">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group row">
+                                        <label for="inputMail" class="col-sm-4 col-form-label font-weight-bolder">Name Of Applicant <span class="text-danger">*</span></label>
+                                        <div class="col-sm-7">
+                                            <input type="text" readonly id="TransporterName" name="TransporterName" value="@Model.TransporterName" class="form-control">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group row">
+                                        <label class="col-sm-4 col-form-label font-weight-bolder">State<span class="text-danger">*</span></label>
+                                        <div class="col-sm-7">
+                                            <select id="StateId" name="StateId" class="form-control form-control-sm searchableselect">
+                                                <option value="">Select State</option>
+                                                @{
+                                                    List<TransporterModel> lsttransporterModels = (List<TransporterModel>)ViewData["StateDetails"];
+                                                    if (lsttransporterModels != null)
+                                                    {
+                                                        foreach (var item in lsttransporterModels)
+                                                        {
+                                                            <option value="@item.StateId">@item.StateName</option>
+                                                        }
+                                                    }
+                                                }
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group row">
+                                        <label for="inputMail" class="col-sm-4 col-form-label font-weight-bolder">Mobile Number<span class="text-danger">*</span></label>
+                                        <div class="col-sm-7">
+                                            <input id="MobileNo" name="MobileNo" value="@Model.MobileNo" type="text" class="form-control">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group row">
+                                        <label class="col-sm-4 col-form-label font-weight-bolder">District<span class="text-danger">*</span></label>
+                                        <div class="col-sm-7">
+                                            <select id="DistrictId" name="DistrictId" class="form-control form-control-sm searchableselect">
+                                                <option value="">Select District</option>
+                                                @{
+                                                    List<TransporterModel> lstDistrict = (List<TransporterModel>)ViewData["District"];
+                                                    if (lstDistrict != null)
+                                                    {
+                                                        foreach (var item in lstDistrict)
+                                                        {
+                                                            <option value="@item.DistrictId">@item.DistrictName</option>
+                                                        }
+                                                    }
+                                                }
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group row">
+                                        <label for="dropdownDepart" class="col-sm-4 col-form-label font-weight-bolder">PAN Card Number<span class="text-danger">*</span></label>
+                                        <div class="col-sm-7">
+                                            <input id="PAN" name="PAN" value="@Model.PAN" readonly type="text" class="form-control">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group row">
+                                        <label for="inputName" class="col-sm-4 col-form-label font-weight-bolder">Pin Code<span class="text-danger">*</span></label>
+                                        <div class="col-sm-7">
+                                            <input id="PinCode" name="PinCode" type="text" value="@Model.PinCode" class="form-control">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group row">
+                                        <label for="inputMail" class="col-sm-4 col-form-label font-weight-bolder">Complete Address<span class="text-danger">*</span></label>
+                                        <div class="col-sm-7">
+                                            <textarea id="Address" name="Address" maxlength="500" class="form-control" rows="1">@Model.Address</textarea>
+                                            <small class="text-danger">Maximum <strong>500</strong> characters</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group row">
+                                        <label for="dropdownDepart" class="col-sm-4 col-form-label font-weight-bolder">E-mail ID<span class="text-danger">*</span></label>
+                                        <div class="col-sm-7">
+                                            <input type="text" id="EmailID" name="EmailID" value="@Model.EmailID" class="form-control">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group row">
+                                        <label for="inputMail" class="col-sm-4 col-form-label font-weight-bolder">Security Question<span class="text-danger">*</span></label>
+                                        <div class="col-sm-7">
+                                            <select style="pointer-events:none;" id="SQuestionId" name="SQuestionId" class="form-control">
+                                                <option>select</option>
+                                                @{
+                                                    List<TransporterModel> lstSQuestion = (List<TransporterModel>)ViewData["SQuestion"];
+                                                    if (lstSQuestion != null)
+                                                    {
+                                                        foreach (var item in lstSQuestion)
+                                                        {
+                                                            <option value="@item.SQuestionId">@item.SQuestion</option>
+                                                        }
+                                                    }
+                                                }
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group row">
+                                        <label for="inputMail" class="col-sm-4 col-form-label font-weight-bolder">Answer<span class="text-danger">*</span></label>
+                                        <div class="col-sm-7">
+                                            <input id="SQAnswer" name="SQAnswer" readonly value="@Model.QAnswer" type="text" class="form-control">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                
+                                <div class="col-sm-12">
+                                    <div class="form-group row">
+                                        <div class="col-sm-12">
+                                            <input type="submit" class="btn btn-success btn-md" onclick="return confirm('Are you sure you want to edit?');" value="Save Profile" name="Submit" id="Submit" />
+                                        </div>
+                                    </div>
+                                </div>
+
+
+
+
+                            </div>
+                        </div>
+                    </section>
+                    @Html.HiddenFor(model => model.TransporterId)
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+
+<input type="hidden" id="hdnStateId" value="@Model.StateId" />
+<input type="hidden" id="hdnSQuestionId" value="@Model.SQuestionId" />
+<input type="hidden" id="hdnDistrictId" value="@Model.DistrictId" />
+<script>
+     
+    $(document).ready(function () {
+        loadNavigation('Edit Profile', 'ql', 'pl', 'tl', 'Vehicle Owner', 'Edit Profile', ' ');
+        $('#IdDIVGSTNo').hide();
+        $('#IdDIVFirmAs').hide();
+        $('#IdDIVCompanyAs').hide();
+        $('#IdDIVNameOfCompany').hide();
+        $('#IdDIVAadhar').show();
+
+        if ($('#hdnStateId').val() != "" && $('#hdnStateId').val() != "0") {
+            $('#StateId').val($('#hdnStateId').val());
+        }
+        if ($('#hdnSQuestionId').val() != "" && $('#hdnSQuestionId').val() != "0") {
+            $('#SQuestionId').val($('#hdnSQuestionId').val());
+        }
+        if ($('#hdnDistrictId').val() != "" && $('#hdnDistrictId').val() != '0') {
+            $('#DistrictId').val($('#hdnDistrictId').val());
+        }
+
+        if ('@Model.TransporterTypeStatus' == "Individual/Proprietor") {
+            $("#Individual").trigger('click');
+            onRadioChange();
+        }
+        else if ('@Model.TransporterTypeStatus' == "Firm") {
+            $("#Firm").trigger('click');
+            if ('@Model.Firm' == "Partnership") {
+                $('#Partnership').trigger('çlick').trigger('click');
+            }
+            else if ('@Model.Firm' == "Proprietary") {
+                $('#Proprietary').trigger('çlick').trigger('click');
+            }
+
+            onRadioChange();
+        }
+        else if ('@Model.TransporterTypeStatus' == "Association") {
+            $("#Association").trigger('click');
+            onRadioChange();
+        }
+        else if ('@Model.TransporterTypeStatus' == "Company") {
+            $('#Company').trigger('click');
+            if ('@Model.Company' == "Private") {
+                $('#Private').trigger('click');
+            }
+            else if ('@Model.Company' == "PublicLimited") {
+                $('#PublicLimited').trigger('click');
+            }
+            else if ('@Model.Company' == "PSU") {
+                $('#PSU').trigger('click');
+            }
+            else if ('@Model.Company' == "JointVenture") {
+                $('#Joint_Venture').trigger('click');
+            }
+            onRadioChange();
+}
+
+        $(':radio').click(function () {
+            return false;
+        });
+    });
+
+    function onRadioChange() {
+        if ($("#Firm").is(":checked")) {
+            $('#IdDIVGSTNo').show();
+            $('#IdDIVFirmAs').show();
+            $('#IdDIVCompanyAs').hide();
+            $('#IdDIVNameOfCompany').show();
+            $('#IdDIVAadhar').hide();
+        }
+        else if ($("#Company").is(":checked")) {
+            $('#IdDIVGSTNo').show();
+            $('#IdDIVFirmAs').hide();
+            $('#IdDIVCompanyAs').show();
+            $('#IdDIVNameOfCompany').show();
+            $('#IdDIVAadhar').hide();
+        }
+        else if ($("#Association").is(":checked")) {
+            $('#IdDIVGSTNo').show();
+            $('#IdDIVFirmAs').hide();
+            $('#IdDIVCompanyAs').hide();
+            $('#IdDIVNameOfCompany').show();
+            $('#IdDIVAadhar').hide();
+        }
+        else {
+            $('#IdDIVGSTNo').hide();
+            $('#IdDIVFirmAs').hide();
+            $('#IdDIVCompanyAs').hide();
+            $('#IdDIVNameOfCompany').hide();
+            $('#IdDIVAadhar').show();
+        }
+    }
+</script>

@@ -1,0 +1,137 @@
+﻿@*// *********************************************************************************************************
+    //  View Name                : ActionTakenRequest
+    //  Desciption               : Show all Action taken enduser requests
+    //  Created By               : Debaraj Swain
+    //  Created On               : 24 March 2021
+    // ********************************************************************************************************
+*@
+@using userregistrationApp.Helper;
+@model userregistrationEF.EndUserModel
+@{
+    ViewData["Title"] = "EndUser Updation Report";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        @Html.Partial("_CMSnavigation")
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item mr-md-1">
+                            <a class="nav-link" href="@Url.Action("AllRequest", "EndUserProfile")">
+                                Add New Request
+                            </a>
+                        </li>
+                        <li class="nav-item mr-md-1">
+                            <a class="nav-link" href="@Url.Action("AllUpdationRequest", "EndUserProfile")">
+                                Updation Request
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="@Url.Action("ActionTakenRequest", "EndUserProfile")">
+                                Action Taken
+                            </a>
+                        </li>
+                    </ul>
+                    @Html.Partial("_CMSutil")
+                </div>
+                <section class="box form-container">
+                    <div class="content-body">
+                        <div class="legend-box">
+                            <ul class="d-flex mb-1 justify-content-end list-unstyled">
+                                <li><span class="bg-success"></span>Approved</li>
+                                <li><span class="bg-warning"></span>Rejected</li>
+                            </ul>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-12">
+
+                                <table id="table-exports" class="table table-sm table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th width="30">Sl#</th>
+                                            <th>Request Type</th>
+                                            <th>User Name / Registration No.</th>
+                                            <th>Registration Type</th>
+                                            <th>User Type</th>
+                                            <th>Applicant Name</th>
+                                            <th>Company Name</th>
+                                            <th>District Name</th>
+                                            <th>State Name</th>
+                                            <th>Status</th>
+                                            <th>User Remark</th>
+                                            <th>Approvers Remark</th>
+                                            <th>Requested By</th>
+                                            <th>Requested On</th>
+                                            <th>Action Taken By</th>
+                                            <th>Action Taken On</th>
+                                            <th width="150px" class="noprint text-center">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @{ int i = 0;
+                                        }
+                                        @foreach (var b in ViewBag.AllReport)
+                                        {
+
+                                            i = i + 1;
+                                            var dyclass = b.ApprovalStatus == "Approved" ? "active-row" : "inactive-row";
+
+                                            <tr class="@dyclass">
+                                                <td>
+                                                    @i
+                                                </td>
+                                                @*<td >@b.EndUserId </td>*@
+                                                <td class="text-primary">@b.IsExisting</td>
+                                                <td>@b.UserName <input type="hidden" id="hfPersonId" name="PersonId" value=@b.EndUserId /> </td>
+                                                <td>@b.RegistrationType </td>
+                                                <td>@b.UserType </td>
+                                                <td>@b.ApplicantName </td>
+                                                <td>@b.CompanyName </td>
+                                                <td>@b.DistrictName </td>
+                                                <td>@b.StateName </td>
+                                                @if (b.ApprovalStatus == "Approved")
+                                                {
+                                                    <td class="text-success">@b.ApprovalStatus</td>
+                                                }
+                                                else
+                                                {
+                                                    <td class="text-orange">@b.ApprovalStatus</td>
+                                                }
+
+                                                <td>@b.UserRemarks </td>
+                                                <td>@b.ApproverRemarks </td>
+                                                <td>@b.AddedBy </td>
+                                                <td>@b.AddedOn </td>
+                                                <td>@b.ActionTakenBy </td>
+                                                <td>@b.ActionTakenOn </td>
+
+
+
+
+                                                <td class="noprint text-center"> 
+                                                    <a href="@CustomQueryStringHelper.EncryptString("EndUserRegistration","EndUserDataView","EndUserProfile",new {id=b.EndUserId })" class="btn-floating btn-outline-primary btn-sm">View Details</a>
+                                                </td>
+                                            </tr>
+                                        }
+
+                                    </tbody>
+                                </table>
+
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+
+    $(document).ready(function () {
+        loadNavigation('ViewPaymentHead', 'glTMng', 'plpaymenthead', 'tl', 'EndUser', 'Action Taken', ' ');
+    });
+</script>

@@ -1,0 +1,308 @@
+﻿@model PermitEF.ePermitModel
+
+@{
+    ViewData["Title"] = "ePermitViewWithoutDSC";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        @Html.Partial("_CMSnavigation")
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+
+                    @Html.Partial("_CMSutil")
+                </div>
+
+                <section class="box form-container">
+                    <div class="content-body">
+
+                       <div class="table-responsive">
+                            <table id="table-exports" class="table table-bordered" style="width: 800px!important;margin: 0 auto;">
+                               
+                                <tbody>
+                                    <tr>
+                                        <th colspan="2" style="text-align: center; border-top: 1px solid black; border-left: 1px solid black;">
+                                            <img id="imgLogo" src="/CMSimg/LogoPrintNew.png" height="80" alt="LOGO">
+                                            <h6>Kanker (Uttar Bastar) District)</h6>
+
+                                        </th>
+
+
+                                    </tr>
+                                    <tr>
+                                        <td class="font-weight-bold text-center text-brown" style="font-size: 20px;" colspan="4">e-Permit Application for @(Html.DisplayFor(model => model.MineralName))</td>
+
+                                    </tr>
+
+                                    <tr>
+                                        <td width="30%" class="font-weight-bold">E-Permit Number</td>
+                                        <td> @(Html.DisplayFor(x => x.BulkPermitNo))</td>
+                                    </tr>
+
+                                    
+
+                                    <tr>
+                                        <td class="font-weight-bold"> Name of  Lessee/Licensee </td>
+                                        <td>
+                                            @(Html.DisplayFor(x => x.LesseeName))<br />
+                                        </td>
+
+                                    </tr>
+
+                                    <tr>
+
+                                        <td class="font-weight-bold">Address  of  Lessee/Licensee </td>
+                                        <td>
+                                            @(Html.DisplayFor(x => x.LesseeAddress))<br />
+                                        </td>
+                                    </tr>
+
+                                    <tr>
+                                        <td class="font-weight-bold">Grant Order Number</td>
+                                        <td>@(Html.DisplayFor(model => model.GrantOrderNo, "GrantOrderNo")) </td>
+
+                                    </tr>
+                                    <tr>
+                                        <td class="font-weight-bold">Grant Order Date</td>
+                                        <td>@(Html.DisplayFor(model => model.DateOfGrant))</td>
+                                    </tr>
+
+                                    <tr>
+                                        <td class="font-weight-bold">Period of Lease/License</td>
+                                        <td>@(Html.DisplayFor(model => model.PeriodOfLease))</td>
+                                    </tr>
+
+
+                                    <tr>
+                                        <td class="font-weight-bold">Village</td>
+                                        <td>@(Html.DisplayFor(model => model.Village))</td>
+                                    </tr>
+
+                                    <tr>
+                                        <td class="font-weight-bold">Tehsil</td>
+                                        <td>@(Html.DisplayFor(model => model.Tehsil))</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="font-weight-bold">Panchayat </td>
+                                        <td>@(Html.DisplayFor(x => x.Panchayat))</td>
+                                    </tr>
+
+                                    <tr>
+                                        <td class="font-weight-bold">Police Station</td>
+                                        <td>@(Html.DisplayFor(x => x.PoliceStation))</td>
+                                    </tr>
+
+                                    <tr>
+                                        <td class="font-weight-bold">District</td>
+                                        <td>@(Html.DisplayFor(x => x.District))<br /></td>
+                                    </tr>
+
+                                    <tr>
+                                        <td class="font-weight-bold">Mineral Name</td>
+                                        <td>@(Html.DisplayFor(x => x.MineralName))<br /></td>
+                                    </tr>
+
+                                    <tr>
+                                        <td class="font-weight-bold">Mineral Form </td>
+                                        <td>@(Html.DisplayFor(model => model.MineralNature))</td>
+                                    </tr>
+
+                                    <tr>
+                                        <td class="font-weight-bold">Mineral Grade</td>
+                                        <td>@(Html.DisplayFor(model => model.MineralGradeName))</td>
+                                    </tr>
+
+                                    <tr>
+                                        <td class="font-weight-bold">Quantity to be Dispatched </td>
+                                        <td>@(Html.DisplayFor(model => model.ProposedQty))</td>
+                                    </tr>
+
+                                    <tr>
+                                        <td class="font-weight-bold">Mineral Unit</td>
+                                        <td>@(Html.DisplayFor(model => model.UnitName))</td>
+                                    </tr>
+
+                                    <tr>
+                                        <td class="font-weight-bold">Price (Rs Per Tonne) </td>
+                                        <td>@(Html.DisplayFor(model => model.RoyaltyRate))</td>
+                                    </tr>
+
+                                    <tr>
+                                        <td class="font-weight-bold">Royalty Per Tonne</td>
+                                        <td>@(Html.DisplayFor(model => model.CalValue))</td>
+                                    </tr>
+
+                                    @if (Model != null && Model.PaymentDetails != null && Model.PaymentDetails.Count > 0)
+                                    {
+                                        decimal total = 0;
+                                        <tr>
+                                            @if (Model.ActiveStatus == 6 || Model.ActiveStatus == 7 || Model.ActiveStatus == 8 || Model.ActiveStatus == 11)
+                                            {
+                                                <td class="font-weight-bold text-center text-red" style="color:red" colspan="4">Total Online Paid Amount</td>
+
+                                            }
+                                            else
+                                            {
+                                                <td class="font-weight-bold text-center text-red" style="color:red" colspan="4">Payable</td>
+                                            }
+                                        </tr>
+
+                                        int i = 16;
+                                        foreach (var objList in Model.PaymentDetails)
+                                        {
+
+                                            if (objList.IsApplicable == true)
+                                            {
+                                                total += Convert.ToDecimal(objList.MappingValue);
+                                                <tr>
+                                                    <td class="font-weight-bold">@objList.PaymentType </td>
+                                                    <td>Rs. @objList.MappingValue </td>
+                                                </tr>
+
+                                                i++;
+                                            }
+                                        }
+                                        <tr>
+
+                                            @if (Model.ActiveStatus == 6 || Model.ActiveStatus == 7 || Model.ActiveStatus == 8 || Model.ActiveStatus == 11)
+                                            {
+                                                <td class="font-weight-bold">Total Online Paid Amount </td>
+                                            }
+                                            else
+                                            {
+                                                <td class="font-weight-bold">Total Payable Amount </td>
+                                            }
+                                            <td>Rs. @total </td>
+                                        </tr>
+
+
+                                        <tr>
+                                            <td class="font-weight-bold text-center text-red" style="color:red;" colspan="4">Shall be paid separately</td>
+                                        </tr>
+                                        total = 0;
+                                        i = i + 1;
+                                        foreach (var objList in Model.PaymentDetails)
+                                        {
+
+                                            if (objList.IsApplicable == false)
+                                            {
+                                                total += Convert.ToDecimal(objList.MappingValue);
+                                                <tr>
+                                                    <td class="font-weight-bold">@objList.PaymentType </td>
+                                                    <td>Rs. @objList.MappingValue </td>
+                                                </tr>
+
+                                                i++;
+                                            }
+                                        }
+                                        <tr>
+                                            <td class="font-weight-bold">Total </td>
+                                            <td>Rs. @total </td>
+                                        </tr>
+
+
+
+                                        <tr>
+                                            <td class="font-weight-bold text-center text-red" style="color:red;" colspan="4">User information</td>
+                                        </tr>
+
+                                        <tr>
+                                            <td class="font-weight-bold">Generated By </td>
+                                            <td>
+                                                @(Html.DisplayFor(model => model.GeneratedBy))
+                                            </td>
+                                        </tr>
+
+                                        <tr>
+                                            <td class="font-weight-bold">Designation</td>
+                                            <td>
+                                                @(Html.DisplayFor(model => model.GeneratedDesignation))
+                                            </td>
+                                        </tr>
+
+                                        <tr>
+                                            <td class="font-weight-bold">Generated Date and Time </td>
+                                            <td>
+                                                <span>@(System.DateTime.Now.ToString("dd/MM/yyyy hh:mm:ss tt"))</span>
+                                            </td>
+                                        </tr>
+                                       
+                                        if (Model != null && (Model.ActiveStatus == 7 || Model.ActiveStatus == 11))
+                                        {
+                                            <tr style="height: 80px">
+                                                <td style="border: 1px solid black; width: 5%; text-align: center">
+                                                    <span>@(i + 4)</span>
+                                                </td>
+                                                <td style="width: 45%; border-bottom: 1px solid black; border-top: 1px solid black; border-left: 1px solid black;">
+                                                    <span>DSC : </span>
+                                                </td>
+                                                <td style="border-bottom: 1px solid black; border-top: 1px solid black; border-right: 1px solid black; width: 50%;"></td>
+                                                <td></td>
+
+                                            </tr>
+                                            <tr>
+                                                <td colspan="2" style="font-size: 12px; text-align: left">
+                                                    <label>
+                                                        <i>This is a system generated permit. So physical signature is not required. </i>
+                                                    </label>
+                                                </td>
+                                               
+
+                                            </tr>
+                                        }
+                                    }
+
+                                </tbody>
+                            </table>
+
+
+
+
+                        </div>
+
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+    <!-- MAIN CONTENT AREA ENDS -->
+</section>
+
+<script>
+    backMe = "yes"
+    $(document).ready(function () {
+        loadNavigation('ViewList', 'glhelpdesk', 'plraiseticket', 'tl', 'E-Permit', 'permit', ' ');
+        $('.searchableselect').searchableselect();
+
+        $('.shorting-lnk').click(function () {
+            $('.shorting-lnk i').toggleClass('fa-sort-amount-up-alt fa-sort-amount-down-alt ');
+        });
+        $('.filter-dropdown').hide();
+        $('.filter-lnk').click(function () {
+            $(this).toggleClass('active');
+            $(this).siblings('.filter-dropdown').slideToggle();
+        });
+        $('.filter-btn').click(function () {
+            $(this).parent('.shorting-cell .filter-dropdown').slideUp();
+            if ($(this).parent().parent('.shorting-cell').find('.filter-lnk').hasClass('active')) {
+                $(this).parent().siblings('.filter-lnk').removeClass('active');
+            }
+        });
+       @* $("#excelIcon").click(function () {
+            exportTableToExcel("ePermitList", "text")
+        });*@
+    });
+</script>
+<script>
+    $(document).ready(function () {
+        $('.datepicker').datetimepicker({
+            format: 'LT',
+            format: 'DD-MM-YYYY',
+
+        });
+    });
+</script>
+

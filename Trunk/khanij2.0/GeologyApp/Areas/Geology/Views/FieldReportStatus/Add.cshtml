@@ -1,0 +1,365 @@
+﻿@*// *********************************************************************************************************
+    //  View Name                : Add
+    //  Desciption               : To Add,Edit,Update Field Report Status details
+    //  Created By               : Lingaraj Dalai
+    //  Created On               : 18 March 2021
+    // ********************************************************************************************************
+*@
+@model GeologyEF.FieldReportStatusmaster
+@{
+    ViewData["Title"] = "Add";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+@if (TempData["msg"] != null)
+{
+    <script>
+         var vv = '@TempData["msg"]';
+        if (vv == 1) {
+            swal("", "Field Report Status inserted successfully.", "success");
+        }
+        else if (vv == 4) {
+            swal("","Field Report Status updated successfully.","success");
+        }
+        else if (vv == 2) {
+            swal("","Field Report Status already exists.","warning");
+        }
+        else {
+            swal("",vv,"error");
+        }
+    </script>
+}
+<script>
+    $(document).ready(function () {
+        debugger;
+        if ($('#hfReportType').val() != "") {
+            $('#ddlReportType').val($('#hfReportType').val());
+        }
+        if ($('#hfReportStatus').val() != "") {
+            $('#ddlStatus').val($('#hfReportStatus').val());
+        }
+        $('.searchableselect').searchableselect();
+        var filesize1 = 0; var filesize2 = 0; var filesize3 = 0;
+        $('input[name="FIELD_REPORTAttachment"]').bind('change', function () {
+            $("input[name='Submit']").attr('disabled', false);
+            filesize1 = this.files[0].size;
+            var val = $(this).val().toLowerCase(),
+                regex = new RegExp("(.*?)\.(pdf|jpeg|jpg|png|xls|tif)$");
+            if (!(regex.test(val))) {
+                swal("", ".docx  type is not an allowed file type. You can use only jpg, jpeg, png, pdf, tif types of file(s). ", "warning");
+                this.value = '';
+                $("input[name='Submit']").attr('disabled', true);
+                return false;
+            }
+            if (filesize1 > 2048000) {
+                swal("", "File size must be 2 MB !", "warning");
+                $("input[name='Submit']").attr('disabled', true);
+                return false;
+            }
+            return false;
+        });
+        $('input[name="MAPS_PLATESAttachment"]').bind('change', function () {
+            $("input[name='Submit']").attr('disabled', false);
+            filesize2 = this.files[0].size;
+            var val = $(this).val().toLowerCase(),
+                regex = new RegExp("(.*?)\.(pdf|jpeg|jpg|png|xls|tif)$");
+            if (!(regex.test(val))) {
+                swal("", ".docx  type is not an allowed file type. You can use only jpg, jpeg, png, pdf, tif types of file(s). ", "warning");
+                this.value = '';
+                $("input[name='Submit']").attr('disabled', true);
+                return false;
+            }
+            if (filesize2 > 2048000) {
+                swal("", "File size must be 2 MB !", "warning");
+                $("input[name='Submit']").attr('disabled', true);
+                return false;
+            }
+            return false;
+
+        });
+        $('input[name="ANNEXUREAttachment"]').bind('change', function () {
+            $("input[name='Submit']").attr('disabled', false);
+            filesize3 = this.files[0].size;
+            var val = $(this).val().toLowerCase(),
+                regex = new RegExp("(.*?)\.(pdf|jpeg|jpg|png|xls|tif)$");
+            if (!(regex.test(val))) {
+                swal("", ".docx  type is not an allowed file type. You can use only jpg, jpeg, png, pdf, tif types of file(s). ", "warning");
+                this.value = '';
+                $("input[name='Submit']").attr('disabled', true);
+                return false;
+            }
+            if (filesize3 > 2048000) {
+                swal("", "File size must be 2 MB !", "warning");
+                $("input[name='Submit']").attr('disabled', true);
+                return false;
+            }
+            return false;
+
+        });
+        /*Validation*/
+        $("#Submit").click(function () {
+            debugger;
+            if (!DropDownValidation("FPO_Id", "FPO Code")) {
+                return false;
+            }
+            else if (!DropDownValidation("ddlReportType", "Report Type")) {
+                return false;
+            }
+            else if (!DropDownValidation("ddlStatus", "Status")) {
+                return false;
+            }
+            else if (!DropDownValidation("RegionalOfficeId", "Regional Office")) {
+                return false;
+            }
+            else if ($("#hdnFIELD_REPORT_FILE_NAME").val() == "") {
+                if (!FileUploadValidation("File10", "Field Report")) {
+                    return false;
+                }
+            }
+            else if ($("#hdnMAPS_PLATES_FILE_NAME").val() == "") {
+                if (!FileUploadValidation("File11", "Map & Plates Files")) {
+                    return false;
+                }
+            }
+            else if ($("#hdnANNEXURE_FILE_NAME").val() == "") {
+                if (!FileUploadValidation("File12", "Annexure Files")) {
+                    return false;
+                }
+            }
+        });
+    });
+    /*Bind FPO details*/
+    function BindFPOData() {
+        debugger;
+        if ($('#FPO_Id').val() != "") {
+            $.ajax({
+                url: '/Geology/MPRCreator/GetFPOdetailsByFPOCode',
+                data: { 'FPOId': $('#FPO_Id').val() },
+                dataType: 'json',
+                type: 'post',
+                success: function (data) {
+                    debugger;
+                    $('#txtFPOdate').val(data.dateOfIssuance);
+                    $('#txtFieldSeason').val(data.explorationSeason);
+                    $('#txtFPOName').val(data.fpO_Name);
+                },
+                error: function (err) {
+                }
+            });
+        }
+        else {
+            $('#txtFPOdate').val('');
+            $('#txtFieldSeason').val('');
+            $('#txtFPOName').val('');
+        }
+    }
+</script>
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        <!-- MAIN CONTENT AREA STARTS -->
+        @Html.Partial("_CMSnavigation")
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link active">
+                                Add
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="~/Geology/FieldReportStatus/ViewList">
+                                View
+                            </a>
+                        </li>
+                    </ul>
+                    @Html.Partial("_CMSutil")
+                </div>
+                <section class="box form-container">
+                    <div class="content-body">
+                        @using (Html.BeginForm("Add", "FieldReportStatus", FormMethod.Post, new { AUTOCOMPLETE = "Off", id = "form1", enctype = "multipart/form-data" }))
+                        {
+                            @Html.AntiForgeryToken()
+                            <div class="row">
+                                <div class="col-lg-6 col-md-12 col-sm-12">
+                                    <div class="form-group row">
+                                        <label for="dropdownDist" class="col-sm-4 col-form-label">FPO Code <span class="text-danger">*</span></label>
+                                        <div class="col-sm-7">
+                                            @Html.DropDownListFor(m => m.FPO_Id, ViewBag.FPOcode as IEnumerable<SelectListItem>, "Select", new { @class = "form-control form-control-sm searchableselect", autofocus = "autofocus", @onchange = "BindFPOData()" })
+                                            @Html.HiddenFor(m => m.MPR_ID)
+                                            @Html.ValidationMessageFor(m => m.FPO_Id, "", new { @class = "text-danger" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 col-md-12 col-sm-12">
+                                    <div class="form-group row">
+                                        <label class="col-sm-4 col-form-label">FPO Date</label>
+                                        <div class="col-sm-7">
+                                            <div class="input-group">
+                                                <input type="text" class="form-control" value="@Model.FPO_AffectiveDate" name="FPO_AffectiveDate" id="txtFPOdate" disabled />
+                                                <div class="input-group-prepend">
+                                                    <label class="input-group-text" for="inputDate2"><i class="icon-calendar-alt-solid"></i></label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 col-md-12 col-sm-12">
+                                    <div class="form-group row">
+                                        <label class="col-sm-4 col-form-label">FPO Name</label>
+                                        <div class="col-sm-7">
+                                            @Html.TextBoxFor(m => m.FPO_Name, new { @class = "form-control", @autofocus = "autofocus", disabled = "true", @id = "txtFPOName" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 col-md-12 col-sm-12">
+                                    <div class="form-group row">
+                                        <label class="col-sm-4 col-form-label">Field Season</label>
+                                        <div class="col-sm-7">
+                                            @Html.TextBoxFor(m => m.ExplorationSeason, new { @class = "form-control", @autofocus = "autofocus", disabled = "true", @id = "txtFieldSeason" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 col-md-12 col-sm-12">
+                                    <div class="form-group row">
+                                        <label class="col-sm-4 col-form-label">Field Officer's Name</label>
+                                        <div class="col-sm-7">
+                                            <input type="text" class="form-control" name="applicantname" value="@Model.ApplicantName" readonly>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 col-md-12 col-sm-12">
+                                    <div class="form-group row">
+                                        <label class="col-sm-4 col-form-label">Field Officer's Designation</label>
+                                        <div class="col-sm-7">
+                                            <input type="text" class="form-control" name="RoleName" value="@Model.RoleName" readonly>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 col-md-12 col-sm-12">
+                                    <div class="form-group row">
+                                        <label class="col-sm-4 col-form-label">Field Officer's Mobile No.</label>
+                                        <div class="col-sm-7">
+                                            <input type="text" class="form-control" name="MobileNo" value="@Model.MobileNo" readonly>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 col-md-12 col-sm-12">
+                                    <div class="form-group row">
+                                        <label class="col-sm-4 col-form-label">Field Officer's Email Id</label>
+                                        <div class="col-sm-7">
+                                            <input type="text" class="form-control" name="EmailId" value="@Model.EmailId" readonly>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 col-md-12 col-sm-12">
+                                    <div class="form-group row">
+                                        <label class="col-sm-4 col-form-label">Select Report Type <span class="text-danger">*</span></label>
+                                        <div class="col-sm-7">
+                                            <select id="ddlReportType" name="ReportType" class="form-control form-control-sm searchableselect">
+                                                <option value="">Select</option>
+                                                <option value="1">Annual Draft Report</option>
+                                                <option value="2">Final Report</option>
+                                                @Html.HiddenFor(m => m.ReportType, new { @id = "hfReportType" })
+                                            </select>
+                                            @Html.ValidationMessageFor(m => m.ReportType, "", new { @class = "text-danger" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 col-md-12 col-sm-12">
+                                    <div class="form-group row">
+                                        <label class="col-sm-4 col-form-label">Select Status <span class="text-danger">*</span></label>
+                                        <div class="col-sm-7">
+                                            <select id="ddlStatus" name="ReportStatus_1" class="form-control  searchableselect">
+                                                <option value="">Select</option>
+                                                <option value="1">Report Submited</option>
+                                                <option value="2">Report Under Process</option>
+                                                @Html.HiddenFor(m => m.ReportStatus_1, new { @id = "hfReportStatus" })
+                                            </select>
+                                            @Html.ValidationMessageFor(m => m.ReportStatus, "", new { @class = "text-danger" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 col-md-12 col-sm-12">
+                                    <div class="form-group row">
+                                        <label for="dropdownDist" class="col-sm-4 col-form-label">Regional Office <span class="text-danger">*</span></label>
+                                        <div class="col-sm-7">
+                                            @Html.DropDownListFor(m => m.RegionalOfficeId, ViewBag.Regionaloffice as IEnumerable<SelectListItem>, "Select", new { @class = "form-control form-control-sm searchableselect", autofocus = "autofocus" })
+                                            @Html.ValidationMessageFor(m => m.RegionalOfficeId, "", new { @class = "text-danger" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 col-md-12 col-sm-12">
+                                    <div class="form-group row">
+                                        <label class="col-sm-4 col-form-label">Field Report <span class="text-danger">*</span></label>
+                                        <div class="col-sm-7">
+                                            <div class="custom-file">
+                                                <input type="file" class="custom-file-input" id="File10" name="FIELD_REPORTAttachment">
+                                                <label class="custom-file-label" for="customFile">Choose Files</label>
+                                            </div>
+                                            @if (Model.FIELD_REPORT_FILE_NAME != null && Model.FIELD_REPORT_FILE_NAME != "")
+                                            {
+                                                <label class="form-control-plaintext">@(Model.FIELD_REPORT_FILE_NAME) <a href='~/@Model.FIELD_REPORT_FILE_PATH' title="" class="ml-2" data-original-title="Download Field Report Copy" target="_blank"><i class="icon-file-pdf-solid h5 text-danger"></i></a></label>
+                                            }
+                                            @Html.HiddenFor(m => m.FIELD_REPORT_FILE_NAME, new { @id = "hdnFIELD_REPORT_FILE_NAME" })
+                                            @Html.ValidationMessageFor(m => m.FIELD_REPORTAttachment, "", new { @class = "text-danger" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 col-md-12 col-sm-12">
+                                    <div class="form-group row">
+                                        <label class="col-sm-4 col-form-label">Maps & Plates <span class="text-danger">*</span></label>
+                                        <div class="col-sm-7">
+                                            <div class="custom-file">
+                                                <input type="file" class="custom-file-input" id="File11" name="MAPS_PLATESAttachment">
+                                                <label class="custom-file-label" for="customFile">Choose Files</label>
+                                            </div>
+                                            @if (Model.MAPS_PLATES_FILE_NAME != null && Model.MAPS_PLATES_FILE_NAME != "")
+                                            {
+                                                <label class="form-control-plaintext">@(Model.MAPS_PLATES_FILE_NAME) <a href='~/@Model.MAPS_PLATES_FILE_PATH' title="" class="ml-2" data-original-title="Download Maps & Plates Copy" target="_blank"><i class="icon-file-pdf-solid h5 text-danger"></i></a></label>
+                                            }
+                                            @Html.ValidationMessageFor(m => m.MAPS_PLATESAttachment, "", new { @class = "text-danger" })
+                                            @Html.HiddenFor(m => m.MAPS_PLATES_FILE_NAME, new { @id = "hdnMAPS_PLATES_FILE_NAME" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 col-md-12 col-sm-12">
+                                    <div class="form-group row">
+                                        <label class="col-sm-4 col-form-label">Annexure <span class="text-danger">*</span></label>
+                                        <div class="col-sm-7">
+                                            <div class="custom-file">
+                                                <input type="file" class="custom-file-input" id="File12" name="ANNEXUREAttachment">
+                                                <label class="custom-file-label" for="customFile">Choose Files</label>
+                                            </div>
+                                            @if (Model.ANNEXURE_FILE_NAME != null && Model.ANNEXURE_FILE_NAME != "")
+                                            {
+                                                <label class="form-control-plaintext">@(Model.ANNEXURE_FILE_NAME) <a href='~/@Model.ANNEXURE_FILE_PATH' title="" class="ml-2" data-original-title="Download Annexure Copy" target="_blank"><i class="icon-file-pdf-solid h5 text-danger"></i></a></label>
+                                            }
+                                            @Html.ValidationMessageFor(m => m.ANNEXUREAttachment, "", new { @class = "text-danger" })
+                                            @Html.HiddenFor(m => m.ANNEXURE_FILE_NAME, new { @id = "hdnANNEXURE_FILE_NAME" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6 offset-lg-2 offset-md-4">
+                                    <input type="submit" value='@ViewBag.Button' class="btn btn-primary btn-md ml-0" name="Submit" id="Submit" />
+                                    <a href="@Url.Content("~/Geology/FieldReportStatus/Add")" class="btn btn-danger btn-md" title="Rest">Reset</a>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+    <!-- MAIN CONTENT AREA ENDS -->
+</section>
+<script>
+    indicateMe = "yes"
+    $(document).ready(function () {
+        loadNavigation('Add', 'glgeology', 'plfierepsta', 'tl', 'Geology', 'Field Report Status', ' ');
+        $('.datepicker').datetimepicker({
+            format: 'LT',
+            format: 'DD/MM/YYYY',
+        }).keydown(false);
+    });
+</script>
+

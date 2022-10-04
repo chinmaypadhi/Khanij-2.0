@@ -1,0 +1,105 @@
+﻿@model MasterEF.Prioritymaster
+@{
+    ViewData["Title"] = "Add";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+
+@if (ViewBag.msg != null)
+{
+    <script>
+
+ swal("",'@ViewBag.msg',"success");
+    </script>
+}
+@if (TempData["msg"] != null)
+{
+    <script>
+        swal("",'@TempData["msg"]',"success");
+    </script>
+}
+<script>
+    $(document).ready(function () {
+        $("#Submit").click(function () {
+            debugger;
+            if ($('#PriorityName').val() == "") {
+                swal("", "Please Enter Priority Name", "warning");
+                $('#PriorityName').focus();
+                return false;
+            }
+        });
+    });
+</script>
+
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        <!-- MAIN CONTENT AREA STARTS -->
+        @Html.Partial("_CMSnavigation")
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="javascript:void(0);">
+                                Add
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="~/Master/Priority/ViewList">
+                                View
+                            </a>
+                        </li>
+                    </ul>
+                    @Html.Partial("_CMSutil")
+                    @*<uc1:util runat="server" ID="util" />*@
+                </div>
+                <section class="box form-container">
+                    <div class="content-body">
+                        @using (Html.BeginForm("Add", "Priority", FormMethod.Post, new { AUTOCOMPLETE = "Off", id = "form1" }))
+                        {
+                            @Html.AntiForgeryToken()
+                            <div class="row">
+                                <div class="col-lg-6 col-12">
+                                    <div class="form-group row">
+                                        <label for="inputLoginId" class="col-sm-4 col-form-label">Priority Name <span class="text-danger">*</span></label>
+                                        <div class="col-sm-7">
+                                            @Html.TextBoxFor(m => m.PriorityName, new { @class = "form-control", @autofocus = "autofocus", @Onkeypress = "return inputLimiter(event,'NameCharactersAndNumbers')" })
+                                            @Html.HiddenFor(m => m.PriorityID)
+                                            <span class="text-danger">@Html.ValidationMessageFor(m => m.PriorityName)</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-6 col-12">
+                                    <div class="form-group row">
+                                        <label for="inputName" class="col-sm-4 col-form-label">Status <span class="text-danger">*</span></label>
+                                        <div class="col-sm-7">
+                                            <div class="py-2">
+                                                @Html.RadioButtonFor(n => n.IsActive, true, new { @checked = true, @class = "custom-radio", id = "Rdbtn_Active" })
+                                                <label class="radio-label">Active</label>
+                                                @Html.RadioButtonFor(n => n.IsActive, false, new { @class = "custom-radio", id = "Rdbtn_Inactive" })
+                                                <label class="radio-label">Inactive</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-6 offset-lg-2 offset-md-4">
+                                    <input type="submit" value='@ViewBag.Button' class="btn btn-primary btn-md ml-0" name="Submit" id="Submit" />
+                                    <input type="reset" value="Reset" class="btn btn-danger btn-md" />
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+</section>
+<script>
+    indicateMe = "yes"
+    $(document).ready(function () {
+        loadNavigation('Add', 'glRoleRes', 'plUser', 'tl', 'Master', 'Priority', ' ');
+    });
+</script>

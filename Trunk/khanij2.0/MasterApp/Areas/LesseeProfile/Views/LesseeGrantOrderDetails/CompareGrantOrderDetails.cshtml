@@ -1,0 +1,909 @@
+﻿@*// *********************************************************************************************************
+    //  View Name                : CompareGrantOrderDetails
+    //  Desciption               : To Compare,Approve,Reject Lessee Grant Order Details
+    //  Created By               : Lingaraj Dalai
+    //  Created On               : 17 July 2021
+    // ********************************************************************************************************
+*@
+@model IEnumerable<MasterEF.GrantOrderViewModel>
+@{
+    ViewData["Title"] = "CompareGrantOrderDetails";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+@if (TempData["Message"] != null)
+{
+    <script>
+        swal("",'@TempData["Message"]',"success");
+    </script>
+}
+<style type="text/css">
+    .compare td.field-name {
+        font-size: .9rem;
+        font-weight: bold;
+    }
+</style>
+<script>
+    backMe="yes"
+    $(document).ready(function () {
+        loadNavigation('CompareGrantOrderDetails', 'glUIS', 'pllesseprof', 'tl', 'Lessee Profile', 'Grant Order & Lease Deed details', ' ');
+        if (@Model.ElementAt(1).STATUS == 1) {
+            $('.btnsave').show();
+            $('.btnsave1').show();
+            $('.btnsave3').show();
+        }
+    /*Show hide controls for Minor/Major-Coal,NonCoal*/
+        if ('@Model.ElementAt(1).MineralTypeName' == 'Minor Mineral') {
+            $("#step2").hide();/*Tab*/
+            $("#step3").hide();/*Tab*/
+            $("#step4").hide();/*Tab*/
+            $("#btnNextMinor").hide();/*Button*/
+        }
+        else {
+            if ('@Model.ElementAt(1).MineralName.ToUpper()' == "COAL") {
+                $('.btnsave1').hide();
+                $('.btnsave3').hide();
+                $("#MDPA-tab").text('CMDPA/CBDPA');
+                $("#hMDPA").text('CMDPA/CBDPA Details');
+                $("#btnNextNonCoal").hide();/*Button*/
+                $("#btnBackNonCoal").hide();/*Button*/
+                $("#btnNextCoal").show();/*Button*/
+                $("#btnBackCoal").show();/*Button*/
+            }
+            else {
+                $("#step4").hide();/*Tab*/
+                $("#btnNextCoal").hide();/*Button*/
+                $("#btnBackCoal").hide();/*Button*/
+                $("#btnNextNonCoal").show();/*Button*/
+                $("#btnBackNonCoal").show();/*Button*/
+                $('.btnsave1').hide();/*Button*/
+            }
+        }
+    });
+    function ValidateDsc(btnAction) {
+        var Type;
+        if (btnAction == 'Approve') {
+            Type = 'Approve';
+            $("#Remarks").prop('required', false);
+        }
+        else if (btnAction == 'Reject') {
+            Type = 'Reject';
+            $("#Remarks").prop('required', true);
+            if ($("#Remarks").val() == "") {
+                $("#Remarks").focus();
+                swal("",'Remarks is required!',"warning")
+                return;
+            }
+        }
+        if (confirm("Before " + Type + " you need to apply your Digital Signature. Are you confirmed to " + Type + " Profile??")) {
+            debugger;
+            var Postdata = 'action=signdoc' + "\n" + 'datatosign=Digital Signature Required' + "\n" + 'signaction=sign' + "\n" + 'filepath=' + "\n" + 'panNumberParam=' + "\n" + 'expirycheck=false' + "\n" + 'issuername=' + "\n" + 'certclass=1|2|3' + "\n" + 'certtype=ALL';
+            connection.send(Postdata);
+            connection.onerror = function (error) {
+                swal("",'Please check the server connection: ' + error+'',"warning");
+            };
+            connection.onmessage = function (e) { // when DSC is success then following function executed.
+                if (e.data.indexOf("subProtocol") == -1) {
+                    //debugger;
+                    $("#DSCResponse").val(e.data).change();
+                    $.ajax(
+                    {
+                        url: '@Url.Action("CheckVerifyResponse", "LesseeDetails", new { Area = "LesseeProfile" })',
+                        type: "POST",
+                        data: { contentType: "pkcs7", signDataBase64Encoded: e.data, responseType: "plain" },
+                            success: function (msg) {
+                                if (msg == "SUCCESS") {
+                                //  debugger;
+                                if (btnAction == "Approve") {
+                                    $("#SubApprove").val("Approve");
+                                }
+                                if (btnAction == "Reject") {
+                                    $("#SubReject").val("Reject");
+                                }
+                                $("#form1").submit();
+                            }
+                        }
+                    });
+                }
+                else {
+                    swal("",e.data,"warning");
+                }
+            };
+        }
+        else {
+            return false;
+        }
+    }
+    //following code is for DSC Signature
+    try {
+        var connection = new WebSocket('wss://localhost.emudhra.com:8080');
+        connection.onopen = function () {
+            console.log('Connection Opened');
+        };
+        connection.onerror = function (error) {
+        };
+        connection.onmessage = function (e) {
+            if (e.data.indexOf("subProtocol") == -1) {
+            }
+        };
+    }
+    catch (e) {
+        swal("","No DSC Connection Found","warning");
+    }
+    function CountAddress() {
+        $("#lblRemarks").text(500 - (document.getElementById("Remarks").value.length));
+    }
+    function NextMDPA() {
+        $('#MDPA').trigger('click');
+        $('[href="#MDPA"]').tab('show');
+        $("#MDPA").show();
+        $('#LeaseDeed').hide();
+        $('#LeaseExtension').hide();
+        $('#NonCaptive').hide();
+        $("#LeaseCTOQty").hide();
+        $("#step5").removeClass('active');
+        $("#step2").addClass('active');
+        $("#step1").removeClass('active');
+        $("#step3").removeClass('active');
+        $("#step4").removeClass('active');
+    }
+    function NextLeaseExtension() {
+        $('#LeaseExtension').trigger('click');
+        $('[href="#LeaseExtension"]').tab('show');
+        $("#LeaseExtension").show();
+        $('#MDPA').hide();
+        $('#LeaseDeed').hide();
+        $('#NonCaptive').hide();
+        $("#LeaseCTOQty").hide();
+        $("#step5").removeClass('active');
+        $("#step3").addClass('active');
+        $("#step1").removeClass('active');
+        $("#step2").removeClass('active');
+        $("#step4").removeClass('active');
+    }
+    function NextNonCaptive() {
+        $('#NonCaptive').trigger('click');
+        $('[href="#NonCaptive"]').tab('show');
+        $("#NonCaptive").show();
+        $('#LeaseExtension').hide();
+        $('#MDPA').hide();
+        $('#LeaseDeed').hide();
+        $("#LeaseCTOQty").hide();
+        $("#step5").removeClass('active');
+        $("#step4").addClass('active');
+        $("#step1").removeClass('active');
+        $("#step3").removeClass('active');
+        $("#step2").removeClass('active');
+    }
+    function NextQuantity() {
+        $('#LeaseCTOQty').trigger('click');
+        $('[href="#LeaseCTOQty"]').tab('show');
+        $("#LeaseCTOQty").show();
+        $('#LeaseExtension').hide();
+        $('#MDPA').hide();
+        $('#LeaseDeed').hide();
+        $('#NonCaptive').hide();
+        $("#step5").addClass('active');
+        $("#step1").removeClass('active');
+        $("#step3").removeClass('active');
+        $("#step2").removeClass('active');
+        $("#step4").removeClass('active');
+    }
+    function BackNonCaptive() {
+        $('#NonCaptive').trigger('click');
+        $('[href="#NonCaptive"]').tab('show');
+        $("#NonCaptive").show();
+        $("#LeaseExtension").hide();
+        $('#MDPA').hide();
+        $("#LeaseDeed").hide();
+        $("#LeaseCTOQty").hide();
+        $("#step5").removeClass('active');
+        $("#step4").addClass('active');
+        $("#step1").removeClass('active');
+        $("#step2").removeClass('active');
+        $("#step3").removeClass('active');
+    }
+    function BackLeaseExtension() {
+        $('#LeaseExtension').trigger('click');
+        $('[href="#LeaseExtension"]').tab('show');
+        $("#LeaseExtension").show();
+        $("#NonCaptive").hide();
+        $('#MDPA').hide();
+        $("#LeaseDeed").hide();
+        $("#LeaseCTOQty").hide();
+        $("#step5").removeClass('active');
+        $("#step3").addClass('active');
+        $("#step1").removeClass('active');
+        $("#step2").removeClass('active');
+        $("#step4").removeClass('active');
+    }
+    function BackMDPA() {
+        $('#MDPA').trigger('click');
+        $('[href="#MDPA"]').tab('show');
+        $("#MDPA").show();
+        $("#NonCaptive").hide();
+        $('#LeaseExtension').hide();
+        $("#LeaseDeed").hide();
+        $("#LeaseCTOQty").hide();
+        $("#step5").removeClass('active');
+        $("#step2").addClass('active');
+        $("#step1").removeClass('active');
+        $("#step3").removeClass('active');
+        $("#step4").removeClass('active');
+    }
+    function BackLeaseDeed() {
+        $('#LeaseDeed').trigger('click');
+        $('[href="#LeaseDeed"]').tab('show');
+        $("#LeaseDeed").show();
+        $("#NonCaptive").hide();
+        $('#LeaseExtension').hide();
+        $('#MDPA').hide();
+        $("#LeaseCTOQty").hide();
+        $("#step5").removeClass('active');
+        $("#step1").addClass('active');
+        $("#step2").removeClass('active');
+        $("#step3").removeClass('active');
+        $("#step4").removeClass('active');
+    }
+</script>
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        @Html.Partial("_CMSnavigation")
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="javascript:void(0);">
+                                Compare
+                            </a>
+                        </li>
+                    </ul>
+                    @Html.Partial("_CMSutil")
+                </div>
+                <section class="box form-container">
+                    <div class="content-body mt-3">
+                        @using (Html.BeginForm("CompareGrantOrderDetails", "LesseeGrantOrderDetails", FormMethod.Post, new { AUTOCOMPLETE = "Off", id = "form1", enctype = "multipart/form-data" }))
+                        {
+                            @(Html.HiddenFor(model => model.ElementAt(1).SubApprove))
+                            @(Html.HiddenFor(model => model.ElementAt(1).SubReject))
+                            @Html.HiddenFor(m => m.ElementAt(1).CREATED_BY)
+                            @Html.HiddenFor(m => m.ElementAt(1).GRANT_ORDER_ID)
+                            <ul class="nav nav-tabs progresstab" id="myTab" role="tablist">
+                                <li class="startstep active" id="step1">
+                                    <a id="LeaseDeed-tab" data-toggle="tab" href="#LeaseDeed" role="tab" aria-controls="LeaseDeed" aria-selected="true" onclick="BackLeaseDeed()">Grant Order & Lease Deed Details</a>
+                                </li>
+                                <li id="step2">
+                                    <a id="MDPA-tab" data-toggle="tab" href="#MDPA" role="tab" aria-controls="MDPA" aria-selected="false" onclick="BackMDPA()">MDPA</a>
+                                </li>
+                                <li id="step3">
+                                    <a id="LeaseExtension-tab" data-toggle="tab" href="#LeaseExtension" role="tab" aria-controls="LeaseExtension" aria-selected="false" onclick="BackLeaseExtension()">Lease Extension Details</a>
+                                </li>
+                                <li id="step4">
+                                    <a id="NonCaptive-tab" data-toggle="tab" href="#NonCaptive" role="tab" aria-controls="NonCaptive" aria-selected="false" onclick="BackNonCaptive()">Request For Non-Captive Sale</a>
+                                </li>
+                                <li id="step5">
+                                    <a id="LeaseCTOQty-tab" data-toggle="tab" href="#LeaseCTOQty" role="tab" aria-controls="LeaseCTOQty" aria-selected="false" onclick="BackLeaseCTO()"> Approved Quantity Details</a>
+                                </li>
+                            </ul>
+                            <div class="tab-content" id="myTabContent">
+                                <div class="tab-pane fade show active" id="LeaseDeed" role="tabpanel" aria-labelledby="LeaseDeed-tab">
+                                    <h5 class="text-brown font-weight-bold mt-0 mb-4"> Grant Order & Lease Deed Details</h5>
+                                    <div class="row">
+                                        <div class="col-sm-12">
+                                            <div id="viewtable">
+                                                <table id="datatable" class="table table-sm table-bordered compare">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Field Names</th>
+                                                            <th>Existing Data</th>
+                                                            <th>Modified Data</th>
+                                                            <th></th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr>
+                                                            <td class="field-name">Order Number</td>
+                                                            <td>@Model.ElementAt(0).GRANT_ORDER_NUMBER</td>
+                                                            <td>@Model.ElementAt(1).GRANT_ORDER_NUMBER</td>
+                                                            @if (Model.ElementAt(0).GRANT_ORDER_NUMBER != Model.ElementAt(1).GRANT_ORDER_NUMBER)
+                                                            {
+                                                                <td class="text-center"><i class="icon-arrow-alt-circle-left-solid text-danger h4"></i></td>
+                                                            }
+                                                            else
+                                                            {
+                                                                <td></td>
+                                                            }
+                                                        </tr>
+                                                        <tr>
+                                                            <td class="field-name">Order Date</td>
+                                                            <td>@Model.ElementAt(0).EXECUTION_OF_DEED_DATE</td>
+                                                            <td>@Model.ElementAt(1).EXECUTION_OF_DEED_DATE</td>
+                                                            @if (Model.ElementAt(0).EXECUTION_OF_DEED_DATE != Model.ElementAt(1).EXECUTION_OF_DEED_DATE)
+                                                            {
+                                                                <td class="text-center"><i class="icon-arrow-alt-circle-left-solid text-danger h4"></i></td>
+                                                            }
+                                                            else
+                                                            {
+                                                                <td></td>
+                                                            }
+                                                        </tr>
+                                                        <tr>
+                                                            <td class="field-name">Lease Validity From</td>
+                                                            <td>@Model.ElementAt(0).FROM_VALIDITY</td>
+                                                            <td>@Model.ElementAt(1).FROM_VALIDITY</td>
+                                                            @if (Model.ElementAt(0).FROM_VALIDITY != Model.ElementAt(1).FROM_VALIDITY)
+                                                            {
+                                                                <td class="text-center"><i class="icon-arrow-alt-circle-left-solid text-danger h4"></i></td>
+                                                            }
+                                                            else
+                                                            {
+                                                                <td></td>
+                                                            }
+                                                        </tr>
+                                                        <tr>
+                                                            <td class="field-name">Lease Validity Upto</td>
+                                                            <td>@Model.ElementAt(0).TO_VALIDITY</td>
+                                                            <td>@Model.ElementAt(1).TO_VALIDITY</td>
+                                                            @if (Model.ElementAt(0).TO_VALIDITY != Model.ElementAt(1).TO_VALIDITY)
+                                                            {
+                                                                <td class="text-center"><i class="icon-arrow-alt-circle-left-solid text-danger h4"></i></td>
+                                                            }
+                                                            else
+                                                            {
+                                                                <td></td>
+                                                            }
+                                                        </tr>
+                                                        <tr>
+                                                            <td class="field-name">Grant Order Copy (with approved lease plan)</td>
+                                                            <td>
+                                                                @if (Model.ElementAt(0).FILE_GRANT_ORDER_COPY != null && Model.ElementAt(0).FILE_GRANT_ORDER_COPY != "" && Model.ElementAt(0).FILE_GRANT_ORDER_COPY != "--")
+                                                                {
+                                                                    <label class="form-control-plaintext">@(Model.ElementAt(0).FILE_GRANT_ORDER_COPY) <a href='~/@Model.ElementAt(0).PATH_GRANT_ORDER_COPY' title="" class="ml-2" data-original-title="Download" target="_blank"><i class="icon-file-pdf-solid h5 text-danger"></i></a></label>
+                                                                }
+                                                            </td>
+                                                            <td>
+                                                                @if (Model.ElementAt(1).FILE_GRANT_ORDER_COPY != null && Model.ElementAt(1).FILE_GRANT_ORDER_COPY != "" && Model.ElementAt(1).FILE_GRANT_ORDER_COPY != "--")
+                                                                {
+                                                                    <label class="form-control-plaintext">@(Model.ElementAt(1).FILE_GRANT_ORDER_COPY) <a href='~/@Model.ElementAt(1).PATH_GRANT_ORDER_COPY' title="" class="ml-2" data-original-title="Download" target="_blank"><i class="icon-file-pdf-solid h5 text-danger"></i></a></label>
+                                                                }
+                                                            </td>
+                                                            @if (Model.ElementAt(0).FILE_GRANT_ORDER_COPY != Model.ElementAt(1).FILE_GRANT_ORDER_COPY)
+                                                            {
+                                                                <td class="text-center"><i class="icon-arrow-alt-circle-left-solid text-danger h4"></i></td>
+                                                            }
+                                                            else
+                                                            {
+                                                                <td></td>
+                                                            }
+                                                        </tr>
+                                                        <tr>
+                                                            <td class="field-name">Lease Deed No.</td>
+                                                            <td>@Model.ElementAt(0).EXECUTION_OF_DEED_NUMBER</td>
+                                                            <td>@Model.ElementAt(1).EXECUTION_OF_DEED_NUMBER</td>
+                                                            @if (Model.ElementAt(0).EXECUTION_OF_DEED_NUMBER != Model.ElementAt(1).EXECUTION_OF_DEED_NUMBER)
+                                                            {
+                                                                <td class="text-center"><i class="icon-arrow-alt-circle-left-solid text-danger h4"></i></td>
+                                                            }
+                                                            else
+                                                            {
+                                                                <td></td>
+                                                            }
+                                                        </tr>
+                                                        <tr>
+                                                            <td class="field-name">Lease Deed Date</td>
+                                                            <td>@Model.ElementAt(0).EXECUTION_OF_DEED_DATE</td>
+                                                            <td>@Model.ElementAt(1).EXECUTION_OF_DEED_DATE</td>
+                                                            @if (Model.ElementAt(0).EXECUTION_OF_DEED_DATE != Model.ElementAt(1).EXECUTION_OF_DEED_DATE)
+                                                            {
+                                                                <td class="text-center"><i class="icon-arrow-alt-circle-left-solid text-danger h4"></i></td>
+                                                            }
+                                                            else
+                                                            {
+                                                                <td></td>
+                                                            }
+                                                        </tr>
+                                                        <tr>
+                                                            <td class="field-name">Lease Deed Document (with plan / LOI Letter)</td>
+                                                            <td>
+                                                                @if (Model.ElementAt(0).FILE_GRANT_ORDER_COPY != null && Model.ElementAt(0).FILE_GRANT_ORDER_COPY != "" && Model.ElementAt(0).FILE_GRANT_ORDER_COPY != "--")
+                                                                {
+                                                                    <label class="form-control-plaintext">@(Model.ElementAt(0).FILE_GRANT_ORDER_COPY) <a href='~/@Model.ElementAt(0).PATH_GRANT_ORDER_COPY' title="" class="ml-2" data-original-title="Download" target="_blank"><i class="icon-file-pdf-solid h5 text-danger"></i></a></label>
+                                                                }
+                                                            </td>
+                                                            <td>
+                                                                @if (Model.ElementAt(1).FILE_GRANT_ORDER_COPY != null && Model.ElementAt(1).FILE_GRANT_ORDER_COPY != "" && Model.ElementAt(1).FILE_GRANT_ORDER_COPY != "--")
+                                                                {
+                                                                    <label class="form-control-plaintext">@(Model.ElementAt(1).FILE_GRANT_ORDER_COPY) <a href='~/@Model.ElementAt(1).PATH_GRANT_ORDER_COPY' title="" class="ml-2" data-original-title="Download" target="_blank"><i class="icon-file-pdf-solid h5 text-danger"></i></a></label>
+                                                                }
+                                                            </td>
+                                                            @if (Model.ElementAt(0).FILE_GRANT_ORDER_COPY != Model.ElementAt(1).FILE_GRANT_ORDER_COPY)
+                                                            {
+                                                                <td class="text-center"><i class="icon-arrow-alt-circle-left-solid text-danger h4"></i></td>
+                                                            }
+                                                            else
+                                                            {
+                                                                <td></td>
+                                                            }
+                                                        </tr>
+                                                        @if (Model.ElementAt(1).MineralTypeName == "Minor Mineral")
+                                                        {
+                                                            <tr>
+                                                                <td class="field-name">Demarcation Copy</td>
+                                                                <td>
+                                                                    @if (Model.ElementAt(0).FILE_DEMARCATION_COPY != null && Model.ElementAt(0).FILE_DEMARCATION_COPY != "" && Model.ElementAt(0).FILE_DEMARCATION_COPY != "--")
+                                                                    {
+                                                                        <label class="form-control-plaintext">@(Model.ElementAt(0).FILE_DEMARCATION_COPY) <a href='~/@Model.ElementAt(0).PATH_DEMARCATION_COPY' title="" class="ml-2" data-original-title="Download" target="_blank"><i class="icon-file-pdf-solid h5 text-danger"></i></a></label>
+                                                                    }
+                                                                </td>
+                                                                <td>
+                                                                    @if (Model.ElementAt(1).FILE_DEMARCATION_COPY != null && Model.ElementAt(1).FILE_DEMARCATION_COPY != "" && Model.ElementAt(1).FILE_DEMARCATION_COPY != "--")
+                                                                    {
+                                                                        <label class="form-control-plaintext">@(Model.ElementAt(1).FILE_DEMARCATION_COPY) <a href='~/@Model.ElementAt(1).PATH_DEMARCATION_COPY' title="" class="ml-2" data-original-title="Download" target="_blank"><i class="icon-file-pdf-solid h5 text-danger"></i></a></label>
+                                                                    }
+                                                                </td>
+                                                                @if (Model.ElementAt(0).FILE_DEMARCATION_COPY != Model.ElementAt(1).FILE_DEMARCATION_COPY)
+                                                                {
+                                                                    <td class="text-center"><i class="icon-arrow-alt-circle-left-solid text-danger h4"></i></td>
+                                                                }
+                                                                else
+                                                                {
+                                                                    <td></td>
+                                                                }
+                                                            </tr>
+                                                        }
+                                                        <tr>
+                                                            <td class="field-name">Lease Period (In Years)</td>
+                                                            <td>@Model.ElementAt(0).LEASE_PERIOD</td>
+                                                            <td>@Model.ElementAt(1).LEASE_PERIOD</td>
+                                                            @if (Model.ElementAt(0).LEASE_PERIOD != Model.ElementAt(1).LEASE_PERIOD)
+                                                            {
+                                                                <td class="text-center"><i class="icon-arrow-alt-circle-left-solid text-danger h4"></i></td>
+                                                            }
+                                                            else
+                                                            {
+                                                                <td></td>
+                                                            }
+                                                        </tr>
+                                                        <tr>
+                                                            <td class="field-name">Remarks</td>
+                                                            <td>@Model.ElementAt(0).Remarks</td>
+                                                            <td>@Model.ElementAt(1).Remarks</td>
+                                                            @if (Model.ElementAt(0).Remarks != Model.ElementAt(1).Remarks)
+                                                            {
+                                                                <td class="text-center"><i class="icon-arrow-alt-circle-left-solid text-danger h4"></i></td>
+                                                            }
+                                                            else
+                                                            {
+                                                                <td></td>
+                                                            }
+                                                        </tr>
+                                                        @if (Model.ElementAt(1).MineralTypeName != "Minor Mineral")
+                                                        {
+                                                            <tr>
+                                                                <td class="field-name">Mines Allotted As per Act</td>
+                                                                <td>@Model.ElementAt(0).MinesAlloted</td>
+                                                                <td>@Model.ElementAt(1).MinesAlloted</td>
+                                                                @if (Model.ElementAt(0).MinesAlloted != Model.ElementAt(1).MinesAlloted)
+                                                                {
+                                                                    <td class="text-center"><i class="icon-arrow-alt-circle-left-solid text-danger h4"></i></td>
+                                                                }
+                                                                else
+                                                                {
+                                                                    <td></td>
+                                                                }
+                                                            </tr>
+                                                            @if (Model.ElementAt(0).MinesAlloted == "MMDR" || Model.ElementAt(1).MinesAlloted == "MMDR")
+                                                            {
+                                                                <tr>
+                                                                    <td class="field-name">Mines under Section 17A</td>
+                                                                    <td>@Model.ElementAt(0).Mines_Section</td>
+                                                                    <td>@Model.ElementAt(1).Mines_Section</td>
+                                                                    @if (Model.ElementAt(0).Mines_Section != Model.ElementAt(1).Mines_Section)
+                                                                    {
+                                                                        <td class="text-center"><i class="icon-arrow-alt-circle-left-solid text-danger h4"></i></td>
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <td></td>
+                                                                    }
+                                                                </tr>
+                                                                @if (Model.ElementAt(0).Mines_Section == "Yes" || Model.ElementAt(1).Mines_Section == "Yes")
+                                                                {
+                                                                    <tr>
+                                                                        <td class="field-name">Mines under Section 17A</td>
+                                                                        <td>@Model.ElementAt(0).MinesSection</td>
+                                                                        <td>@Model.ElementAt(1).MinesSection</td>
+                                                                        @if (Model.ElementAt(0).MinesSection != Model.ElementAt(1).MinesSection)
+                                                                        {
+                                                                            <td class="text-center"><i class="icon-arrow-alt-circle-left-solid text-danger h4"></i></td>
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            <td></td>
+                                                                        }
+                                                                    </tr>
+                                                                }
+                                                            }
+                                                            @if (Model.ElementAt(1).MineralName.ToUpper() == "COAL")
+                                                            {
+                                                                <tr>
+                                                                    <td class="field-name">Type of Mines</td>
+                                                                    <td>@Model.ElementAt(0).MinesType</td>
+                                                                    <td>@Model.ElementAt(1).MinesType</td>
+                                                                    @if (Model.ElementAt(0).MinesType != Model.ElementAt(1).MinesType)
+                                                                    {
+                                                                        <td class="text-center"><i class="icon-arrow-alt-circle-left-solid text-danger h4"></i></td>
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <td></td>
+                                                                    }
+                                                                </tr>
+                                                            }
+                                                        }
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row mt-4">
+                                        <div class="col-sm-12 text-center">
+                                            <a class="btn btn-primary btn-md ml-0 waves-effect waves-light btnNext" onclick="NextMDPA()" id="btnNextMinor">Next</a>
+                                            <input data-toggle="modal" data-target="#approve" type="button" value="Approve" class="btn btn-success btn-md btnsave1" name="Approve" style="display:none;" />
+                                            <input data-toggle="modal" data-target="#reject" type="button" value="Reject" class="btn btn-danger btn-md btnsave1" name="Reject" style="display:none;" />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="tab-pane fade" id="MDPA" role="tabpanel" aria-labelledby="MDPA-tab">
+                                    <h5 class="text-brown font-weight-bold mt-0 mb-4" id="hMDPA">MDPA</h5>
+                                    <div class="row">
+                                        <div class="col-sm-12">
+                                            <div id="viewtable">
+                                                <table id="datatable" class="table table-sm table-bordered compare">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Field Names</th>
+                                                            <th>Existing Data</th>
+                                                            <th>Modified Data</th>
+                                                            <th></th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr>
+                                                            <td class="field-name">Order Number</td>
+                                                            <td>@Model.ElementAt(0).MDPA_GRANT_ORDER_NUMBER</td>
+                                                            <td>@Model.ElementAt(1).MDPA_GRANT_ORDER_NUMBER</td>
+                                                            @if (Model.ElementAt(0).MDPA_GRANT_ORDER_NUMBER != Model.ElementAt(1).MDPA_GRANT_ORDER_NUMBER)
+                                                            {
+                                                                <td class="text-center"><i class="icon-arrow-alt-circle-left-solid text-danger h4"></i></td>
+                                                            }
+                                                            else
+                                                            {
+                                                                <td></td>
+                                                            }
+                                                        </tr>
+                                                        <tr>
+                                                            <td class="field-name">Order Date</td>
+                                                            <td>@Model.ElementAt(0).MDPA_GRANT_ORDER_DATE</td>
+                                                            <td>@Model.ElementAt(1).MDPA_GRANT_ORDER_DATE</td>
+                                                            @if (Model.ElementAt(0).MDPA_GRANT_ORDER_DATE != Model.ElementAt(1).MDPA_GRANT_ORDER_DATE)
+                                                            {
+                                                                <td class="text-center"><i class="icon-arrow-alt-circle-left-solid text-danger h4"></i></td>
+                                                            }
+                                                            else
+                                                            {
+                                                                <td></td>
+                                                            }
+                                                        </tr>
+                                                        <tr>
+                                                            <td class="field-name">Agreement Date</td>
+                                                            <td>@Model.ElementAt(0).MDPA_GRANT_AGREEMENT_DATE</td>
+                                                            <td>@Model.ElementAt(1).MDPA_GRANT_AGREEMENT_DATE</td>
+                                                            @if (Model.ElementAt(0).MDPA_GRANT_AGREEMENT_DATE != Model.ElementAt(1).MDPA_GRANT_AGREEMENT_DATE)
+                                                            {
+                                                                <td class="text-center"><i class="icon-arrow-alt-circle-left-solid text-danger h4"></i></td>
+                                                            }
+                                                            else
+                                                            {
+                                                                <td></td>
+                                                            }
+                                                        </tr>
+                                                        @if (Model.ElementAt(1).MineralName.ToUpper().ToUpper() == "COAL")
+                                                        {
+                                                            <tr>
+                                                                <td class="field-name">Final Offer <small>(Revenue Sharing in %)</small></td>
+                                                                <td>@Model.ElementAt(0).FINAL_OFFER</td>
+                                                                <td>@Model.ElementAt(1).FINAL_OFFER</td>
+                                                                @if (Model.ElementAt(0).FINAL_OFFER != Model.ElementAt(1).FINAL_OFFER)
+                                                                {
+                                                                    <td class="text-center"><i class="icon-arrow-alt-circle-left-solid text-danger h4"></i></td>
+                                                                }
+                                                                else
+                                                                {
+                                                                    <td></td>
+                                                                }
+                                                            </tr>
+                                                        }
+                                                        <tr>
+                                                            <td class="field-name">MDPA Document</td>
+                                                            <td>
+                                                                @if (Model.ElementAt(0).FILE_MDPA_COPY != null && Model.ElementAt(0).FILE_MDPA_COPY != "" && Model.ElementAt(0).FILE_MDPA_COPY != "--")
+                                                                {
+                                                                    <label class="form-control-plaintext">@(Model.ElementAt(0).FILE_MDPA_COPY) <a href='~/@Model.ElementAt(0).PATH_MDPA_COPY' title="" class="ml-2" data-original-title="Download" target="_blank"><i class="icon-file-pdf-solid h5 text-danger"></i></a></label>
+                                                                }
+                                                            </td>
+                                                            <td>
+                                                                @if (Model.ElementAt(1).FILE_MDPA_COPY != null && Model.ElementAt(1).FILE_MDPA_COPY != "" && Model.ElementAt(0).FILE_MDPA_COPY != "--")
+                                                                {
+                                                                    <label class="form-control-plaintext">@(Model.ElementAt(1).FILE_MDPA_COPY) <a href='~/@Model.ElementAt(1).PATH_MDPA_COPY' title="" class="ml-2" data-original-title="Download" target="_blank"><i class="icon-file-pdf-solid h5 text-danger"></i></a></label>
+                                                                }
+                                                            </td>
+                                                            @if (Model.ElementAt(0).FILE_MDPA_COPY != Model.ElementAt(1).FILE_MDPA_COPY)
+                                                            {
+                                                                <td class="text-center"><i class="icon-arrow-alt-circle-left-solid text-danger h4"></i></td>
+                                                            }
+                                                            else
+                                                            {
+                                                                <td></td>
+                                                            }
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row mt-4">
+                                        <div class="col-sm-12 text-center">
+                                            <a class="btn btn-dark btn-md ml-0 waves-effect waves-light btnPrevious" onclick="BackLeaseDeed()">Previous</a>
+                                            <a class="btn btn-primary btn-md ml-0 waves-effect waves-light btnNext" onclick="NextLeaseExtension()">Next</a>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="tab-pane fade" id="LeaseExtension" role="tabpanel" aria-labelledby="LeaseExtension-tab">
+                                    <h5 class="text-brown font-weight-bold mt-0 mb-4" id="hMDPA">MDPA</h5>
+                                    <div class="row">
+                                        <div class="col-sm-12">
+                                            <div id="viewtable">
+                                                <table id="datatable" class="table table-sm table-bordered compare">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Field Names</th>
+                                                            <th>Existing Data</th>
+                                                            <th>Modified Data</th>
+                                                            <th></th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr>
+                                                            <td class="field-name">Auction Type</td>
+                                                            <td>@Model.ElementAt(0).AuctionName</td>
+                                                            <td>@Model.ElementAt(1).AuctionName</td>
+                                                            @if (Model.ElementAt(0).AuctionName != Model.ElementAt(1).AuctionName)
+                                                            {
+                                                                <td class="text-center"><i class="icon-arrow-alt-circle-left-solid text-danger h4"></i></td>
+                                                            }
+                                                            else
+                                                            {
+                                                                <td></td>
+                                                            }
+                                                        </tr>
+                                                        @if (Model.ElementAt(0).AuctionTypeId == 1 || Model.ElementAt(1).AuctionTypeId == 1)
+                                                        {
+                                                            <tr>
+                                                                <td class="field-name">Lease Extended as per MMDR Amendment 2021</td>
+                                                                <td>@Model.ElementAt(0).LeaseExtender</td>
+                                                                <td>@Model.ElementAt(1).LeaseExtender</td>
+                                                                @if (Model.ElementAt(0).LeaseExtender != Model.ElementAt(1).LeaseExtender)
+                                                                {
+                                                                    <td class="text-center"><i class="icon-arrow-alt-circle-left-solid text-danger h4"></i></td>
+                                                                }
+                                                                else
+                                                                {
+                                                                    <td></td>
+                                                                }
+                                                            </tr>
+                                                        }
+                                                        @if (Model.ElementAt(0).LeaseExtender == "Yes" || Model.ElementAt(1).LeaseExtender == "Yes")
+                                                        {
+                                                            <tr>
+                                                                <td class="field-name">Lease Extension Validity From</td>
+                                                                <td>@Model.ElementAt(0).LEASEEXTENSION_FROM_VALIDITY</td>
+                                                                <td>@Model.ElementAt(1).LEASEEXTENSION_FROM_VALIDITY</td>
+                                                                @if (Model.ElementAt(0).LEASEEXTENSION_FROM_VALIDITY != Model.ElementAt(1).LEASEEXTENSION_FROM_VALIDITY)
+                                                                {
+                                                                    <td class="text-center"><i class="icon-arrow-alt-circle-left-solid text-danger h4"></i></td>
+                                                                }
+                                                                else
+                                                                {
+                                                                    <td></td>
+                                                                }
+                                                            </tr>
+                                                            <tr>
+                                                                <td class="field-name">Lease Extension Validity Upto</td>
+                                                                <td>@Model.ElementAt(0).LEASEEXTENSION_TO_VALIDITY</td>
+                                                                <td>@Model.ElementAt(1).LEASEEXTENSION_TO_VALIDITY</td>
+                                                                @if (Model.ElementAt(0).LEASEEXTENSION_TO_VALIDITY != Model.ElementAt(1).LEASEEXTENSION_TO_VALIDITY)
+                                                                {
+                                                                    <td class="text-center"><i class="icon-arrow-alt-circle-left-solid text-danger h4"></i></td>
+                                                                }
+                                                                else
+                                                                {
+                                                                    <td></td>
+                                                                }
+                                                            </tr>
+                                                            <tr>
+                                                                <td class="field-name">Lease Extension Document</td>
+                                                                <td>
+                                                                    @if (Model.ElementAt(0).FILE_LEASEEXTENSION != null && Model.ElementAt(0).FILE_LEASEEXTENSION != "" && Model.ElementAt(0).FILE_LEASEEXTENSION != "--")
+                                                                    {
+                                                                        <label class="form-control-plaintext">@(Model.ElementAt(0).FILE_LEASEEXTENSION) <a href='~/@Model.ElementAt(0).PATH_LEASEEXTENSION' title="" class="ml-2" data-original-title="Download" target="_blank"><i class="icon-file-pdf-solid h5 text-danger"></i></a></label>
+                                                                    }
+                                                                </td>
+                                                                <td>
+                                                                    @if (Model.ElementAt(1).FILE_LEASEEXTENSION != null && Model.ElementAt(1).FILE_LEASEEXTENSION != "" && Model.ElementAt(1).FILE_LEASEEXTENSION != "--")
+                                                                    {
+                                                                        <label class="form-control-plaintext">@(Model.ElementAt(1).FILE_MDPA_COPY) <a href='~/@Model.ElementAt(1).PATH_LEASEEXTENSION' title="" class="ml-2" data-original-title="Download" target="_blank"><i class="icon-file-pdf-solid h5 text-danger"></i></a></label>
+                                                                    }
+                                                                </td>
+                                                                @if (Model.ElementAt(0).FILE_LEASEEXTENSION != Model.ElementAt(1).FILE_LEASEEXTENSION)
+                                                                {
+                                                                    <td class="text-center"><i class="icon-arrow-alt-circle-left-solid text-danger h4"></i></td>
+                                                                }
+                                                                else
+                                                                {
+                                                                    <td></td>
+                                                                }
+                                                            </tr>
+                                                        }
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row mt-4">
+                                        <div class="col-sm-12 text-center">
+                                            <a class="btn btn-dark btn-md ml-0 waves-effect waves-light btnPrevious" onclick="BackMDPA()">Previous</a>
+                                            <a class="btn btn-primary btn-md ml-0 waves-effect waves-light btnNext" onclick="NextNonCaptive()" id="btnNextCoal">Next</a>
+                                            <a class="btn btn-primary btn-md ml-0 waves-effect waves-light btnNext" onclick="NextQuantity()" id="btnNextNonCoal">Next</a>
+                                            @*<input data-toggle="modal" data-target="#approve" type="button" value="Approve" class="btn btn-success btn-md btnsave3" name="Approve" style="display:none;" />
+                            <input data-toggle="modal" data-target="#reject" type="button" value="Reject" class="btn btn-danger btn-md btnsave3" name="Reject" style="display:none;" />*@
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="tab-pane fade" id="NonCaptive" role="tabpanel" aria-labelledby="NonCaptive-tab">
+                                    <h5 class="text-brown font-weight-bold mt-0 mb-4">MDPA</h5>
+                                    <div class="row">
+                                        <div class="col-sm-12">
+                                            <div id="viewtable">
+                                                <table id="datatable" class="table table-sm table-bordered compare">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Field Names</th>
+                                                            <th>Existing Data</th>
+                                                            <th>Modified Data</th>
+                                                            <th></th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr>
+                                                            <td class="field-name">Mineral Sale Percentage </td>
+                                                            <td>@Model.ElementAt(0).MineralSalePercentage</td>
+                                                            <td>@Model.ElementAt(1).MineralSalePercentage</td>
+                                                            @if (Model.ElementAt(0).MineralSalePercentage != Model.ElementAt(1).MineralSalePercentage)
+                                                            {
+                                                                <td class="text-center"><i class="icon-arrow-alt-circle-left-solid text-danger h4"></i></td>
+                                                            }
+                                                            else
+                                                            {
+                                                                <td></td>
+                                                            }
+                                                        </tr>
+                                                        <tr>
+                                                            <td class="field-name">Tender/Allotment Document</td>
+                                                            <td>
+                                                                @if (Model.ElementAt(0).FILE_ALLOTTMENT != null && Model.ElementAt(0).FILE_ALLOTTMENT != "" && Model.ElementAt(0).FILE_ALLOTTMENT != "--")
+                                                                {
+                                                                    <label class="form-control-plaintext">@(Model.ElementAt(0).FILE_ALLOTTMENT) <a href='~/@Model.ElementAt(0).PATH_ALLOTTMENT' title="" class="ml-2" data-original-title="Download" target="_blank"><i class="icon-file-pdf-solid h5 text-danger"></i></a></label>
+                                                                }
+                                                            </td>
+                                                            <td>
+                                                                @if (Model.ElementAt(1).FILE_ALLOTTMENT != null && Model.ElementAt(1).FILE_ALLOTTMENT != "" && Model.ElementAt(1).FILE_ALLOTTMENT != "--")
+                                                                {
+                                                                    <label class="form-control-plaintext">@(Model.ElementAt(1).FILE_MDPA_COPY) <a href='~/@Model.ElementAt(1).PATH_ALLOTTMENT' title="" class="ml-2" data-original-title="Download" target="_blank"><i class="icon-file-pdf-solid h5 text-danger"></i></a></label>
+                                                                }
+                                                            </td>
+                                                            @if (Model.ElementAt(0).FILE_ALLOTTMENT != Model.ElementAt(1).FILE_ALLOTTMENT)
+                                                            {
+                                                                <td class="text-center"><i class="icon-arrow-alt-circle-left-solid text-danger h4"></i></td>
+                                                            }
+                                                            else
+                                                            {
+                                                                <td></td>
+                                                            }
+                                                        </tr>
+                                                        <tr>
+                                                            <td class="field-name">Amount /Percentage</td>
+                                                            <td>@Model.ElementAt(0).AllotmentAmount</td>
+                                                            <td>@Model.ElementAt(1).AllotmentAmount</td>
+                                                            @if (Model.ElementAt(0).AllotmentAmount != Model.ElementAt(1).AllotmentAmount)
+                                                            {
+                                                                <td class="text-center"><i class="icon-arrow-alt-circle-left-solid text-danger h4"></i></td>
+                                                            }
+                                                            else
+                                                            {
+                                                                <td></td>
+                                                            }
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row mt-4">
+                                        <div class="col-sm-12 text-center">
+                                            <a class="btn btn-dark btn-md ml-0 waves-effect waves-light btnPrevious" onclick="BackLeaseExtension()">Previous</a>
+                                            <a class="btn btn-primary btn-md ml-0 waves-effect waves-light btnNext" onclick="NextQuantity()">Next</a>
+                                            @*<input data-toggle="modal" data-target="#approve" type="button" value="Approve" class="btn btn-success btn-md btnsave" name="Approve" style="display:none;" />
+                            <input data-toggle="modal" data-target="#reject" type="button" value="Reject" class="btn btn-danger btn-md btnsave" name="Reject" style="display:none;" />*@
+                                        </div>
+                                    </div>
+                                </div>
+                                <div href="#LeaseCTOQty" class="tab-pane fade" id="LeaseCTOQty" role="tabpanel" aria-labelledby="LeaseCTOQty-tab">
+                                    <h5 class="text-brown font-weight-bold mt-0 mb-4">Financial Year wise Approved Mineral Quantity</h5>
+                                    <div class="form-group row pt-3">
+                                        <div class="col-sm-7">
+                                            <div class="table-responsive">
+                                                @Html.Raw((String)ViewBag.tableLA)
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row mt-4">
+                                        <div class="col-sm-12 text-center">
+                                            <a class="btn btn-dark btn-md ml-0 waves-effect waves-light btnPrevious" onclick="BackNonCaptive()" id="btnBackCoal">Previous</a>
+                                            <a class="btn btn-dark btn-md ml-0 waves-effect waves-light btnPrevious" onclick="BackLeaseExtension()" id="btnBackNonCoal">Previous</a>
+                                            <input data-toggle="modal" data-target="#approve" type="button" value="Approve" class="btn btn-success btn-md btnsave" name="Approve" style="display:none;" />
+                                            <input data-toggle="modal" data-target="#reject" type="button" value="Reject" class="btn btn-danger btn-md btnsave" name="Reject" style="display:none;" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal fade approve" id="approve" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                <div class="modal-dialog  modal-dialog-centered">
+                                    <div class="modal-content text-center">
+                                        <div class="modal-body">
+                                            <h5>Are You Sure to Approve the Information !! </h5>
+                                            <button type="button" class="btn btn-success btn-md" onclick="return ValidateDsc('Approve');">Yes</button>
+                                            <button type="button" class="btn btn-danger btn-md" data-dismiss="modal">No</button>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal fade" id="reject" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title mt-0 font-weight-bold" id="H1">Rejection Remark</h5>
+                                            <a class="close" data-dismiss="modal" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </a>
+                                        </div>
+                                        <div class="modal-body">
+                                            <label>Remark<span class="text-danger">*</span></label>
+                                            @Html.TextAreaFor(m => m.ElementAt(1).Remarks, new { @class = "form-control", @maxlength = "500", @rows = "2", @onkeyup = "CountAddress()" })
+                                            <small class="text-danger">Maximum <strong><label id="lblRemarks" class="col-form-label">500</label></strong> characters</small>
+                                            <input type="button" class="btn btn-success btn-md mt-4" name="Reject" value="Submit" onclick="return ValidateDsc('Reject');" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+
+                </section>
+            </div>
+        </div>
+    </div>
+</section>
+

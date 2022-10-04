@@ -1,0 +1,250 @@
+﻿@using SupportApp.Web
+@model SupportEF.NoticeLetterEF
+
+@{
+    ViewData["Title"] = "NoticePenalty";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+<style>
+    .center {
+        text-align: center;
+    }
+</style>
+<script>
+    $(document).ready(function () {
+        loadNavigation('NoticePenalty', 'glTMng', 'plpaymenthead', 'tl', 'Notice', 'Notice Letter Inbox', ' ');
+    });
+</script>
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        @Html.Partial("_CMSnavigation")
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="#">
+                                Notice Letter Inbox
+                            </a>
+                        </li>
+                    </ul>
+                    @Html.Partial("_CMSutil")
+                </div>
+                <section class="box form-container">
+                    @*<div class="search-box">
+            @using (Html.BeginForm("NoticePenalty", "Noticeletter", FormMethod.Post, new { AUTOCOMPLETE = "Off", id = "form1" }))
+            {
+                <div class="searchform px-3 py-3">
+
+                        <div class="row">
+
+
+                            <div class="col-sm-4">
+                                <div class="form-group row">
+                                    <label for="inputText" class="col-sm-3 col-form-label">
+                                        From Date
+                                    </label>
+                                    <div class="col-sm-8">
+                                        <div class="input-group">
+                                            <input type="text" class="form-control datepicker" id="Text3">
+                                            <div class="input-group-prepend">
+                                                <label class="input-group-text" for="inputDate1"><i class="icon-calendar-alt-solid"></i></label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-4">
+                                <div class="form-group row">
+                                    <label for="inputText" class="col-sm-3 col-form-label">
+                                        To Date
+                                    </label>
+                                    <div class="col-sm-8">
+                                        <div class="input-group">
+                                            <input type="text" class="form-control datepicker" id="Text1">
+                                            <div class="input-group-prepend">
+                                                <label class="input-group-text" for="inputDate1"><i class="icon-calendar-alt-solid"></i></label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+
+
+                            <div class="col-sm-2">
+                                <a href="#" class="btn btn-sm btn-success m-0 waves-effect waves-light"> Show </a>
+                            </div>
+
+
+                        </div>
+
+
+
+
+                    </div>
+            }
+        </div>*@
+                    <button class="btn btn-danger" id="Paymentbtn" style="margin-right: 10px; width: 150px;">Make Payment</button>
+
+                    <div class="content-body pt-0">
+                        <div class="legend-box">
+                            <ul class="d-flex mb-1 justify-content-end list-unstyled">
+                                <li><span class="bg-success"></span> Active</li>
+                                <li><span class="bg-warning"></span> Inactive</li>
+                            </ul>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <table id="table-exports" class="table table-sm table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th> <input type="checkbox" id="gdh" name="chkbox" class="chkit" /> </th>
+                                            <th width="30">Sl#</th>
+                                            <th>Report Heading</th>
+                                            <th>Create Date</th>
+                                            <th>Notice View</th>
+                                            <th>DD Attachment</th>
+                                            <th>User Attachment</th>
+                                            <th>Status</th>
+                                            <th>Payment Status</th>
+                                            <th>Payment Attachment</th>
+                                            <th>Payment Date</th>
+                                            <th>Payment Amount</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @{ int i = 0;
+                                            int j;
+                                        }
+                                        @foreach (var b in ViewBag.ViewList)
+                                        {
+                                        <tr class="active-row">
+
+                                            <td>
+                                                <input type="checkbox" name="chkbox" class="chkitem RowCheck" id="chkkk_@i" />
+                                                <input type="hidden" id="hdnNoticeDetails_@i" value=@b.NoticeDetailsID />
+                                                <input type="hidden" id="hdnNoticePenaltyAmount_@i" value=@b.PenaltyAmount />
+                                                <input type="hidden" id="hdnNoticeStatus_@i" value=@b.Status_Type />
+                                            </td>
+                                            @if (i == 0)
+                                            {
+                                                <td>1</td>
+                                            }
+                                            else
+                                            {
+                                                j = i + 1;
+                                                <td>@j</td>
+                                            }
+
+                                            @*<td><p class="m-0">@b.CompanyId</p> </td>*@
+                                            <td><p class="m-0">@b.NoticeSubject</p> </td>
+                                            <td><p class="m-0">@b.CreatedOn</p> </td>
+                                            <td class="noprint">
+                                                <a href="@CustomQueryStringHelper.EncryptString("Notice","SubmittedNoticeDetails","noticeletter",new {id=@b.NoticeID,Type=@b.StatusType })" class="btn-floating btn-outline-primary btn-sm"
+                                                   title="View"><i class="icon-street-view-solid"></i></a>
+                                                @*<a href="@Url.Content("~/notice/noticeletter/SubmittedNoticeDetails/")@b.NoticeID/@b.StatusType"
+            class="btn-floating btn-outline-primary btn-sm"
+            title="View"><i class="icon-street-view-solid"></i></a>*@
+                                            </td>
+                                            <td>@Html.ActionLink((string)"Attachment", "DownloadFile", new { filename = @b.FilePath })</td>
+                                            <td>@Html.ActionLink((string)"Attachment", "DownloadFile", new { filename = @b.UserFilePath })</td>
+                                            <td><p class="m-0">@b.Status_Type</p> </td>
+                                            <td><p class="m-0">@b.PenaltyPaymentStatus</p> </td>
+                                            <td>@Html.ActionLink((string)"Attachment", "DownloadFile", new { filename = @b.PenaltyFilePath })</td>
+                                            <td><p class="m-0">@b.PenaltyDate</p> </td>
+                                            <td><p class="m-0">@b.PenaltyAmount</p> </td>
+                                        </tr>
+                                            i++;
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+    <!-- MAIN CONTENT AREA ENDS -->
+</section>
+<script>
+    //------------------Check Box UnCheck & check-------------------------
+    $(document).on('change', '.chkitem:input[type="checkbox"]', function () {
+        var totChk = $('.chkitem:input[type="checkbox"]').length;
+
+        var dv = totChk;
+        var totChecked = $('.chkitem:input[type="checkbox"]:checked').length;
+        if (totChecked == dv) {
+            $('[id$=gdh]').prop('checked', true);
+        } else {
+            $('[id$=gdh]').prop('checked', false);
+        }
+    });
+
+
+    $('[id$=gdh]').change(function () {
+
+        if ($(this).is(':checked')) {
+            $('.chkitem:input[type="checkbox"]').prop('checked', true);
+
+        }
+        else {
+            $('.chkitem:input[type="checkbox"]').prop('checked', false);
+
+        }
+    });
+
+
+        $("#Paymentbtn").click(function () {
+        var idsToSend = [];
+        // var QtyToSend = [];
+        var ArrtotalPayableAmt = []
+        var totalPayableAmt = 0;
+            var PaymentType = "";
+          
+
+      //  var grid = $("#NoticePenaltyGrid").data("kendoGrid");
+            var ds = $('#table-exports').find("tbody > tr");
+           // var count;
+        for (var i = 0; i < ds.length; i++) {
+            //var row = ds.find("tr[data-uid='" + ds[i].uid + "']");
+            if ($($(ds[i]).find('.RowCheck')).prop('checked')) {
+                //if (i == 0) {
+                //    i = i + 1;
+                //}
+          
+                idsToSend.push($("#hdnNoticeDetails_"+i).val());
+                ArrtotalPayableAmt.push($("#hdnNoticePenaltyAmount_"+i).val());
+                totalPayableAmt = parseFloat(totalPayableAmt) + parseFloat($("#hdnNoticePenaltyAmount_"+i).val());
+                PaymentType = $("#hdnNoticeStatus_"+i).val();
+            }
+        }
+
+        if (idsToSend == null || idsToSend.length == 0) {
+            alert("Please select one record for payment!");
+            return false;
+        }
+
+        $.ajax({
+            type: "POST",
+            url: '@Url.Action("NoticePenaltyPayment", "Noticeletter")',
+            data: {
+                arr: JSON.stringify(idsToSend),
+                ArrtotalPayableAmt: JSON.stringify(ArrtotalPayableAmt),
+                totalPayableAmt: totalPayableAmt,
+                PaymentType: PaymentType
+            },
+            success: function (response) {
+                window.location.href = response;
+                //$("#mainDiv").empty();
+                //$("#mainDiv").html(response);
+            },
+            failure: function (response) {
+            }
+        });
+
+        idsToSend = [];
+    });
+</script>

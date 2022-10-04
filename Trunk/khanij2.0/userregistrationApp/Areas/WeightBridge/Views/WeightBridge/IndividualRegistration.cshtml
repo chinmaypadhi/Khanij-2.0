@@ -1,0 +1,932 @@
+﻿@model userregistrationEF.AddWeighBridgeModel
+@{
+    ViewData["Title"] = "Add";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+<style>
+    @@media only screen and (max-width: 1366px) {
+        .indiv-reg-deatils .col-lg-1 {
+            flex: 0 0 16.666667%;
+            max-width: 16.666667%;
+        }
+    }
+</style>
+@if (TempData["Message"] != null)
+{
+    <script>
+        var vv = '@TempData["Message"]';
+        if (vv == 1) {
+            swal("","WeighBridge Saved.","success");
+        }
+        if (vv == 2) {
+            swal("", "WeighBridge Updated.", "success");
+        }
+        if (vv == 3) {
+            swal("", "Please Fill All information marked with red.", "warning");
+        }
+        else if (vv == 4) {
+            swal("", "Something Errror occured. Please Try After Sometime!!", "error");
+        }
+    </script>
+}
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        @Html.Partial("_CMSnavigation")
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="/WeightBridge/WeightBridge/IndividualRegistration">
+                                Add
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/WeightBridge/WeightBridge/IndividualRegistrationView">
+                                View
+                            </a>
+                        </li>
+                    </ul>
+                    @Html.Partial("_CMSutil")
+                </div>
+                <section class="box form-container">
+                    <div class="content-body">
+                        <form id="form1" action="/WeightBridge/WeightBridge/Register" method="post" enctype="multipart/form-data">
+                            @Html.AntiForgeryToken()
+                            <div class="indiv-reg-deatils mb-2">
+                                <p> @ViewBag.UserType Name : <span class="font-weight-bold">@ViewBag.Name</span> , Registration Code : <span class="font-weight-bold">@ViewBag.Loginid</span> ,  District : <span class="font-weight-bold">@ViewBag.District</span></p>
+                            </div>
+                            <h5>Weighbridge Information</h5>
+                            <div class="row">
+                                <div class="col-lg-3 col-md-6">
+                                    <label class="col-form-label">Weighbridge Name<span class="mandatory  text-danger">*</span></label>
+                                    <div class="form-group">
+                                        @Html.HiddenFor(m => m.WeighBridgeID)
+                                        @Html.HiddenFor(m => m.ID)
+                                        <input type="hidden" id="isWBduplicate" value="0" />
+                                        <input type="hidden" name="WeighBridgeType" value="Individual" />
+                                        @Html.TextBoxFor(m => m.WeighBridgeName, new { @class = "form-control", @maxlength = "50", @onkeypress = "return /[0-9a-zA-Z]/i.test(event.key)" })
+                                        <span class="text-danger">@Html.ValidationMessageFor(m => m.WeighBridgeName)</span>
+                                    </div>
+                                </div>
+                                <div class="col-lg-3 col-md-6">
+                                    <label class="col-form-label">Supervisor Name <span class="mandatory text-danger">*</span></label>
+                                    <div class="form-group">
+                                        @Html.TextBoxFor(m => m.SupervisorName, new { @class = "form-control", @maxlength = "50", @onkeypress = "return /^[a-zA-Z ]+$/i.test(event.key)" })
+                                        <span class="text-danger">@Html.ValidationMessageFor(m => m.SupervisorName)</span>
+                                    </div>
+                                </div>
+                                <div class="col-lg-3 col-md-6">
+                                    <label class="col-form-label">Supervisor Contact <span class="mandatory text-danger">*</span></label>
+                                    <div class="form-group">
+                                        @Html.TextBoxFor(m => m.SupervisorContact, new { @class = "form-control", @maxlength = "10", @onkeypress = "return onlynumbers(event)" })
+                                        <span class="text-danger">@Html.ValidationMessageFor(m => m.SupervisorContact)</span>
+                                    </div>
+                                </div>
+                                <div class="col-lg-3 col-md-6">
+                                    <label class="col-form-label">Capacity(in mt.) <span class="mandatory text-danger">*</span></label>
+                                    <div class="form-group">
+                                        @Html.TextBoxFor(m => m.Capacity, new { @class = "form-control", @maxlength = "20", @onkeypress = "return onlynumbersanddecimals(event)" })
+                                        <span class="text-danger">@Html.ValidationMessageFor(m => m.Capacity)</span>
+                                    </div>
+                                </div>
+                                <div class="col-lg-3 col-md-6">
+                                    <label class="col-form-label">Land/Area Type<span class="mandatory text-danger">*</span></label>
+                                    <div class="form-group">
+                                        <select id="LandAreaTypeID" name="LandAreaTypeID" class="form-control">
+                                            <option value="0">Select</option>
+                                            @{
+                                                List<userregistrationEF.AreaDetails> listareatype = (List<userregistrationEF.AreaDetails>)ViewData["AreaType"];
+                                                foreach (var item in listareatype)
+                                                {
+                                                    if (Model.LandAreaTypeID == item.LAND_ID)
+                                                    {
+                                                        <option value="@item.LAND_ID" selected>@item.LandName</option>
+                                                    }
+                                                    else
+                                                    {
+                                                        <option value="@item.LAND_ID">@item.LandName</option>
+                                                    }
+                                                }
+                                            }
+                                        </select>
+                                        <span class="text-danger">@Html.ValidationMessageFor(m => m.LandAreaTypeID)</span>
+                                    </div>
+                                </div>
+                                <div class="col-lg-3 col-md-6">
+                                    <label class="col-form-label">Area of Land(in hectares.) <span class="mandatory text-danger">*</span></label>
+                                    <div class="form-group">
+                                        @Html.TextBoxFor(m => m.AreaofLand, new { @class = "form-control", @maxlength = "20", @onkeypress = "return onlynumbersanddecimals(event)" })
+                                        <span class="text-danger">@Html.ValidationMessageFor(m => m.AreaofLand)</span>
+                                    </div>
+                                </div>
+                                <div class="col-lg-3 col-md-6">
+                                    <label class="col-form-label">Location<span class="mandatory text-danger">*</span></label>
+                                    <div class="form-group">
+                                        <select id="Location" name="Location" class="form-control">
+                                            <option value="">Select</option>
+                                            @{
+                                                foreach (var item in (List<string>)ViewData["Location"])
+                                                {
+                                                    if (Model.Location == item)
+                                                    {
+                                                        <option value="@item" selected>@item</option>
+                                                    }
+                                                    else
+                                                    {
+                                                        <option value="@item">@item</option>
+                                                    }
+                                                }
+                                            }
+                                        </select>
+                                    </div>
+                                    <span class="text-danger">@Html.ValidationMessageFor(m => m.Location)</span>
+                                </div>
+                                <div class="col-lg-3 col-md-6">
+                                    <label class="col-form-label">Upload Stamp Copy<span class="mandatory text-danger">*</span></label>
+                                    <div class="form-group">
+                                        <div class="custom-file">
+                                            <input id="StampCopy" name="StampCopy" type="file" class="form-control custom-file-input">
+                                            @{
+                                                if (Model.StampCopyFilePath != null && Model.StampCopyFilePath != "")
+                                                {
+                                                    <label class="custom-file-label">@Model.StampCopyFilePath.Substring(37)</label>
+                                                }
+                                                else
+                                                {
+                                                    <label class="custom-file-label">Choose file...</label>
+                                                }
+                                            }
+
+                                        </div>
+                                        <small class="text-danger"><strong>(.jpg, .jpeg, .png, .pdf)</strong> files with <strong> &#60; 2 MB </strong> size only.</small>
+                                        @{
+                                            if (Model.StampCopyFilePath != null)
+                                            {
+                                                <a href="~/Upload/WeighBridge/@Model.StampCopyFilePath" target="_blank"><i class="icon-file-pdf-solid text-danger h4"></i></a>
+                                            }
+                                        }
+                                        <input id="@Model.StampCopyFilePath" type="hidden" value="@Model.StampCopyFilePath" name="StampCopyFilePath" />
+                                        <span class="text-danger">@Html.ValidationMessageFor(m => m.StampCopy)</span>
+                                    </div>
+                                </div>
+                                <div class="col-lg-3 col-md-6">
+                                    <label class="col-form-label">
+                                        Stamp Valid From <span class="mandatory text-danger">*</span>
+                                    </label>
+                                    <div class="form-group">
+                                        <div class="input-group">
+                                            <input id="hdnStampValidFrom" type="hidden" value="@Model.StampValidFrom.ToString("dd-MMM-yyyy")" />
+                                            <input id="StampValidFrom" type="text" name="StampValidFrom" class="form-control datepicker" />
+                                            <div class="input-group-prepend">
+                                                <label class="input-group-text" for="txtTenderDate1"><i class="icon-calendar-alt-solid"></i></label>
+                                            </div>
+                                            <span class="text-danger">@Html.ValidationMessageFor(m => m.StampValidFrom)</span>
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                                <div class="col-lg-3 col-md-6">
+                                    <label class="col-form-label">
+                                        Stamp Valid To <span class="mandatory text-danger">*</span>
+                                    </label>
+                                    <div class="form-group">
+                                        <div class="input-group">
+                                            <input id="hdnStampValidTo" type="hidden" value="@Model.StampValidTo.ToString("dd-MMM-yyyy")" />
+                                            <input id="StampValidTo" type="text" name="StampValidTo" class="form-control datepicker" />
+                                            <div class="input-group-prepend">
+                                                <label class="input-group-text" for="txtTenderDate2"><i class="icon-calendar-alt-solid"></i></label>
+                                            </div>
+                                            <span class="text-danger">@Html.ValidationMessageFor(m => m.StampValidTo)</span>
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <div class="col-lg-3 col-md-6">
+                                    <label class="col-form-label">
+                                        Availability of Electricity <span class="mandatory text-danger">*</span>
+                                    </label>
+                                    <div class="form-group">
+                                        <div class="form-check form-check-inline">
+
+                                            @Html.RadioButtonFor(m => m.ElectricityAvailablity, true, new { @class = "custom-radio" })
+                                            <label class="form-check-label" for="ra1">
+                                                Yes
+                                            </label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+
+                                            @Html.RadioButtonFor(m => m.ElectricityAvailablity, false, new { @class = "custom-radio" })
+                                            <label class="form-check-label" for="ra2">
+                                                No
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-3 col-md-6">
+                                    <label class="col-form-label">
+                                        Internet Availability <span class="mandatory text-danger">*</span>
+                                    </label>
+                                    <div class="form-group">
+                                        <div class="form-check form-check-inline">
+                                            @Html.RadioButtonFor(m => m.InternetAvailability, true, new { @class = "custom-radio" })
+                                            <label class="form-check-label" for="ra3">
+                                                Yes
+                                            </label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            @Html.RadioButtonFor(m => m.InternetAvailability, false, new { @class = "custom-radio" })
+                                            <label class="form-check-label" for="ra4">
+                                                No
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <br />
+                            <h5>Technical Information</h5>
+                            <div class="row">
+
+                                <div class="col-lg-3 col-md-6">
+                                    <label class="col-form-label">Weighbridge Make <span class="mandatory text-danger">*</span></label>
+                                    <div class="form-group">
+                                        <select id="MakeID" name="MakeID" class="form-control">
+                                            <option value="0">Select</option>
+                                            @{
+                                                List<userregistrationEF.ViewWeighBridgeMakeModel> list = (List<userregistrationEF.ViewWeighBridgeMakeModel>)ViewData["WBMake"];
+                                                if (list != null)
+                                                {
+                                                    foreach (var item in list)
+                                                    {
+                                                        if (Model.MakeID == item.WeighBridgeMakeID)
+                                                        {
+                                                            <option value="@item.WeighBridgeMakeID" selected>@item.WeighBridgeMake</option>
+                                                        }
+                                                        else
+                                                        {
+                                                            <option value="@item.WeighBridgeMakeID">@item.WeighBridgeMake</option>
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        </select>
+                                        <span class="text-danger">@Html.ValidationMessageFor(m => m.MakeID)</span>
+                                    </div>
+                                </div>
+                                <div class="col-lg-3 col-md-6">
+                                    <label class="col-form-label">Weighbridge Model <span class="mandatory text-danger">*</span></label>
+                                    <div class="form-group">
+                                        <select id="ModelID" name="ModelID" class="form-control">
+                                            <option>Select</option>
+                                        </select>
+                                        <span class="text-danger">@Html.ValidationMessageFor(m => m.MakeID)</span>
+                                    </div>
+                                </div>
+                                <div class="col-lg-3 col-md-6">
+                                    <label class="col-form-label">Model Baud Rate<span class="mandatory text-danger">*</span></label>
+                                    <div class="form-group">
+                                        @Html.TextBoxFor(m => m.ModelBaudRate, new { @class = "form-control", @autofocus = "autofocus", @onkeypress = "return /[0-9a-zA-Z]/i.test(event.key)" })
+                                        <span class="text-danger">@Html.ValidationMessageFor(m => m.ModelBaudRate)</span>
+                                    </div>
+                                </div>
+                                <div class="col-lg-3 col-md-6">
+                                    <label class="col-form-label">Data Bit<span class="mandatory text-danger">*</span></label>
+                                    <div class="form-group">
+                                        @Html.TextBoxFor(m => m.DataBit, new { @class = "form-control", @autofocus = "autofocus", @onkeypress = "return /[0-9a-zA-Z]/i.test(event.key)" })
+                                        <span class="text-danger">@Html.ValidationMessageFor(m => m.DataBit)</span>
+                                    </div>
+                                </div>
+                                <div class="col-lg-3 col-md-6">
+                                    <label class="col-form-label">Stop Bit<span class="mandatory text-danger">*</span></label>
+                                    <div class="form-group">
+                                        @Html.TextBoxFor(m => m.StopBit, new { @class = "form-control", @autofocus = "autofocus", @onkeypress = "return /[0-9a-zA-Z]/i.test(event.key)" })
+                                        <span class="text-danger">@Html.ValidationMessageFor(m => m.StopBit)</span>
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-3 col-md-6">
+                                    <label class="col-form-label">Parity<span class="mandatory text-danger">*</span></label>
+                                    <div class="form-group">
+                                        @Html.TextBoxFor(m => m.Parity, new { @class = "form-control", @autofocus = "autofocus", @onkeypress = "return /[0-9a-zA-Z ,@#()]/i.test(event.key)" })
+                                        <span class="text-danger">@Html.ValidationMessageFor(m => m.Parity)</span>
+                                    </div>
+                                </div>
+                                <div class="col-lg-3 col-md-6">
+                                    <label class="col-form-label">String Read From Hyperterminal<span class="mandatory text-danger">*</span></label>
+                                    <div class="form-group">
+                                        @Html.TextBoxFor(m => m.HyperterminalReading, new { @class = "form-control", @autofocus = "autofocus", @onkeypress = "return /[0-9a-zA-Z]/i.test(event.key)" })
+                                        <span class="text-danger">@Html.ValidationMessageFor(m => m.HyperterminalReading)</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <br />
+                            <h5>Location Information</h5>
+                            <div class="row">
+                                <div class="col-lg-6">
+                                    <div class="bg-light p-2 form-group border">
+                                        <small><strong>Point 1</strong></small>
+                                        <div class="row">
+                                            <div class="col-lg-6 col-md-6">
+                                                <label class="col-form-label">Latitude<span class="mandatory text-danger">*</span></label>
+                                                <div class="form-group">
+                                                    @Html.TextBoxFor(m => m.Lat1, new { @class = "form-control", @autofocus = "autofocus", @onkeypress = "return onlynumbersanddecimals(event)" })
+                                                    <span class="text-danger">@Html.ValidationMessageFor(m => m.Lat1)</span>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-6 col-md-6">
+                                                <label class="col-form-label">Longitude<span class="mandatory text-danger">*</span></label>
+                                                <div class="form-group">
+                                                    @Html.TextBoxFor(m => m.Lon1, new { @class = "form-control", @autofocus = "autofocus", @onkeypress = "return onlynumbersanddecimals(event)" })
+                                                    <span class="text-danger">@Html.ValidationMessageFor(m => m.Lon1)</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6">
+                                    <div class="bg-light p-2 form-group border">
+                                        <small><strong>Point 2</strong></small>
+                                        <div class="row">
+                                            <div class="col-lg-6 col-md-6">
+                                                <label class="col-form-label">Latitude<span class="mandatory text-danger">*</span></label>
+                                                <div class="form-group">
+                                                    @Html.TextBoxFor(m => m.Lat2, new { @class = "form-control", @autofocus = "autofocus", @onkeypress = "return onlynumbersanddecimals(event)" })
+                                                    <span class="text-danger">@Html.ValidationMessageFor(m => m.Lat2)</span>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-6 col-md-6">
+                                                <label class="col-form-label">Longitude<span class="mandatory text-danger">*</span></label>
+                                                <div class="form-group">
+                                                    @Html.TextBoxFor(m => m.Lon2, new { @class = "form-control", @autofocus = "autofocus", @onkeypress = "return onlynumbersanddecimals(event)" })
+                                                    <span class="text-danger">@Html.ValidationMessageFor(m => m.Lon2)</span>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6">
+                                    <div class="bg-light p-2 form-group border">
+                                        <small><strong>Point 3</strong></small>
+                                        <div class="row">
+                                            <div class="col-lg-6 col-md-6">
+                                                <label class="col-form-label">Latitude<span class="mandatory text-danger">*</span></label>
+                                                <div class="form-group">
+                                                    @Html.TextBoxFor(m => m.Lat3, new { @class = "form-control", @autofocus = "autofocus", @onkeypress = "return onlynumbersanddecimals(event)" })
+                                                    <span class="text-danger">@Html.ValidationMessageFor(m => m.Lat3)</span>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-6 col-md-6">
+                                                <label class="col-form-label">Longitude<span class="mandatory text-danger">*</span></label>
+                                                <div class="form-group">
+                                                    @Html.TextBoxFor(m => m.Lon3, new { @class = "form-control", @autofocus = "autofocus", @onkeypress = "return onlynumbersanddecimals(event)" })
+                                                    <span class="text-danger">@Html.ValidationMessageFor(m => m.Lon3)</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6">
+                                    <div class="bg-light p-2 form-group border">
+                                        <small><strong>Point 4</strong></small>
+                                        <div class="row">
+                                            <div class="col-lg-6 col-md-6">
+                                                <label class="col-form-label">Latitude<span class="mandatory text-danger">*</span></label>
+                                                <div class="form-group">
+                                                    @Html.TextBoxFor(m => m.Lat4, new { @class = "form-control", @autofocus = "autofocus", @onkeypress = "return onlynumbersanddecimals(event)" })
+                                                    <span class="text-danger">@Html.ValidationMessageFor(m => m.Lat4)</span>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-6 col-md-6">
+                                                <label class="col-form-label">Longitude<span class="mandatory text-danger">*</span></label>
+                                                <div class="form-group">
+                                                    @Html.TextBoxFor(m => m.Lon4, new { @class = "form-control", @autofocus = "autofocus", @onkeypress = "return onlynumbersanddecimals(event)" })
+                                                    <span class="text-danger">@Html.ValidationMessageFor(m => m.Lon4)</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+
+
+                            <div class="mt-3">
+                                @*<button type="button" onclick="loadmodaldata()" class="btn btn-success" data-toggle="modal" data-target="#exampleModal2">@ViewBag.submit</button>*@
+                                @*<input name="Submit" type="submit" value='@ViewBag.submit' onclick="return Validate()" class="btn btn-success" />*@
+                                <input id="btnSaveWB" type="button" value="@ViewBag.submit" class="btn btn-success" />
+                                <input type="hidden" name="Submit" value="@ViewBag.submit" />
+                                <button type="button" class="btn btn-danger ml-2" onclick="cancel('@ViewBag.cancel')">@ViewBag.cancel</button>
+                            </div>
+                            @*modal for confirm and submit*@
+                            <div class="modal fade" id="exampleModal2" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h6 class="modal-title" id="exampleModalLabel">
+                                                Weighbridge Registration Detail
+                                            </h6>
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                        <div class="modal-body mineral-concesion-details">
+                                            <p> <small><span id="spusertype">Lfdfde</span> Name : <span id="spName" class="font-weight-bold">Ziyauel khan</span></small> | <small> Code : <span id="spCode" class="font-weight-bold">25634567834</span></small></p>
+                                            <div class="row">
+                                                <label class="col-lg-3 col-12 col-form-label">Weighbridge Name</label>
+                                                <div class="col-lg-3 col-12">
+                                                    <label id="lblWeighBridgeName" class="form-control-plaintext"><span class="colon">:</span>WeighBridgeWB1</label>
+                                                </div>
+
+                                                <label class="col-lg-3 col-12 col-form-label">Supervisor Name</label>
+                                                <div class="col-lg-3 col-md-6 col-sm-12">
+                                                    <label id="lblSupervisorName" class="form-control-plaintext"><span class="colon">:</span>Anil kumar Das</label>
+                                                </div>
+
+                                                <label class="col-lg-3 col-12 col-form-label">Contact Number</label>
+                                                <div class="col-lg-3 col-md-6 col-sm-12">
+                                                    <label id="lblSupervisorContact" class="form-control-plaintext"><span class="colon">:</span>9933558645</label>
+                                                </div>
+
+                                                <label class="col-lg-3 col-12 col-form-label">Make</label>
+                                                <div class="col-lg-3 col-md-6 col-sm-12">
+                                                    <label id="lblmake" class="form-control-plaintext"><span class="colon">:</span>xyzxyzxyz</label>
+                                                </div>
+
+                                                <label class="col-lg-3 col-12 col-form-label">Model</label>
+                                                <div class="col-lg-3 col-md-6 col-sm-12">
+                                                    <label id="lblmodel" class="form-control-plaintext"><span class="colon">:</span>xyzxyzxyz</label>
+                                                </div>
+
+                                                <label class="col-lg-3 col-12 col-form-label">Modem Baud Rate</label>
+                                                <div class="col-lg-3 col-12">
+                                                    <label id="lblmodembaudrate" class="form-control-plaintext"><span class="colon">:</span>4354</label>
+                                                </div>
+
+                                                <label class="col-lg-3 col-12 col-form-label">Data Bit</label>
+                                                <div class="col-lg-3 col-12">
+                                                    <label id="lbldatabit" class="form-control-plaintext"><span class="colon">:</span>92,00000</label>
+                                                </div>
+
+                                                <label class="col-lg-3 col-12 col-form-label">Stop Bit</label>
+                                                <div class="col-lg-3 col-12">
+                                                    <label id="lblstopbit" class="form-control-plaintext"><span class="colon">:</span>12,00</label>
+                                                </div>
+
+                                                <label class="col-lg-3 col-12 col-form-label">Parity</label>
+                                                <div class="col-lg-3 col-12">
+                                                    <label id="lblparity" class="form-control-plaintext"><span class="colon">:</span>xyzxyzxyz</label>
+                                                </div>
+
+                                                <label class="col-lg-3 col-12 col-form-label">String Read From HyperTerminal</label>
+                                                <div class="col-lg-3 col-12">
+                                                    <label id="lblhyperterminalread" class="form-control-plaintext"><span class="colon">:</span>xyzxyzxyz</label>
+                                                </div>
+
+                                                <label class="col-lg-3 col-12 col-form-label">Capacity</label>
+                                                <div class="col-lg-3 col-12">
+                                                    <label id="lblcapacity" class="form-control-plaintext"><span class="colon">:</span>1200 MT</label>
+                                                </div>
+
+                                                <label class="col-lg-3 col-12 col-form-label">Land / Area Type</label>
+                                                <div class="col-lg-3 col-12">
+                                                    <label id="lblareatype" class="form-control-plaintext"><span class="colon">:</span>xyzxyzxyz</label>
+                                                </div>
+
+                                                <label class="col-lg-3 col-12 col-form-label">Area of Land</label>
+                                                <div class="col-lg-9 col-12">
+                                                    <label id="lblareaofland" class="form-control-plaintext"><span class="colon">:</span>1400 Acr</label>
+                                                </div>
+
+                                                <label class="col-lg-3 col-12 col-form-label">Location</label>
+                                                <div class="col-lg-3 col-12">
+                                                    <label id="lbllocation" class="form-control-plaintext"><span class="colon">:</span>Inside Lease area</label>
+                                                </div>
+
+                                                <label class="col-lg-3 col-12 col-form-label">Latitude</label>
+                                                <div class="col-lg-3 col-12">
+                                                    <label id="lbllatitude" class="form-control-plaintext"><span class="colon">:</span>65354</label>
+                                                </div>
+
+                                                <label class="col-lg-3 col-12 col-form-label">Longitude</label>
+                                                <div class="col-lg-3 col-12">
+                                                    <label id="lbllongitude" class="form-control-plaintext"><span class="colon">:</span>12875</label>
+                                                </div>
+
+                                                <label class="col-lg-3 col-12 col-form-label">Electricity Availability</label>
+                                                <div class="col-lg-3 col-12">
+                                                    <label id="lblelectricityavail" class="form-control-plaintext"><span class="colon">:</span>yes</label>
+                                                </div>
+                                                <label class="col-lg-3 col-12 col-form-label">Internet Availability</label>
+                                                <div class="col-lg-3 col-12">
+                                                    <label id="lblinternetavail" class="form-control-plaintext"><span class="colon">:</span>yes</label>
+                                                </div>
+                                                <label class="col-lg-3 col-12 col-form-label"> Stamp Valid From </label>
+                                                <div class="col-lg-3 col-12">
+                                                    <label id="lblstampingvalidfrom" class="form-control-plaintext"><span class="colon">:</span>	31 Mar 2021</label>
+                                                </div>
+                                                <label class="col-lg-3 col-12 col-form-label"> Stamp Valid To </label>
+                                                <div class="col-lg-3 col-12">
+                                                    <label id="lblstampingvalidto" class="form-control-plaintext"><span class="colon">:</span>31 Mar 2022</label>
+                                                </div>
+                                                <label class="col-lg-3 col-12 col-form-label"> Stamp Copy </label>
+                                                <div class="col-lg-3 col-12">
+                                                    <label class="form-control-plaintext"><span class="colon">:</span><a id="astampingcopy" href="#" target="_blank"><i class="icon-file-pdf-solid text-danger h4"></i></a></label>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                        <div class="modal-footer">
+                                            <input name="Submit" type="submit" value='@ViewBag.submit' class="btn btn-success" />
+                                            @*<a class="btn btn-success" data-toggle="modal" data-target="#exampleModal" data-bs-dismiss="modal">Submit</a>*@
+                                            <a class="btn btn-danger" data-dismiss="modal" aria-label="Close" href="javascript:void(0);">Cancel</a>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+    <!-- MAIN CONTENT AREA ENDS -->
+</section>
+
+<script>
+    $(document).ready(function () {
+        loadNavigation('Add', 'weigbrig', 'weigbrigone', 'tl', 'Weighbridge', 'Weighbridge Registration', ' ');
+        $('.datepicker').datetimepicker({
+            format: 'LT',
+            format: 'DD-MMM-YYYY',
+            icons: {
+                previous: 'icon-angle-left-solid',
+                next: 'icon-angle-right-solid',
+            }
+        }).keydown(false);
+        $('.datepicker').val('');
+        if ($("#hdnStampValidFrom").val() != "01-Jan-0001") {
+            $("#StampValidFrom").val($("#hdnStampValidFrom").val());
+        }
+        if ($("#hdnStampValidTo").val() != "01-Jan-0001") {
+            $("#StampValidTo").val($("#hdnStampValidTo").val());
+        }
+        if ($('#MakeID').val() != "0") {
+            $.ajax({
+                type: "post",
+                url: "/WeightBridge/WeightBridge/GetWBModelByMake",
+                data: { 'makeid': $('#MakeID').val() },
+                datatype: "json",
+                traditional: true,
+                success: function (data) {
+                    debugger;
+                    $('#ModelID').html('');
+                    $('#ModelID').append('<option value="0">Select Model</option>');
+                    $.each(data, function (ind, item) {
+                        debugger
+                        $('#ModelID').append('<option value="' + item.weighBridgeModelTypeID + '">' + item.weighBridgeModelType + '</option>');
+                    });
+                    $('#ModelID').val('@Model.ModelID');
+                }
+            });
+        }
+        //------------On Make Change Bind Model--
+        $('#MakeID').change(function () {
+            debugger;
+            if ($('#MakeID').val() != "0") {
+                $.ajax({
+                    type: "post",
+                    url: "/WeightBridge/WeightBridge/GetWBModelByMake",
+                    data: { 'makeid': $('#MakeID').val() },
+                    datatype: "json",
+                    traditional: true,
+                    success: function (data) {
+                        debugger;
+                        $('#ModelID').html('');
+                        $('#ModelID').append('<option value="0">Select Model</option>');
+                        $.each(data, function (ind, item) {
+                            debugger
+                            $('#ModelID').append('<option value="' + item.weighBridgeModelTypeID + '">' + item.weighBridgeModelType + '</option>');
+                        });
+                    }
+                });
+            }
+        });
+    });
+    $('#btnSaveWB').click(function (e) {
+        if (Validate()) {
+            e.preventDefault();
+            swal({
+                title: "Are you sure ??",
+                icon: "warning",
+                buttons: ["No", "Yes"],
+            })
+            .then((submit) => {
+                if (submit) {
+                    $("#form1").submit();
+                }
+            });
+        }
+        else {
+            return false;
+        }
+    });
+    function loadmodaldata() {
+        debugger
+        $('#spusertype').text('@ViewBag.UserType');
+        $('#spName').text('@ViewBag.Name');
+        $('#spCode').text('@ViewBag.Loginid');
+        $('#lblWeighBridgeName').text($('#WeighBridgeName').val());
+        $('#lblSupervisorName').text($('#SupervisorName').val());
+        $('#lblSupervisorContact').text($('#SupervisorContact').val());
+        $('#lblmake').text($('#MakeID option:selected').text());
+        $('#lblmodel').text($('#ModelID option:selected').text());
+        $('#lblmodembaudrate').text($('#ModelBaudRate').val());
+        $('#lbldatabit').text($('#DataBit').val());
+        $('#lblstopbit').text($('#StopBit').val());
+        $('#lblparity').text($('#Parity').val());
+        $('#lblhyperterminalread').text($('#HyperterminalReading').val());
+        $('#lblcapacity').text($('#Capacity').val() + ' mt.');
+        $('#lblareatype').text($('#LandAreaTypeID option:selected').text());
+        $('#lblareaofland').text($('#AreaofLand').val() + ' hect.');
+        $('#lbllocation').text($('#Location').val());
+        $('#lbllatitude').text($('#Lattitude').val());
+        $('#lbllongitude').text($('#Longitude').val());
+        $('#lblelectricityavail').text(($('#ElectricityAvailablity').val() === true) ? 'Yes' : 'No');
+        $('#lblinternetavail').text(($('#InternetAvailability').val() === true) ? 'Yes' : 'No');
+        $('#lblstampingvalidfrom').text($('#StampValidFrom').val());
+        $('#lblstampingvalidto').text($('#StampValidTo').val());
+        tmppath = URL.createObjectURL($('#StampCopy')[0].files[0]);
+        $('#astampingcopy').attr('href', tmppath);
+    };
+    $('#StampCopy').on('change', function () {
+        debugger;
+        var fileExtension = ['jpg', 'jpeg', 'png', 'pdf'];
+        if ($.inArray($(this).val().split('.').pop().toLowerCase(), fileExtension) == -1) {
+            swal("", "Only formats are allowed : " + fileExtension.join(', '), "warning");
+            $(this).focus();
+            return false;
+        }
+
+        if (Number(this.files[0].size) > 2097152) {
+            swal("", 'Please upload file less than 2MB!', "warning");
+            $(this).val('');
+            $(this).focus();
+            return false;
+        }
+        else {
+            var fileName = $(this).val().split("\\").pop();
+            $(this).next('.custom-file-label').html(fileName);
+        }
+
+    });
+    function Validate() {
+        debugger
+        if ($('#WeighBridgeName').val() == "") {
+            swal("", "Please Enter Weighbridge Name", "warning");
+            $("#WeighBridgeName").focus();
+            return false;
+        }
+        if ($('#SupervisorName').val() == "") {
+            swal("", "Please Enter Supervisor Name", "warning");
+            $("#SupervisorName").focus();
+            return false;
+        }
+        if ($('#SupervisorContact').val() == "") {
+            swal("", "Please Enter Supervisor Contact", "warning");
+            $("#SupervisorContact").focus();
+            return false;
+        }
+        if ($('#SupervisorContact').val() != "") {
+            if ($('#SupervisorContact').val().length != 10) {
+                swal("", "Supervisor contact number is not valid", "warning");
+                $("#SupervisorContact").focus();
+                return false;
+            };
+        }
+        if ($('#Capacity').val() == "") {
+            swal("", "Please Enter Capacity", "warning");
+            $("#Capacity").focus();
+            return false;
+        }
+        if ($('#LandAreaTypeID').val() == "0") {
+            swal("", "Please Land Area Type", "warning");
+            $("#LandAreaTypeID").focus();
+            return false;
+        }
+        if ($('#AreaofLand').val() == "") {
+            swal("", "Please Enter Area of Land", "warning");
+            $("#AreaofLand").focus();
+            return false;
+        }
+        if ($('#Location').val() == "") {
+            swal("", "Please Location", "warning");
+            $("#Location").focus();
+            return false;
+        }
+        if ($('#StampValidFrom').val() == "") {
+            swal("", "Please Select Stamp Valid From", "warning");
+            $("#StampValidFrom").focus();
+            return false;
+        }
+
+        if ($('#StampValidTo').val() == "") {
+            swal("", "Please Select Stamp Valid To", "warning");
+            $("#StampValidTo").focus();
+            return false;
+        }
+        var todaydate = new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate());
+        if (new Date($('#StampValidFrom').val()) < todaydate) {
+            swal('', 'Stamp Valid From cannot be less than current date', 'warning');
+            return false;
+        }
+        if (new Date($('#StampValidTo').val()) < todaydate) {
+            swal('', 'Stamp Valid To cannot be less than current date', 'warning');
+            return false;
+        }
+        if (new Date($('#StampValidTo').val()) < new Date($('#StampValidFrom').val())) {
+            swal('', 'Stamp Valid To must be greater than Stamp Valid From', 'warning');
+            return false;
+        }
+        if ($('#MakeID').val() == "0") {
+            swal("", "Please Select Weighbridge Make", "warning");
+            $("#MakeID").focus();
+            return false;
+        }
+
+        if ($('#ModelID').val() == "0") {
+            swal("", "Please Select Weighbridge Model", "warning");
+            $("#ModelID").focus();
+            return false;
+        }
+
+        if ($('#ModelBaudRate').val() == "") {
+            swal("", "Please Enter ModelBaudRate", "warning");
+            $("#ModelBaudRate").focus();
+            return false;
+        }
+
+        if ($("#DataBit").val() == "") {
+            swal("", "Please Enter DataBit", "warning");
+            $("#DataBit").focus();
+            return false;
+        }
+
+
+
+        if ($('#StopBit').val() == "") {
+            swal("", "Please Enter StopBit", "warning");
+            $("#StopBit").focus();
+            return false;
+        }
+
+        if ($('#HyperterminalReading').val() == "") {
+            swal("", "Please Enter HyperterminalReading", "warning");
+            $("#HyperterminalReading").focus();
+            return false;
+        }
+
+        if ($('#Parity').val() == "") {
+            swal("", "Please Enter Parity", "warning");
+            $("#Parity").focus();
+            return false;
+        }
+        if ($('#Lat1').val() == "") {
+            swal("", "Please Enter Point 1 Latitude", "warning");
+            $("#Lat1").focus();
+            return false;
+        }
+        if ($('#Lon1').val() == "") {
+            swal("", "Please Enter Point 1 Longitude", "warning");
+            $("#Lon1").focus();
+            return false;
+        }
+        if ($('#Lat2').val() == "") {
+            swal("", "Please Enter Point 2 Latitude", "warning");
+            $("#Lat2").focus();
+            return false;
+        }
+        if ($('#Lon2').val() == "") {
+            swal("", "Please Enter Point 3 Longitude", "warning");
+            $("#Lon2").focus();
+            return false;
+        }
+        if ($('#Lat3').val() == "") {
+            swal("", "Please Enter Point 3 Latitude", "warning");
+            $("#Lat3").focus();
+            return false;
+        }
+        if ($('#Lon3').val() == "") {
+            swal("", "Please Enter Point 3 Longitude", "warning");
+            $("#Lon3").focus();
+            return false;
+        }
+        if ($('#Lat4').val() == "") {
+            swal("", "Please Enter Point 4 Latitude", "warning");
+            $("#Lat4").focus();
+            return false;
+        }
+        if ($('#Lon4').val() == "") {
+            swal("", "Please Enter Point 4 Longitude", "warning");
+            $("#Lon4").focus();
+            return false;
+        }
+        var regexLat = /^\d{2}\.\d{4,6}$/;
+        if (!regexLat.test($("#Lat1").val())) {
+            swal("", "Point 1 Latitude is not in correct format", "warning");
+            return false;
+        }
+        if (!regexLat.test($("#Lon1").val())) {
+            swal("", "Point 1 Longitude is not in correct format", "warning");
+            return false;
+        }
+        if (!regexLat.test($("#Lat2").val())) {
+            swal("", "Point 2 Latitude is not in correct format", "warning");
+            return false;
+        }
+        if (!regexLat.test($("#Lon2").val())) {
+            swal("", "Point 2 Longitude is not in correct format", "warning");
+            return false;
+        }
+        if (!regexLat.test($("#Lat3").val())) {
+            swal("", "Point 3 Latitude is not in correct format", "warning");
+            return false;
+        }
+        if (!regexLat.test($("#Lon3").val())) {
+            swal("", "Point 3 Longitude is not in correct format", "warning");
+            return false;
+        }
+        if (!regexLat.test($("#Lat4").val())) {
+            swal("", "Point 4 Latitude is not in correct format", "warning");
+            return false;
+        }
+        if (!regexLat.test($("#Lon4").val())) {
+            swal("", "Point 4 Longitude is not in correct format", "warning");
+            return false;
+        }
+        if ('@ViewBag.submit' == 'SAVE') {
+            if ($('#StampCopy').val() == "") {
+                swal("", "Please Upload Stamp Copy", "warning");
+                $('#StampCopy').focus();
+                return false;
+            }
+        }
+        if ('@ViewBag.submit' == 'SAVE') {
+            $.ajax({
+                async: false,
+                url: '/WeightBridge/WBIndependent/WBCheck',
+                data: { 'WeighBridgeName': $('#WeighBridgeName').val() },
+                dataType: 'json',
+                type: 'post',
+                success: function (data) {
+                    console.log(data);
+                    debugger
+                    if (data == '1') {
+                        $('#isWBduplicate').val(data);
+                    }
+                    else {
+                        $('#isWBduplicate').val('0');
+                    }
+                },
+                error: function (err) {
+                    swal("", err.responseText, "warning");
+                }
+            });
+            if ($('#isWBduplicate').val() == "1") {
+                swal('Weighbridge Name already exists!. Try different name', '', 'warning');
+                return false;
+            }
+        }
+        return true;
+    }
+    function cancel(type) {
+        if (type == "RESET") {
+            window.location.href = '/WeightBridge/WeightBridge/IndividualRegistration';
+        }
+        else {
+            window.location.href = '/WeightBridge/WeightBridge/IndividualRegistrationView';
+        }
+    }
+    function onlynumbers(evt) {
+        var charCode = (evt.which) ? evt.which : event.keyCode
+        if (charCode > 31 && (charCode < 48 || charCode > 57))
+            return false;
+
+        return true;
+    }
+    function onlynumbersanddecimals(evt) {
+        var charCode = (evt.which) ? evt.which : evt.keyCode;
+        if (charCode != 46 && charCode > 31
+            && (charCode < 48 || charCode > 57))
+            return false;
+
+        return true;
+    }
+</script>
+<script src="~/CMSjs/specialChar.js"></script>
+
+
+

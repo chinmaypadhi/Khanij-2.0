@@ -1,0 +1,155 @@
+﻿@model MasterEF.UserInformationEF
+@{
+    ViewData["Title"] = "MineralInformation";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<script>
+    $(document).ready(function () {
+        $("#MINERAL_CATEGORY_ID").change(function () {
+            var MineralCatId = $('#MINERAL_CATEGORY_ID').val();
+            if (MineralCatId == "") {
+                MineralCatId = 0;
+            }
+            $('#ddlMineralCount').empty();
+            var v = "";
+            if (MineralCatId != 0) {
+
+                $.ajax({
+                    type: "POST",
+                    url: "/master/UserInformation/GetMinealList",
+                    data: { 'intMineralCatID': MineralCatId },
+                    cache: false,
+                    //contentType: "application/json",
+                    datatype: "JSON",
+                    success: function (SList) {
+                        debugger;
+                        $.each(SList, function (i, item) {
+                            // console.log(item);
+                            var opt = new Option(item.mineralname , item.mineralid );
+                            $('#ddlMineralCount').append(opt).selectpicker('refresh');
+                       
+                        });
+                       
+                    }
+                });
+            }
+            else {
+                alert('Select State');
+            }
+
+        });
+    });
+</script>
+<section class="wrapper main-wrapper row">
+    @{string UserType = "LESSEE";}
+    <div class="col-12">
+        @Html.Partial("_navigation")
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="javascript:void(0);">
+                                Mineral Information
+                            </a>
+                        </li>
+                    </ul>
+                    @Html.Partial("_util")
+                </div>
+
+                <section class="box form-container">
+                    <div class="content-body">
+
+                        <h5 class="text-brown font-weight-bold mt-0">Mineral Information</h5>
+                        @using (Html.BeginForm("MineralInformation", "UserInformation", FormMethod.Post, new { enctype = "multipart/form-data", AUTOCOMPLETE = "Off", id = "form1" }))
+                        {
+                            <div class="row">
+                                <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                    <label class="col-form-label pt-0 font-weight-bolder">Mineral Category<span class="text-danger">*</span></label>
+
+                                    @Html.DropDownListFor(model => model.MINERAL_CATEGORY_ID, ViewBag.ViewMineralCategoryList as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control", autofocus = "autofocus", required = "required" })
+                                </div>
+                                <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                    <label class="col-form-label pt-0 font-weight-bolder">Mineral<span class="text-danger">*</span></label>
+                                    <select id="ddlMineralCount" name="MineralCount" data-style="bg-white" class="selectpicker form-control" multiple></select>
+                                </div>
+                                <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                    <label class="col-form-label pt-0 font-weight-bolder">Mineral Form<span class="text-danger">*</span></label>
+                                    <select id="ddlMineralFormCount" name="MineralFormCount" data-style="bg-white" class="selectpicker form-control" multiple></select>
+                                </div>
+
+                                <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                    <label class="col-form-label font-weight-bolder">Mineral Grade <span class="text-danger">*</span></label>
+                                    <select id="ddlMineralGradeCount" name="MineralGradeCount" data-style="bg-white" class="selectpicker form-control" multiple></select>
+                                </div>
+                                <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                    <label for="inputLoginId" class="col-form-label font-weight-bolder">Reserve Estimated<span class="text-danger">*</span></label>
+                                    @Html.TextBoxFor(x => x.ESTIMATED_RESERVE, new { @maxlength = "20", @class = "form-control" })
+                                </div>
+                                <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                    <label for="inputLoginId" class="col-form-label font-weight-bolder">Minable Reserve<span class="text-danger">*</span></label>
+                                    @Html.TextBoxFor(x => x.MINABLE_RESERVE, new { @maxlength = "20", @class = "form-control" })
+                                </div>
+
+                                <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                    <label class="col-form-label font-weight-bolder">Copy of the relevant page of MP/SOM whereby reserve<span class="text-danger">*</span></label>
+                                    <div class="custom-file">
+                                        <input type="file" class="custom-file-input" id="flMP" name="flMP">
+                                        <label class="custom-file-label" for="customFile">Choose Files</label>
+                                    </div>
+                                    <a href="@Url.Action("Download", "Application", new { name = Model.COPY_OF_MP_SOM_ESTIMATION_FILE_NAME, path = Model.COPY_OF_MP_SOM_ESTIMATION_FILE_PATH })" target="_blank" class="file-download-licensee">@((Model.COPY_OF_MP_SOM_ESTIMATION_FILE_NAME != null) ? Model.COPY_OF_MP_SOM_ESTIMATION_FILE_NAME : "")</a>
+                                </div>
+                                <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                    <label class="col-form-label font-weight-bolder">Remarks<span class="text-danger">*</span></label>
+                                    @Html.TextAreaFor(x => x.Remarks, new { @class = "form-control", @style = "Resize:none", @maxlength = "500" })
+                                </div>
+
+                            </div>
+                        }
+                        @if (@Model.STATUS != 5)
+                        {
+                            <div class="row" style="position: absolute; bottom: 20px; right: 30px;">
+                                <div class="col-md-12 col-sm-12">
+
+
+                                    @if (UserType.ToUpper() == "LESSEE")
+                                    {
+                                        <input type="submit" value="Save & Update" class="btn btn-success btn-md ml-0 waves-effect waves-light">
+
+                                        <input type="button" title="Forward to DD" value="Forward To DD" name="cmd" class="btn btn-warning text-dark btn-md waves-effect waves-light ml-0" onclick="return OnForwarding('Forward To DD');" />
+                                    }
+                                    <input type="button" value="Approve" class="btn btnsave DMO-Button" id="approve" name="approve" onclick="return OnForwarding('Approve');" style="display: none;">
+                                    <input type="button" value="Reject" class="btn btnsave DMO-Button" id="reject" name="reject" onclick="return OnForwarding('Reject');" style="display: none;">
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+    <!-- MAIN CONTENT AREA ENDS -->
+</section>
+<uc1:footer runat="server" ID="footer" />
+<link href="../css/bootstrap-datetimepicker.min.css" rel="stylesheet">
+<script src="../js/moment.min.js"></script>
+<script src="../js/bootstrap-datetimepicker.min.js"></script>
+
+<script>
+    indicateMe = "yes"
+    backMe = "yes"
+    $(document).ready(function () {
+        loadNavigation('MineralInformation', 'glRoleRes', 'pllesseprof', 'tl', 'Roles and Responsibity', 'Lessee Profile', ' ');
+    });
+</script>
+
+<script>
+    $(document).ready(function () {
+        $('.datepicker').datetimepicker({
+            format: 'LT',
+            format: 'DD-MM-YYYY',
+
+        });
+    });
+</script>

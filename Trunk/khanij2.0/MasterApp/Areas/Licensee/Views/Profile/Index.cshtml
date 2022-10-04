@@ -1,0 +1,805 @@
+﻿<link rel="stylesheet" href='@Url.Content("~/CMScss/lesse-licensee-profile.css")' type="text/css" />
+@using MasterEF;
+@using MasterApp.Web;
+@using Microsoft.AspNetCore.Mvc;
+@using  Microsoft.AspNetCore.Http;
+@inject IHttpContextAccessor HttpContextAccessor
+@{
+    ViewData["Title"] = "LicenseeProfile";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+
+@{
+    UserLoginSession profile = HttpContextAccessor.HttpContext.Session.Get<UserLoginSession>(KeyHelper.UserKey);
+    ViewIBMProfile objIBMProfileetailsModel = ViewBag.ProfileIBMDetailsModel;
+    ProfileCount objprofileCountDetails = ViewBag.GetProfileCount;
+    CTEProfile cTEProfile = ViewBag.CTEProfile;
+    CTOProfile cTOProfile = ViewBag.CTOProfile;
+    GrantProfile grantProfile = ViewBag.GrantProfile;
+    ECProfile eCProfile = ViewBag.ECProfile;
+    AreaProfile areaProfile = ViewBag.AreaProfile;
+    ApplicationProfile applicationProfile = ViewBag.ApplicationProfile;
+    LicenseeDetails officeProfile = ViewBag.OfficeProfile;
+    MineralProfile mineralProfile = ViewBag.MineralProfile;
+}
+<script>
+    backMe = "yes"
+    $(document).ready(function () {
+        loadNavigation('LicenseeProfile', 'Master', 'mastwo', 'tl', 'Licensee Profile', '', ' ');
+        $('.searchableselect').searchableselect();
+
+        $('.datepicker').datetimepicker({
+            format: 'LT',
+            format: 'DD-MM-YYYY',
+            daysOfWeekDisabled: [],
+            widgetPositioning: {
+                horizontal: 'auto',
+                vertical: 'bottom'
+            }
+        });
+
+        @*if (@profile.UserTypeId== "7") {
+            $("#divLessee").show();
+            $("#divDD").hide();
+        }
+        else {
+            $("#divDD").show();
+            $("#divLessee").hide();
+        }*@
+        //$(function () {
+        //    $("body").tooltip({
+        //        selector: '[data-toggle="tooltip"]',
+        //        container: 'body'
+        //    });
+        //})
+        $("#btn-co").click(function () {
+            $("#co_detail").css("display", "block");
+            $("#bo_detail").css("display", "none");
+            $("#so_detail").css("display", "none");
+            $("#ao_detail").css("display", "none");
+            $("#btn-co").removeClass("btn btn-outline-info btn-sm").addClass("btn btn-outline-info btn-sm active");
+            $("#btn-bo").removeClass("btn btn-outline-info btn-sm active").addClass("btn btn-outline-info btn-sm");
+            $("#btn-so").removeClass("btn btn-outline-info btn-sm active").addClass("btn btn-outline-info btn-sm");
+            $("#btn-ao").removeClass("btn btn-outline-info btn-sm active").addClass("btn btn-outline-info btn-sm");
+        });
+        $("#btn-bo").click(function () {
+            $("#co_detail").css("display", "none");
+            $("#bo_detail").css("display", "block");
+            $("#so_detail").css("display", "none");
+            $("#ao_detail").css("display", "none");
+            $("#btn-bo").removeClass("btn btn-outline-info btn-sm").addClass("btn btn-outline-info btn-sm active");
+            $("#btn-co").removeClass("btn btn-outline-info btn-sm active").addClass("btn btn-outline-info btn-sm");
+            $("#btn-so").removeClass("btn btn-outline-info btn-sm active").addClass("btn btn-outline-info btn-sm");
+            $("#btn-ao").removeClass("btn btn-outline-info btn-sm active").addClass("btn btn-outline-info btn-sm");
+        });
+        $("#btn-so").click(function () {
+            $("#co_detail").css("display", "none");
+            $("#bo_detail").css("display", "none");
+            $("#so_detail").css("display", "block");
+            $("#ao_detail").css("display", "none");
+            $("#btn-so").removeClass("btn btn-outline-info btn-sm").addClass("btn btn-outline-info btn-sm active");
+            $("#btn-bo").removeClass("btn btn-outline-info btn-sm active").addClass("btn btn-outline-info btn-sm");
+            $("#btn-co").removeClass("btn btn-outline-info btn-sm active").addClass("btn btn-outline-info btn-sm");
+            $("#btn-ao").removeClass("btn btn-outline-info btn-sm active").addClass("btn btn-outline-info btn-sm");
+        });
+        $("#btn-ao").click(function () {
+            $("#co_detail").css("display", "none");
+            $("#bo_detail").css("display", "none");
+            $("#so_detail").css("display", "none");
+            $("#ao_detail").css("display", "block");
+            $("#btn-ao").removeClass("btn btn-outline-info btn-sm").addClass("btn btn-outline-info btn-sm active");
+            $("#btn-bo").removeClass("btn btn-outline-info btn-sm active").addClass("btn btn-outline-info btn-sm");
+            $("#btn-co").removeClass("btn btn-outline-info btn-sm active").addClass("btn btn-outline-info btn-sm");
+            $("#btn-so").removeClass("btn btn-outline-info btn-sm active").addClass("btn btn-outline-info btn-sm");
+        });
+        if (@applicationProfile.STATUS== 2) {
+            $("#divApplication").addClass("card approved mb-4");
+        }
+        else if (@applicationProfile.STATUS==1){
+            $("#divApplication").addClass("card forwarded mb-4"); rejected
+        }
+        else if (@applicationProfile.STATUS==3){
+            $("#divApplication").addClass("card rejected mb-4");
+        }
+        else {
+            $("#divApplication").addClass("card draf mb-4");
+        }
+        if (@grantProfile.STATUS== 2) {
+            $("#divGrant").addClass("card approved mb-4");
+        }
+        else if (@grantProfile.STATUS== 1) {
+            $("#divGrant").addClass("card forwarded mb-4");
+        }
+        else {
+            $("#divGrant").addClass("card draf mb-4");
+        }
+        if (@areaProfile.STATUS== 2) {
+            $("#divLease").addClass("card approved mb-4");
+        }
+        else if (@areaProfile.STATUS== 1) {
+            $("#divLease").addClass("card forwarded mb-4");
+        }
+        else {
+            $("#divLease").addClass("card draf mb-4");
+        }
+        if (@objIBMProfileetailsModel.STATUS== 2) {
+            $("#divIBM").addClass("card approved mb-4");
+        }
+        else if (@objIBMProfileetailsModel.STATUS== 1) {
+            $("#divIBM").addClass("card forwarded mb-4");
+        }
+         else if (@objIBMProfileetailsModel.STATUS==3){
+            $("#divIBM").addClass("card rejected mb-4");
+        }
+        else {
+            $("#divIBM").addClass("card draf mb-4");
+        }
+
+        if (@mineralProfile.STATUS== 2) {
+            $("#divMineral").addClass("card approved mb-4");
+        }
+        else if (@mineralProfile.STATUS== 1) {
+            $("#divMineral").addClass("card forwarded mb-4");
+        }
+        else {
+            $("#divMineral").addClass("card draf mb-4");
+        }
+
+        if (@eCProfile.STATUS== 2) {
+            $("#divEnvironmentClearance").addClass("card approved mb-4");
+        }
+        else if (@eCProfile.STATUS== 1) {
+            $("#divEnvironmentClearance").addClass("card forwarded mb-4");
+        }
+        else {
+            $("#divEnvironmentClearance").addClass("card draf mb-4");
+        }
+        if (@cTEProfile.STATUS== 2) {
+            $("#divCTE").addClass("card approved mb-4");
+        }
+        else if (@cTEProfile.STATUS== 1) {
+            $("#divCTE").addClass("card forwarded mb-4");
+        }
+        else {
+            $("#divCTE").addClass("card draf mb-4");
+        }
+        if (@cTOProfile.STATUS== 2) {
+            $("#divCTO").addClass("card approved mb-4");
+        }
+        else if (@cTOProfile.STATUS== 1) {
+            $("#divCTO").addClass("card forwarded mb-4");
+        }
+        else {
+            $("#divCTO").addClass("card draf mb-4");
+        }
+    });
+</script>
+
+
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        @Html.Partial("_CMSnavigation")
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="#">
+                                Licensee profile
+                            </a>
+                        </li>
+                    </ul>
+                    @Html.Partial("_CMSutil")
+                </div>
+                <section class="box form-container">
+
+                    <div class="content-body">
+                        <div class="row profile-info">
+                            <div class="custom-col col-lg-8">
+                                <div class="bg-light mb-4 p-3 shadow-sm">
+                                    <div class="row">
+                                        <div id="co_detail" class="col-lg-12">
+                                            <div class="row">
+                                                <div class="col-lg-6 col-md-12 col-sm-12">
+                                                    <div class="row">
+                                                        <label class="col-lg-5 col-md-3 col-sm-12 col-form-label">Customer Id</label>
+                                                        <div class="col-lg-7 col-md-9 col-sm-12">
+                                                            <label class="form-control-plaintext"><span class="colon">:</span><a href="~/Licensee/OfficeDetails/Create"><span class="badge badge-dark font-weight-bold" style="font-size:16px;">@profile.UserName</span></a></label>
+                                                        </div>
+                                                    </div>
+
+                                                </div>
+                                                <div class="col-lg-6 col-md-12 col-sm-12">
+                                                    <div class="row">
+                                                        <label class="col-lg-5 col-md-3 col-sm-12 col-form-label">Status</label>
+                                                        <div class="col-lg-7 col-md-9 col-sm-12">
+                                                            <label class="form-control-plaintext"><span class="colon">:</span>@applicationProfile.LeaseStatus</label>
+                                                        </div>
+                                                    </div>
+
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-lg-6 col-md-12 col-sm-12">
+                                                    <div class="row">
+                                                        <label class="col-lg-5 col-md-3 col-sm-12 col-form-label">Mobile Number</label>
+                                                        <div class="col-lg-7 col-md-9 col-sm-12">
+                                                            <label class="form-control-plaintext"><span class="colon">:</span>@officeProfile.CORPORATE_LANDLINE_NO</label>
+                                                        </div>
+                                                    </div>
+
+                                                </div>
+                                                <div class="col-lg-6 col-md-12 col-sm-12">
+                                                    <div class="row">
+                                                        <label class="col-lg-5 col-md-3 col-sm-12 col-form-label">Email Id</label>
+                                                        <div class="col-lg-7 col-md-9 col-sm-12">
+                                                            <label class="form-control-plaintext"><span class="colon">:</span><a href="mailto:@officeProfile.CORPORATE_MAIL_ID">@officeProfile.CORPORATE_MAIL_ID</a></label>
+                                                        </div>
+                                                    </div>
+
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-lg-6 col-md-12 col-sm-12">
+                                                    <div class="row">
+                                                        <label class="col-lg-5 col-md-3 col-sm-12 col-form-label">Address</label>
+                                                        <div class="col-lg-7 col-md-9 col-sm-12">
+                                                            <label class="form-control-plaintext">
+                                                                <span class="colon">:</span>
+                                                                @if (string.IsNullOrEmpty(officeProfile.CORPORATE_ADDRESS))
+                                                                {
+                                                                    @officeProfile.CORPORATE_ADDRESS;
+                                                                }
+                                                                else if (officeProfile.CORPORATE_ADDRESS.Length > 80)
+                                                                {
+                                                                    @officeProfile.CORPORATE_ADDRESS.Substring(0, 80);
+                                                                }
+                                                                else
+                                                                {
+                                                                    @officeProfile.CORPORATE_ADDRESS;
+                                                                }
+                                                            </label>
+                                                        </div>
+                                                    </div>
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div id="bo_detail" class="col-lg-12" style="display: none">
+                                            <div class="row">
+                                                <div class="col-lg-6 col-md-12 col-sm-12">
+                                                    <div class="row">
+                                                        <label class="col-lg-5 col-md-3 col-sm-12 col-form-label">Customer Id</label>
+                                                        <div class="col-lg-7 col-md-9 col-sm-12">
+                                                            <label class="form-control-plaintext"><span class="colon">:</span><a href="~/Licensee/OfficeDetails/Create"><span class="badge badge-dark font-weight-bold" style="font-size:16px;">@profile.UserName</span></a></label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-6 col-md-12 col-sm-12">
+                                                    <div class="row">
+                                                        <label class="col-lg-5 col-md-3 col-sm-12 col-form-label">Status</label>
+                                                        <div class="col-lg-7 col-md-9 col-sm-12">
+                                                            <label class="form-control-plaintext"><span class="colon">:</span>@applicationProfile.LeaseStatus</label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-lg-6 col-md-12 col-sm-12">
+                                                    <div class="row">
+                                                        <label class="col-lg-5 col-md-3 col-sm-12 col-form-label">Mobile Number</label>
+                                                        <div class="col-lg-7 col-md-9 col-sm-12">
+                                                            <label class="form-control-plaintext"><span class="colon">:</span>@officeProfile.BRANCH_CONTACT_DETAILS1</label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-6 col-md-12 col-sm-12">
+                                                    <div class="row">
+                                                        <label class="col-lg-5 col-md-3 col-sm-12 col-form-label">Email Id</label>
+                                                        <div class="col-lg-7 col-md-9 col-sm-12">
+                                                            <label class="form-control-plaintext"><span class="colon">:</span><a href="mailto:@officeProfile.BRANCH_MAIL_ID">@officeProfile.BRANCH_MAIL_ID</a></label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-lg-6 col-md-12 col-sm-12">
+                                                    <div class="row">
+                                                        <label class="col-lg-5 col-md-3 col-sm-12 col-form-label">Address</label>
+                                                        <div class="col-lg-7 col-md-9 col-sm-12">
+                                                            <label class="form-control-plaintext">
+                                                                <span class="colon">:</span>
+                                                                @if (officeProfile == null || string.IsNullOrEmpty(officeProfile.BRANCH_ADDRESS) == true)
+                                                                {
+                                                                    @officeProfile.BRANCH_ADDRESS
+                                                                }
+                                                                else if (officeProfile.BRANCH_ADDRESS.Length > 80)
+                                                                {
+                                                                    @officeProfile.BRANCH_ADDRESS.Substring(0, 80)
+                                                                }
+                                                                else
+                                                                {
+                                                                    @officeProfile.BRANCH_ADDRESS
+                                                                }
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div id="so_detail" class="custom-col col-lg-12" style="display: none">
+                                            <div class="row">
+                                                <div class="col-lg-6 col-md-12 col-sm-12">
+                                                    <div class="row">
+                                                        <label class="col-lg-5 col-md-3 col-sm-12 col-form-label">Customer Id</label>
+                                                        <div class="col-lg-7 col-md-9 col-sm-12">
+                                                            <label class="form-control-plaintext"><span class="colon">:</span><a href="~/Licensee/OfficeDetails/Create"><span class="badge badge-dark font-weight-bold" style="font-size:16px;">@profile.UserName</span></a></label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-6 col-md-12 col-sm-12">
+                                                    <div class="row">
+                                                        <label class="col-lg-5 col-md-3 col-sm-12 col-form-label">Status</label>
+                                                        <div class="col-lg-7 col-md-9 col-sm-12">
+                                                            <label class="form-control-plaintext"><span class="colon">:</span>@applicationProfile.LeaseStatus</label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-lg-6 col-md-12 col-sm-12">
+                                                    <div class="row">
+                                                        <label class="col-lg-5 col-md-3 col-sm-12 col-form-label">Mobile Number</label>
+                                                        <div class="col-lg-7 col-md-9 col-sm-12">
+                                                            <label class="form-control-plaintext"><span class="colon">:</span>@officeProfile.SITE_CONTACT_DETAILS1</label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-6 col-md-12 col-sm-12">
+                                                    <div class="row">
+                                                        <label class="col-lg-5 col-md-3 col-sm-12 col-form-label">Email Id</label>
+                                                        <div class="col-lg-7 col-md-9 col-sm-12">
+                                                            <label class="form-control-plaintext"><span class="colon">:</span><a href="mailto:@officeProfile.SITE_MAIL_ID">@officeProfile.SITE_MAIL_ID</a></label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-lg-6 col-md-12 col-sm-12">
+                                                    <div class="row">
+                                                        <label class="col-lg-5 col-md-3 col-sm-12 col-form-label">Address</label>
+                                                        <div class="col-lg-7 col-md-9 col-sm-12">
+                                                            <label class="form-control-plaintext">
+                                                                <span class="colon">:</span>
+                                                                @if (officeProfile == null || string.IsNullOrEmpty(officeProfile.SITE_ADDRESS) == true)
+                                                                {
+                                                                    @officeProfile.SITE_ADDRESS
+                                                                }
+                                                                else if (officeProfile.SITE_ADDRESS.Length > 80)
+                                                                {
+                                                                    @officeProfile.SITE_ADDRESS.Substring(0, 80)
+                                                                }
+                                                                else
+                                                                {
+                                                                    @officeProfile.SITE_ADDRESS
+                                                                }
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div id="ao_detail" class="custom-col col-lg-12" style="display: none">
+                                            <div class="row">
+                                                <div class="col-lg-6 col-md-12 col-sm-12">
+                                                    <div class="row">
+                                                        <label class="col-lg-5 col-md-3 col-sm-12 col-form-label">Customer Id</label>
+                                                        <div class="col-lg-7 col-md-9 col-sm-12">
+                                                            <label class="form-control-plaintext"><span class="colon">:</span><a href="~/Licensee/OfficeDetails/Create"><span class="badge badge-dark font-weight-bold" style="font-size:16px;">@profile.UserName</span></a></label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-6 col-md-12 col-sm-12">
+                                                    <div class="row">
+                                                        <label class="col-lg-5 col-md-3 col-sm-12 col-form-label">Status</label>
+                                                        <div class="col-lg-7 col-md-9 col-sm-12">
+                                                            <label class="form-control-plaintext"><span class="colon">:</span>@applicationProfile.LeaseStatus</label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-lg-6 col-md-12 col-sm-12">
+                                                    <div class="row">
+                                                        <label class="col-lg-5 col-md-3 col-sm-12 col-form-label">Mobile Number</label>
+                                                        <div class="col-lg-7 col-md-9 col-sm-12">
+                                                            <label class="form-control-plaintext"><span class="colon">:</span>@officeProfile.AGENT_CONTACT_DETAILS1</label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-6 col-md-12 col-sm-12">
+                                                    <div class="row">
+                                                        <label class="col-lg-5 col-md-3 col-sm-12 col-form-label">Email Id</label>
+                                                        <div class="col-lg-7 col-md-9 col-sm-12">
+                                                            <label class="form-control-plaintext"><span class="colon">:</span><a href="mailto:@officeProfile.AGENT_MAIL_ID">@officeProfile.AGENT_MAIL_ID</a></label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-lg-6 col-md-12 col-sm-12">
+                                                    <div class="row">
+                                                        <label class="col-lg-5 col-md-3 col-sm-12 col-form-label">Address</label>
+                                                        <div class="col-lg-7 col-md-9 col-sm-12">
+                                                            <label class="form-control-plaintext">
+                                                                <span class="colon">:</span>
+                                                                @if (officeProfile == null || string.IsNullOrEmpty(officeProfile.AGENT_ADDRESS) == true)
+                                                                {
+                                                                    @officeProfile.AGENT_ADDRESS
+                                                                }
+                                                                else if (officeProfile.AGENT_ADDRESS.Length > 80)
+                                                                {
+                                                                    @officeProfile.AGENT_ADDRESS.Substring(0, 80)
+                                                                }
+                                                                else
+                                                                {
+                                                                    @officeProfile.AGENT_ADDRESS
+                                                                }
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-12"><hr /></div>
+                                        <div class="col-lg-12">
+                                            <p class="mb-1 font-weight-bold">Click to switch different offices <small>(Mobile No. , address &amp; Email Id)</small></p>
+                                            <ol class="offices-switch d-flex flex-md-row flex-column pl-0  mb-0 pl-0 list-unstyled">
+                                                <li class="mr-md-2 mb-2"><button type="button" class="btn btn-outline-info btn-sm active" id="btn-co">Corporate</button></li>
+                                                <li class="mr-md-2 mb-2"><button type="button" class="btn btn-outline-info btn-sm" id="btn-bo">Branch</button></li>
+                                                <li class="mr-md-2 mb-2"><button type="button" class="btn btn-outline-info btn-sm" id="btn-so">Site</button></li>
+                                                <li class="mr-md-2 mb-2"><button type="button" class="btn btn-outline-info btn-sm" id="btn-ao">Agent</button></li>
+                                            </ol>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="custom-col col-lg-4">
+                                <div class="bg-light mb-4 p-3 shadow-sm">
+                                    <div class="lessee-progress">
+                                        <div class="progress" data-percentage=@objprofileCountDetails.PERCENTAGES>
+                                            <span class="progress-left">
+                                                <span class="progress-bar"></span>
+                                            </span>
+                                            <span class="progress-right">
+                                                <span class="progress-bar"></span>
+                                            </span>
+                                            <div class="progress-value">
+                                                <div>
+                                                    <h5 class="font-weight-bold my-0">@objprofileCountDetails.PERCENTAGES</h5>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <h5 class="mb-0 text-center mt-4">Licensee Profile</h5>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="lessee-profile-parent">
+                            <div class="row">
+
+                                <div class="custom-col col-lg-4 col-md-6 col-sm-12">
+                                    <div id="divApplication" class="card mb-4">
+                                        <div class="card-body ">
+                                            <div class="d-flex justify-content-between mb-3">
+                                                <h5 class="card-title mt-0">Licensee Application Details</h5>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-sm-12">
+                                                    <div class="row">
+                                                        <label class="col-lg-12 col-md-12 col-sm-12 col-form-label  font-weight-normal text-dark">@profile.ApplicantName</label>
+                                                        @*<label class="col-lg-5 col-md-3 col-sm-12 col-form-label">Name</label>
+                                                            <div class="col-lg-7 col-md-9 col-sm-12">
+                                                                <label class="form-control-plaintext"><span class="colon">:</span>@profile.ApplicantName </label>
+                                                            </div>*@
+                                                        <label class="col-lg-5 col-md-3 col-sm-12 col-form-label">Type</label>
+                                                        <div class="col-lg-7 col-md-9 col-sm-12">
+                                                            <label class="form-control-plaintext"><span class="colon">:</span>@applicationProfile.APPLICATION_TYPE_NAME </label>
+                                                        </div>
+                                                        <label class="col-lg-5 col-md-3 col-sm-12 col-form-label">Storage</label>
+                                                        <div class="col-lg-7 col-md-9 col-sm-12">
+                                                            <label class="form-control-plaintext"><span class="colon">:</span>@applicationProfile.STORAGE_CAPACITY</label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                            </div>
+                                            <div class="view-more">
+                                                <a href="~/Licensee/ApplicationDetails/Create" class="btn btn-outline-info  btn-sm">Fill Details</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="custom-col col-lg-4 col-md-6 col-sm-12">
+                                    <div class="card mb-4">
+                                        <div id="divGrant" class="card-body">
+                                            <div class="d-flex justify-content-between mb-4">
+                                                <h5 class="card-title mt-0">Grant Order </h5>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-sm-12">
+                                                    <div class="row">
+                                                        <label class="col-lg-5 col-md-3 col-sm-12 col-form-label">Order No.</label>
+                                                        <div class="col-lg-7 col-md-9 col-sm-12">
+                                                            <label class="form-control-plaintext"><span class="colon">:</span>@grantProfile.GrantOrderNumber</label>
+                                                        </div>
+                                                        <label class="col-lg-5 col-md-3 col-sm-12 col-form-label">Order Date</label>
+                                                        <div class="col-lg-7 col-md-9 col-sm-12">
+                                                            <label class="form-control-plaintext"><span class="colon">:</span>@grantProfile.GrantOrderDate</label>
+                                                        </div>
+                                                        <label class="col-lg-5 col-md-3 col-sm-12 col-form-label">Period (in yr)</label>
+                                                        <div class="col-lg-7 col-md-9 col-sm-12">
+                                                            <label class="form-control-plaintext"><span class="colon">:</span>@grantProfile.LicensePeriod</label>
+                                                        </div>
+                                                        @if (grantProfile.GRANTValidityStatus == "Validity Expired")
+                                                        {
+                                                            <label class="col-lg-5 col-md-3 col-sm-12 col-form-label"><span class="text-danger">Validity</span> </label>
+                                                            <div class="col-lg-7 col-md-9 col-sm-12">
+                                                                <label class="form-control-plaintext text-danger"><span class="colon">:</span>@grantProfile.GRANTVALIDITY</label>
+                                                            </div>
+                                                        }
+                                                        else
+                                                        {
+                                                            <label class="col-lg-5 col-md-3 col-sm-12 col-form-label">Validity</label>
+                                                            <div class="col-lg-7 col-md-9 col-sm-12">
+                                                                <label class="form-control-plaintext"><span class="colon">:</span>@grantProfile.GRANTVALIDITY</label>
+                                                            </div>
+                                                        }
+
+                                                    </div>
+                                                </div>
+
+                                            </div>
+                                            <div class="view-more">
+                                                <a href="~/Licensee/GrantDetails/Create" class="btn btn-outline-info  btn-sm">Fill Details</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="custom-col col-lg-4 col-md-6 col-sm-12">
+                                    <div id="divLease" class="card mb-4">
+                                        <div class="card-body">
+                                            <div class="d-flex justify-content-between mb-4">
+                                                <h5 class="card-title mt-0">Area Details</h5>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-sm-12">
+                                                    <div class="row">
+                                                        <label class="col-lg-4 col-md-3 col-sm-12 col-form-label">State</label>
+                                                        <div class="col-lg-8 col-md-9 col-sm-12">
+                                                            <label class="form-control-plaintext"><span class="colon">:</span>@areaProfile.StateName</label>
+                                                        </div>
+                                                        <label class="col-lg-4 col-md-3 col-sm-12 col-form-label">District</label>
+                                                        <div class="col-lg-8 col-md-9 col-sm-12">
+                                                            <label class="form-control-plaintext"><span class="colon">:</span>@areaProfile.DistrictName</label>
+                                                        </div>
+                                                        <label class="col-lg-4 col-md-3 col-sm-12 col-form-label">Village</label>
+                                                        <div class="col-lg-8 col-md-9 col-sm-12">
+                                                            <label class="form-control-plaintext"><span class="colon">:</span>@areaProfile.VillageName</label>
+                                                        </div>
+                                                        <label class="col-lg-4 col-md-3 col-sm-12 col-form-label">Pincode</label>
+                                                        <div class="col-lg-8 col-md-9 col-sm-12">
+                                                            <label class="form-control-plaintext"><span class="colon">:</span>@areaProfile.PIN_CODE</label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                            </div>
+                                            <div class="view-more">
+                                                <a href="~/Licensee/AreaDetails/Create" class="btn btn-outline-info  btn-sm">Fill Details</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="custom-col col-lg-4 col-md-6 col-sm-12">
+                                    <div id="divIBM" class="card mb-0">
+                                        <div class="card-body">
+                                            <div class="d-flex justify-content-between mb-4">
+                                                <h5 class="card-title mt-0">IBM Details</h5>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-sm-12">
+                                                    <div class="row">
+                                                        <label class="col-lg-5 col-md-3 col-sm-12 col-form-label">Code</label>
+                                                        <div class="col-lg-7 col-md-9 col-sm-12">
+                                                            <label class="form-control-plaintext"><span class="colon">:</span>@objIBMProfileetailsModel.IBM_NUMBER</label>
+                                                        </div>
+                                                        <label class="col-lg-5 col-md-3 col-sm-12 col-form-label">Registration Date</label>
+                                                        <div class="col-lg-7 col-md-9 col-sm-12">
+                                                            <label class="form-control-plaintext"><span class="colon">:</span>@objIBMProfileetailsModel.IBM_APPLICATON_DATE</label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="view-more">
+                                                    <a href="~/Licensee/UserInformationLiensee/IBMDetails" class="btn btn-outline-info  btn-sm">Fill Details</a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="custom-col col-lg-4 col-md-6 col-sm-12">
+                                    <div id="divCTE" class="card mb-4">
+                                        <div class="card-body">
+                                            <div class="d-flex justify-content-between mb-4">
+                                                <h5 class="card-title mt-0">Consent to Establish Details</h5>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-sm-12">
+                                                    <div class="row">
+                                                        <label class="col-lg-5 col-md-3 col-sm-12 col-form-label">Order No </label>
+                                                        <div class="col-lg-7 col-md-9 col-sm-12">
+                                                            <label class="form-control-plaintext"><span class="colon">:</span>@cTEProfile.CTE_ORDER_NO</label>
+                                                        </div>
+                                                        <label class="col-lg-5 col-md-3 col-sm-12 col-form-label">Order Date </label>
+                                                        <div class="col-lg-7 col-md-9 col-sm-12">
+                                                            <label class="form-control-plaintext"><span class="colon">:</span>@cTEProfile.CTE_ORDER_DATE</label>
+                                                        </div>
+
+                                                        @if (cTEProfile.CTEValidityStatus == "Validity Expired")
+                                                        {
+                                                            <label class="col-lg-5 col-md-3 col-sm-12 col-form-label"><span class="text-danger">Validity</span> </label>
+                                                            <div class="col-lg-7 col-md-9 col-sm-12">
+                                                                <label class="form-control-plaintext text-danger "><span class="colon">:</span>@cTEProfile.CTEVALIDITY</label>
+                                                            </div>
+                                                        }
+                                                        else
+                                                        {
+                                                            <label class="col-lg-5 col-md-3 col-sm-12 col-form-label">Validity </label>
+                                                            <div class="col-lg-7 col-md-9 col-sm-12">
+                                                                <label class="form-control-plaintext"><span class="colon">:</span>@cTEProfile.CTEVALIDITY</label>
+                                                            </div>
+                                                        }
+
+                                                    </div>
+                                                </div>
+
+                                            </div>
+                                            <div class="view-more">
+                                                <a href="~/Licensee/UserInformationLiensee/CTEDetails" class="btn btn-outline-info  btn-sm">Fill Details</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="custom-col col-lg-4 col-md-6 col-sm-12">
+                                    <div id="divCTO" class="card approved mb-4">
+                                        <div class="card-body">
+                                            <div class="d-flex justify-content-between mb-4">
+                                                <h5 class="card-title mt-0">Consent to Operate Details</h5>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-sm-12">
+                                                    <div class="row">
+                                                        <label class="col-lg-5 col-md-3 col-sm-12 col-form-label">Order No</label>
+                                                        <div class="col-lg-7 col-md-9 col-sm-12">
+                                                            <label class="form-control-plaintext"><span class="colon">:</span> @cTOProfile.CTO_ORDER_NO</label>
+                                                        </div>
+                                                        <label class="col-lg-5 col-md-3 col-sm-12 col-form-label">Order Date </label>
+                                                        <div class="col-lg-7 col-md-9 col-sm-12">
+                                                            <label class="form-control-plaintext"><span class="colon">:</span>@cTOProfile.CTO_ORDER_DATE</label>
+                                                        </div>
+                                                        @if (cTOProfile.CTOValidityStatus == "Validity Expired")
+                                                        {
+                                                            <label class="col-lg-5 col-md-3 col-sm-12 col-form-label"><span class="text-danger">Validity</span></label>
+                                                            <div class="col-lg-7 col-md-9 col-sm-12">
+                                                                <label class="form-control-plaintext text-danger"><span class="colon">:</span>@cTOProfile.CTOVALIDITY</label>
+                                                            </div>
+                                                        }
+                                                        else
+                                                        {
+                                                            <label class="col-lg-5 col-md-3 col-sm-12 col-form-label">Validity </label>
+                                                            <div class="col-lg-7 col-md-9 col-sm-12">
+                                                                <label class="form-control-plaintext"><span class="colon">:</span>@cTOProfile.CTOVALIDITY</label>
+                                                            </div>
+                                                        }
+
+                                                    </div>
+                                                </div>
+
+                                            </div>
+                                            <div class="view-more">
+                                                <a href="~/Licensee/CTODetail/Create" class="btn btn-outline-info  btn-sm">Fill Details</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="custom-col col-lg-4 col-md-6 col-sm-12">
+                                    <div id="divEnvironmentClearance" class="card mb-4">
+                                        <div class="card-body">
+                                            <div class="d-flex justify-content-between mb-4">
+                                                <h5 class="card-title mt-0">Environment Clearance Details</h5>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-sm-12">
+                                                    <div class="row">
+                                                        <label class="col-lg-4 col-md-3 col-sm-12 col-form-label">Order No.</label>
+                                                        <div class="col-lg-8 col-md-9 col-sm-12">
+                                                            <label class="form-control-plaintext"><span class="colon">:</span>@eCProfile.EC_ORDRER_NUMBER</label>
+                                                        </div>
+                                                        <label class="col-lg-4 col-md-3 col-sm-12 col-form-label">Order Date </label>
+                                                        <div class="col-lg-8 col-md-9 col-sm-12">
+                                                            <label class="form-control-plaintext"><span class="colon">:</span> @eCProfile.EC_APPLICATON_DATE</label>
+                                                        </div>
+
+                                                        @if (eCProfile.ECValidityStatus == "Validity Expired")
+                                                        {
+                                                            <label class="col-lg-4 col-md-3 col-sm-12 col-form-label"><span class="text-danger">Validity</span> </label>
+                                                            <div class="col-lg-8 col-md-9 col-sm-12">
+                                                                <label class="form-control-plaintext text-danger">
+                                                                    <span class="colon">:</span> @eCProfile.EC_VALIDITY
+                                                                    @*<img src="~/CMSimg/expired.png" />*@
+                                                                    @*<i class="icon-pencil-alt-solid"></i>*@
+                                                                </label>
+                                                            </div>
+                                                        }
+                                                        else
+                                                        {
+                                                            <label class="col-lg-4 col-md-3 col-sm-12 col-form-label">Validity</label>
+                                                            <div class="col-lg-8 col-md-9 col-sm-12">
+                                                                <label class="form-control-plaintext">
+                                                                    <span class="colon">:</span> @eCProfile.EC_VALIDITY
+                                                                </label>
+                                                            </div>
+                                                        }
+
+                                                    </div>
+                                                </div>
+
+                                            </div>
+                                            <div class="view-more">
+                                                <a href="~/Licensee/EnvrinmentClearance/ECDetail" class="btn btn-outline-info  btn-sm">Fill Details</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="custom-col col-lg-4 col-md-6 col-sm-12">
+                                    <div id="divMineral" class="card mb-4">
+                                        <div class="card-body">
+                                            <div class="d-flex justify-content-between mb-4">
+                                                <h5 class="card-title mt-0"> Mineral Details</h5>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-sm-12">
+                                                    <div class="row">
+                                                        <label class="col-lg-5 col-md-3 col-sm-12 col-form-label">Mineral Type </label>
+                                                        <div class="col-lg-7 col-md-9 col-sm-12">
+                                                            <label class="form-control-plaintext"><span class="colon">:</span> @mineralProfile.MineralType</label>
+                                                        </div>
+                                                        <label class="col-lg-5 col-md-3 col-sm-12 col-form-label">Mineral Name </label>
+                                                        <div class="col-lg-7 col-md-9 col-sm-12">
+                                                            <label class="form-control-plaintext"><span class="colon">:</span>@mineralProfile.MineralName</label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                            </div>
+                                            <div class="view-more">
+                                                <a href="~/Licensee/Mineralinfo/Create" class="btn btn-outline-info  btn-sm">Fill Details</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+    <!-- MAIN CONTENT AREA ENDS -->
+</section>
+
+

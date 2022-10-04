@@ -1,0 +1,188 @@
+﻿
+@{
+    ViewData["Title"] = "Add";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+@model MasterEF.SinglePaymentHeadModel
+@using MasterEF;
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        @Html.Partial("_CMSnavigation")
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="/Master/PaymentHeadMaster/Add">
+                                Add New Payment Head
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/Master/PaymentHeadMaster/ViewList">
+                                View
+                            </a>
+                        </li>
+                    </ul>
+                    @Html.Partial("_CMSutil")
+                </div>
+
+                <section class="box form-container">
+                    <div class="content-body">
+                        <div class="single-account" id="IdDIVSingleAccount">
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <div class="form-group row">
+                                        <label for="inputName" class="col-sm-3 col-form-label text-left">Select Payment Type<span class="text-danger">*</span></label>
+                                        <div class="col-sm-7">
+                                            <select id="ddlSinglePaymentType" class="form-control form-control-sm searchableselect">
+                                                <option value="">Select Payment Type</option>
+                                                @{
+                                                    List<SinglePaymentHeadModel> singlePaymentHeadModels = (List<SinglePaymentHeadModel>)ViewData["PaymentType"];
+                                                    if (singlePaymentHeadModels != null)
+                                                    {
+                                                        foreach (var item in singlePaymentHeadModels)
+                                                        {
+                                                            //if (item.PaymentType == ((SinglePaymentHeadModel)ViewData["PaymentTypeID"]).PaymentType)
+                                                            if (item.PaymentType == Model.PaymentType)
+                                                            {
+                                                                <option selected="selected" value="@item.PaymentTypeId">@item.PaymentType</option>
+                                                            }
+                                                            else
+                                                            {
+                                                                <option value="@item.PaymentTypeId">@item.PaymentType</option>
+                                                            }
+                                                           
+                                                        }
+                                                    }
+                                                }
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-6">
+                                    <div class="form-group row">
+                                        <label for="inputName" class="col-sm-4 col-form-label">Head Of Account <span class="text-danger">*</span></label>
+                                        <div class="col-sm-7">
+                                            <input type="text" id="txtHeadOfAccount" value="@Model.HeadOFAccount" class="form-control" />
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-6">
+                                    <div class="form-group row">
+                                        <label for="inputName" class="col-sm-3 col-form-label text-left">SBI Scheme Code<span class="text-danger">*</span></label>
+                                        <div class="col-sm-7">
+                                            <input type="text" id="txtSBISchemeCode" value="@Model.SBISchemeCode" class="form-control" />
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-6">
+                                    <div class="form-group row">
+                                        <label for="inputName" class="col-sm-4 col-form-label">HDFC Scheme Code<span class="text-danger">*</span></label>
+                                        <div class="col-sm-7">
+                                            <input type="text" id="txtHDFCSchemeCode" value="@Model.HDFCSchemeCode" class="form-control" />
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-6">
+                                    <div class="form-group row">
+                                        <label for="inputName" class="col-sm-3 col-form-label text-left">ICICI Scheme Code<span class="text-danger">*</span></label>
+                                        <div class="col-sm-7">
+                                            <input type="text" id="txtICICISchemeCode" value="@Model.ICICISchemeCode" class="form-control" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-6 ">
+                            <button onclick="Validate();" class="btn btn-primary btn-md ml-0">@ViewBag.Button</button>
+                            <a href="/Master/PaymentHeadMaster/Add" class="btn btn-danger btn-md">Reset</a>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+</section>
+<input type="hidden" id="hdnHeadId" value="@Model.PaymentHeadId" />
+<input type="hidden" id="hdnPaymentTypeId" value="@Model.PaymentTypeId" />
+<script>
+    indicateMe="yes"
+    $(document).ready(function () {
+        $('.searchableselect').searchableselect();
+        debugger;
+        loadNavigation('EditSinglePaymentHead', 'glRoleRes', 'plUser', 'tl', 'Master', 'Payment Head', ' ');     
+        if ($('#hdnPaymentTypeId').val() != "") {
+            $('#ddlSinglePaymentType').val($('#hdnPaymentTypeId').val());
+        }
+    });
+    var ddlAccountType = $('#ddlAccountType');
+    var ddlSinglePaymentType = $('#ddlSinglePaymentType');
+    var txtHeadOfAccount = $('#txtHeadOfAccount');
+    var txtSBISchemeCode = $('#txtSBISchemeCode');
+    var txtHDFCSchemeCode = $('#txtHDFCSchemeCode');
+    var txtICICISchemeCode = $('#txtICICISchemeCode');
+
+    function Validate() {
+
+        if (ddlSinglePaymentType.val() == "") {
+            swal("", 'Please Select Payment Type', "warning");
+            ddlSinglePaymentType.focus();
+            return false;
+        }
+        if (txtHeadOfAccount.val() == "") {
+            swal("", 'Please Enter Head Of Account', "warning");
+            txtHeadOfAccount.focus();
+            return false;
+        }
+
+        if (txtSBISchemeCode.val() == "") {
+            swal("", 'Please Enter SBI Scheme Code', "warning");
+            txtSBISchemeCode.focus();
+            return false;
+        }
+        if (txtHDFCSchemeCode.val() == "") {
+            swal("", 'Please Enter HDFC Scheme Code', "warning");
+            txtHDFCSchemeCode.focus();
+            return false;
+        }
+        if (txtICICISchemeCode.val() == "") {
+            swal("", 'Please Enter ICICI Scheme Code', "warning");
+            txtICICISchemeCode.focus();
+            return false;
+        }
+
+
+        $.ajax({
+            type: "post",
+            url: "/Master/PaymentHeadMaster/AddSinglePayment",
+            data: {
+                'PaymentHeadId': $('#hdnHeadId').val(), 'PaymentTypeId': ddlSinglePaymentType.val(),
+                'AccountType': 'Single Account', 'DistrictId': null, 'HeadOFAccount': txtHeadOfAccount.val(),
+                'SBISchemeCode': txtSBISchemeCode.val(), 'HDFCSchemeCode': txtHDFCSchemeCode.val(),
+                'ICICISchemeCode': txtICICISchemeCode.val()
+            },
+            dataType: "json",
+            success: function (msg) {
+                if (msg == 1) {
+                    alert("Record has been Modified successfully.");
+                    window.location.href = "/Master/PaymentHeadMaster/ViewList";
+                }
+                else if (msg == 2) {
+                    alert("Record already existed.");
+                }
+
+
+            },
+            error: function (msg) { }
+        });
+
+    }
+
+</script>

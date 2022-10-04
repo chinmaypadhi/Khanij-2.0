@@ -1,0 +1,184 @@
+﻿@*// *********************************************************************************************************
+    //  View Name                : ViewList
+    //  Desciption               : To View and Delete Website Notification Details
+    //  Created By               : Lingaraj Dalai
+    //  Created On               : 08 Oct 2021
+    // ********************************************************************************************************
+*@
+@model IEnumerable<HomeEF.ViewNotificationModel>
+@{
+    ViewData["Title"] = "Archive";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+@if (TempData["Message"] != null)
+{
+    <script>
+        swal("",'@TempData["Message"]',"success");
+    </script>
+}
+<script>
+    deleteMe = "yes";
+    activetMe = "yes";
+    $(document).ready(function () {
+        loadNavigation('Archive', 'glhelpdesk', 'plraiseticket', 'tl', 'CMS', 'Notification', ' ');
+        $('.searchableselect').searchableselect();
+        $('#datatable').DataTable();
+        $('.shorting-lnk').click(function () {
+            $('.shorting-lnk i').toggleClass('fa-sort-amount-up-alt fa-sort-amount-down-alt ');
+        });
+         $("#ckbCheckAll").click(function () {
+            $(".checkBoxClass").prop('checked', $(this).prop('checked'));
+        });
+        $("#deleteIcon").click(function () {
+            var idsToSend = new Array();
+                $('table [type="checkbox"]').each(function () {
+                    if ($(this).is(':checked')) {
+                        idsToSend.push($(this).val());
+                    }
+                });
+            if (idsToSend.length <= 0) {
+                swal("", "Please select Notification to Delete !", "warning");
+                return false;
+            }
+            else {
+                if (confirm("Are you sure to Delete?")) {
+                    $.ajax({
+                        type: "POST",
+                        url: "/Website/Notification/Delete",
+                        data: {
+                            arr: JSON.stringify(idsToSend)
+                        },
+                        dataType: "json",
+                        success: function (result) {
+                            if (result == 4) {
+                                swal("", "Notification Deleted Sucessfully.", "success");
+                            }
+                            else {
+                                swal("", "Something Errror occured. Please Try After Sometime!!", "error");
+                            }
+                              setTimeout(function () {
+                                window.location.href = '@Url.Action("Archive", "Notification", new { Area = "Website" })'
+                            }, 10000);
+                        }
+                    });
+                    idsToSend = [];
+                }
+            }
+        });
+         $("#activeIcon").click(function () {
+            var idsToSend = new Array();
+                $('table [type="checkbox"]').each(function () {
+                    if ($(this).is(':checked')) {
+                        idsToSend.push($(this).val());
+                    }
+                });
+            if (idsToSend.length <= 0) {
+                swal("", "Please select Notification to Active !", "warning");
+                return false;
+            }
+            else {
+                if (confirm("Are you sure to Active?")) {
+                    $.ajax({
+                        type: "POST",
+                        url: "/Website/Notification/Active",
+                        data: {
+                            arr: JSON.stringify(idsToSend)
+                        },
+                        dataType: "json",
+                        success: function (result) {
+                            if (result == 4) {
+                                swal("", "Notification Active Sucessfully!!", "success");
+                            }
+                            else {
+                                swal("", "Something Errror occured. Please Try After Sometime!!", "error");
+                            }
+                            setTimeout(function () {
+                                window.location.href = '@Url.Action("Archive", "Notification", new { Area = "Website" })'
+                            }, 10000);
+                        }
+                    });
+                    idsToSend = [];
+                }
+            }
+        });
+    });
+</script>
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        @Html.Partial("_navigation")
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link" href="~/Website/Notification/Add">
+                                Add
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="~/Website/Notification/ViewList">
+                                View
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="javascript:void(0);">
+                                Archive
+                            </a>
+                        </li>
+                    </ul>
+                    @Html.Partial("_util")
+                </div>
+                <section class="box form-container">
+                    <div class="content-body">
+
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div id="viewtable">
+                                    <table id="datatable" class="table table-sm table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th width="20px" class="text-center">
+                                                    <input type="checkbox" id="ckbCheckAll">
+                                                </th>
+                                                <th width="20px">Sl#</th>
+                                                <th width="120px">Type</th>
+                                                <th>Subject</th>
+                                                <th width="100px">Publish On</th>
+                                                <th width="100px">Created On</th>
+                                                <th class="noprint text-center">Document</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @{
+                                                var count = 0;
+                                                foreach (var item in Model)
+                                                {
+                                                    count++;
+                                                    <tr>
+                                                        <td class="text-center noprint">
+                                                            <input type="checkbox" class="checkBoxClass" id="chk" value="@item.INT_NOTIFICATION_ID">
+                                                        </td>
+                                                        <td>@count</td>
+                                                        <td>@item.VCH_NOTIFICATION_NAME</td>
+                                                        <td>@item.VCH_NOTIFICATION_SUB</td>
+                                                        <td>@item.DTM_PUBLISHED_ON</td>
+                                                        <td>@item.DTM_CREATED_ON</td>
+                                                        <td class="noprint text-center"><a href='~/@item.VCH_UPLOAD_FILE' data-original-title="Download" target="_blank"><i class="icon-file-pdf-solid h5 text-danger"></i></a></td>
+                                                    </tr>
+                                                }
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+    <!-- MAIN CONTENT AREA ENDS -->
+</section>
+
+

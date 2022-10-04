@@ -1,0 +1,139 @@
+﻿@model PermitEF.ePermitModel
+@{
+    ViewData["Title"] = "Add";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+
+@if (ViewBag.msg != null)
+{
+<script>
+        alert('@ViewBag.msg');
+</script>
+}
+
+
+
+
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        <!-- MAIN CONTENT AREA STARTS -->
+        @Html.Partial("_CMSnavigation")
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="#">
+                                New Fifth
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="@Url.Content("~/Permit/PaymentConfig/FifthScheduleView")">
+                                View Fifth Schedule
+                            </a>
+                        </li>
+                    </ul>
+                    @Html.Partial("_CMSutil")
+                    @*<uc1:util runat="server" ID="util" />*@
+                </div>
+
+                <section class="box form-container">
+                    <div class="content-body">
+                        @using (Html.BeginForm("FifthScheduleAdd", "PaymentConfig", FormMethod.Post, new { AUTOCOMPLETE = "Off", id = "form1" }))
+                        {
+                        <div class="row">
+                            <div class="col-lg-6 col-md-12">
+                                <div class="row">
+                                    <label for="inputLoginId" class="col-sm-4 col-form-label font-weight-bold">Mineral Name<span class="text-danger">*</span></label>
+                                    <div class="col-sm-7">
+                                        @Html.DropDownListFor(model => model.MineralId, ViewBag.ViewMineralList as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control form-group", autofocus = "autofocus" })
+                                        @(Html.HiddenFor(model => model.MineralId))
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-6 col-md-12">
+                                <div class="row">
+                                    <label for="inputLoginId" class="col-sm-4 col-form-label font-weight-bold">Description<span class="text-danger">*</span></label>
+                                    <div class="col-sm-7">
+                                        @Html.TextBoxFor(m => m.Description, new { @class = "form-control form-group" })
+                                        @Html.ValidationMessageFor(x => x.Description, "", new { @class = "text-danger", @maxlength = 50 })
+                                        @Html.HiddenFor(m => m.FifthSchId)
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-6 col-md-12">
+                                <div class="row">
+                                    <label for="inputLoginId" class="col-sm-4 col-form-label font-weight-bold">Addtional Rate<span class="text-danger">*</span></label>
+                                    <div class="col-sm-7">
+                                        @Html.TextBoxFor(m => m.AddtionalRate,new { Value = "" , @class = "form-control form-group" })
+                                        @Html.ValidationMessageFor(x => x.AddtionalRate, "", new { @class = "text-danger", @maxlength = 50 })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-6 col-md-12">
+                                <div class="form-group row">
+                                    <label for="inputName" class="col-sm-4 col-form-label font-weight-bold">Status <span class="text-danger">*</span></label>
+                                    <div class="col-sm-7">
+                                        
+                                            @Html.RadioButtonFor(n => n.IsActive, "1" , new { @class = "custom-radio" }) Active
+                                            @Html.RadioButtonFor(n => n.IsActive, "0" , new { @class = "custom-radio ml-2" })Inactive
+                                        
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <input type="submit" value='@ViewBag.Button' class="btn btn-primary btn-md" name="Submit" id="Submit" />
+                                <input type="reset" value="Reset" class="btn btn-danger btn-md" />
+                            </div>
+                        </div>
+                        }
+                    </div>
+                </section>
+            </div>
+
+        </div>
+
+    </div>
+</section>
+
+
+
+
+<script>
+    indicateMe = "yes"
+    backMe = "yes"
+    $(document).ready(function () {
+        loadNavigation('Add', 'glhelpdesk', 'plraiseticket', 'tl', 'Permit', 'Fifth Schedule', ' ');
+        $('.datetime').datetimepicker({
+            format: "DD/MM/YYYY"
+        }).keydown(false);
+    });
+</script>
+<script>
+    $(document).ready(function () {
+        $("#Submit").click(function () {
+            if (!DropDownValidation("MineralId", "Mineral Name")) {
+                return false;
+            }
+            if (!blankFieldValidation("Description", "Description")) {
+                return false;
+            }
+            if (!blankFieldValidation("AddtionalRate", "Addtional Rate")) {
+                return false;
+            }
+
+
+        });
+
+
+    });
+
+</script>

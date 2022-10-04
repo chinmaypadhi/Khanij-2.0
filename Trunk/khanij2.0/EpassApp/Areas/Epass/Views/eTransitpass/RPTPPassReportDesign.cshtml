@@ -1,0 +1,948 @@
+﻿@*// *********************************************************************************************************
+    //  View Name                : RPTPPassportDesign
+    //  Desciption               : To print RPTP Passport Print
+    //  Created By               : Suroj Kumar Pradhan
+    //  Created On               : 25 aug 2021
+    // ********************************************************************************************************
+*@
+
+@model EpassEF.RPTPModel
+@{
+    ViewData["Title"] = "RPTPPassReportDesign";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+@inject EpassApp.KhanijSecurity.KhanijIDataProtection protector;
+<h1>RPTPPassReportDesign</h1>
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        @Html.Partial("_CMSnavigation")
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="Adde-TransitPassTP.aspx">
+                                Add
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link" href="Viewe-TransitPassTP.aspx">
+                                View
+                            </a>
+                        </li>
+
+                    </ul>
+                    @Html.Partial("_CMSutil")
+                </div>
+
+                <section class="box form-container">
+                    <div class="content-body">
+                        @using (Html.BeginForm("", "", FormMethod.Post, new { id = "__EUAntiForgeryForm", @class = "form-horizontal bordered-row" }))
+                        {
+
+                            <div id="PrintAll">
+                                @(Html.HiddenFor(model => model.RoyaltyPaidTransitPassNo))
+                                <div id="TPReport" class="container-fluid pdf-page size-a4">
+                                    <div class="row">
+                                        <div class="col-sm-12">
+                                            <table style="width: 100%;">
+                                                <tr style="border: none;">
+                                                    <td style="border-top: 1px solid black; border-left: 1px solid black;">
+                                                        <img src="~/img/govt-logo.png" class="" width="100" height="100" />
+                                                    </td>
+                                                    <td style="border-top: 1px solid black; border-right: 1px solid black; text-align: center">
+                                                        <span id="lead2" class="lead" style="font-size: 30px; text-align: center; color: red">GOVERNMENT OF CHHATTISGARH</span>
+                                                        <br />
+                                                        <span id="lead1" class="lead" style="font-size: 25px; text-align: center">MINERAL RESOURCES DEPARTMENT</span>
+                                                        <br />
+                                                        <span id="lead3" class="lead" style="font-size: 20px; text-align: center;">(@Html.DisplayFor(model => model.DistrictName) District)</span>
+                                                        @if (Model.RePrintCount != null)
+                                                        {
+                                                            <h5 style="text-align: right; margin-top: 0px; margin-right: 10px;">
+                                                                <strong class="text-danger">@Model.RePrintCount  </strong>
+                                                            </h5>
+                                                        }
+                                                        @if (ViewBag.usertype == "End User")
+                                                        {
+                                                            <h5 style="text-align: right; margin-top: 0px; margin-right: 10px;">
+                                                                <strong>Copy For : End User </strong>(प्रति : अंतिम उपयोगकर्ता)
+                                                            </h5>
+                                                        }
+                                                        else
+                                                        {
+                                                            <h5 style="text-align: right; margin-top: 0px; margin-right: 10px;">
+                                                                <strong>Copy For : Licensee </strong>(प्रति : अनुज्ञप्ति)
+                                                            </h5>
+                                                        }
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                            <table class="" border="1" style="width: 100%;">
+                                                <tbody>
+                                                    <tr>
+                                                        <td style="width: 60%;">
+                                                            <strong>
+                                                                FORM-10
+                                                                See Rule 13 (iii)
+                                                                Royalty Paid Transit Pass
+                                                                <br />
+                                                            </strong>
+                                                            प्ररूप -१0 (नियम -१३ (३) देखिये) रॉयल्टी पेड अभिवहन पास
+                                                        </td>
+                                                        <td style="text-align: center; width: 60%;">
+                                                            <div class="barcode-title">
+                                                                <p><strong>Royalty Paid Transit Pass Number </strong>(रॉयल्टी भुगतान अभिवहन पास क्रमांक) : </p>
+                                                                <p><strong>--------------------------------------------------------- </strong></p>
+                                                                @*<p class="text-center">@(Html.DisplayFor(model => model.TransitPassNumber))</p>*@
+                                                                <p class="BarCodeNumber" id="BarCodeNumber"></p>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>
+                                                            <strong>District</strong> (जिला)
+                                                            <br />
+                                                            <strong>Issue Date & Time</strong> (जारी करने का दिनांक एवं समय)
+                                                        </td>
+                                                        <td>
+                                                            @(Html.DisplayFor(model => model.DistrictName))<br />
+                                                            @if (Model != null && Model.GrossWeight != null && Model.GrossWeight > 0)
+                                                            {
+                                                                @(Html.DisplayFor(model => model.IssueDateTimeTp))
+
+
+                                                            }
+                                                            else
+                                                            {
+                                                                @(Html.DisplayFor(model => model.IssueDateTimeTp))
+                                                            }
+                                                        </td>
+                                                    </tr>
+
+                                                    <tr>
+                                                        @if (Model != null && Model.RailwayId != null && Model.RailwayId > 0)
+                                                        {
+                                                            <td>
+                                                                @*<strong>RTP Permit No. (RTP - परमिट क्रं.)</strong>*@
+                                                                <strong>E-Permit No.</strong> (ई - परमिट क्रं.)
+                                                                <br />
+                                                            </td>
+                                                            <td>@(Html.DisplayFor(model => model.BulkPermitNo))</td>
+                                                        }
+                                                        else
+                                                        {
+                                                            <td>
+                                                                <strong>E-Permit No.</strong> (ई - परमिट क्रं.)
+                                                                <br />
+                                                            </td>
+                                                            <td>@(Html.DisplayFor(model => model.BulkPermitNo))</td>
+                                                        }
+                                                    </tr>
+
+                                                    @if (Model != null && (Model.RailwayId == null || Model.RailwayId == 0))
+                                                    {
+                                                        <tr>
+                                                            <td>
+                                                                <strong>Vehicle Type</strong> (वाहन का प्रकार)
+                                                                <br />
+                                                                <strong>Vehicle No</strong> (वाहन क्रमांक)
+                                                                <br />
+                                                                <strong>Portal Registration No. of Vehicle </strong>(पोर्टल पंजीकरण क्रमांक)
+                                                            </td>
+                                                            <td>
+                                                                @(Html.DisplayFor(model => model.VehicleType))
+                                                                <br />
+                                                                @(Html.DisplayFor(model => model.VehicleNumber))
+                                                                <br />
+                                                                @* @if(Model.VehicleId == 0)
+                                                                    {
+                                                                        @(Html.Label("Not Applicable"))
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        @(Html.DisplayFor(model => model.VehicleId))
+                                                                    }*@
+                                                                @(Html.DisplayFor(model => model.VehicleCHiMMSNo))
+
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>
+                                                                <strong>Name and Address of the Permit Holder </strong>(अनुज्ञप्तिधारी का नाम एवं पता)
+                                                            </td>
+                                                            <td>@(Html.DisplayFor(model => model.AddressOfLicenseHolder))</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>
+                                                                <strong>Licensee Area Details</strong> (लाइसेंस क्षेत्र का विवरण)
+                                                                <br />
+                                                                <strong>Village/Tehsil/District</strong> (ग्राम / तहसील / जिला)
+                                                            </td>
+                                                            <td>
+                                                                @(Html.DisplayFor(model => model.VillageName)) / @(Html.DisplayFor(model => model.TehsilName)) / @(Html.DisplayFor(model => model.DistrictName))
+                                                            </td>
+                                                        </tr>
+                                                    }
+
+                                                    <tr>
+                                                        <td>
+                                                            <strong>Name of Mineral(s)/Products</strong> खनिज(खनिजों)/उत्पादों का नाम
+                                                            <br />
+                                                        </td>
+                                                        <td>
+                                                            @(Html.DisplayFor(model => model.MineralName))
+                                                        </td>
+                                                    </tr>
+
+
+                                                    <tr>
+                                                        <td>
+                                                            <strong>Grade</strong> (ग्रेड)
+                                                            <br />
+                                                        </td>
+                                                        <td>
+                                                            @(Html.DisplayFor(model => model.MineralGrade))
+                                                        </td>
+                                                    </tr>
+                                                    @if (Model != null && Model.RailwayId == null)
+                                                    {
+                                                        <tr>
+                                                            <td>
+                                                                <strong>
+                                                                    Sale value of the Mineral (In Rs per Ton / Cubic Meter)
+                                                                    <br />
+                                                                </strong>
+                                                                (खनिज का विक्रय मूल्य (रु. प्रति टन / प्रति घनमीटर))
+
+                                                                <br />
+                                                            </td>
+                                                            <td>
+                                                                Rs @(Html.DisplayFor(model => model.MineralSaleValue)) / @(Html.DisplayFor(model => model.UnitName))
+                                                            </td>
+                                                        </tr>
+                                                    }
+
+                                                    @if (Model != null && Model.RailwayId != null && Model.RailwayId > 0)
+                                                    {
+                                                        <tr>
+                                                            <td>
+                                                                <strong>Qunatity of Mineral (Tonne/Cubic Meter) </strong>
+                                                                (खनिज की मात्रा (टन/घनमीटर))
+
+                                                            </td>
+                                                            <td>Rs @(Html.DisplayFor(model => model.RailQty)) / @(Html.DisplayFor(model => model.UnitName))</td>
+                                                        </tr>
+
+                                                    }
+                                                    else
+                                                    {
+                                                        if (Model != null && Model.TareWeight != null && Model.TareWeight > 0)
+                                                        {
+                                                            <tr>
+                                                                <td>
+                                                                    <strong>Tare Weight (Qty.)</strong> (वाहन का टेयर वेट (टन))
+                                                                    <br />
+                                                                </td>
+                                                                <td>
+                                                                    @if (Model != null && Model.TareWeight != null && Model.TareWeight > 0)
+                                                                    {
+                                                                        @(Html.DisplayFor(model => model.TareWeight))
+                                                                        @(Html.DisplayFor(model => model.UnitName))
+
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        @(Html.DisplayFor(model => model.TareWeight))
+                                                                        @(Html.DisplayFor(model => model.UnitName))
+                                                                    }
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>
+                                                                    <strong>Gross Weight (Qty.)</strong> (वाहन का ग्रॉस वेट (टन))
+                                                                    <br />
+                                                                </td>
+                                                                <td>
+                                                                    @if (Model != null && Model.GrossWeight != null && Model.GrossWeight > 0)
+                                                                    {
+                                                                        @(Html.DisplayFor(model => model.GrossWeight))
+                                                                        @(Html.DisplayFor(model => model.UnitName))
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        @(Html.DisplayFor(model => model.GrossWeight))
+                                                                        @(Html.DisplayFor(model => model.UnitName))
+                                                                    }
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>
+                                                                    <strong>Net Weight of Mineral (Qty.) </strong>(परिवहन किये जा रहे खनिज की मात्रा (टन))
+                                                                    <br />
+                                                                </td>
+                                                                <td>
+                                                                    @if (Model != null && Model.NetWeight != null && Model.NetWeight > 0)
+                                                                    {
+                                                                        @(Html.DisplayFor(model => model.NetWeight))
+                                                                        @(Html.DisplayFor(model => model.UnitName))
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        @(Html.DisplayFor(model => model.NetWeight))
+                                                                        @(Html.DisplayFor(model => model.UnitName))
+                                                                    }
+                                                                </td>
+                                                            </tr>
+                                                        }
+                                                        else
+                                                        {
+                                                            <tr>
+                                                                <td>
+                                                                    <strong>Total Weight (Qty.)</strong> (वाहन का कुल वेट (टन))
+                                                                    <br />
+                                                                </td>
+                                                                <td>
+                                                                    @if (Model != null && Model.NetWeight != null && Model.NetWeight > 0)
+                                                                    {
+                                                                        @(Html.DisplayFor(model => model.NetWeight))
+                                                                        @(Html.DisplayFor(model => model.UnitName))
+
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        @(Html.DisplayFor(model => model.NetWeight))
+                                                                        @(Html.DisplayFor(model => model.UnitName))
+                                                                    }
+                                                                </td>
+                                                            </tr>
+                                                        }
+                                                    }
+                                                    <tr>
+                                                        <td>
+                                                            <strong>Name of Consignee </strong>(भेजने वाले का नाम)
+                                                            <br />
+                                                        </td>
+                                                        <td>
+                                                            @(Html.DisplayFor(model => model.ApplicantName))
+                                                        </td>
+                                                    </tr>
+                                                    @if (Model != null && Model.DateOfDispatcheString != "")
+                                                    {
+                                                        <tr>
+                                                            <td>
+                                                                <strong>Date & Time of Dispatch from the place of storage (as mentioned in permit)</strong> भंडारण स्थल से प्रेषण की तारीख व समय (अनुज्ञप्ती उल्लेखित)
+                                                                <br />
+                                                            </td>
+                                                            <td>
+                                                                @(Html.DisplayFor(model => model.DateOfDispatcheString))
+                                                            </td>
+                                                        </tr>
+                                                    }
+                                                    <tr>
+                                                        <td>
+                                                            <strong>
+                                                                Mineral Purchaser / Recipient’s Name
+                                                                <br />
+                                                            </strong>
+                                                            (खनिज क्रेता / प्राप्तकर्ता का नाम)
+
+                                                            <br />
+                                                        </td>
+                                                        <td>@(Html.DisplayFor(model => model.PurchaserConsigneeName))</td>
+                                                    </tr>
+
+                                                    @if (Model != null && Model.RailwayId != null && Model.RailwayId > 0)
+                                                    {
+                                                        <tr>
+                                                            <td>
+                                                                <strong>Name of Railway Sliding </strong>(रेल्वे स्लाइडिंग का नाम )
+                                                            </td>
+                                                            <td>
+                                                                @(Html.DisplayFor(model => model.NameofRailwaySlidingName))
+                                                            </td>
+                                                        </tr>
+
+                                                        <tr>
+                                                            <td>
+                                                                <strong>Railway Division / Zone Name </strong>(रेल्वे डिवीज़न / जोन नाम )
+                                                            </td>
+                                                            <td>
+                                                                @(Html.DisplayFor(model => model.RailwayZoneName))
+                                                            </td>
+                                                        </tr>
+                                                    }
+                                                    else
+                                                    {
+                                                        if (Model != null && Model.NameOfCarrierOwner != "" && Model.NameOfCarrierDriver != "")
+                                                        {
+                                                            <tr>
+                                                                <td>
+                                                                    <strong>
+                                                                        Owner (Vehicle)  Name & Contact Number
+                                                                        <br />
+                                                                    </strong>
+                                                                    (वाहन मालिक (परिवहनकर्ता) का नाम एवं दूरभाष क्रमांक)
+
+                                                                    <br />
+                                                                </td>
+                                                                <td>
+                                                                    @if (Model != null && Model.GrossWeight != null && Model.GrossWeight > 0)
+                                                                    {
+                                                                        <span>@(Html.DisplayFor(model => model.NameOfCarrierOwner)) </span>
+                                                                        //(@Html.DisplayFor(model => model.TransporterMobile))
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <span>@(Html.DisplayFor(model => model.NameOfCarrierOwner)) </span>
+                                                                        //(@Html.DisplayFor(model => model.TransporterMobile))
+                                                                    }
+                                                                </td>
+                                                            </tr>
+
+                                                            <tr>
+                                                                <td>
+                                                                    <strong>
+                                                                        Driver Name & Contact Number
+                                                                        <br />
+                                                                    </strong>
+                                                                    (वाहन चालक का नाम एवं दूरभाष क्रमांक)
+
+                                                                    <br />
+                                                                </td>
+                                                                <td>
+                                                                    @if (Model != null && Model.GrossWeight != null && Model.GrossWeight > 0)
+                                                                    {
+                                                                        <span>@(Html.DisplayFor(model => model.NameOfCarrierDriver))</span>
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <span>@(Html.DisplayFor(model => model.NameOfCarrierDriver))</span>
+                                                                    }
+
+                                                                </td>
+                                                            </tr>
+                                                        }
+                                                    }
+                                                    @*  <tr>
+                                                            <td>
+                                                                <strong>Mode of Transportation </strong>(परिवहन पथ का प्रकार)
+                                                                <br />
+                                                            </td>
+                                                            <td>@(Html.DisplayFor(model => model.TransportationMode))</td>
+                                                        </tr>*@
+                                                    <tr>
+                                                        <td>
+                                                            <strong>
+                                                                Sale value of the Mineral
+                                                                <br />
+                                                            </strong>
+                                                            (खनिज का विक्रय मूल्य)
+
+                                                            <br />
+                                                        </td>
+                                                        <td>
+                                                            Rs @(Html.DisplayFor(model => model.MineralSaleValue)) / @(Html.DisplayFor(model => model.UnitName))
+                                                        </td>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <td>
+                                                            <strong>Route</strong> (मार्ग)
+                                                            <br />
+                                                        </td>
+                                                        <td>@(Html.DisplayFor(model => model.RouteName))</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>
+                                                            <strong>Destination of dispatch</strong> (प्रेषण का गंतव्य)
+                                                            <br />
+                                                        </td>
+                                                        <td>@(Html.DisplayFor(model => model.Destination))</td>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <td colspan="2" style="font-size: 12px; text-align: left">
+                                                            <label>
+                                                                <i>This is a system generated e-Transit Pass. So physical signature is not required. Generated Time : @Model.SystemDateTime.ToString("dd/MM/yyyy hh:mm:ss tt") </i>
+                                                            </label>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                                <span class="page-break"></span>
+                                <footer></footer>
+
+                                <div id="TPReport3" class="container-fluid pdf-page size-a4">
+                                    <div class="row">
+                                        <div class="col-sm-12">
+                                            <table style="width: 100%;">
+                                                <tr style="border: none;">
+                                                    <td style="border-top: 1px solid black; border-left: 1px solid black;">
+                                                        <img src="~/img/govt-logo.png" class="" width="100" height="100" />
+                                                    </td>
+                                                    <td style="border-top: 1px solid black; border-right: 1px solid black; text-align: center">
+                                                        <span id="lead4" class="lead" style="font-size: 30px; text-align: center; color: red">GOVERNMENT OF CHHATTISGARH</span>
+                                                        <br />
+                                                        <span id="lead5" class="lead" style="font-size: 25px; text-align: center">MINERAL RESOURCES DEPARTMENT</span>
+                                                        <br />
+                                                        <span id="lead6" class="lead" style="font-size: 20px; text-align: center;">(@Html.DisplayFor(model => model.DistrictName) District)</span>
+                                                        @if (@Model.RePrintCount != null)
+                                                        {
+                                                            <h5 style="text-align: right; margin-top: 0px; margin-right: 10px;">
+                                                                <strong class="text-danger">@Model.RePrintCount  </strong>
+                                                            </h5>
+                                                        }
+                                                        <h5 style="text-align: right; margin-top: 0px; margin-right: 10px;">
+                                                            <strong>Copy For : Purchaser / Consignee </strong>(प्रति : क्रेता / परेषिती(माल पानेवाला))
+                                                        </h5>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                            <table class="" border="1" style="width: 100%;">
+                                                <tbody>
+                                                    <tr>
+                                                        <td style="width: 60%;">
+                                                            <strong>
+                                                                FORM-10
+                                                                See Rule 13 (iii)
+                                                                Royalty Paid Transit Pass
+                                                                <br />
+                                                            </strong>
+                                                            प्ररूप -१0 (नियम -१३ (३) देखिये) रॉयल्टी पेड अभिवहन पास
+                                                        </td>
+                                                        <td style="text-align: center; width: 60%;">
+                                                            <div class="barcode-title">
+                                                                <p><strong>Royalty Paid Transit Pass Number</strong> (रॉयल्टी भुगतान अभिवहन पास क्रमांक) : </p>
+                                                                <p><strong>--------------------------------------------------------- </strong></p>
+                                                                @*<p class="text-center">@(Html.DisplayFor(model => model.TransitPassNumber))</p>*@
+                                                                <p class="BarCodeNumber" id="BarCodeNumber"></p>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>
+                                                            <strong>District </strong>(जिला)
+                                                            <br />
+                                                            <strong>Issue Date & Time </strong>(जारी करने का दिनांक एवं समय)
+                                                        </td>
+                                                        <td>
+                                                            @(Html.DisplayFor(model => model.DistrictName))<br />
+                                                            @if (Model != null && Model.GrossWeight != null && Model.GrossWeight > 0)
+                                                            {
+                                                                @(Html.DisplayFor(model => model.IssueDateTimeTp))
+
+
+                                                            }
+                                                            else
+                                                            {
+                                                                @(Html.DisplayFor(model => model.IssueDateTimeTp))
+                                                            }
+                                                        </td>
+                                                    </tr>
+
+                                                    <tr>
+                                                        @if (Model != null && Model.RailwayId != null && Model.RailwayId > 0)
+                                                        {
+                                                            <td>
+                                                                @*<strong>RTP Permit No. (RTP - परमिट क्रं.)</strong>*@
+                                                                <strong>E-Permit No.</strong> (ई - परमिट क्रं.)
+                                                                <br />
+                                                            </td>
+                                                            <td>@(Html.DisplayFor(model => model.BulkPermitNo))</td>
+                                                        }
+                                                        else
+                                                        {
+                                                            <td>
+                                                                <strong>E-Permit No.</strong> (ई - परमिट क्रं.)
+                                                                <br />
+                                                            </td>
+                                                            <td>@(Html.DisplayFor(model => model.BulkPermitNo))</td>
+                                                        }
+                                                    </tr>
+
+                                                    @if (Model != null && (Model.RailwayId == null || Model.RailwayId == 0))
+                                                    {
+                                                        <tr>
+                                                            <td>
+                                                                <strong>Vehicle Type</strong> (वाहन का प्रकार)
+                                                                <br />
+                                                                <strong>Vehicle No</strong> (वाहन क्रमांक)
+                                                                <br />
+                                                                <strong>Portal Registration No. of Vehicle </strong>(पोर्टल पंजीकरण क्रमांक)
+                                                            </td>
+                                                            <td>
+                                                                @(Html.DisplayFor(model => model.VehicleType))
+                                                                <br />
+                                                                @(Html.DisplayFor(model => model.VehicleNumber))
+                                                                <br />
+                                                                @* @if(Model.VehicleId == 0)
+                                                                    {
+                                                                        @(Html.Label("Not Applicable"))
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        @(Html.DisplayFor(model => model.VehicleId))
+                                                                    }*@
+                                                                @(Html.DisplayFor(model => model.VehicleCHiMMSNo))
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>
+                                                                <strong>Name and Address of the Permit Holder </strong>(अनुज्ञप्तिधारी का नाम एवं पता)
+                                                            </td>
+                                                            <td>@(Html.DisplayFor(model => model.AddressOfLicenseHolder))</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>
+                                                                <strong>Mining Area Details</strong> (खान क्षेत्र का विवरण)
+                                                                <br />
+                                                                <strong>Village/Tehsil/District </strong>(ग्राम / तहसील / जिला)
+                                                            </td>
+                                                            <td>
+                                                                @(Html.DisplayFor(model => model.VillageName)) / @(Html.DisplayFor(model => model.TehsilName)) / @(Html.DisplayFor(model => model.DistrictName))
+                                                            </td>
+                                                        </tr>
+                                                    }
+                                                    @*<tr>
+                                                            <td>
+                                                                <strong>Area in Hectare (रकबा हेक्टेयर)</strong>
+                                                                <br />
+                                                            </td>
+                                                            <td>
+                                                                @(Html.DisplayFor(model => model.Area))
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>
+                                                                <strong>Lease Validity Period (अनुज्ञप्ति  / पटटा अवधि)</strong>
+                                                                <br />
+                                                            </td>
+                                                            <td>@(Html.DisplayFor(model => model.LeaseFromDate)) to @(Html.DisplayFor(model => model.LeaseToDate)) @(Html.DisplayFor(model => model.LeaseValidity))</td>
+                                                        </tr>*@
+
+                                                    <tr>
+                                                        <td>
+                                                            <strong>Name of Mineral(s)/Products </strong>खनिज(खनिजों)/उत्पादों का नाम
+                                                            <br />
+                                                        </td>
+                                                        <td>
+                                                            @(Html.DisplayFor(model => model.MineralName))
+                                                        </td>
+                                                    </tr>
+
+                                                    @*<tr>
+                                                            <td>
+                                                                <strong>Category (Mineral form viz. lump/fines/steam/slack etc.)
+                                                                            <br />
+                                                                    (खनिज श्रेणी (खनिज  प्रकार जैसे लम्प / फाईन्स / स्टीम / स्लैक / अन्य))
+                                                                </strong>
+                                                                <br />
+                                                            </td>
+                                                            <td>@(Html.DisplayFor(model => model.MineralNature)) </td>
+                                                        </tr>*@
+                                                    <tr>
+                                                        <td>
+                                                            <strong>Grade</strong> (ग्रेड)
+                                                            <br />
+                                                        </td>
+                                                        <td>
+                                                            @(Html.DisplayFor(model => model.MineralGrade))
+                                                        </td>
+                                                    </tr>
+                                                    @if (Model != null && Model.RailwayId == null)
+                                                    {
+                                                        <tr>
+                                                            <td>
+                                                                <strong>
+                                                                    Sale value of the Mineral (In Rs per Ton / Cubic Meter)
+                                                                    <br />
+                                                                </strong>
+                                                                (खनिज का विक्रय मूल्य (रु. प्रति टन / प्रति घनमीटर))
+
+                                                                <br />
+                                                            </td>
+                                                            <td>
+                                                                Rs @(Html.DisplayFor(model => model.MineralSaleValue)) / @(Html.DisplayFor(model => model.UnitName))
+                                                            </td>
+                                                        </tr>
+                                                    }
+
+                                                    @if (Model != null && Model.RailwayId != null && Model.RailwayId > 0)
+                                                    {
+                                                        <tr>
+                                                            <td>
+                                                                <strong>Qunatity of Mineral (Tonne/Cubic Meter) </strong>
+                                                                (खनिज की मात्रा (टन/घनमीटर))
+
+                                                            </td>
+                                                            <td>Rs @(Html.DisplayFor(model => model.RailQty)) / @(Html.DisplayFor(model => model.UnitName))</td>
+                                                        </tr>
+
+                                                    }
+                                                    else
+                                                    {
+                                                        if (Model != null && Model.TareWeight != null && Model.TareWeight > 0)
+                                                        {
+                                                            <tr>
+                                                                <td>
+                                                                    <strong>Tare Weight (Qty.)</strong> (वाहन का टेयर वेट (टन))
+                                                                    <br />
+                                                                </td>
+                                                                <td>
+                                                                    @if (Model != null && Model.TareWeight != null && Model.TareWeight > 0)
+                                                                    {
+                                                                        @(Html.DisplayFor(model => model.TareWeight))
+                                                                        @(Html.DisplayFor(model => model.UnitName))
+
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        @(Html.DisplayFor(model => model.TareWeight))
+                                                                        @(Html.DisplayFor(model => model.UnitName))
+                                                                    }
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>
+                                                                    <strong>Gross Weight (Qty.)</strong> (वाहन का ग्रॉस वेट (टन))
+                                                                    <br />
+                                                                </td>
+                                                                <td>
+                                                                    @if (Model != null && Model.GrossWeight != null && Model.GrossWeight > 0)
+                                                                    {
+                                                                        @(Html.DisplayFor(model => model.GrossWeight))
+                                                                        @(Html.DisplayFor(model => model.UnitName))
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        @(Html.DisplayFor(model => model.GrossWeight))
+                                                                        @(Html.DisplayFor(model => model.UnitName))
+                                                                    }
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>
+                                                                    <strong>Net Weight of Mineral (Qty.) </strong>(परिवहन किये जा रहे खनिज की मात्रा (टन))
+                                                                    <br />
+                                                                </td>
+                                                                <td>
+                                                                    @if (Model != null && Model.NetWeight != null && Model.NetWeight > 0)
+                                                                    {
+                                                                        @(Html.DisplayFor(model => model.NetWeight))
+                                                                        @(Html.DisplayFor(model => model.UnitName))
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        @(Html.DisplayFor(model => model.NetWeight))
+                                                                        @(Html.DisplayFor(model => model.UnitName))
+                                                                    }
+                                                                </td>
+                                                            </tr>
+                                                        }
+                                                        else
+                                                        {
+                                                            <tr>
+                                                                <td>
+                                                                    <strong>Total Weight (Qty.) </strong>(वाहन का कुल वेट (टन))
+                                                                    <br />
+                                                                </td>
+                                                                <td>
+                                                                    @if (Model != null && Model.NetWeight != null && Model.NetWeight > 0)
+                                                                    {
+                                                                        @(Html.DisplayFor(model => model.NetWeight))
+                                                                        @(Html.DisplayFor(model => model.UnitName))
+
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        @(Html.DisplayFor(model => model.NetWeight))
+                                                                        @(Html.DisplayFor(model => model.UnitName))
+                                                                    }
+                                                                </td>
+                                                            </tr>
+                                                        }
+                                                    }
+                                                    <tr>
+                                                        <td>
+                                                            <strong>Name of Consignee </strong>(भेजने वाले का नाम)
+                                                            <br />
+                                                        </td>
+                                                        <td>
+                                                            @(Html.DisplayFor(model => model.ApplicantName))
+                                                        </td>
+                                                    </tr>
+                                                    @if (Model != null && Model.DateOfDispatcheString != "")
+                                                    {
+                                                        <tr>
+                                                            <td>
+                                                                <strong>Date & Time of Dispatch from the place of storage (as mentioned in permit)</strong> भंडारण स्थल से प्रेषण की तारीख व समय (अनुज्ञप्ती उल्लेखित)
+                                                                <br />
+                                                            </td>
+                                                            <td>
+                                                                @(Html.DisplayFor(model => model.DateOfDispatcheString))
+                                                            </td>
+                                                        </tr>
+                                                    }
+                                                    <tr>
+                                                        <td>
+                                                            <strong>
+                                                                Mineral Purchaser / Recipient’s Name
+                                                                <br />
+                                                            </strong>
+                                                            (खनिज क्रेता / प्राप्तकर्ता का नाम)
+
+                                                            <br />
+                                                        </td>
+                                                        <td>@(Html.DisplayFor(model => model.PurchaserConsigneeName))</td>
+                                                    </tr>
+
+                                                    @if (Model != null && Model.RailwayId != null && Model.RailwayId > 0)
+                                                    {
+                                                        <tr>
+                                                            <td>
+                                                                <strong>Name of Railway Sliding </strong>(रेल्वे स्लाइडिंग का नाम )
+                                                            </td>
+                                                            <td>
+                                                                @(Html.DisplayFor(model => model.NameofRailwaySlidingName))
+                                                            </td>
+                                                        </tr>
+
+                                                        <tr>
+                                                            <td>
+                                                                <strong>Railway Division / Zone Name </strong>(रेल्वे डिवीज़न / जोन नाम )
+                                                            </td>
+                                                            <td>
+                                                                @(Html.DisplayFor(model => model.RailwayZoneName))
+                                                            </td>
+                                                        </tr>
+                                                    }
+                                                    else
+                                                    {
+                                                        if (Model != null && Model.NameOfCarrierOwner != "" && Model.NameOfCarrierDriver != "")
+                                                        {
+                                                            <tr>
+                                                                <td>
+                                                                    <strong>
+                                                                        Owner (Vehicle)  Name & Contact Number
+                                                                        <br />
+                                                                    </strong>
+                                                                    (वाहन मालिक (परिवहनकर्ता) का नाम एवं दूरभाष क्रमांक)
+
+                                                                    <br />
+                                                                </td>
+                                                                <td>
+                                                                    @if (Model != null && Model.GrossWeight != null && Model.GrossWeight > 0)
+                                                                    {
+                                                                        <span>@(Html.DisplayFor(model => model.NameOfCarrierOwner)) </span>
+                                                                        //(@Html.DisplayFor(model => model.TransporterMobile))
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <span>@(Html.DisplayFor(model => model.NameOfCarrierOwner)) </span>
+                                                                        //(@Html.DisplayFor(model => model.TransporterMobile))
+                                                                    }
+                                                                </td>
+                                                            </tr>
+
+                                                            <tr>
+                                                                <td>
+                                                                    <strong>
+                                                                        Driver Name & Contact Number
+                                                                        <br />
+                                                                    </strong>
+                                                                    (वाहन चालक का नाम एवं दूरभाष क्रमांक)
+
+                                                                    <br />
+                                                                </td>
+                                                                <td>
+                                                                    @if (Model != null && Model.GrossWeight != null && Model.GrossWeight > 0)
+                                                                    {
+                                                                        <span>@(Html.DisplayFor(model => model.NameOfCarrierDriver))</span>
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <span>@(Html.DisplayFor(model => model.NameOfCarrierDriver))</span>
+                                                                    }
+
+                                                                </td>
+                                                            </tr>
+                                                        }
+                                                    }
+                                                    @*<tr>
+                                                            <td>
+                                                                <strong>Mode of Transportation </strong>(परिवहन पथ का प्रकार)
+                                                                <br />
+                                                            </td>
+                                                            <td>@(Html.DisplayFor(model => model.TransportationMode))</td>
+                                                        </tr>*@
+                                                    <tr>
+                                                        <td>
+                                                            <strong>
+                                                                Sale value of the Mineral
+                                                                <br />
+                                                            </strong>
+                                                            (खनिज का विक्रय मूल्य)
+
+                                                            <br />
+                                                        </td>
+                                                        <td>
+                                                            Rs @(Html.DisplayFor(model => model.MineralSaleValue)) / @(Html.DisplayFor(model => model.UnitName))
+                                                        </td>
+                                                    </tr>
+                                                    @*   @if (Model != null && Model.RailwayId == null)
+                                                        {
+                                                            <tr>
+                                                                <td>
+                                                                    <strong>Route </strong>(परिवहन मार्ग (व्हाया))
+                                                                    <br />
+                                                                </td>
+                                                                <td>@(Html.DisplayFor(model => model.RouteName))</td>
+                                                            </tr>
+                                                        }*@
+
+                                                    <tr>
+                                                        <td>
+                                                            <strong>Route</strong> (मार्ग)
+                                                            <br />
+                                                        </td>
+                                                        <td>@(Html.DisplayFor(model => model.RouteName))</td>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <td>
+                                                            <strong>Destination of dispatch</strong> (प्रेषण का गंतव्य)
+                                                            <br />
+                                                        </td>
+                                                        <td>@(Html.DisplayFor(model => model.Destination))</td>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <td colspan="2" style="font-size: 12px; text-align: left">
+                                                            <label>
+                                                                <i>This is a system generated e-Transit Pass. So physical signature is not required. Generated Time : @Model.SystemDateTime.ToString("dd/MM/yyyy hh:mm:ss tt") </i>
+                                                            </label>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        }
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN CONTENT AREA ENDS -->
+</section>

@@ -1,0 +1,136 @@
+﻿@*// *********************************************************************************************************
+    //  View Name                : View LeaveAssignClassWise
+    //  Desciption               : To View LeaveAssignClassWise
+    //  Created By               : Suresh kumar behera
+    //  Created On               : 13-july-2021
+    // ********************************************************************************************************
+*@
+@model IEnumerable<EstablishmentEf.LeaveAssignClassWiseQuery>
+@{
+    ViewData["Title"] = "ViewLeaveAssignClassWise";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+@inject EstablishmentApp.KhanijSecurity.KhanijIDataProtection protector;
+
+@if (TempData["msg"] != null)
+{
+    <script>
+        var vv = '@TempData["msg"]';
+        if (vv == 1) {
+            swal("", "Apply leave assign successfully.", "success");
+        }
+        else if (vv == 2) {
+            swal("", "leave assign allready exists.", "warning");
+        }
+        else if (vv == 3) {
+            swal("", "leave assign updated sucessfully", "success");
+        }
+        else if (vv == 4) {
+            swal("", "leave assign  deleted sucessfully", "success");
+        }
+        else if (vv == 5) {
+            swal("", "leave assign  allredy approved", "warning");
+        }
+        else {
+            swal("", "Something Errror occured. Please Try After Sometime!!", "error");
+        }
+    </script>
+
+    TempData["msg"] = null;
+
+}
+
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        @*@Html.Partial("_navigation")*@
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link" href="@Url.Content("~/LeaveManagement/LeaveAssignClassWise/AddLeaveAssignClassWise")">
+                                Add leave assign Class wise
+                            </a>
+                        </li>
+                        <li class="nav-item">
+
+                            <a class="nav-link active" href="javascript:void(0);">
+                                View leave assign Class wise
+                            </a>
+                        </li>
+                    </ul>
+                    @*@Html.Partial("_util")*@
+                </div>
+                <section class="box form-container">
+                    <div class="content-body pt-0">
+                        <div class="legend-box">
+                            <ul class="d-flex mb-1 justify-content-end list-unstyled">
+                                <li><span class="bg-success"></span> Active</li>
+                                <li><span class="bg-warning"></span> Inactive</li>
+                            </ul>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-12">
+                                @*<div class="table-responsive" id="viewtable">*@
+                                    <table id="table-exports" class="table table-sm table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th width="30px">Sl#</th>
+                                                <th>Employee Calss</th>
+                                                <th>Leave Type</th>
+                                                <th>No of Days</th>
+                                                <th width="60px" class="noprint">Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @{
+                                                var count = 0;
+                                                foreach (var item in Model)
+                                                {
+                                                    count++;
+
+                                                    <tr class="active-row">
+
+                                                        <td>@count</td>
+                                                        <td>@item.EmployeeClass</td>
+                                                        <td>@item.LeaveType</td>
+                                                        <td>@item.decNoOfDays</td>
+
+                                                        <td class="noprint">
+                                                            <a href="@Url.Content("~/LeaveManagement/LeaveAssignClassWise/AddLeaveAssignClassWise/")@protector.Decode(Convert.ToString(@item.intId))" class="btn-outline-primary btn-sm"><i class="icon-pencil-alt-solid"></i></a>
+                                                            <a href="@Url.Content("~/LeaveManagement/LeaveAssignClassWise/DeleteLeaveAssignClassWise/")@protector.Decode(Convert.ToString(@item.intId))" class="btn-outline-danger btn-sm" onclick="return confirm('Are you sure to Delete?')"><i class="icon-trash-alt-solid"></i></a>
+                                                        </td>
+                                                    </tr>
+
+                                                }
+                                            }
+                                        </tbody>
+                                    </table>
+                                @*</div>*@
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+    <!-- MAIN CONTENT AREA ENDS -->
+</section>
+
+<script>
+
+
+    $(document).ready(function () {
+        loadNavigation('ViewLeavAssignClassWise', 'glempprofile', 'plofficetype', 'tl', 'Leave Management', 'View Leave Assign Class Wise', ' ');
+
+        $('.searchableselect').searchableselect();
+
+        $('.shorting-lnk').click(function () {
+            $('.shorting-lnk i').toggleClass('fa-sort-amount-up-alt fa-sort-amount-down-alt ');
+        });
+
+    });
+</script>
+
+

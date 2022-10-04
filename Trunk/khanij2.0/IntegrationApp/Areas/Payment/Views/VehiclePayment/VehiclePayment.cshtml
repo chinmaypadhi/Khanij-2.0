@@ -1,0 +1,207 @@
+﻿
+@{
+    ViewData["Title"] = "MergeEPermit";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<section class="wrapper main-wrapper row">
+    <div class="col-12" id="mainDiv">
+        @Html.Partial("_CMSnavigation")
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            @*<a class="nav-link active" href="#">
+
+                                </a>*@
+                        </li>
+
+                    </ul>
+                    @Html.Partial("_CMSutil")
+                </div>
+                @using (Html.BeginForm("VehiclePayment", "VehiclePayment", FormMethod.Post, new { enctype = "multipart/form-data", AUTOCOMPLETE = "Off", id = "__EUAntiForgeryForm" }))
+                {
+                    <input type="hidden" name="arr" value="@ViewBag.arr" id="arr" />
+                    <input type="hidden" name="total" value="@ViewBag.total" id="total" />
+                    <input type="hidden" name="TransactionalID" value="@ViewBag.TransactionalID" id="TransactionalID" />
+                    <input type="hidden" name="PaymentMode" id="PaymentMode" value="" />
+                    <input type="hidden" name="PaymentBank" id="PaymentBank" value="" />
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="form-group row">
+                                <label for="inputMail" class="col-sm-4 col-form-label font-weight-bolder">Payable</label>
+                                <div class="col-sm-7">
+                                    <label class="form-control">@ViewBag.total</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="row">
+
+                        <label class="list-group-item active text-center" style="visibility:hidden" id="divOnlineOption"></label>
+
+                        @*<div class="col-sm-12 text-center">*@
+
+                        <div class="row col-md-12">
+                            <div class="col-md-2 default-form-control-style">
+
+                                <img src="@Url.Content("~/img/SBI.jpg")" alt="SBI" style="width:100px;height:50px;" />
+                                @*@if (Model.ActiveStatus != 6)
+                                    {*@
+                                <input name="BankSelection" type="radio" id="chkSBI" value="SBI" checked="checked" />
+                                @*@Html.RadioButtonFor(n => n.PaymentBank, "SBI", new { @Name = "BankSelection", @class = "custom-radio" })*@
+                                @* }*@
+                            </div>
+                            <div class="col-md-2 default-form-control-style">
+                                <img src="@Url.Content("~/img/ICICI.png")" alt="ICICI" style="width:100px;height:50px;" />
+                                @*@if (Model.ActiveStatus != 6)
+                                    {*@
+                                <input name="BankSelection" type="radio" id="chkICICI" value="ICICI" />
+                                @*@Html.RadioButtonFor(n => n.PaymentBank, "ICICI", new { @Name = "BankSelection", @class = "custom-radio" })*@
+
+                                @*}*@
+                            </div>
+                            <div class="col-md-2 default-form-control-style">
+                                <img src="@Url.Content("~/img/DemoBank.jpg")" alt="ICICI" style="width:100px;height:50px;" />
+                                <input name="BankSelection" type="radio" id="chkDemoBank" value="DEMOBANK" />
+                            </div>
+
+                        </div>
+                        @*</div>*@
+                    </div>
+                    <div class="row" id="divPaymentOption" style="display: none">
+                        <div class="col-lg-12 col-md-12 col-xs-12">
+                            <div id="divOnline">
+                                <div class="col-md-12">
+                                    <div class="col-md-4 default-form-control-style" style="text-align: left;">
+                                        @(Html.Label("Net Banking"))
+                                        <input name="ModeSelection" type="radio" value="NetBanking" checked="checked" />
+                                    </div>
+                                    <div class="col-md-4 default-form-control-style">
+                                        @(Html.Label("NEFT/RTGS"))
+                                        <input name="ModeSelection" type="radio" value="NEFT" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-12 col-md-12 col-sm-12">
+                        <input type="submit" id="btnSave" value="Save" onclick="return onMakePayment();" class="btn btn-success btn-md ml-0 waves-effect waves-light" />
+
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+    <!-- MAIN CONTENT AREA ENDS -->
+</section>
+
+<script>
+    excelMe = "yes"
+    pdfMe = "yes"
+    backMe = "yes"
+    $(document).ready(function () {
+        loadNavigation('balancequantitye-permit', 'glepermit', 'Vehicle', 'tl', 'Payment', 'Online Payment', ' ');
+        $('.searchableselect').searchableselect();
+
+        $('#datatable').DataTable();
+
+
+        $('.shorting-lnk').click(function () {
+            $('.shorting-lnk i').toggleClass('fa-sort-amount-up-alt fa-sort-amount-down-alt ');
+        });
+
+    });
+
+
+</script>
+<script>
+    $("#chkICICI").click(function () {
+        $("#divPaymentOption").show();
+    });
+    $("#chkHDFC").click(function () {
+        $("#divPaymentOption").hide();
+    });
+
+    $("#chkSBI").click(function () {
+        $("#divPaymentOption").hide();
+    });
+
+    $('#chkDemoBank').click(function () {
+        $("#divPaymentOption").hide();
+    });
+
+</script>
+<script>
+    function onMakePayment() {
+        if (confirm('Are you sure to make payment ?')) {
+
+
+            if ($("#divOnlineOption").hasClass("active") == true) {
+                $("#PaymentMode").val(1); // set online payment mode
+                var bank = $("input:radio[name='BankSelection']:checked").val();
+                var mode = $("input:radio[name='ModeSelection']:checked").val();
+                if (bank == "HDFC") {
+                    $("#PaymentBank").val("HDFC");
+                    $("#__EUAntiForgeryForm").submit();
+                }
+                else if (bank == "ICICI") {
+                    $("#PaymentBank").val("ICICI");
+                    if (mode == "NetBanking") {
+                        $("#P_Mode").val("NetBanking")
+                        $("#__EUAntiForgeryForm").submit();
+                    }
+                    else {
+                        $("#P_Mode").val("NEFT")
+                        $("#__EUAntiForgeryForm").submit();
+                    }
+                }
+                else if (bank == "SBI") {
+                    $("#PaymentBank").val("SBI");
+                    $("#__EUAntiForgeryForm").submit();
+                }
+                else if (bank == "DEMOBANK") {
+                    $("#PaymentBank").val("DEMOBANK");
+                    $("#__EUAntiForgeryForm").submit();
+                }
+                else {
+                    alert("Please select bank to make payment !");
+                    return false;
+                }
+            }
+            else {
+                $("#PaymentMode").val(0); // set offline mode value
+                if ($("#ChallanNumber").val()) {
+                    if ($("#ChallanDate").val()) {
+                        if ($('input[name="ChallanCopyPath"]').val() != "") {
+                            if (filesize < 2048000) {
+                                if (confirm('Are you sure to make payment ?')) {
+                                    $("#__EUAntiForgeryForm").submit();
+                                }
+                            }
+                            else {
+                                alert("Please make sure your file is less than 2 MB!");
+                                return false;
+                            }
+                        }
+                        else {
+                            alert("Please select file!");
+                        }
+                    }
+                    else {
+                        lert("Please enter Challan Date!");
+                        $("#ChallanDate").focus();
+                    }
+                }
+                else {
+                    alert("Please enter Challan Number!");
+                    $("#ChallanNumber").focus();
+                }
+            }
+        }
+    }
+</script>

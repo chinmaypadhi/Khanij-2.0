@@ -1,0 +1,2237 @@
+﻿@*// *********************************************************************************************************
+    //  View Name                : PrintFormG2
+    //  Desciption               : Print Yearly Return FORM G2
+    //  Created By               : Akshaya Dalei
+    //  Created On               : 18 Oct 2021
+    // ********************************************************************************************************
+*@
+@model dynamic
+@{
+    ViewData["Title"] = "Print Yearly Return Form G2";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<html>
+<head>
+    <title>Yearly eReturn</title>
+    <style>
+        div, p, table {
+            padding: 0px;
+            margin: 0px;
+        }
+
+
+        .margin {
+            margin: 25px;
+        }
+
+        .logo-title-border {
+            border: 0.5px solid;
+            margin-top: 20px;
+            margin-bottom: 30px;
+            margin-left: 10px;
+            margin-right: 10px;
+            padding: 10px;
+            width: 226px;
+        }
+
+        .img-logo {
+            margin-left: 40px;
+            padding-top: 20px;
+        }
+
+        .barcode-title {
+        }
+
+        .size-a4 {
+            width: 8.3in;
+            height: 11.7in;
+        }
+
+        td {
+            width: 50%;
+            padding: 10px;
+            margin: 10px;
+        }
+    </style>
+</head>
+<body class="margin">
+
+    <section class="content-header">
+
+        <ol class="breadcrumb">
+
+            <li class="active">Print</li>
+        </ol>
+    </section>
+    <br />
+    @using (Html.BeginForm("", "", FormMethod.Post, new { id = "__G2AntiForgeryForm", @class = "form-horizontal bordered-row" }))
+    {
+        @if (Model.OtherDetails != null && !string.IsNullOrEmpty(Model.OtherDetails.DSCFilePath))
+        {
+            <span id="lblGenerate">Download FORM</span>
+            <a target="_blank" class="btn btn-primary" href='@ViewBag.ServerPath@Model.OtherDetails.DSCFilePath'>Download</a>
+        }
+        else
+        {
+            <h1>
+                Print
+                <img src="~/img/1475779253_BT_printer.ico" style="height:40px;width:40px;cursor:pointer;" onclick="getPDF()" />
+            </h1>
+        }
+
+        <input type="hidden" name="Year" value="@ViewBag.Year" id="Year" />
+        <input type="hidden" name="OtherDetails.OtherDetails_Id" value="@Model.OtherDetails.OtherDetails_Id" id="OtherDetails_Id" />
+        <input type="hidden" name="UserId" value="@ViewBag.UserId " id="Uid" />
+        <div id="eReturnYearly" class="container-fluid  pdf-page size-a4" style="min-height: 17874px">
+            <div>
+                <p class="text-center"><b>FORM G2</b></p>
+                <p class="text-center">[See rule 45(5) (c) (ii)]</p>
+                <br />
+                <p class="text-center">For the financial year <b>1st April,&nbsp; @ViewBag.begning&nbsp;&nbsp;&nbsp; to&nbsp;&nbsp;&nbsp; 31st March,&nbsp; @ViewBag.closing</b></p>
+                <br />
+                <p class="text-center">ANNUAL RETURN</p>
+                <br />
+                <p class="text-center">[To be used for minerals Copper, Gold, Lead, Pyrites, Tin, Tungsten and Zinc]</p>
+                <br />
+                <p class="text-left">To</p>
+                <p class="text-left">&nbsp;&nbsp;&nbsp;&nbsp;(i) The Regional Controller of Mines</p>
+                <p class="text-left">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Indian Bureau of Mines</p>
+                <p class="text-left">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Raipur</b> &nbsp;&nbsp;Region,</p>
+                <p class="text-left">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;PIN:&nbsp;&nbsp; <b>492001</b> </p>
+                <p>
+                    (Please address to Regional Controller of Mines in whose territorial jurisdiction the mines falls as notified from
+                    time to time by the Controller General, Indian Bureau of Mines under rule 62 of the Mineral Conservation and
+                    Development Rules, 1988)
+                </p>
+                <p class="text-left">&nbsp;&nbsp;&nbsp;&nbsp;(ii) The State Government</p>
+
+            </div>
+            @* PART – 1*@
+            <div>
+                <p class="text-center"><b>PART – I (General)</b></p>
+                <div class="row">
+                    <div class="col-sm-12">
+                        <table class="" border="1" style="width: 100%;">
+                            <tbody>
+                                <tr>
+                                    <td colspan="4">
+                                        <p><b>1. Details of the Mine:</b></p>
+                                    </td>
+
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <p>
+                                            (a) Registration number allotted by Indian Bureau of Mines<br />
+                                            (to give registration number of the Lessee/ Owner)
+                                        </p>
+                                    </td>
+                                    <td colspan="3">
+                                        <p class="text-center">@Model.MineDetails.Registrationnumber</p>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <p>(b) Mine Code (allotted by Indian Bureau of Mines )</p>
+                                    </td>
+                                    <td colspan="3">
+                                        <p class="text-center">@Model.MineDetails.MINE_CODE</p>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <p>(c) Name of the Mineral</p>
+                                    </td>
+                                    <td colspan="3">
+                                        <p class="text-center">@Model.MineDetails.MineralName</p>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <p>(d) Name of Mine</p>
+                                    </td>
+                                    <td colspan="3">
+                                        <p class="text-center">@Model.MineDetails.MineName</p>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <p>
+                                            (e) Name(s) of other mineral(s),
+                                            if any, produced from the same mine
+                                        </p>
+                                    </td>
+                                    <td colspan="3">
+                                        <p class="text-center">@Model.MineDetails.OtherMineral</p>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="4">
+                                        <p><b>2. Location of the Mine :</b></p>
+                                    </td>
+
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <p>Village</p>
+                                    </td>
+                                    <td colspan="3">
+                                        <p class="text-center">@Model.MineDetails.MineVillage</p>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <p>Post Office</p>
+                                    </td>
+                                    <td colspan="3">
+                                        <p class="text-center">@Model.OtherDetails.MinePostOffice</p>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <p>Tahsil/Taluk</p>
+                                    </td>
+                                    <td colspan="3">
+                                        <p class="text-center">@Model.MineDetails.MineTehsil</p>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <p>District</p>
+                                    </td>
+                                    <td colspan="3">
+                                        <p class="text-center">@Model.MineDetails.MineDistrict</p>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <p>State</p>
+                                    </td>
+                                    <td colspan="3">
+                                        <p class="text-center">@Model.MineDetails.MineState</p>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <p>PIN Code</p>
+                                    </td>
+                                    <td colspan="3">
+                                        <p class="text-center">@Model.MineDetails.MinePinCode</p>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="2">
+                                        <p>Fax no:&nbsp;&nbsp; @Model.OtherDetails.MineFaxNo</p>
+                                    </td>
+                                    <td colspan="2">
+                                        <p>E-mail:&nbsp;&nbsp; @Model.MineDetails.MineEmailID</p>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="2">
+                                        <p>Phone no:&nbsp;&nbsp; @Model.MineDetails.MinePhoneNo</p>
+                                    </td>
+                                    <td colspan="2">
+                                        <p>Mobile:&nbsp;&nbsp; @Model.MineDetails.MineMobileNo</p>
+                                    </td>
+                                </tr>
+                                <tr class="page-break">
+                                    <td colspan="4">
+                                        <p><b>3. Name and address of Lessee/Owner (along with fax no. and e-mail):</b></p>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <p>Name of Lessee/Owner</p>
+                                    </td>
+                                    <td colspan="3">
+                                        <p class="text-center">@Model.MineDetails.LesseeName</p>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <p>Address</p>
+                                    </td>
+                                    <td colspan="3">
+                                        <p class="text-center">@Model.MineDetails.LesseeAddress</p>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <p>District</p>
+                                    </td>
+                                    <td colspan="3">
+                                        <p class="text-center">@Model.MineDetails.LesseeDistrictName</p>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <p>State</p>
+                                    </td>
+                                    <td colspan="3">
+                                        <p class="text-center">@Model.MineDetails.LesseeStateName</p>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <p>PIN Code</p>
+                                    </td>
+                                    <td colspan="3">
+                                        <p class="text-center">@Model.MineDetails.LesseePinCode</p>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="2">
+                                        <p>Fax no:&nbsp;&nbsp; @Model.OtherDetails.LesseeFaxNo</p>
+                                    </td>
+                                    <td colspan="2">
+                                        <p>E-mail:&nbsp;&nbsp; @Model.MineDetails.LesseeEmailID</p>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="2">
+                                        <p>Phone no:&nbsp;&nbsp; @Model.MineDetails.LesseePhoneNo</p>
+                                    </td>
+                                    <td colspan="2">
+                                        <p>Mobile:&nbsp;&nbsp; @Model.MineDetails.LesseeMobileNo</p>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <p><b>4. Registered Office of the Lessee:</b></p>
+                                    </td>
+                                    <td colspan="3">
+                                        <p class="text-center">@Model.OtherDetails.RegisteredOffice</p>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <p><b>5. Director in charge :</b></p>
+                                    </td>
+                                    <td colspan="3">
+                                        <p class="text-center">@Model.OtherDetails.Director_in_charge</p>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <p><b>6. Agent :</b></p>
+                                    </td>
+                                    <td colspan="3">
+                                        <p class="text-center">@Model.OtherDetails.Agent</p>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <p><b>7. Manager :</b></p>
+                                    </td>
+                                    <td colspan="3">
+                                        <p class="text-center">@Model.OtherDetails.Manager</p>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <p><b>8. Mining Engineer in charge:</b></p>
+                                    </td>
+                                    <td colspan="3">
+                                        <p class="text-center">@Model.OtherDetails.MiningEngineer_in_charge</p>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <p><b>9. Geologist in charge :</b></p>
+                                    </td>
+                                    <td colspan="3">
+                                        <p class="text-center">@Model.OtherDetails.Geologist_in_charge</p>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <p><b>10. Transferor (previous owner), if any, and date of transfer:</b></p>
+                                    </td>
+                                    <td colspan="3">
+                                        <p class="text-center">@Model.OtherDetails.Transferor</p>
+                                        <br />
+                                        <p class="text-center">@Model.OtherDetails.Dateof_Transfer</p>
+                                    </td>
+                                </tr>
+                                <tr class="page-break">
+                                    <td colspan="4">
+                                        <p>
+                                            <b>11. Particulars of area operated/Lease </b>
+                                            <br />
+                                            (Furnish information on items (i) to (vi) lease-wise in case mine workings cover more than one lease)
+                                        </p>
+                                    </td>
+                                </tr>
+                        </table>
+                        <table id="tbl_AreaParticular" style="width: 100%" border="1">
+                            <tr id="tr_Area"><td></td><td></td></tr>
+
+                        </table>
+
+                        <table style="width: 100%" border="1">
+                            <tr>
+                                <td>(vii) In case there is more than one mine in the same lease area, indicate name of mine and mineral produced</td>
+                                <td colspan="3"><label id="More_mine_details"></label>&nbsp;&nbsp; and &nbsp;&nbsp; <label id="Mineral_produced"></label></td>
+                            </tr>
+                            <tr>
+                                <td><b>12. Lease area (surface area) utilisation as at the end of year (hectares):</b></td>
+                                <td style="width: 30%">Under forest</td>
+                                <td style="width: 30%">Outside forest</td>
+                                <td style="width: 40%">Total</td>
+                            </tr>
+                            <tr>
+                                <td>(i) Already exploited & abandoned by opencast (O/C) mining</td>
+                                <td style="width: 30%">@Model.LeaseArea.UnderForest1</td>
+                                <td style="width: 30%">@Model.LeaseArea.Outsideforest1</td>
+                                <td style="width: 40%">@Model.LeaseArea.Total1</td>
+                            </tr>
+                            <tr>
+                                <td>(ii) Covered under current (O/C) Workings</td>
+                                <td style="width: 30%">@Model.LeaseArea.UnderForest2</td>
+                                <td style="width: 30%">@Model.LeaseArea.Outsideforest2</td>
+                                <td style="width: 40%">@Model.LeaseArea.Total2</td>
+                            </tr>
+                            <tr>
+                                <td>(iii) Reclaimed/rehabilitated</td>
+                                <td style="width: 30%">@Model.LeaseArea.UnderForest3</td>
+                                <td style="width: 30%">@Model.LeaseArea.Outsideforest3</td>
+                                <td style="width: 40%">@Model.LeaseArea.Total3</td>
+                            </tr>
+                            <tr>
+                                <td>(iv) Used for waste disposal</td>
+                                <td style="width: 30%">@Model.LeaseArea.UnderForest4</td>
+                                <td style="width: 30%">@Model.LeaseArea.Outsideforest4</td>
+                                <td style="width: 40%">@Model.LeaseArea.Total4</td>
+                            </tr>
+                            <tr>
+                                <td>(v) Occupied by plant, buildings, residential, welfare buildings & roads</td>
+                                <td style="width: 30%">@Model.LeaseArea.UnderForest5</td>
+                                <td style="width: 30%">@Model.LeaseArea.Outsideforest5</td>
+                                <td style="width: 40%">@Model.LeaseArea.Total5</td>
+                            </tr>
+                            <tr>
+                                <td>(vi) Used for any other purpose (specify)</td>
+                                <td style="width: 30%">@Model.LeaseArea.UnderForest6</td>
+                                <td style="width: 30%">@Model.LeaseArea.Outsideforest6</td>
+                                <td style="width: 40%">@Model.LeaseArea.Total6</td>
+                            </tr>
+                            <tr>
+                                <td>(vii) Work done under progressive mine closure plan during the year</td>
+                                <td style="width: 30%">@Model.LeaseArea.UnderForest7</td>
+                                <td style="width: 30%">@Model.LeaseArea.Outsideforest7</td>
+                                <td style="width: 40%">@Model.LeaseArea.Total7</td>
+                            </tr>
+                            <tr>
+                                <td><b>13. Ownership/exploiting Agency of the mine:(Public Sector/Private Sector/Joint Sector)</b></td>
+                                <td colspan="3">@Model.LeaseArea.AgencyofMine</td>
+
+                            </tr>
+
+                        </table>
+
+                    </div>
+                </div>
+            </div>
+            <br />
+            @* PART - 2*@
+            <div>
+                <p class="text-center page-break"><b>PART - II (Employment and Wages)</b></p>
+                <br />
+                <div class="row">
+                    <div class="col-sm-12">
+                        <table border="1" style="width: 100%;">
+                            <tr>
+                                <td colspan="3">1.Number of supervisory staff employed at the mine</td>
+                            </tr>
+                            <tr>
+                                <td>Description</td>
+                                <td>Wholly employed</td>
+                                <td>Partly employed</td>
+                            </tr>
+                            <tr>
+                                <td>(i) Graduate Mining Engineer</td>
+                                <td>@Model.Staff.Whollyemployed1</td>
+                                <td>@Model.Staff.Partlyemployed1</td>
+                            </tr>
+                            <tr>
+                                <td>(ii) Diploma Mining Engineer</td>
+                                <td>@Model.Staff.Whollyemployed2</td>
+                                <td>@Model.Staff.Partlyemployed2</td>
+                            </tr>
+                            <tr>
+                                <td>(iii) Geologist</td>
+                                <td>@Model.Staff.Whollyemployed3</td>
+                                <td>@Model.Staff.Partlyemployed3</td>
+                            </tr>
+                            <tr>
+                                <td>(iv) Surveyor</td>
+                                <td>@Model.Staff.Whollyemployed4</td>
+                                <td>@Model.Staff.Partlyemployed4</td>
+                            </tr>
+                            <tr>
+                                <td>(v) Other administrative and technical supervisory staff</td>
+                                <td>@Model.Staff.Whollyemployed5</td>
+                                <td>@Model.Staff.Partlyemployed5</td>
+                            </tr>
+                            <tr>
+                                <td>Total:</td>
+                                <td>@Model.Staff.Whollyemployed_Total</td>
+                                <td>@Model.Staff.Partlyemployed_Total</td>
+                            </tr>
+                            <tr>
+                                <td>2.(i) Number of days the mine worked:</td>
+                                <td colspan="2">
+                                    <label id="NoOfDaysWork"></label>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>(ii) No. of shifts per day:</td>
+                                <td colspan="2">
+                                    <label id="NoOfShif"></label>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <p>
+                                        (iii) Indicate reasons for work stoppage in the mine during the year (due to strike, lockout, heavy
+                                        rain, non-availability of labour, transport bottleneck, lack of demand, uneconomic operations,etc.)
+                                        and the number of days of work stoppage for each of the factors separately .
+                                    </p>
+                                </td>
+                                <td colspan="2">
+                                    <table id="MiningWork" style="width: 100%;">
+                                        <tr>
+                                            <th style="width: 50%; text-align: center; border-bottom: 1px solid #080808;">Reasons</th>
+                                            <th style="width: 50%; text-align: center; border-left: 1px solid #080808; border-bottom: 1px solid #080808;">No Of Days</th>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+                <br />
+                <div class="row">
+                    <div class="col-sm-12">
+                        <p class="text-left">3. Employment and salary/wages paid #:</p>
+                        <br />
+                        <table border="1" style="width: 100%;">
+                            <tr>
+                                <td colspan="9">
+                                    Maximum number of persons employed on any one day during the year:<br />
+                                    (i) In workings below ground on (date)...<b>@Model.SalaryWages.WorkingBelowGrounddate_str</b> (a) ( number).....<b>@Model.SalaryWages.WorkingBelowNo</b><br />
+                                    (ii) In all in the mine on (date)...<b>@Model.SalaryWages.WorkingOnMinedate_str</b> (a) ( number).....<b>@Model.SalaryWages.WorkingOnMineNo</b>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td rowspan="2">Classification</td>
+                                <td colspan="3">Total number of man days worked during the year</td>
+                                <td rowspan="2">No. of days worked during the year</td>
+                                <td colspan="3">Average daily number of persons employed</td>
+                                <td rowspan="2">Total Wages/Salary for the year (₹)</td>
+                            </tr>
+                            <tr>
+                                <td>Direct</td>
+                                <td>Contract</td>
+                                <td>Total</td>
+                                <td>Male</td>
+                                <td>Female</td>
+                                <td>Total</td>
+                            </tr>
+                            <tr>
+
+                                <td style="width: 20%">(1)</td>
+                                <td style="width: 10%">2(A)</td>
+                                <td style="width: 10%">2(B)</td>
+                                <td style="width: 10%">2(C)</td>
+                                <td style="width: 10%">(3)</td>
+                                <td style="width: 10%">4(A)</td>
+                                <td style="width: 10%">4(B)</td>
+                                <td style="width: 10%">4(C)</td>
+                                <td style="width: 10%">(5)</td>
+
+                            </tr>
+                            <tr>
+                                <td>Below Ground</td>
+                                <td>@Model.SalaryWages.BG_Direct</td>
+                                <td>@Model.SalaryWages.BG_Contract</td>
+                                <td>@Model.SalaryWages.BG_Total</td>
+                                <td>@Model.SalaryWages.BG_NoOFDaysWork</td>
+                                <td>@Model.SalaryWages.BG_Male</td>
+                                <td>@Model.SalaryWages.BG_Female</td>
+                                <td>@Model.SalaryWages.BG_Average_Total</td>
+                                <td>@Model.SalaryWages.BG_TotalWages</td>
+                            </tr>
+                            <tr>
+                                <td>Opencast</td>
+                                <td>@Model.SalaryWages.OC_Direct</td>
+                                <td>@Model.SalaryWages.OC_Contract</td>
+                                <td>@Model.SalaryWages.OC_Total</td>
+                                <td>@Model.SalaryWages.OC_NoOFDaysWork</td>
+                                <td>@Model.SalaryWages.OC_Male</td>
+                                <td>@Model.SalaryWages.OC_Female</td>
+                                <td>@Model.SalaryWages.OC_Average_Total</td>
+                                <td>@Model.SalaryWages.OC_TotalWages</td>
+                            </tr>
+                            <tr>
+                                <td>Above Ground</td>
+                                <td>@Model.SalaryWages.AG_Direct</td>
+                                <td>@Model.SalaryWages.AG_Contract</td>
+                                <td>@Model.SalaryWages.AG_Total</td>
+                                <td>@Model.SalaryWages.AG_NoOFDaysWork</td>
+                                <td>@Model.SalaryWages.AG_Male</td>
+                                <td>@Model.SalaryWages.AG_Female</td>
+                                <td>@Model.SalaryWages.AG_Average_Total</td>
+                                <td>@Model.SalaryWages.AG_TotalWages</td>
+                            </tr>
+                            <tr>
+                                <td>Total:</td>
+                                <td>@Model.SalaryWages.Total_Direct</td>
+                                <td>@Model.SalaryWages.Total_Contract</td>
+                                <td>@Model.SalaryWages.Total_Total</td>
+                                <td>@Model.SalaryWages.Total_NoOFDaysWork</td>
+                                <td>@Model.SalaryWages.Total_Male</td>
+                                <td>@Model.SalaryWages.Total_Female</td>
+                                <td>@Model.SalaryWages.Total_Average_Total</td>
+                                <td>@Model.SalaryWages.Total_TotalWages</td>
+                            </tr>
+                        </table>
+                        <p class="text-left">Note : To include all employees exclusive to the mine and attached factory, workshop or mineral dressing plant at the mine site</p>
+                    </div>
+                </div>
+            </div>
+            <br />
+            @* PART-2 A*@
+            <div>
+                <p class="text-center page-break"><b>PART-II A (Capital Structure)</b></p>
+                <br />
+                <div class="row">
+                    <div class="col-sm-12">
+                        <table border="1" style="width: 100%;">
+                            <tr>
+                                <td colspan="7">
+                                    1. Value of Fixed Assets* (₹……@Model.CapitalStucture.ValueofFixedAssets)
+                                    (in respect of the mine, beneficiation plant, mine work-shop, power and water installation)
+                                    In case this information is furnished as combined information in another mine's return please specify Mine Code/Mine
+                                    Name:@Model.CapitalStucture.OtherMineCode
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>"Description"</td>
+                                <td>At the beginning of the year(₹)</td>
+                                <td>Additions during the Year(₹)")</td>
+                                <td>Sold or discarded during the year(₹)</td>
+                                <td>Depreciation during the year(₹)</td>
+                                <td>Net closing Balance (₹) (2+3)-(4+5)</td>
+                                <td>Estimated market value**(₹)</td>
+                            </tr>
+                            <tr>
+                                <td class="text-center">1</td>
+                                <td class="text-center">2</td>
+                                <td class="text-center">3</td>
+                                <td class="text-center">4</td>
+                                <td class="text-center">5</td>
+                                <td class="text-center">6</td>
+                                <td class="text-center">7</td>
+                            </tr>
+                            <tr>
+                                <td>(i) Land***</td>
+                                <td>@Model.CapitalStucture.Land_AtBeginning</td>
+                                <td>@Model.CapitalStucture.Land_Additions</td>
+                                <td>@Model.CapitalStucture.Land_Sold_Discarded</td>
+                                <td>@Model.CapitalStucture.Land_Depreciation</td>
+                                <td>@Model.CapitalStucture.Land_Net_closing_Balance</td>
+                                <td>@Model.CapitalStucture.Land_Estimated_Market</td>
+
+                            </tr>
+                            <tr>
+                                <td colspan="7">(ii) Building:</td>
+                            </tr>
+                            <tr>
+                                <td>Industrial</td>
+                                <td>@Model.CapitalStucture.Industrial_AtBeginning</td>
+                                <td>@Model.CapitalStucture.Industrial_Additions</td>
+                                <td>@Model.CapitalStucture.Industrial_Sold_Discarded</td>
+                                <td>@Model.CapitalStucture.Industrial_Depreciation</td>
+                                <td>@Model.CapitalStucture.Industrial_Net_closing_Balance</td>
+                                <td>@Model.CapitalStucture.Industrial_Estimated_Market</td>
+                            </tr>
+                            <tr>
+                                <td>Residential</td>
+                                <td>@Model.CapitalStucture.Residential_AtBeginning</td>
+                                <td>@Model.CapitalStucture.Residential_Additions</td>
+                                <td>@Model.CapitalStucture.Residential_Sold_Discarded</td>
+                                <td>@Model.CapitalStucture.Residential_Depreciation</td>
+                                <td>@Model.CapitalStucture.Residential_Net_closing_Balance</td>
+                                <td>@Model.CapitalStucture.Residential_Estimated_Market</td>
+                            </tr>
+                            <tr>
+                                <td>(iii) Plant and Machinery including transport equipment</td>
+                                <td>@Model.CapitalStucture.P_M_T_AtBeginning</td>
+                                <td>@Model.CapitalStucture.P_M_T_Additions</td>
+                                <td>@Model.CapitalStucture.P_M_T_Sold_Discarded</td>
+                                <td>@Model.CapitalStucture.P_M_T_Depreciation</td>
+                                <td>@Model.CapitalStucture.P_M_T_Net_closing_Balance</td>
+                                <td>@Model.CapitalStucture.P_M_T_Estimated_Market</td>
+                            </tr>
+                            <tr>
+                                <td style="width: 20%">(iv) Capitalised Expenditure such as pre-production exploration, development,major overhaul and repair to machinery etc (As prescribed under Income Tax Act)</td>
+                                <td>@Model.CapitalStucture.Exp_AtBeginning</td>
+                                <td>@Model.CapitalStucture.Exp_Additions</td>
+                                <td>@Model.CapitalStucture.Exp_Sold_Discarded</td>
+                                <td>@Model.CapitalStucture.Exp_Depreciation</td>
+                                <td>@Model.CapitalStucture.Exp_Net_closing_Balance</td>
+                                <td>@Model.CapitalStucture.Exp_Estimated_Market</td>
+                            </tr>
+                            <tr>
+                                <td>Total:</td>
+                                <td>@Model.CapitalStucture.Total_AtBeginning</td>
+                                <td>@Model.CapitalStucture.Total_Additions</td>
+                                <td>@Model.CapitalStucture.Total_Sold_Discarded</td>
+                                <td>@Model.CapitalStucture.Total_Depreciation</td>
+                                <td>@Model.CapitalStucture.Total_Net_closing_Balance</td>
+                                <td>@Model.CapitalStucture.Total_Estimated_Market</td>
+                            </tr>
+                        </table>
+                        <p>
+                            * In case the fixed assets are common to more than one mine, furnish combined information for all such mines together
+                            in any one of the mine’s return. In the returns for other mines, give only a cross reference to the particular mine's return
+                            where-in the information is included.
+                            ** Optional and may be furnished in respect of items (i), (ii) and (iii) if the mine owner desires.
+                            *** Including any non-recurring expenditure incurred on the acquisition of land.
+                        </p>
+                    </div>
+                </div>
+                <br />
+                <div class="row">
+                    <div class="col-sm-12">
+                        <table border="1" style="width: 100%;">
+                            <tr>
+                                <td colspan="3"><b>2. Source of Finance</b> ( at the end of the year) :</td>
+                            </tr>
+                            <tr>
+                                <td>(i) Paid up Share Capital (₹)</td>
+                                <td colspan="2">@Model.SourceOfFinance.ShareCapital</td>
+                            </tr>
+                            <tr>
+                                <td>(ii)Own Capital (₹)</td>
+                                <td colspan="2">@Model.SourceOfFinance.OwnCapital</td>
+                            </tr>
+                            <tr>
+                                <td>(iii)Reserve & Surplus (All Types)( ₹)</td>
+                                <td colspan="2">@Model.SourceOfFinance.Reserve</td>
+                            </tr>
+                            <tr>
+                                <td colspan="3">(iv)Long Term loans outstanding (#)(₹)</td>
+                            </tr>
+                            <tr>
+                                <td>Name of the Institution/Source</td>
+                                <td>Amount of Loan (₹)</td>
+                                <td>Rate of Interest</td>
+                            </tr>
+                            <tr>
+                                <td>@Model.SourceOfFinance.Institution</td>
+                                <td>@Model.SourceOfFinance.AmountofLoan</td>
+                                <td>@Model.SourceOfFinance.RateofInterest</td>
+                            </tr>
+                        </table>
+                        <p>
+                            (#) Indicate the names of the lending institutions such as State Finance Corporation, Industrial Development and other
+                            Public Corporations, Co-operative Banks, Nationalised Banks and other sources along with the amount of loan from
+                            each source and the rate of interest at which loan has been taken.
+                        </p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-12">
+                        <table border="1" style="width: 100%;">
+                            <tr>
+                                <td colspan="2">3. Interest and Rent (₹)</td>
+
+                            </tr>
+                            <tr>
+                                <td>(i) Interest paid during the year</td>
+                                <td>@Model.SourceOfFinance.Interestpaid</td>
+                            </tr>
+                            <tr>
+                                <td>(ii) Rents (excluding surface rent) paid during the year</td>
+                                <td>@Model.SourceOfFinance.Rentspaid</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <br />
+            @* Part 3*@
+            <div>
+                <p class="text-center page-break"><b>PART - III (Consumption of Materials)</b></p>
+                <br />
+                <div class="row">
+                    <div class="col-sm-12">
+                        <table style="width: 100%" border="1">
+                            <tr>
+                                <td colspan="4">1. Quantity and cost of material consumed during the year</td>
+                            </tr>
+                            <tr>
+                                <td>Description</td>
+                                <td>Unit</td>
+                                <td>Quantity</td>
+                                <td>Value (₹)</td>
+                            </tr>
+                            <tr>
+                                <td colspan="4">(i) Fuel</td>
+                            </tr>
+                            <tr>
+                                <td>(a) Coal</td>
+                                <td>Tonnes</td>
+                                <td>@Model.MaterialConsumed.CoalQty</td>
+                                <td>@Model.MaterialConsumed.CoalValue</td>
+                            </tr>
+                            <tr>
+                                <td>(b) Diesel Oil</td>
+                                <td>Ltrs.</td>
+                                <td>@Model.MaterialConsumed.DieselOilQty</td>
+                                <td>@Model.MaterialConsumed.DieselOilValue</td>
+                            </tr>
+                            <tr>
+                                <td>(c) Petrol</td>
+                                <td>trs.</td>
+                                <td>@Model.MaterialConsumed.PetrolQty</td>
+                                <td>@Model.MaterialConsumed.PetrolValue</td>
+                            </tr>
+                            <tr>
+                                <td>(d) Kerosene</td>
+                                <td>Ltrs.</td>
+                                <td>@Model.MaterialConsumed.KeroseneQty</td>
+                                <td>@Model.MaterialConsumed.KeroseneValue</td>
+                            </tr>
+                            <tr>
+                                <td>(e) Gas</td>
+                                <td>Cu.M.</td>
+                                <td>@Model.MaterialConsumed.GasQty</td>
+                                <td>@Model.MaterialConsumed.GasValue</td>
+                            </tr>
+                            <tr>
+                                <td colspan="4">@Html.Label("(ii) Lubricant")</td>
+                            </tr>
+                            <tr>
+                                <td>(a) Lubricant oil</td>
+                                <td>Ltrs.</td>
+                                <td>@Model.MaterialConsumed.LubricantoilQty</td>
+                                <td>@Model.MaterialConsumed.LubricantoilValue</td>
+                            </tr>
+                            <tr>
+                                <td>(b) Grease</td>
+                                <td>Kgs.</td>
+                                <td>@Model.MaterialConsumed.GreaseQty</td>
+                                <td>@Model.MaterialConsumed.GreaseValue</td>
+                            </tr>
+                            <tr>
+                                <td colspan="4">Electricity</td>
+                            </tr>
+                            <tr>
+                                <td>(a) Consumed</td>
+                                <td>Kwh</td>
+                                <td>@Model.MaterialConsumed.ConsumedQty</td>
+                                <td>@Model.MaterialConsumed.ConsumedValue</td>
+                            </tr>
+                            <tr>
+                                <td>(b) Generated</td>
+                                <td>Kwh</td>
+                                <td>@Model.MaterialConsumed.GeneratedQty</td>
+                                <td>@Model.MaterialConsumed.GeneratedValue</td>
+                            </tr>
+                            <tr>
+                                <td>(c) Sold</td>
+                                <td>Kwh</td>
+                                <td>@Model.MaterialConsumed.SoldQty</td>
+                                <td>@Model.MaterialConsumed.SoldValue</td>
+                            </tr>
+                            <tr>
+                                <td colspan="3">(iv) Explosives (furnish full details in Part IV)</td>
+                                <td>@Model.MaterialConsumed.ExplosivesValue</td>
+                            </tr>
+                            <tr>
+                                <td>(v) Tyres</td>
+                                <td>Nos.</td>
+                                <td>@Model.MaterialConsumed.TyresQty</td>
+                                <td>@Model.MaterialConsumed.TyresValue</td>
+                            </tr>
+                            <tr>
+                                <td colspan="3">(vi) Timber & Supports</td>
+                                <td>@Model.MaterialConsumed.Timber_SupportsValue</td>
+                            </tr>
+                            <tr>
+                                <td>(vii) Drill rods & kits</td>
+                                <td>
+                                    <label>Nos.</label>
+                                </td>
+                                <td>@Model.MaterialConsumed.Drill_kitsQty</td>
+                                <td>@Model.MaterialConsumed.Drill_kitsValue</td>
+                            </tr>
+                            <tr>
+                                <td colspan="3">(viii) Other spares & stores</td>
+                                <td>@Model.MaterialConsumed.OtherSparesValue</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+                <br />
+                <div class="row">
+                    <div class="col-sm-12">
+                        <table style="width: 100%" border="1">
+                            <tr class="page-break">
+                                <td colspan="3">2 Royalty, Rents and Payments made to DMF & NMET (₹):</td>
+                            </tr>
+                            <tr>
+                                <td>X</td>
+                                <td>Paid for current year</td>
+                                <td>Paid towards past arrears</td>
+                            </tr>
+                            <tr>
+                                <td>(a) Royalty</td>
+                                <td>@Model.RoyaltyandRents.RoyaltyCurrentyear</td>
+                                <td>@Model.RoyaltyandRents.RoyaltyArrears</td>
+                            </tr>
+                            <tr>
+                                <td>(b) Dead rent</td>
+                                <td>@Model.RoyaltyandRents.DeadRentCurrentyear</td>
+                                <td>@Model.RoyaltyandRents.DeadRentArrears</td>
+                            </tr>
+                            <tr>
+                                <td>(c) Surface rent</td>
+                                <td>@Model.RoyaltyandRents.SurfaceRentCurrentyear</td>
+                                <td>@Model.RoyaltyandRents.SurfaceRentArrears</td>
+                            </tr>
+                            <tr>
+                                <td>(d) Payment made to DMF</td>
+                                <td>@Model.RoyaltyandRents.DMFCurrentyear</td>
+                                <td>@Model.RoyaltyandRents.DMFArrears</td>
+                            </tr>
+                            <tr>
+                                <td>(e) Payment made to NMET</td>
+                                <td>@Model.RoyaltyandRents.NMETCurrentyear</td>
+                                <td>@Model.RoyaltyandRents.NMETArrears</td>
+                            </tr>
+                            <tr>
+                                <td colspan="2">3 Compensation paid for felling trees during the year (₹)</td>
+                                <td>@Model.RoyaltyandRents.Compensation_Trees</td>
+                            </tr>
+                            <tr>
+                                <td colspan="2">4 Depreciation on fixed assets (₹)</td>
+                                <td>@Model.RoyaltyandRents.Depreciation</td>
+                            </tr>
+                            <tr>
+                                <td colspan="3">5 Taxes and cesses</td>
+                            </tr>
+                            <tr>
+                                <td>X</td>
+                                <td colspan="2">Amount in Rupees paid during the year to: <b>@ViewBag.begning - @ViewBag.closing</b></td>
+                            </tr>
+                            <tr>
+                                <td>X</td>
+                                <td>Central Govt</td>
+                                <td>State Govt</td>
+                            </tr>
+                            <tr>
+                                <td>(i) Sales Tax</td>
+                                <td>@Model.RoyaltyandRents.SalesTax_CentralGovt</td>
+                                <td>@Model.RoyaltyandRents.SalesTax_StateGovt</td>
+                            </tr>
+                            <tr>
+                                <td>(ii) Welfare cess</td>
+                                <td>@Model.RoyaltyandRents.Welfarecess_CentralGovt</td>
+                                <td>@Model.RoyaltyandRents.Welfarecess_StateGovt</td>
+                            </tr>
+                            <tr>
+                                <td colspan="3">(iii) Other taxes & cesses:-</td>
+                            </tr>
+                            <tr>
+                                <td>(a) Mineral cess</td>
+                                <td>@Model.RoyaltyandRents.Cess_CentralGovt</td>
+                                <td>@Model.RoyaltyandRents.Cess_StateGovt</td>
+                            </tr>
+                            <tr>
+                                <td>(b) Cess on dead rent</td>
+                                <td>@Model.RoyaltyandRents.CessdeadRent_CentralGovt</td>
+                                <td>@Model.RoyaltyandRents.CessdeadRent_StateGovt</td>
+                            </tr>
+                            <tr>
+                                <td>(c) Others (please specify)</td>
+                                <td>@Model.RoyaltyandRents.Others_CentralGovt</td>
+                                <td>@Model.RoyaltyandRents.Others_StateGovt</td>
+                            </tr>
+                            <tr>
+                                <td colspan="3">6 Other expenses (₹):</td>
+                            </tr>
+                            <tr>
+                                <td colspan="2">(i) Overheads</td>
+                                <td>@Model.RoyaltyandRents.Overheads</td>
+                            </tr>
+                            <tr>
+                                <td colspan="2">(ii) Maintenance</td>
+                                <td>@Model.RoyaltyandRents.Maintenance</td>
+                            </tr>
+                            <tr>
+                                <td colspan="2">(iii) Money value of other benefits paid to workmen</td>
+                                <td>@Model.RoyaltyandRents.Moneyvalue</td>
+                            </tr>
+                            <tr>
+                                <td colspan="2">(iv) Payment made to professional agencies</td>
+                                <td>@Model.RoyaltyandRents.Paymentmade</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <br />
+            @*Part 4*@
+            <div>
+                <p class="text-center page-break"><b>Part –IV (Consumption of Explosives)</b></p>
+                <br />
+                <div class="row">
+                    <div class="col-sm-12">
+                        <table style="width: 100%" border="1">
+                            <tr>
+
+                                <td rowspan="4" colspan="3">Licensed capacity of magazine: (specify unit separately in kg/tonne, numbers, metres )</td>
+                                <td>Item</td>
+                                <td>Unit</td>
+                                <td>Capacity</td>
+                            </tr>
+                            <tr>
+                                <td>@Model.Explosives.LicensedCapacity_Item1</td>
+                                <td>@Model.Explosives.LicensedCapacity_UnitName1</td>
+                                <td>@Model.Explosives.LicensedCapacity_Capacity1</td>
+                            </tr>
+                            <tr>
+                                <td>@Model.Explosives.LicensedCapacity_Item2</td>
+                                <td>@Model.Explosives.LicensedCapacity_UnitName2</td>
+                                <td>@Model.Explosives.LicensedCapacity_Capacity2</td>
+                            </tr>
+                            <tr>
+                                <td>@Model.Explosives.LicensedCapacity_Item3</td>
+                                <td>@Model.Explosives.LicensedCapacity_UnitName3</td>
+                                <td>@Model.Explosives.LicensedCapacity_Capacity3</td>
+                            </tr>
+                            <tr>
+                                <td rowspan="2" class="text-center">Classification of Explosives</td>
+                                <td rowspan="2" class="text-center">Unit</td>
+                                <td colspan="2" class="text-center">Quantity consumed during the year</td>
+                                <td colspan="2" class="text-center">Estimated requirement during the next year</td>
+                            </tr>
+                            <tr>
+                                <td>Small dia.(upto 32 mm)</td>
+                                <td>Large dia. (above 32 mm)</td>
+                                <td>Small dia. (upto 32 mm)</td>
+                                <td>Large dia. (above 32 mm)</td>
+                            </tr>
+                            <tr>
+                                <td>1.Gun Powder</td>
+                                <td>Kg.</td>
+                                <td>@Model.Explosives.GunPow_Qty_Small</td>
+                                <td>@Model.Explosives.GunPow_Qty_Large</td>
+                                <td>@Model.Explosives.GunPow_Estimated_Small</td>
+                                <td>@Model.Explosives.GunPow_Estimated_Large</td>
+                            </tr>
+                            <tr>
+                                <td>2.Nitrate Mixture</td>
+                                <td>Kg.</td>
+                                <td>X</td>
+                                <td>X</td>
+                                <td>X</td>
+                                <td>X</td>
+                            </tr>
+                            <tr>
+                                <td>a. Loose ammonium nitrate</td>
+                                <td>@Model.Explosives.Looseammo_nitrate_Unit</td>
+                                <td>@Model.Explosives.Looseammo_nitrate_Qty_Small</td>
+                                <td>@Model.Explosives.Looseammo_nitrate_Qty_Large</td>
+                                <td>@Model.Explosives.Looseammo_nitrate_Estimated_Small</td>
+                                <td>@Model.Explosives.Looseammo_nitrate_Estimated_Large</td>
+
+                            </tr>
+                            <tr>
+                                <td>b. Ammonium nitrate in cartridged form</td>
+                                <td>@Model.Explosives.Cartridged_Unit</td>
+                                <td>@Model.Explosives.Cartridged_Qty_Small</td>
+                                <td>@Model.Explosives.Cartridged_Qty_Large</td>
+                                <td>@Model.Explosives.Cartridged_Estimated_Small</td>
+                                <td>@Model.Explosives.Cartridged_Estimated_Large</td>
+                            </tr>
+                            <tr>
+                                <td>3. Nitro compound</td>
+                                <td>Kg.</td>
+                                <td>@Model.Explosives.NitroCompound_Qty_Small</td>
+                                <td>@Model.Explosives.NitroCompound_Qty_Large</td>
+                                <td>@Model.Explosives.NitroCompound_Estimated_Small</td>
+                                <td>@Model.Explosives.NitroCompound_Estimated_Large</td>
+                            </tr>
+                            <tr>
+                                <td>4. Liquid Oxygen soaked cartridges</td>
+                                <td>Kg.</td>
+                                <td>@Model.Explosives.LiquidOxygen_Qty_Small</td>
+                                <td>@Model.Explosives.LiquidOxygen_Qty_Large</td>
+                                <td>@Model.Explosives.LiquidOxygen_Estimated_Small</td>
+                                <td>@Model.Explosives.LiquidOxygen_Estimated_Large</td>
+                            </tr>
+                            <tr>
+                                <td>5.Slurry explosives (Mention different trade names)</td>
+                                <td>Kg.</td>
+                                <td>@Model.Explosives.SlurryExplosives_Qty_Small</td>
+                                <td>@Model.Explosives.SlurryExplosives_Qty_Large</td>
+                                <td>@Model.Explosives.SlurryExplosives_Estimated_Small</td>
+                                <td>@Model.Explosives.SlurryExplosives_Estimated_Large</td>
+                            </tr>
+                            <tr>
+                                <td>6. Detonators</td>
+                                <td>No.s</td>
+                                <td>X</td>
+                                <td>X</td>
+                                <td>X</td>
+                                <td>X</td>
+                            </tr>
+                            <tr>
+                                <td>(i) Ordinary")</td>
+                                <td>@Model.Explosives.Detonators_Ord_Unit</td>
+                                <td>@Model.Explosives.Detonators_Ord_Qty_Large</td>
+                                <td>@Model.Explosives.Detonators_Ord_Estimated_Small</td>
+                                <td>@Model.Explosives.Detonators_Ord_Estimated_Large</td>
+                                <td>@Model.Explosives.Detonators_Elec_Ord_Unit</td>
+                            </tr>
+                            <tr>
+                                <td>(ii) Electrical</td>
+                                <td></td>
+                                <td>X</td>
+                                <td>X</td>
+                                <td>X</td>
+                                <td>X</td>
+                            </tr>
+                            <tr>
+                                <td class="text-center">(a) Ordinary</td>
+                                <td>@Model.Explosives.Detonators_Elec_Ord_Unit</td>
+                                <td>@Model.Explosives.Detonators_Elec_Ord_Qty_Small</td>
+                                <td>@Model.Explosives.Detonators_Elec_Ord_Qty_Large</td>
+                                <td>@Model.Explosives.Detonators_Elec_Ord_Estimated_Small</td>
+                                <td>@Model.Explosives.Detonators_Elec_Ord_Estimated_Large</td>
+                            </tr>
+                            <tr>
+                                <td class="text-center">(b) Delay</td>
+                                <td>@Model.Explosives.Detonators_Elec_Del_Unit</td>
+                                <td>@Model.Explosives.Detonators_Elec_Del_Qty_Small</td>
+                                <td>@Model.Explosives.Detonators_Elec_Del_Qty_Large</td>
+                                <td>@Model.Explosives.Detonators_Elec_Del_Estimated_Small</td>
+                                <td>@Model.Explosives.Detonators_Elec_Del_Estimated_Large</td>
+                            </tr>
+                            <tr>
+                                <td>7. Fuse</td>
+                                <td></td>
+                                <td>X</td>
+                                <td>X</td>
+                                <td>X</td>
+                                <td>X</td>
+                            </tr>
+                            <tr>
+                                <td class="text-center">(a)Safety Fuse</td>
+                                <td>@Model.Explosives.Fuse_Saf_Unit</td>
+                                <td>@Model.Explosives.Fuse_Saf_Qty_Small</td>
+                                <td>@Model.Explosives.Fuse_Saf_Qty_Large</td>
+                                <td>@Model.Explosives.Fuse_Saf_Estimated_Small</td>
+                                <td>@Model.Explosives.Fuse_Saf_Estimated_Large</td>
+                            </tr>
+                            <tr>
+                                <td class="text-center">(b)Detonating Fuse</td>
+                                <td>@Model.Explosives.Fuse_Deton_Unit</td>
+                                <td>@Model.Explosives.Fuse_Deton_Qty_Small</td>
+                                <td>@Model.Explosives.Fuse_Deton_Qty_Large</td>
+                                <td>@Model.Explosives.Fuse_Deton_Estimated_Small</td>
+                                <td>@Model.Explosives.Fuse_Deton_Estimated_Large</td>
+                            </tr>
+                            <tr>
+                                <td>8.Plastic ignition cord</td>
+                                <td>Mts</td>
+                                <td>@Model.Explosives.Plastic_Qty_Small</td>
+                                <td>@Model.Explosives.Plastic_Qty_Large</td>
+                                <td>@Model.Explosives.Plastic_Estimated_Small</td>
+                                <td>@Model.Explosives.Plastic_Estimated_Large</td>
+                            </tr>
+                            <tr>
+                                <td>9.Others (specify)</td>
+                                <td>@Model.Explosives.Others_Qty_UnitName</td>
+                                <td>@Model.Explosives.Others_Qty_Small</td>
+                                <td>@Model.Explosives.Others_Qty_Large</td>
+                                <td>@Model.Explosives.Others_Estimated_Small</td>
+                                <td>@Model.Explosives.Others_Estimated_Large</td>
+                            </tr>
+                        </table>
+                        <p>Different sizes of soaked liquid oxygen cartridges to be reported in equivalent kg. as per manufacturer’s instruction.</p>
+                    </div>
+                </div>
+            </div>
+            <br />
+            @*Part 5*@
+            <div>
+                <p class="text-center page-break"><b>PART–V (General Geology and Mining)</b></p>
+                <br />
+                <p class="text-center">(Items 2 and 3 to be submitted separately for each mineral)</p>
+                <br />
+                <p class="text-left">1. Exploration</p>
+                <p class="text-left">1(i) Exploration activities during the year:</p>
+                <br />
+                <div class="row">
+                    <div class="col-sm-12">
+                        <table style="width: 100%" border="1">
+                            <tr>
+                                <td></td>
+                                <td></td>
+                                <td>At the beginning of the year</td>
+                                <td>During the year</td>
+                                <td>Cumulative</td>
+                                <td>Grid spacing/Dimension</td>
+                            </tr>
+                            <tr>
+                                <td rowspan="2">Drilling</td>
+                                <td>No of holes</td>
+                                <td>@Model.Exploration.Drilling_holes_Beginning</td>
+                                <td>@Model.Exploration.Drilling_holes_During</td>
+                                <td>@Model.Exploration.Drilling_holes_Cumulative</td>
+                                <td>@Model.Exploration.Drilling_holes_Dimension</td>
+                            </tr>
+                            <tr>
+                                <td>Metrage</td>
+                                <td>@Model.Exploration.Drilling_Metrage_Beginning</td>
+                                <td>@Model.Exploration.Drilling_Metrage_During</td>
+                                <td>@Model.Exploration.Drilling_Metrage_Cumulative</td>
+                                <td>@Model.Exploration.Drilling_Metrage_Dimension</td>
+                            </tr>
+                            <tr>
+                                <td rowspan="2">Pitting</td>
+                                <td>No of Pits</td>
+                                <td>@Model.Exploration.Pitting_Pits_Beginning</td>
+                                <td>@Model.Exploration.Pitting_Pits_During</td>
+                                <td>@Model.Exploration.Pitting_Pits_Cumulative</td>
+                                <td>@Model.Exploration.Pitting_Pits_Dimension</td>
+                            </tr>
+                            <tr>
+                                <td>Excavation (in m3)</td>
+                                <td>@Model.Exploration.Pitting_Excavation_Beginning</td>
+                                <td>@Model.Exploration.Pitting_Excavation_During</td>
+                                <td>@Model.Exploration.Pitting_Excavation_Cumulative</td>
+                                <td>@Model.Exploration.Pitting_Excavation_Dimension</td>
+                            </tr>
+                            <tr>
+                                <td rowspan="3">Trenching</td>
+                                <td>No of trenches</td>
+                                <td>@Model.Exploration.Pitting_trenches_Beginning</td>
+                                <td>@Model.Exploration.Pitting_trenches_During</td>
+                                <td>@Model.Exploration.Pitting_trenches_Cumulative</td>
+                                <td>@Model.Exploration.Pitting_trenches_Dimension</td>
+                            </tr>
+                            <tr>
+                                <td>Excavation (in m3)</td>
+                                <td>@Model.Exploration.Pitting_Excavation1_Beginning</td>
+                                <td>@Model.Exploration.Pitting_Excavation1_During</td>
+                                <td>@Model.Exploration.Pitting_Excavation1_Cumulative</td>
+                                <td>@Model.Exploration.Pitting_Excavation1_Dimension</td>
+                            </tr>
+                            <tr>
+                                <td>Length covered (in metre)</td>
+                                <td>@Model.Exploration.Pitting_Length_Beginning</td>
+                                <td>@Model.Exploration.Pitting_Length_During</td>
+                                <td>@Model.Exploration.Pitting_Length_Cumulative</td>
+                                <td>@Model.Exploration.Pitting_Length_Dimension</td>
+                            </tr>
+                            <tr>
+                                <td colspan="2">Expenditure on exploration (₹)</td>
+                                <td>@Model.Exploration.Expenditure_Beginning</td>
+                                <td>@Model.Exploration.Expenditure_During</td>
+                                <td>@Model.Exploration.Expenditure_Cumulative</td>
+                                <td style="text-align: center">X</td>
+                            </tr>
+                        </table>
+                        <p class="text-left">1(ii). Any other exploration activity during the year:</p>
+                        <p class="text-left">2. Reserves and Resources estimated (in tonnes).</p>
+                    </div>
+                </div>
+                <br />
+                <div class="row">
+                    <div class="col-sm-12">
+                        <table style="width: 100%" border="1">
+                            <tr>
+                                <td style="width: 20%">Classification</td>
+                                <td style="width: 10%">Code</td>
+                                <td style="width: 20%">
+                                    At the beginning of the year 1.4.@ViewBag.begning
+                                </td>
+                                <td style="width: 10%">Assessed during the year</td>
+                                <td style="width: 20%">Depletion of reserves during the year</td>
+                                <td style="width: 20%">Balance resources as on 31.3.@ViewBag.closing</td>
+                            </tr>
+                            <tr>
+                                <td>(1)</td>
+                                <td>(2)</td>
+                                <td>(3)</td>
+                                <td>(4)</td>
+                                <td>(5)</td>
+                                <td>(6)=(3+4-5)</td>
+                            </tr>
+                            <tr>
+                                <td colspan="6">A. Mineral Reserve</td>
+                            </tr>
+                            <tr>
+                                <td>1. Proved Mineral Reserve</td>
+                                <td>111</td>
+                                <td>@Model.Reserves.AtBeginning_Proved</td>
+                                <td>@Model.Reserves.Assessed_Proved</td>
+                                <td>@Model.Reserves.Depletion_Proved</td>
+                                <td>@Model.Reserves.Balance_Proved</td>
+                            </tr>
+                            <tr>
+                                <td rowspan="2">2. Probable mineral Reserve</td>
+                                <td>121</td>
+                                <td>@Model.Reserves.AtBeginning_Probable1</td>
+                                <td>@Model.Reserves.Assessed_Probable1</td>
+                                <td>@Model.Reserves.Depletion_Probable1</td>
+                                <td>@Model.Reserves.Balance_Probable1</td>
+                            </tr>
+                            <tr>
+                                <td>122</td>
+                                <td>@Model.Reserves.AtBeginning_Probable2</td>
+                                <td>@Model.Reserves.Assessed_Probable2</td>
+                                <td>@Model.Reserves.Depletion_Probable2</td>
+                                <td>@Model.Reserves.Balance_Probable2</td>
+                            </tr>
+                            <tr>
+                                <td>3. Total Reserves</td>
+                                <td></td>
+                                <td>@Model.Reserves.AtBeginning_TotalReserves</td>
+                                <td>@Model.Reserves.Assessed_TotalReserves</td>
+                                <td>@Model.Reserves.Depletion_TotalReserves</td>
+                                <td>@Model.Reserves.Balance_TotalReserves</td>
+                            </tr>
+                            <tr>
+                                <td colspan="6">B. Remaining Resources</td>
+                            </tr>
+                            <tr>
+                                <td>1. Feasibility mineral Resource</td>
+                                <td>211</td>
+                                <td>@Model.Reserves.AtBeginning_Feasibility</td>
+                                <td>@Model.Reserves.Assessed_Feasibility</td>
+                                <td>@Model.Reserves.Depletion_Feasibility</td>
+                                <td>@Model.Reserves.Balance_Feasibility</td>
+                            </tr>
+                            <tr>
+                                <td rowspan="2">2. Prefeasibility mineral resource</td>
+                                <td>221</td>
+                                <td>@Model.Reserves.AtBeginning_Prefeasibility1</td>
+                                <td>@Model.Reserves.Assessed_Prefeasibility1</td>
+                                <td>@Model.Reserves.Depletion_Prefeasibility1</td>
+                                <td>@Model.Reserves.Balance_Prefeasibility1</td>
+                            </tr>
+                            <tr>
+                                <td>222</td>
+                                <td>@Model.Reserves.AtBeginning_Prefeasibility2</td>
+                                <td>@Model.Reserves.Assessed_Prefeasibility2</td>
+                                <td>@Model.Reserves.Depletion_Prefeasibility2</td>
+                                <td>@Model.Reserves.Balance_Prefeasibility2</td>
+                            </tr>
+                            <tr>
+                                <td>3. Measured mineral resource</td>
+                                <td>331</td>
+                                <td>@Model.Reserves.AtBeginning_Measured</td>
+                                <td>@Model.Reserves.Assessed_Measured</td>
+                                <td>@Model.Reserves.Depletion_Measured</td>
+                                <td>@Model.Reserves.Balance_Measured</td>
+                            </tr>
+                            <tr>
+                                <td>4. Indicated mineral resource</td>
+                                <td>332</td>
+                                <td>@Model.Reserves.AtBeginning_Indicated</td>
+                                <td>@Model.Reserves.Assessed_Indicated</td>
+                                <td>@Model.Reserves.Depletion_Indicated</td>
+                                <td>@Model.Reserves.Balance_Indicated</td>
+                            </tr>
+                            <tr>
+                                <td>5. Inferred mineral resource</td>
+                                <td>333</td>
+                                <td>@Model.Reserves.AtBeginning_Inferred</td>
+                                <td>@Model.Reserves.Assessed_Inferred</td>
+                                <td>@Model.Reserves.Depletion_Inferred</td>
+                                <td>@Model.Reserves.Balance_Inferred</td>
+                            </tr>
+                            <tr>
+                                <td>6. Reconnaissance mineral resource</td>
+                                <td>334</td>
+                                <td>@Model.Reserves.AtBeginning_Reconnaissance</td>
+                                <td>@Model.Reserves.Assessed_Reconnaissance</td>
+                                <td>@Model.Reserves.Depletion_Reconnaissance</td>
+                                <td>@Model.Reserves.Balance_Reconnaissance</td>
+                            </tr>
+                            <tr>
+                                <td>7. Total remaining Resources</td>
+                                <td></td>
+                                <td>@Model.Reserves.AtBeginning_Totalremaining</td>
+                                <td>@Model.Reserves.Assessed_Totalremaining</td>
+                                <td>@Model.Reserves.Depletion_Totalremaining</td>
+                                <td>@Model.Reserves.Balance_Totalremaining</td>
+
+                            </tr>
+                            <tr>
+                                <td>Total (A+B)</td>
+                                <td></td>
+                                <td>@Model.Reserves.AtBeginning_Total</td>
+                                <td>@Model.Reserves.Assessed_Total</td>
+                                <td>@Model.Reserves.Depletion_Total</td>
+                                <td>@Model.Reserves.Balance_Total</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+                <br />
+                <div class="row">
+                    <div class="col-sm-12">
+                        <p class="text-left page-break"><b>3 Subgrade/Mineral Reject (in tonnes)</b></p>
+                        <p>(Information to be given in respect of overburden/ waste and mineral fractions generated below threshold value, if prescribed)</p>
+                        <table style="width: 100%" border="1">
+                            <tr>
+                                <td>Generation Sub-grade Mineral Reject (in tounes)</td>
+                                <td>At the beginning of the year</td>
+                                <td>Generated during the year</td>
+                                <td>Disposed during the year</td>
+                                <td>Total stacked at the end of the year</td>
+                                <td>Average grade of the mineral reject generated.</td>
+                            </tr>
+                            <tr>
+                                <td>from unprocessed ore</td>
+                                <td>@Model.RejectWaste.Reject_AtBeginning</td>
+                                <td>@Model.RejectWaste.Reject_DuringYear</td>
+                                <td>@Model.RejectWaste.Reject_DisposedDuringYear</td>
+                                <td>@Model.RejectWaste.Reject_Stacked</td>
+                                <td>@Model.RejectWaste.Reject_AverageGrade</td>
+                            </tr>
+                            <tr>
+                                <td>from processed ore</td>
+                                <td>@Model.RejectWaste.Processed_AtBeginning</td>
+                                <td>@Model.RejectWaste.Processed_DuringYear</td>
+                                <td>@Model.RejectWaste.Processed_DisposedDuringYear</td>
+                                <td>@Model.RejectWaste.Processed_Stacked</td>
+                                <td>@Model.RejectWaste.Processed_AverageGrade</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+                <br />
+                <div class="row">
+                    <div class="col-sm-12">
+                        <p class="text-left"><b>4. Overburden and Waste (in m3)</b></p>
+                        <p>(Information to be given in respect of overburden/ waste and mineral fractions generated below threshold value, if prescribed)</p>
+                        <table style="width: 100%" border="1">
+                            <tr>
+                                <td>At the beginning of the year</td>
+                                <td>Generated during the year</td>
+                                <td>Disposed in dumps during the year</td>
+                                <td>Backfilled during the year</td>
+                                <td>Total at the end of the year</td>
+                            </tr>
+                            <tr>
+                                <td>@Model.RejectWaste.Waste_AtBeginning</td>
+                                <td>@Model.RejectWaste.Waste_DuringYear</td>
+                                <td>@Model.RejectWaste.Waste_DisposedDuringYear</td>
+                                <td>@Model.RejectWaste.Waste_Stacked</td>
+                                <td>@Model.RejectWaste.Waste_AverageGrade</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+                <br />
+                <div class="row">
+                    <div class="col-sm-12">
+                        <p class="text-left"><b>5. Trees planted/ survival rate</b></p>
+                        <table style="width: 100%" border="1">
+                            <tr>
+                                <td>Description</td>
+                                <td>Within lease area</td>
+                                <td>Outside lease area</td>
+                            </tr>
+                            <tr>
+                                <td>i) Number of trees planted during the year</td>
+                                <td>@Model.RejectWaste.Treesplanted_in_LeaseArea</td>
+                                <td>@Model.RejectWaste.Treesplanted_Outside_LeaseArea</td>
+                            </tr>
+                            <tr>
+                                <td>ii) Survival rate in percentage</td>
+                                <td>@Model.RejectWaste.Survivalrate_in_LeaseArea</td>
+                                <td>@Model.RejectWaste.Survivalrate_Outside_LeaseArea</td>
+                            </tr>
+                            <tr>
+                                <td>iii) Total no. of trees at the end of the year</td>
+                                <td>@Model.RejectWaste.NoOFTrees_in_LeaseArea</td>
+                                <td>@Model.RejectWaste.NoOFTrees_Outside_LeaseArea</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+                <br />
+                <div class="row">
+                    <div class="col-sm-12">
+                        <p class="text-left">
+                            <b> 6. Type of Machinery</b>: Give the following information for the types of machinery in use such as hoist, fans, drills,
+                            loaders, excavators, dumpers, haulages, conveyors, pumps, etc.
+                        </p>
+                        <table id="TypeofMachinery" style="width: 100%" border="1">
+                            <tr>
+                                <th>Type of machinery</th>
+                                <th>Capacity of each type of machinery</th>
+                                <th>Unit (in which capacity is reported)</th>
+                                <th>No. of machinery</th>
+                                <th>Electrical/ Non-electrical (specify)</th>
+                                <th>Used in opencast/ underground (specify)</th>
+                            </tr>
+
+                        </table>
+                    </div>
+                </div>
+                <br />
+                <div class="row">
+                    <div class="col-sm-12">
+                        <p class="text-left page-break">
+                            <b>7(i) Details of mineral Treatment Plant, if any</b>:@Model.Furnish.Mineral_Treatment
+                            <br /> Give a brief description of the process capacity of the machinery
+                            deployed and its availability. (Submit Flow Sheet and Material Balance of the Plant separately).
+                        </p>
+                        <table style="width: 100%" border="1">
+                            <tr>
+                                <td colspan="2">Item</td>
+                                <td>Tonnage</td>
+                                <td>Average Grade</td>
+                            </tr>
+                            <tr>
+                                <td colspan="2">Feed:</td>
+                                <td>@Model.Furnish.TonnageFeed</td>
+                                <td>@Model.Furnish.AverageFeed</td>
+                            </tr>
+                            <tr>
+                                <td>Concentrates/processed products :    (mention name with comma(,) separate)</td>
+                                <td>@Model.Furnish.Processed_products</td>
+                                <td>@Model.Furnish.Processed_Tonnage</td>
+                                <td>@Model.Furnish.Processed_Average</td>
+                            </tr>
+                            <tr>
+                                <td>By-products/Co-products :    (mention name with comma(,) separate)</td>
+                                <td>@Model.Furnish.Co_products</td>
+                                <td>@Model.Furnish.Co_products_Tonnage</td>
+                                <td>@Model.Furnish.Co_products_Average</td>
+                            </tr>
+                            <tr>
+                                <td colspan="2">Tailings :   </td>
+                                <td>@Model.Furnish.TonnageTailings</td>
+                                <td>@Model.Furnish.AverageTailings</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <br />
+            @*Part 6*@
+            <div>
+                <p class="text-center"><b>PART-VI (PRODUCTION, DESPATCHES AND STOCKS)</b></p><br />
+                <p class="text-center">(To be submitted separately for each mineral)</p><br />
+                <p class="text-center">(Unit of Quantity in Tonnes; indicate unit of quantity if not in tonnes)</p>
+                <br />
+                <p class="text-left">&nbsp;&nbsp;&nbsp;&nbsp;<b>1. Production and Stocks of ROM ore</b></p>
+                <table style="width: 100%" border="1">
+                    <tr>
+                        <th rowspan="2"></th>
+                        <th colspan="2">Opening stocks</th>
+                        <th colspan="2">Production</th>
+                        <th colspan="2">Closing stocks</th>
+                    </tr>
+                    <tr>
+                        <th>Quantity</th>
+                        <th>Metal content/ grade</th>
+                        <th>Quantity</th>
+                        <th>Metal content/ grade</th>
+                        <th>Quantity</th>
+                        <th>Metal content/ grade</th>
+                    </tr>
+                    <tr>
+                        <td colspan="7">A. From Underground workings</td>
+                    </tr>
+                    <tr>
+                        <td>i) From Development</td>
+                        <td>@Model.ProductionandStocks.Development_OS_Qty</td>
+                        <td>@Model.ProductionandStocks.Development_OS_grade</td>
+                        <td>@Model.ProductionandStocks.Development_Production_Qty</td>
+                        <td>@Model.ProductionandStocks.Development_Production_grade</td>
+                        <td>@Model.ProductionandStocks.Development_CS_Qty</td>
+                        <td>@Model.ProductionandStocks.Development_CS_grade</td>
+                    </tr>
+                    <tr>
+                        <td>ii) From Stoping</td>
+                        <td>@Model.ProductionandStocks.Stoping_OS_Qty</td>
+                        <td>@Model.ProductionandStocks.Stoping_OS_grade</td>
+                        <td>@Model.ProductionandStocks.Stoping_Production_Qty</td>
+                        <td>@Model.ProductionandStocks.Stoping_Production_grade</td>
+                        <td>@Model.ProductionandStocks.Stoping_CS_Qty</td>
+                        <td>@Model.ProductionandStocks.Stoping_CS_grade</td>
+                    </tr>
+                    <tr>
+                        <td>B. From Opencast workings</td>
+                        <td>@Model.ProductionandStocks.OpenCastWork_OS_Qty</td>
+                        <td>@Model.ProductionandStocks.OpenCastWork_OS_grade</td>
+                        <td>@Model.ProductionandStocks.OpenCastWork_Production_Qty</td>
+                        <td>@Model.ProductionandStocks.OpenCastWork_Production_grade</td>
+                        <td>@Model.ProductionandStocks.OpenCastWork_CS_Qty</td>
+                        <td>@Model.ProductionandStocks.OpenCastWork_CS_grade</td>
+                    </tr>
+                    <tr>
+                        <td>Total</td>
+                        <td>@Model.ProductionandStocks.Total_OS_Qty</td>
+                        <td></td>
+                        <td>@Model.ProductionandStocks.Total_Production_Qty</td>
+                        <td></td>
+                        <td>@Model.ProductionandStocks.Total_CS_Qty</td>
+                        <td></td>
+                    </tr>
+                </table>
+                <br />
+                <p class="text-left">&nbsp;&nbsp;&nbsp;&nbsp;<b>2. Ex-mine price of the ore produced (₹ per unit):</b>&nbsp;&nbsp;&nbsp;&nbsp;@Model.ProductionandStocks.ExMinePrice &nbsp;&nbsp;₹</p>
+
+                <br />
+                <p class="text-left">&nbsp;&nbsp;&nbsp;&nbsp;<b>3. Recoveries at Concentrator/Mill/Plant:</b></p>
+                <table id="tblRecoveries_Concentrator1" style="width: 100%" border="1">
+                    <tr>
+                        <th colspan="2">Opening stocks of the Ore at concentrator/plant</th>
+                        <th colspan="2">Ore received from the mine</th>
+                        <th colspan="2">Ore treated</th>
+
+                    </tr>
+                    <tr>
+                        <th>Quantity</th>
+                        <th>Metal content/ grade</th>
+                        <th>Quantity</th>
+                        <th>Metal content/ grade</th>
+                        <th>Quantity</th>
+                        <th>Metal content/ grade</th>
+                    </tr>
+
+                </table>
+                <br />
+                <br />
+                <table id="tblRecoveries_Concentrator2" style="width: 100%" border="1">
+                    <tr>
+                        <th colspan="3">Concentrates * Obtained</th>
+                        <th colspan="2">Tailings</th>
+                        <th colspan="2">Closing stocks of concentrates at the concentrator/plant</th>
+
+                    </tr>
+                    <tr>
+                        <th>Quantity</th>
+                        <th>Metal content/ grade</th>
+                        <th>Value (₹)</th>
+                        <th>Quantity</th>
+                        <th>Metal content/ grade</th>
+                        <th>Quantity</th>
+                        <th>Metal content/ grade</th>
+                    </tr>
+
+                </table>
+                <br />
+
+                <p class="text-left page-break">&nbsp;&nbsp;&nbsp;&nbsp;<b>4. Recovery at the Smelter/Mill/Plant:</b></p>
+                <table id="tblRecoveries_Smelter1" style="width: 100%" border="1">
+                    <tr>
+                        <th colspan="2">Opening Stocks of the concentrates at the smelter /plant</th>
+                        <th colspan="2">Concentrates received from concentrator/plant</th>
+                        <th colspan="2">Concentrates received from other sources (specify)</th>
+                        <th colspan="2">Concentrates sold (if any)</th>
+                    </tr>
+                    <tr>
+                        <th>Quantity</th>
+                        <th>Metal content/ grade</th>
+                        <th>Quantity</th>
+                        <th>Metal content/ grade</th>
+                        <th>Quantity</th>
+                        <th>Metal content/ grade</th>
+                        <th>Quantity</th>
+                        <th>Metal content/ grade</th>
+                    </tr>
+                </table>
+                <br />
+                <table id="tblRecoveries_Smelter2" style="width: 100%" border="1">
+                    <tr>
+                        <th colspan="2">Concentrates treated</th>
+                        <th colspan="2">Closing stocks of concentrate at the Smelter/Plant</th>
+                        <th colspan="3">Metals(*) recovered (specify)</th>
+                        <th colspan="3">Other by-products, if any, recovered</th>
+                    </tr>
+                    <tr>
+                        <th>Quantity</th>
+                        <th>Metal content/ grade</th>
+
+                        <th>Quantity</th>
+                        <th>Metal content/ grade</th>
+
+                        <th>Quantity</th>
+                        <th>Grade</th>
+                        <th>Value (₹)</th>
+
+                        <th>Quantity</th>
+                        <th>Grade</th>
+                        <th>Value (₹)</th>
+                    </tr>
+                </table>
+                <br />
+                <p class="text-left">
+                    &nbsp;&nbsp;&nbsp;&nbsp;(*) Please give category-wise break-up viz. blister, fire refined copper, cathodes, electrolytic copper wire bars, lead ingots, zinc cathodes, zinc dross, gold, tungsten etc.
+                </p>
+                <br />
+                <p class="text-left">&nbsp;&nbsp;&nbsp;&nbsp;<b>5. Sales during the month:</b></p><br />
+                <table id="tblSales" style="width: 100%" border="1">
+                    <tr>
+                        <th rowspan="2">Metal/ Product</th>
+                        <th colspan="2">Opening stocks of Metals/Products</th>
+                        <th rowspan="2">Place of sale</th>
+                        <th colspan="3">Metals/Products sold(*)</th>
+                        <th colspan="2">Closing stocks of Metals/Products</th>
+                    </tr>
+                    <tr>
+                        <th>Quantity</th>
+                        <th>Grade</th>
+                        <th>Quantity</th>
+                        <th>Grade</th>
+                        <th>Value(#)(₹)</th>
+                        <th>Quantity</th>
+                        <th>Grade</th>
+                    </tr>
+                </table><br />
+                <p class="text-left">
+                    &nbsp;&nbsp;&nbsp;&nbsp;
+                    Note:<br />
+                    (#) Please give ex-plant sale value.<br />
+                    (*) Please give category-wise break-up of metals and other products sold.
+                </p>
+                <br />
+                <p class="text-left">
+                    &nbsp;&nbsp;&nbsp;&nbsp;<b>6. Details of deductions made from sale value for computation of Ex-mine price (₹ / Unit)</b>
+                </p><br />
+                <table style="width: 100%" border="1">
+                    <tr>
+                        <th style="width: 40%">Deduction claimed # </th>
+                        <th style="width: 30%">Amount ( in ₹ / Tonne)</th>
+                        <th style="width: 30%">Remarks</th>
+                    </tr>
+                    <tr>
+                        <td style="width: 40%;">
+                            a)Cost of transportation<br />
+                            (indicate loading station and distance from mine in remarks)
+                        </td>
+                        <td style="width: 30%;">@Model.Deductions.Amount1</td>
+                        <td style="width: 30%;">@Model.Deductions.Remarks1</td>
+                    </tr>
+                    <tr>
+                        <td style="width: 40%;">b) Loading and unloading charges</td>
+                        <td style="width: 30%;">@Model.Deductions.Amount2</td>
+                        <td style="width: 30%;">@Model.Deductions.Remarks2</td>
+                    </tr>
+                    <tr>
+                        <td style="width: 40%;">c) Railway freight, if applicable (indicate destination and distance)</td>
+                        <td style="width: 30%;">@Model.Deductions.Amount3</td>
+                        <td style="width: 30%;">@Model.Deductions.Remarks3</td>
+                    </tr>
+                    <tr>
+                        <td style="width: 40%;">d) Port handling charges/ export duty (indicate name of port)</td>
+                        <td style="width: 30%;">@Model.Deductions.Amount4</td>
+                        <td style="width: 30%;">@Model.Deductions.Remarks4</td>
+                    </tr>
+                    <tr>
+                        <td style="width: 40%;">e) Charges for sampling and analysis</td>
+                        <td style="width: 30%;">@Model.Deductions.Amount5</td>
+                        <td style="width: 30%;">@Model.Deductions.Remarks5</td>
+                    </tr>
+                    <tr>
+                        <td style="width: 40%;">f) Rent for the plot at Stocking yard</td>
+                        <td style="width: 30%;">@Model.Deductions.Amount6</td>
+                        <td style="width: 30%;">@Model.Deductions.Remarks6</td>
+                    </tr>
+                    <tr>
+                        <td style="width: 40%;">g) Other charges (specify clearly)&nbsp;&nbsp;&nbsp; @Model.Deductions.Deduction_claimedType7</td>
+                        <td style="width: 30%;">@Model.Deductions.Amount7</td>
+                        <td style="width: 30%;">@Model.Deductions.Remarks7</td>
+                    </tr>
+                    <tr>
+                        <td style="width: 40%;">Total (a) to (g)</td>
+                        <td style="width: 60%;" colspan="2">@Model.Deductions.TotalAmount</td>
+                    </tr>
+                </table>
+                <br />
+                <p class="text-left">
+                    &nbsp;&nbsp;&nbsp;&nbsp;# Not applicable for captive dispatches and ex-mine sales
+                </p><br />
+                <p class="text-left page-break">
+                    &nbsp;&nbsp;&nbsp;&nbsp;7. Sales/ Dispatches of ore and concentrates effected for Domestic Purposes and for Exports:
+                </p><br />
+                <table id="tblSales_Dispatches" style="width: 100%" border="1">
+                    <tr>
+                        <th rowspan="2">Grade(ore/Conc.)</th>
+                        <th rowspan="2">Nature of Despatch (indicate whether Domestic Sale or Domestic Transfer or Captive consumption or Export)</th>
+                        <th colspan="4">For Domestic Purposes</th>
+                        <th colspan="3">For export</th>
+                    </tr>
+                    <tr>
+                        <th>Registration number as allotted by the Indian Bureau of Mines to the buyer ##</th>
+                        <th>Consignee name ##</th>
+                        <th>Quantity</th>
+                        <th>Sale value (₹)</th>
+                        <th>Country</th>
+                        <th>Quantity</th>
+                        <th>F.O.B Value(₹)</th>
+                    </tr>
+                </table><br />
+                <p class="text-left">
+                    &nbsp;&nbsp;&nbsp;&nbsp;## To indicate separately if more than one buyer.
+                </p><br />
+                <p class="text-left">
+                    &nbsp;&nbsp;&nbsp;&nbsp;<b> 8. Give reasons for increase/decrease in production/nil production, if any, during the month compared to the previous month.</b>
+                </p>
+                <p class="text-left"> &nbsp;&nbsp;&nbsp;&nbsp; a)@Model.ReasonInc_Dec.productionIncrDecResion </p>
+                <br />
+                <p class="text-left">
+                    &nbsp;&nbsp;&nbsp;&nbsp; <b>9. Give reasons for increase/decrease in grade wise ex-mine price, if any, during the month compared to the previous month.</b>
+                </p>
+                <p class="text-left"> &nbsp;&nbsp;&nbsp;&nbsp; a)@Model.ReasonInc_Dec.ex_minepriceIncrDecResion   </p>
+            </div>
+            <br />
+            @*Part 7*@
+            <div>
+                <p class="text-center"><b>PART-VII: COST OF PRODUCTION</b></p>
+                <p class="text-center">Cost of production per tonne of ore/mineral produced</p>
+                <br />
+
+                <table style="width: 100%" border="1">
+                    <tr>
+                        <td style="width: 10%">Sl.No.</td>
+                        <td style="width: 45%">Item</td>
+                        <td style="width: 45%">Cost per tonne (₹)</td>
+                    </tr>
+                    <tr>
+                        <td style="width: 10%">(i)</td>
+                        <td style="width: 45%">Direct Cost</td>
+                        <td style="width: 45%"></td>
+                    </tr>
+                    <tr>
+                        <td style="width: 10%"></td>
+                        <td style="width: 45%">(a) Exploration</td>
+                        <td style="width: 45%">@Model.CostOfProduction.Exploration</td>
+                    </tr>
+                    <tr>
+                        <td style="width: 10%"></td>
+                        <td style="width: 45%">(b) Mining</td>
+                        <td style="width: 45%">@Model.CostOfProduction.Mining</td>
+                    </tr>
+                    <tr>
+                        <td style="width: 10%"></td>
+                        <td style="width: 45%">(c) Beneficiation(Mechanical Only)</td>
+                        <td style="width: 45%">@Model.CostOfProduction.Beneficiation</td>
+                    </tr>
+                    <tr>
+                        <td style="width: 10%">(ii)</td>
+                        <td style="width: 45%">Over-head cost</td>
+                        <td style="width: 45%">@Model.CostOfProduction.Over_headcost</td>
+                    </tr>
+                    <tr>
+                        <td style="width: 10%">(iii)</td>
+                        <td style="width: 45%">Depreciation</td>
+                        <td style="width: 45%">@Model.CostOfProduction.Depreciation</td>
+                    </tr>
+                    <tr>
+                        <td style="width: 10%">(iv)</td>
+                        <td style="width: 45%">Interest</td>
+                        <td style="width: 45%">@Model.CostOfProduction.Interest</td>
+                    </tr>
+                    <tr>
+                        <td style="width: 10%">(v)</td>
+                        <td style="width: 45%">Royalty</td>
+                        <td style="width: 45%">@Model.CostOfProduction.Royalty</td>
+                    </tr>
+                    <tr>
+                        <td style="width: 10%">(vi)</td>
+                        <td style="width: 45%">Payments made to DMF</td>
+                        <td style="width: 45%">@Model.CostOfProduction.DMF</td>
+                    </tr>
+                    <tr>
+                        <td style="width: 10%">(vii)</td>
+                        <td style="width: 45%">Payments made to NMET</td>
+                        <td style="width: 45%">@Model.CostOfProduction.NMET</td>
+                    </tr>
+                    <tr>
+                        <td style="width: 10%">(viii)</td>
+                        <td style="width: 45%">Taxes</td>
+                        <td style="width: 45%">@Model.CostOfProduction.Taxes</td>
+                    </tr>
+                    <tr>
+                        <td style="width: 10%">(ix)</td>
+                        <td style="width: 45%">Dead Rent</td>
+                        <td style="width: 45%">@Model.CostOfProduction.Dead_Rent</td>
+                    </tr>
+                    <tr>
+                        <td style="width: 10%">(x)</td>
+                        <td style="width: 45%">Others (specify)</td>
+                        <td style="width: 45%">@Model.CostOfProduction.Others</td>
+                    </tr>
+                    <tr>
+                        <td style="width: 10%"></td>
+                        <td style="width: 45%">Total</td>
+                        <td style="width: 45%">@Model.CostOfProduction.Total</td>
+                    </tr>
+                </table>
+                <br />
+
+                <p>
+                    Note: Information given under Part VII will be kept confidential. The Government, however, will be free to utilize the
+                    information for general studies without revealing the identity of the firm.
+                </p>
+                <br />
+                <p>
+                    <input type="checkbox" name="@Model.CostOfProduction.certify" value="@Model.CostOfProduction.certify" checked>
+                    I certify that the information furnished above is correct and complete in all respects
+                </p>
+
+                <table style="width: 50%">
+                    <tr>
+                        <td style="width: 100%">
+                            <b>Name in full:</b> @Model.MineDetails.LesseeName<br />
+                            Designation: Owner/Agent/Mining Engineer/Manager<br />
+                            <b>Place:</b>@Model.MineDetails.LesseeAddress<br />
+                            <b>Date: </b>@Model.OtherDetails.SubmitDate
+                        </td>
+                    </tr>
+                </table>
+
+                @* <table style="width: 100%">
+                        <tr>
+                            <td style="width: 50%">
+                                <b>Place:</b>@Model.MineDetails.LesseeAddress<br />
+                                <b>Date: </b>@Model.OtherDetails.SubmitDate
+                            </td>
+                            <td style="width: 50%"><b>Signature </b>
+                                <br />
+                                <b>Name in full:</b>@Model.MineDetails.LesseeName<br />
+                                Designation: Owner/Agent/Mining Engineer/Manager
+                            </td>
+                        </tr>
+                    </table>*@
+            </div> 
+        </div>
+        <input id="fName" type="hidden" />
+        <input id="fid" type="hidden" />
+    }
+</body>
+</html>
+@*Part 1*@
+<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.3.3/jspdf.min.js"></script>
+<script src="https://html2canvas.hertzen.com/dist/html2canvas.js"></script>
+<script type="text/javascript">
+
+    function getPDF() {
+        debugger;
+        var HTML_Width = $("#eReturnYearly").width();
+        var HTML_Height = $("#eReturnYearly").height();
+        var top_left_margin = 15;
+        var PDF_Width = HTML_Width + (top_left_margin * 2);
+        var PDF_Height = (PDF_Width * 1.5) + (top_left_margin * 2);
+        var canvas_image_width = HTML_Width;
+        var canvas_image_height = HTML_Height;
+
+        var totalPDFPages = Math.ceil(HTML_Height / PDF_Height) - 1;
+
+
+        html2canvas($("#eReturnYearly")[0], { allowTaint: true }).then(function (canvas) {
+            debugger;
+            canvas.getContext('2d');
+
+            console.log(canvas.height + "  " + canvas.width);
+
+            // var data = canvas.toDataURL();
+            var data = canvas.toDataURL("image/JPEG", 1.0);
+            var pdf = new jsPDF('p', 'pt', [PDF_Width, PDF_Height]);
+            pdf.addImage(data, 'JPEG', top_left_margin, top_left_margin, canvas_image_width, canvas_image_height);
+
+
+            for (var i = 1; i <= totalPDFPages; i++) {
+                pdf.addPage(PDF_Width, PDF_Height);
+                pdf.addImage(data, 'JPEG', top_left_margin, -(PDF_Height * i) + (top_left_margin * 4), canvas_image_width, canvas_image_height);
+            }
+            //data = data.replace('data:image/png;base64,', '');
+            //data = pdf.output("datauristring").replace('data:application/pdf;base64,', '');
+            pdf.save("FormG2.pdf");
+        });
+    };
+
+    $(document).ready(function () {
+        getMineWork();
+        getTypeOfMachinery();
+        getConcentrator();
+        getSmelter();
+        getSales();
+        getSalesDispatches();
+        getAreaParticular();
+    });
+
+    function getAreaParticular() {
+
+        try {
+            var Y = $("#Year").val();
+            $.ajax({
+                type: "GET",
+                url: "/eReturn_NonCoal_Yearly/EReturnYearlyNonCoalG2/GetParticularsofArea",
+                data: { 'Year': Y },
+                dataType: "json",
+                success: function (result) {
+
+                    $("#tr_Area").remove();
+                    for (i = 0; i < result.objParticular.lease_number.length; i++) {
+
+                        $('#tbl_AreaParticular tbody').append('<tr><td colspan="4">(i) Lease number allotted by the State Government &nbsp;&nbsp;<b>' + result.objParticular.lease_number[i] + '</b>  </td></tr><tr><td colspan="4">(ii) Area under lease (hectares):</td> </tr><tr><td> <p>Under Forest</p></td><td colspan="3"><p class="text-center">'
+                            + result.objParticular.underlease_UnderForest[i] + '</p></td></tr><tr><td><p>Outside Forest</p></td><td colspan="3"><p class="text-center">'
+                            + result.objParticular.underlease_OutsideForest[i] + '</p></td></tr><tr><td><p>Total</p></td><td colspan="3"><p class="text-center">'
+                            + result.objParticular.underlease_Total[i] + '</p></td></tr><tr><td><p>(iii) Date of execution of mining lease deed</p></td><td colspan="3"><p class="text-center">'
+                            + result.objParticular.date_of_execution_str[i] + '</p></td></tr><tr> <td><p>(iv) Period of lease</p></td><td colspan="3"><p class="text-center">'
+                            + result.objParticular.periodoflease[i] + '</p></td></tr><tr><td colspan="4"><p>(v) Area for which surface rights are held (hectares)</p></td></tr><tr><td><p>Under Forest</p></td><td colspan="3"><p class="text-center">'
+                            + result.objParticular.surfacerights_UnderForest[i] + '</p></td></tr> <tr> <td><p>Outside Forest</p> </td> <td colspan="3"><p class="text-center">'
+                            + result.objParticular.surfacerights_OutsideForest[i] + '</p></td></tr><tr><td><p>Total</p></td><td colspan="3"><p class="text-center">'
+                            + result.objParticular.surfacerights_Total[i] + '</p></td></tr> <tr> <td> <p>(vi) Date and period of renewal (if applicable)</p></td><td colspan="3"><p class="text-center">'
+                            + result.objParticular.renewalDate_str[i] + ' and ' + result.objParticular.renewalPeriod[i] + '</p></td></tr>');
+
+                        $("#More_mine_details").text(result.objParticular.more_mine_details);
+                        $("#Mineral_produced").text(result.objParticular.mineral_produced);
+
+
+
+
+
+                    }
+
+
+                }
+            });
+        }
+        catch (e) { }
+    }
+
+    function getMineWork() {
+
+        try {
+            var Y = $("#Year").val();
+            $.ajax({
+                type: "GET",
+                url: "/eReturn_NonCoal_Yearly/EReturnYearlyNonCoalG2/GetWorkDetails",
+                data: { 'Year': Y },
+                dataType: "json",
+                success: function (result) {
+
+                    for (i = 0; i < result.objWork.noOfDaysMineStop.length; i++) {
+                        $('#MiningWork tbody').append('<tr><td style="width: 50%; text-align: center;">'
+                            + result.objWork.reason[i] + '</td><td style="width: 50%; text-align: center; border-left: 1px solid #080808;">'
+                            + result.objWork.noOfDaysMineStop[i] + '</td></tr>');
+
+                    }
+                    $("#NoOfDaysWork").text(result.objWork.noOfDaysMineWorked);
+                    $("#NoOfShif").text(result.objWork.noOfShiftPerDay);
+
+                }
+            });
+        }
+        catch (e) { }
+    }
+
+    function getTypeOfMachinery() {
+        try {
+
+            var Y = $("#Year").val();
+            var Uid = $("#Uid").val();
+            $.ajax({
+                type: "GET",
+                url: "/eReturn_NonCoal_Yearly/EReturnYearlyNonCoalG2/GetMachineryDetailsForPrint",
+                data: { 'Year': Y },
+                dataType: "json",
+                success: function (result) {
+
+                    if (result != null) {
+                        for (i = 0; i < result.length; i++) {
+                            $('#TypeofMachinery tbody').append('<tr><td style="width: 25%;">'
+                                + result[i].typeofMachinery + '</td><td style="width: 15%; text-align: left; border-left: 1px solid #70ADD6;">'
+                                + result[i].capacity + '</td><td style="width: 15%; text-align: left; border-left: 1px solid #70ADD6;">'
+                                + result[i].capacity_Unit + '</td><td style="width: 15%; text-align: left; border-left: 1px solid #70ADD6;">'
+                                + result[i].noofMachinery + '</td><td style="width: 15%; text-align: left; border-left: 1px solid #70ADD6;">'
+                                + result[i].type_Electrical + '</td><td style="width: 15%; text-align: left; border-left: 1px solid #70ADD6;">'
+                                + result[i].used_Area + '</td></tr>');
+                        }
+                    }
+                    else {
+                        alert("No Data Available");
+                    }
+                }
+            });
+        }
+        catch (e) { }
+    }
+
+    function getConcentrator() {
+
+        try {
+
+            var Y = $("#Year").val();
+            $.ajax({
+                type: "GET",
+                url: "/eReturn_NonCoal_Yearly/EReturnYearlyNonCoalG2/GetRecoveries_ForPrint",
+                data: { 'Year': Y },
+                dataType: "json",
+                success: function (result) {
+
+                    if (result != null) {
+                        for (i = 0; i < result.length; i++) {
+                            $('#tblRecoveries_Concentrator1 tbody').append('<tr><td style="width: 20%;">'
+                                + result[i].oS_qty + '</td><td style="width: 16%; text-align: left; border-left: 1px solid #70ADD6;">'
+                                + result[i].oS_grade + '</td><td style="width: 16%; text-align: left; border-left: 1px solid #70ADD6;">'
+                                + result[i].oreReceived_qty + '</td><td style="width: 16%; text-align: left; border-left: 1px solid #70ADD6;">'
+                                + result[i].oreReceived_grade + '</td><td style="width: 16%; text-align: left; border-left: 1px solid #70ADD6;">'
+                                + result[i].oreTreated_qty + '</td><td style="width: 16%; text-align: left; border-left: 1px solid #70ADD6;">'
+                                + result[i].oreTreated_grade + '</td></tr>');
+
+                            $('#tblRecoveries_Concentrator2 tbody').append('<tr><td style="width: 10%;">'
+                                + result[i].concentrates_qty + '</td><td style="width: 15%; text-align: left; border-left: 1px solid #70ADD6;">'
+                                + result[i].concentrates_grade + '</td><td style="width: 15%; text-align: left; border-left: 1px solid #70ADD6;">'
+                                + result[i].concentrates_Value + '</td><td style="width: 15%; text-align: left; border-left: 1px solid #70ADD6;">'
+                                + result[i].tailings_Qty + '</td><td style="width: 15%; text-align: left; border-left: 1px solid #70ADD6;">'
+                                + result[i].tailing_grade + '</td><td style="width: 15%; text-align: left; border-left: 1px solid #70ADD6;">'
+                                + result[i].cS_qty + '</td><td style="width: 15%; text-align: left; border-left: 1px solid #70ADD6;">'
+                                + result[i].cS_grade + '</td></tr>');
+                        }
+                    }
+                    else {
+                        alert("No Data Available");
+                    }
+                }
+            });
+        }
+        catch (e) { }
+    }
+
+    function getSmelter() {
+        try {
+
+            var Y = $("#Year").val();
+            $.ajax({
+                type: "GET",
+                url: "/eReturn_NonCoal_Yearly/EReturnYearlyNonCoalG2/GetRecoveriesSmelter_ForPrint",
+                data: { 'Year': Y },
+                dataType: "json",
+                success: function (result) {
+
+                    if (result != null) {
+                        for (i = 0; i < result.length; i++) {
+                            $('#tblRecoveries_Smelter1 tbody').append('<tr><td style="width: 20%;">'
+                                + result[i].oS_qty + '</td><td style="width: 16%; text-align: left; border-left: 1px solid #70ADD6;">'
+                                + result[i].oS_grade + '</td><td style="width: 16%; text-align: left; border-left: 1px solid #70ADD6;">'
+                                + result[i].concentratesreceived_qty + '</td><td style="width: 16%; text-align: left; border-left: 1px solid #70ADD6;">'
+                                + result[i].concentratesreceived_grade + '</td><td style="width: 16%; text-align: left; border-left: 1px solid #70ADD6;">'
+                                + result[i].concentrates_othersources_qty + '</td><td style="width: 16%; text-align: left; border-left: 1px solid #70ADD6;">'
+                                + result[i].concentratesreceived_grade + '</td><td style="width: 16%; text-align: left; border-left: 1px solid #70ADD6;">'
+                                + result[i].concentrates_sold_qty + '</td><td style="width: 16%; text-align: left; border-left: 1px solid #70ADD6;">'
+                                + result[i].concentrates_sold_grade + '</td></tr>');
+
+                            $('#tblRecoveries_Smelter2 tbody').append('<tr><td style="width: 10%;">'
+                                + result[i].concentrates_treated_qty + '</td><td style="width: 15%; text-align: left; border-left: 1px solid #70ADD6;">'
+                                + result[i].concentrates_treated_grade + '</td><td style="width: 15%; text-align: left; border-left: 1px solid #70ADD6;">'
+                                + result[i].cS_qty + '</td><td style="width: 15%; text-align: left; border-left: 1px solid #70ADD6;">'
+                                + result[i].cS_grade + '</td><td style="width: 15%; text-align: left; border-left: 1px solid #70ADD6;">'
+                                + result[i].metalsrecovered_qty + '</td><td style="width: 15%; text-align: left; border-left: 1px solid #70ADD6;">'
+                                + result[i].metalsrecovered_grade + '</td><td style="width: 15%; text-align: left; border-left: 1px solid #70ADD6;">'
+                                + result[i].metalsrecovered_Value + '</td><td style="width: 15%; text-align: left; border-left: 1px solid #70ADD6;">'
+                                + result[i].other_byproducts_qty + '</td><td style="width: 15%; text-align: left; border-left: 1px solid #70ADD6;">'
+                                + result[i].other_byproducts_grade + '</td><td style="width: 15%; text-align: left; border-left: 1px solid #70ADD6;">'
+                                + result[i].other_byproducts_Value + '</td></tr>');
+                        }
+                    }
+                    else {
+                        alert("No Data Available");
+                    }
+                }
+            });
+        }
+        catch (e) { }
+    }
+
+    function getSales() {
+        try {
+            var Y = $("#Year").val();
+            $.ajax({
+                type: "GET",
+                url: "/eReturn_NonCoal_Yearly/EReturnYearlyNonCoalG2/GetSaleProduct_ForPrint",
+                data: { 'Year': Y },
+                dataType: "json",
+                success: function (result) {
+
+                    if (result != null) {
+                        for (i = 0; i < result.length; i++) {
+                            $('#tblSales tbody').append('<tr><td style="width: 12%;">'
+                                + result[i].product + '</td><td style="width: 11%; text-align: left; border-left: 1px solid #70ADD6;">'
+                                + result[i].oS_Qty + '</td><td style="width: 11%; text-align: left; border-left: 1px solid #70ADD6;">'
+                                + result[i].oS_Grade + '</td><td style="width: 11%; text-align: left; border-left: 1px solid #70ADD6;">'
+                                + result[i].placeOfSale + '</td><td style="width: 11%; text-align: left; border-left: 1px solid #70ADD6;">'
+                                + result[i].sold_Qty + '</td><td style="width: 11%; text-align: left; border-left: 1px solid #70ADD6;">'
+                                + result[i].sold_Grade + '</td><td style="width: 11%; text-align: left; border-left: 1px solid #70ADD6;">'
+                                + result[i].sold_Value + '</td><td style="width: 11%; text-align: left; border-left: 1px solid #70ADD6;">'
+                                + result[i].cS_Qty + '</td><td style="width: 11%; text-align: left; border-left: 1px solid #70ADD6;">'
+                                + result[i].cS_Grade + '</td></tr>');
+
+                        }
+                    }
+                    else {
+                        alert("No Data Available");
+                    }
+                }
+            });
+        }
+        catch (e) { }
+    }
+
+    function getSalesDispatches() {
+        try {
+            var Y = $("#Year").val();
+            $.ajax({
+                type: "GET",
+                url: "/eReturn_NonCoal_Yearly/EReturnYearlyNonCoalG2/GetSaleDispatch_G2_ForPrint",
+                data: { 'Year': Y },
+                dataType: "json",
+                success: function (result) {
+
+                    if (result != null) {
+                        for (i = 0; i < result.length; i++) {
+                            $('#tblSales_Dispatches tbody').append('<tr><td style="width: 12%;">'
+                                + result[i].mineralGrade + '</td><td style="width: 11%; text-align: left; border-left: 1px solid #70ADD6;">'
+                                + result[i].natureofDispatch + '</td><td style="width: 11%; text-align: left; border-left: 1px solid #70ADD6;">'
+                                + result[i].registrationNo + '</td><td style="width: 11%; text-align: left; border-left: 1px solid #70ADD6;">'
+                                + result[i].purchaserConsinee + '</td><td style="width: 11%; text-align: left; border-left: 1px solid #70ADD6;">'
+                                + result[i].domesticPurposes_Quantity + '</td><td style="width: 11%; text-align: left; border-left: 1px solid #70ADD6;">'
+                                + result[i].saleValue + '</td><td style="width: 11%; text-align: left; border-left: 1px solid #70ADD6;">'
+                                + result[i].country + '</td><td style="width: 11%; text-align: left; border-left: 1px solid #70ADD6;">'
+                                + result[i].export_Quantity + '</td><td style="width: 11%; text-align: left; border-left: 1px solid #70ADD6;">'
+                                + result[i].fobValue + '</td></tr>');
+
+                        }
+                    }
+                    else {
+                        alert("No Data Available");
+                    }
+                }
+            });
+        }
+        catch (e) { }
+    }
+</script>
+

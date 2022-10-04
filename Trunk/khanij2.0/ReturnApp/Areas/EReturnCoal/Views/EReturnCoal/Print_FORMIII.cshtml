@@ -1,0 +1,1227 @@
+﻿@*// *********************************************************************************************************
+    //  View Name                : Print_FORMIII
+    //  Desciption               : To Print FORM III
+    //  Created By               : Akshaya Dalei
+    //  Created On               : 08 Nov 2021
+    // ********************************************************************************************************
+*@
+@model ReturnEF.CoalYearlyViewModel
+@{
+    ViewBag.Title = "Print FIRST SCHEDULE FORM III";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+
+<html>
+<head>
+    <title>Yearly eReturn</title>
+
+
+
+    <style>
+        div, p, table {
+            padding: 0px;
+            margin: 0px;
+        }
+
+        h1 {
+            page-break-before: always;
+        }
+
+        .margin {
+            margin: 25px;
+        }
+
+        .logo-title-border {
+            border: 0.5px solid;
+            margin-top: 20px;
+            margin-bottom: 30px;
+            margin-left: 10px;
+            margin-right: 10px;
+            padding: 10px;
+            width: 226px;
+        }
+
+        .img-logo {
+            margin-left: 40px;
+            padding-top: 20px;
+        }
+
+        .barcode-title {
+        }
+
+        .size-a4 {
+            width: 8.3in;
+            height: 11.7in;
+        }
+
+        td {
+            width: 50%;
+            padding: 10px;
+            margin: 10px;
+        }
+    </style>
+
+</head>
+<body class="margin">
+
+    <section class="content-header">
+
+
+
+
+        <ol class="breadcrumb">
+
+            <li class="active">Print</li>
+
+
+        </ol>
+    </section>
+    <br />
+    @using (Html.BeginForm("", "", FormMethod.Post, new { id = "__FormIIIAntiForgeryForm", @class = "form-horizontal bordered-row" }))
+    {
+        @if (Model != null && !string.IsNullOrEmpty(Model.objMine.DSCFilePath))
+        {
+
+            <span id="lblGenerate">Download FORM</span>
+            <a target="_blank" class="btn btn-primary" href='@ViewBag.ServerPath@Model.objMine.DSCFilePath'>Download</a>
+
+        }
+        else
+        {
+            <h3>
+                Print
+                <img src="~/img/1475779253_BT_printer.ico" style="height:40px;width:40px;cursor:pointer;" onclick="getPDF()" />
+            </h3>
+        }
+        <input type="hidden" name="Year" value="@ViewBag.EncryptData" id="Year" />
+        <input type="hidden" name="Uid" value="@ViewBag.UserId" id="Uid" />
+        @Html.HiddenFor(x => x.objMine.Coal_Year_Id)
+        <div id="eReturnYearly" class="container-fluid  pdf-page size-a4" style="min-height: 13757px; height: auto; height: auto !important;">
+            <div>
+                <p class="text-center"><b>FIRST SCHEDULE</b></p>
+                <p class="text-center">FORM III</p>
+                <p class="text-center">(See Regulation 5)</p>
+                <br />
+                <p class="text-center"><b>Annual Return for the year ending on the 31st December, @ViewBag.Year</b></p>
+                <br />
+                <p class="text-left">&nbsp;&nbsp;&nbsp;&nbsp;1. Name of mine:<b> @Html.DisplayFor(m => m.objMine.Name_of_mine)</b></p>
+                <p class="text-left">&nbsp;&nbsp;&nbsp;&nbsp;2. Postal address of mine:<b> @Html.DisplayFor(m => m.objMine.postal_address_of_mine)</b></p>
+                <br />
+                @*<p class="text-left">&nbsp;&nbsp;&nbsp;&nbsp;3. Date of opening : <b>@Html.DisplayFor(m => m.objMine.DateOfopening)</b>&nbsp;&nbsp;&nbsp;&nbsp; Place :<b>@Html.DisplayFor(m => m.objMine.Tahsil)</b>&nbsp;&nbsp;&nbsp;&nbsp; District:<b>@Html.DisplayFor(m => m.objMine.District)</b></p>*@
+                <p class="text-left">&nbsp;&nbsp;&nbsp;&nbsp;3. Date of opening : <b>@Html.DisplayFor(m => m.objMine.DateOfopening)</b></p>
+                <p class="text-left">&nbsp;&nbsp;&nbsp;&nbsp;4. Date of closing (if closed) : <b>@Html.DisplayFor(m => m.objMine.DateOfclosing)</b></p>
+                <br />
+                <p class="text-left">&nbsp;&nbsp;&nbsp;&nbsp;5. Situation of mine District :<b>@Html.DisplayFor(m => m.objMine.District)</b></p>
+                <p class="text-left">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;State :<b>@Html.DisplayFor(m => m.objMine.State)</b></p>
+                <br />
+                <p class="text-left">&nbsp;&nbsp;&nbsp;&nbsp;6. Name of Owner :<b>@Html.DisplayFor(m => m.objMine.Name_of_Owner)</b></p>
+                <p class="text-left">&nbsp;&nbsp;&nbsp;&nbsp;Postal address of owner :<b>@Html.DisplayFor(m => m.objMine.Postal_address_of_owner)</b></p>
+                <br />
+                <p class="text-left">&nbsp;&nbsp;&nbsp;&nbsp;7. Name of Managing Agents (if any) :<b>@Html.DisplayFor(m => m.objMine.Name_of_agents)</b></p>
+                <p class="text-left">&nbsp;&nbsp;&nbsp;&nbsp;Postal address of managing agents, :<b>@Html.DisplayFor(m => m.objMine.Address_of_agents)</b></p>
+                <br />
+                <p class="text-left">&nbsp;&nbsp;&nbsp;&nbsp;8. Name of Agent (if any) as defined in section 2(c) of the Mines Act, 1952:<b>@Html.DisplayFor(m => m.objMine.Agent_Name)</b></p>
+                <p class="text-left">&nbsp;&nbsp;&nbsp;&nbsp;Postal address of agent :<b>@Html.DisplayFor(m => m.objMine.Agent_Address)</b></p>
+                <br />
+                <p class="text-left">&nbsp;&nbsp;&nbsp;&nbsp;9. Name of manager :<b>@Html.DisplayFor(m => m.objMine.Name_of_manager)</b></p>
+                <p class="text-left">&nbsp;&nbsp;&nbsp;&nbsp;Postal address of manager :<b>@Html.DisplayFor(m => m.objMine.Address_of_manager)</b></p>
+                <br />
+                <p class="text-left">&nbsp;&nbsp;&nbsp;&nbsp;10. Other superior supervisory staff employed as at the end of the year. (Please give designations and numbers employed) :</p>
+                <table border="1" style="margin-left: 200px;">
+                    <thead>
+                        <tr>
+                            <td>Designation</td>
+                            <td>Number of employee</td>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @for (int i = 0; i < @Model.objMine.DesignationsList.Count(); i++)
+                        {
+                            <tr>
+                                <td>
+                                    @Model.objMine.DesignationsList[i]
+                                </td>
+                                <td>
+                                    @Model.objMine.Numbers_employedList[i]
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+
+                </table>
+                <br />
+                <p class="text-left">&nbsp;&nbsp;&nbsp;&nbsp;11. (a) Whether machinery is used ?<b>@Html.DisplayFor(m => m.objMine.Machinery_Used)</b></p>
+                <p class="text-left">&nbsp;&nbsp;&nbsp;&nbsp;(b) Nature of power used, if any (e.g., electricity, steam, compressed air, etc.) :<b>@Html.DisplayFor(m => m.objMine.Nature_Of_Power)</b></p>
+                <br />
+                <p class="text-left">&nbsp;&nbsp;&nbsp;&nbsp;12. Tables A to F duly filled in, are attached.</p>
+                <p>
+                    @Html.CheckBoxFor(m => m.objMine.Certify)
+                    Certified that the information given above and in Tables A to F below is correct to the best of my knowledge.
+                </p>
+                <br />
+                <p class="text-right">Yours faithfully,</p>
+                <p class="text-right">Signature …………………………</p>
+                <p class="text-right">Designation : Owner/Agent/Manager</p>
+                <span class="page-break"></span>
+                <br />
+            </div>
+
+            @*  TABLE A - EMPLOYMENT*@
+            <div>
+
+                <p class="text-center"><b>TABLE A - EMPLOYMENT</b></p>
+                <br />
+                <p class="text-left">&nbsp;&nbsp;&nbsp;&nbsp;Maximum number of persons employed on any one day during the year &nbsp;&nbsp;&nbsp;&nbsp;<b> @Html.DisplayFor(m => m.objEmployment.NumberofPersons)</b> &nbsp;&nbsp;</p>
+                <p class="text-left">&nbsp;&nbsp;&nbsp;&nbsp;(i)in workings below ground on &nbsp;&nbsp;&nbsp;&nbsp; <b>@Html.DisplayFor(m => m.objEmployment.Belowground_onDay)</b> (a) <b>@Html.DisplayFor(m => m.objEmployment.Belowground_onDatestr) </b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;No. of employee &nbsp;&nbsp;&nbsp;&nbsp; <b>@Html.DisplayFor(m => m.objEmployment.Belowground_No_Employee)</b></p>
+                <p class="text-left">&nbsp;&nbsp;&nbsp;&nbsp;(ii)in all in the mine on &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b> </b>(a) <b> @Html.DisplayFor(m => m.objEmployment.Mine_onDatestr)</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;No. of employee &nbsp;&nbsp;&nbsp;&nbsp; <b>14</b></p>
+                <br />
+                <table style="width: 100%" border="1">
+                    <tr>
+                        <td>Classification</td>
+                        <td colspan="3">Total number of mandays worked during the year (b)</td>
+                        <td>Number of days worked during the year</td>
+                        <td colspan="4">Average daily number of persons employed (c)</td>
+                        <td>Total wages or salary bill for the year(d)</td>
+                    </tr>
+                    <tr>
+                        <td>(1)</td>
+                        <td>(2A)</td>
+                        <td>(2B)</td>
+                        <td>(2C)</td>
+                        <td>(3)</td>
+                        <td>(4A)</td>
+                        <td>(4B)</td>
+                        <td>(4C)</td>
+                        <td>(4D)</td>
+                        <td>(5)</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Below ground:<br />
+                            (i) Overman & Sirdars<br />
+                            (ii) Miners & Loaders<br />
+                            (iii) Others
+                        </td>
+                        <td>
+                            <br />@Html.DisplayFor(m => m.objEmployment.BG_Overman_2A)<br />@Html.DisplayFor(m => m.objEmployment.BG_Mine_Loader_2A)<br />@Html.DisplayFor(m => m.objEmployment.BG_Others_2A)
+                        </td>
+                        <td>
+                            <br />@Html.DisplayFor(m => m.objEmployment.BG_Overman_2B)<br />@Html.DisplayFor(m => m.objEmployment.BG_Mine_Loader_2B)<br />@Html.DisplayFor(m => m.objEmployment.BG_Others_2B)
+                        </td>
+                        <td>
+                            <br />@Html.DisplayFor(m => m.objEmployment.BG_Overman_2C)<br />@Html.DisplayFor(m => m.objEmployment.BG_Mine_Loader_2C)<br />@Html.DisplayFor(m => m.objEmployment.BG_Others_2C)
+                        </td>
+                        <td>
+                            <br />@Html.DisplayFor(m => m.objEmployment.BG_Overman_3)<br />
+                            @Html.DisplayFor(m => m.objEmployment.BG_Mine_Loader_3)<br />
+                            @Html.DisplayFor(m => m.objEmployment.BG_Others_3)
+                        </td>
+                        <td>
+                            <br />@Html.DisplayFor(m => m.objEmployment.BG_Overman_4A)<br />@Html.DisplayFor(m => m.objEmployment.BG_Mine_Loader_4A)<br />@Html.DisplayFor(m => m.objEmployment.BG_Others_4A)
+                        </td>
+                        <td>
+                            <br />@Html.DisplayFor(m => m.objEmployment.BG_Overman_4B)<br />@Html.DisplayFor(m => m.objEmployment.BG_Mine_Loader_4B)<br />@Html.DisplayFor(m => m.objEmployment.BG_Others_4B)
+                        </td>
+                        <td>
+                            <br />@Html.DisplayFor(m => m.objEmployment.BG_Overman_4C)<br />@Html.DisplayFor(m => m.objEmployment.BG_Mine_Loader_4C)<br />@Html.DisplayFor(m => m.objEmployment.BG_Others_4C)
+                        </td>
+                        <td>
+                            <br />@Html.DisplayFor(m => m.objEmployment.BG_Overman_4D)<br />@Html.DisplayFor(m => m.objEmployment.BG_Mine_Loader_4D)<br />@Html.DisplayFor(m => m.objEmployment.BG_Others_4D)
+                        </td>
+                        <td>
+                            <br />@Html.DisplayFor(m => m.objEmployment.BG_Overman_5)<br />@Html.DisplayFor(m => m.objEmployment.BG_Mine_Loader_5)<br />@Html.DisplayFor(m => m.objEmployment.BG_Others_5)
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Opencast Working :<br />
+                            (i) Overman & Sirdars<br />
+                            (ii) Miners & Loaders<br />
+                            (iii) Others
+                        </td>
+                        <td>
+                            <br />@Html.DisplayFor(m => m.objEmployment.OC_Overman_2A)<br />@Html.DisplayFor(m => m.objEmployment.OC_Mine_Loader_2A)<br />@Html.DisplayFor(m => m.objEmployment.OC_Others_2A)
+                        </td>
+                        <td>
+                            <br />@Html.DisplayFor(m => m.objEmployment.OC_Overman_2B)<br />@Html.DisplayFor(m => m.objEmployment.OC_Mine_Loader_2B)<br />@Html.DisplayFor(m => m.objEmployment.OC_Others_2B)
+                        </td>
+                        <td>
+                            <br />@Html.DisplayFor(m => m.objEmployment.OC_Overman_2C)<br />@Html.DisplayFor(m => m.objEmployment.OC_Mine_Loader_2C)<br />@Html.DisplayFor(m => m.objEmployment.OC_Others_2C)
+                        </td>
+                        <td>
+                            <br />@Html.DisplayFor(m => m.objEmployment.OC_Overman_3)<br />
+                            @Html.DisplayFor(m => m.objEmployment.OC_Mine_Loader_3)<br />
+                            @Html.DisplayFor(m => m.objEmployment.OC_Others_3)
+                        </td>
+                        <td>
+                            <br />@Html.DisplayFor(m => m.objEmployment.OC_Overman_4A)<br />@Html.DisplayFor(m => m.objEmployment.OC_Mine_Loader_4A)<br />@Html.DisplayFor(m => m.objEmployment.OC_Others_4A)
+                        </td>
+                        <td>
+                            <br />@Html.DisplayFor(m => m.objEmployment.OC_Overman_4B)<br />@Html.DisplayFor(m => m.objEmployment.OC_Mine_Loader_4B)<br />@Html.DisplayFor(m => m.objEmployment.OC_Others_4B)
+                        </td>
+                        <td>
+                            <br />@Html.DisplayFor(m => m.objEmployment.OC_Overman_4C)<br />@Html.DisplayFor(m => m.objEmployment.OC_Mine_Loader_4C)<br />@Html.DisplayFor(m => m.objEmployment.OC_Others_4C)
+                        </td>
+                        <td>
+                            <br />@Html.DisplayFor(m => m.objEmployment.OC_Overman_4D)<br />@Html.DisplayFor(m => m.objEmployment.OC_Mine_Loader_4D)<br />@Html.DisplayFor(m => m.objEmployment.OC_Others_4D)
+                        </td>
+                        <td>
+                            <br />@Html.DisplayFor(m => m.objEmployment.OC_Overman_5)<br />
+                            @Html.DisplayFor(m => m.objEmployment.OC_Mine_Loader_5)<br />
+                            @Html.DisplayFor(m => m.objEmployment.OC_Others_5)
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>
+                            Above ground :<br />
+                            (i) Clerical and Supervisory staff (excluding the superior supervisory staff )<br />
+                            (ii) Workers in any attached factory, workshop or mineral dressing plant.<br />
+                            (iii) Others
+                        </td>
+                        <td>
+                            <br />@Html.DisplayFor(m => m.objEmployment.CS_staff_2A)<br />@Html.DisplayFor(m => m.objEmployment.Workers_2A)<br />@Html.DisplayFor(m => m.objEmployment.Others_2A)
+                        </td>
+                        <td>
+                            <br />@Html.DisplayFor(m => m.objEmployment.CS_staff_2B)<br />@Html.DisplayFor(m => m.objEmployment.Workers_2B)<br />@Html.DisplayFor(m => m.objEmployment.Others_2B)
+                        </td>
+                        <td>
+                            <br />@Html.DisplayFor(m => m.objEmployment.CS_staff_2C)<br />@Html.DisplayFor(m => m.objEmployment.Workers_2C)<br />@Html.DisplayFor(m => m.objEmployment.Others_2C)
+                        </td>
+                        <td>
+                            <br />@Html.DisplayFor(m => m.objEmployment.CS_staff_3)<br />
+                            @Html.DisplayFor(m => m.objEmployment.Workers_3)<br />
+                            @Html.DisplayFor(m => m.objEmployment.Others_3)
+                        </td>
+                        <td>
+                            <br />@Html.DisplayFor(m => m.objEmployment.CS_staff_4A)<br />@Html.DisplayFor(m => m.objEmployment.Workers_4A)<br />@Html.DisplayFor(m => m.objEmployment.Others_4A)
+                        </td>
+                        <td>
+                            <br />@Html.DisplayFor(m => m.objEmployment.CS_staff_4B)<br />@Html.DisplayFor(m => m.objEmployment.Workers_4B)<br />@Html.DisplayFor(m => m.objEmployment.Others_4B)
+                        </td>
+                        <td>
+                            <br />@Html.DisplayFor(m => m.objEmployment.CS_staff_4C)<br />@Html.DisplayFor(m => m.objEmployment.Workers_4C)<br />@Html.DisplayFor(m => m.objEmployment.Others_4C)
+                        </td>
+                        <td>
+                            <br />@Html.DisplayFor(m => m.objEmployment.CS_staff_4D)<br />@Html.DisplayFor(m => m.objEmployment.Workers_4D)<br />@Html.DisplayFor(m => m.objEmployment.Others_4D)
+                        </td>
+                        <td>
+                            <br />@Html.DisplayFor(m => m.objEmployment.CS_staff_5)<br />
+                            @Html.DisplayFor(m => m.objEmployment.Workers_5)<br />
+                            @Html.DisplayFor(m => m.objEmployment.Others_5)
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>Total</td>
+                        <td>@Html.DisplayFor(m => m.objEmployment.Total_2A)</td>
+                        <td>@Html.DisplayFor(m => m.objEmployment.Total_2B)</td>
+                        <td>@Html.DisplayFor(m => m.objEmployment.Total_2C)</td>
+                        <td>@Html.DisplayFor(m => m.objEmployment.Total_3) </td>
+                        <td>@Html.DisplayFor(m => m.objEmployment.Total_4A)</td>
+                        <td>@Html.DisplayFor(m => m.objEmployment.Total_4B)</td>
+                        <td>@Html.DisplayFor(m => m.objEmployment.Total_4C)</td>
+                        <td>@Html.DisplayFor(m => m.objEmployment.Total_4D)</td>
+                        <td>@Html.DisplayFor(m => m.objEmployment.Total_5)</td>
+                    </tr>
+                </table>
+                <br />
+                <p class="text-center">INSTRUCTIONS</p>
+                <p>
+                    (a) Give day of the week and the date and month.
+                    (b) Obtained by adding the daily attendance for the whole year.
+                    (c) Obtained by dividing the number of man-days worked by the number of working days.
+                    The total shown in column (4D) should agree with the quotient obtained by dividing the
+                    total shown in column (2C) by the number of working days shown in column (3)
+                    (d) Includes all cash payments including bonuses. Employer’s contributions to provident
+                    funds, welfare activities, etc., and concessions in kind should not be included.
+                    (e) Persons employed in the removal of overburden should be included among “Others” and
+                    not among “Miners and Loaders”.
+                </p>
+            </div>
+            <span class="page-break"></span>
+            <br />
+            @*TABLE B – TYPE AND AGREGATE HORSE-POWER OF ELECTRICAL APPARTATUS*@
+            <div>
+                <p class="text-center">TABLE B – TYPE AND AGREGATE HORSE-POWER OF ELECTRICAL APPARTATUS</p>
+                <table style="width: 100%" border="1">
+                    <tr>
+                        <td colspan="3">1. Electricity generated, purchased or received otherwise (in kwh).</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td>Generated</td>
+                        <td>Purchased or received</td>
+                    </tr>
+                    <tr>
+                        <td>(a) For own use</td>
+                        <td>@Html.DisplayFor(m => m.objElectrical.Generated_OwnUse)</td>
+                        <td>@Html.DisplayFor(m => m.objElectrical.Purchased_OwnUse)</td>
+                    </tr>
+                    <tr>
+                        <td>(b) For sale</td>
+                        <td>@Html.DisplayFor(m => m.objElectrical.Generated_Sale)</td>
+                        <td>@Html.DisplayFor(m => m.objElectrical.Purchased_Sale)</td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">2. System of supply (whether direct current or alternating current) :-</td>
+                    </tr>
+                    <tr>
+                        <td>(i) Voltage of supply</td>
+                        <td colspan="2">@Html.DisplayFor(m => m.objElectrical.Voltageofsupply)</td>
+
+                    </tr>
+                    <tr>
+                        <td>(ii) Periodicity</td>
+                        <td colspan="2">@Html.DisplayFor(m => m.objElectrical.Periodicity)</td>
+
+                    </tr>
+                    <tr>
+                        <td>(iii) Source of supply</td>
+                        <td colspan="2">@Html.DisplayFor(m => m.objElectrical.Source_of_supply)</td>
+
+                    </tr>
+
+                    <tr>
+                        <td colspan="3">3. Voltage at which current is used for :</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td>Above ground</td>
+                        <td>Below ground</td>
+                    </tr>
+                    <tr>
+                        <td>(a) Lighting</td>
+                        <td>@Html.DisplayFor(m => m.objElectrical.Ag_Lighting)</td>
+                        <td>@Html.DisplayFor(m => m.objElectrical.Bg_Lighting)</td>
+                    </tr>
+                    <tr>
+                        <td>(b) Power</td>
+                        <td>@Html.DisplayFor(m => m.objElectrical.Ag_Power)</td>
+                        <td>@Html.DisplayFor(m => m.objElectrical.Bg_Power)</td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">4. Length of cables (in metres)</td>
+                    </tr>
+                    <tr>
+                        <td>(i) High pressure</td>
+                        <td colspan="2">@Html.DisplayFor(m => m.objElectrical.High_pressure)</td>
+
+                    </tr>
+                    <tr>
+                        <td>(ii) Medium pressure</td>
+                        <td colspan="2">@Html.DisplayFor(m => m.objElectrical.Medium_pressure)</td>
+
+                    </tr>
+
+                </table>
+                <span class="page-break"></span>
+                <table style="width: 100%" border="1">
+                    <tr>
+                        <td colspan="5">5. Total number and aggregate horse-power of motors</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td colspan="2">In use</td>
+                        <td colspan="2">In reserve</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td>Number of units</td>
+                        <td>Total h.p.</td>
+                        <td>Number of units</td>
+                        <td>Total h.p.</td>
+                    </tr>
+
+                    <tr>
+                        <td colspan="5">(a) Installed above ground for :</td>
+                    </tr>
+                    <tr>
+                        <td>(i) Winding</td>
+                        <td>@Html.DisplayFor(m => m.objElectrical.A1_Winding_NoOfUnit_Use)</td>
+                        <td>@Html.DisplayFor(m => m.objElectrical.A1_Winding_TotalHP_Use)</td>
+                        <td>@Html.DisplayFor(m => m.objElectrical.A1_Winding_NoOfUnit_Reserve)</td>
+                        <td>@Html.DisplayFor(m => m.objElectrical.A1_Winding_TotalHP_Reserve)</td>
+                    </tr>
+                    <tr>
+                        <td>(ii) Ventilation</td>
+                        <td>@Html.DisplayFor(m => m.objElectrical.A1_Ventilation_NoOfUnit_Use)</td>
+                        <td>@Html.DisplayFor(m => m.objElectrical.A1_Ventilation_TotalHP_Use)</td>
+                        <td>@Html.DisplayFor(m => m.objElectrical.A1_Ventilation_NoOfUnit_Reserve)</td>
+                        <td>@Html.DisplayFor(m => m.objElectrical.A1_Ventilation_TotalHP_Reserve)</td>
+                    </tr>
+                    <tr>
+                        <td>(iii) Haulage</td>
+                        <td>@Html.DisplayFor(m => m.objElectrical.A1_Haulage_NoOfUnit_Use)</td>
+                        <td>@Html.DisplayFor(m => m.objElectrical.A1_Haulage_TotalHP_Use)</td>
+                        <td>@Html.DisplayFor(m => m.objElectrical.A1_Haulage_NoOfUnit_Reserve)</td>
+                        <td>@Html.DisplayFor(m => m.objElectrical.A1_Haulage_TotalHP_Reserve)</td>
+                    </tr>
+                    <tr>
+                        <td>(iv) Pumping</td>
+                        <td>@Html.DisplayFor(m => m.objElectrical.A1_Pumping_NoOfUnit_Use)</td>
+                        <td>@Html.DisplayFor(m => m.objElectrical.A1_Pumping_TotalHP_Use)</td>
+                        <td>@Html.DisplayFor(m => m.objElectrical.A1_Pumping_NoOfUnit_Reserve)</td>
+                        <td>@Html.DisplayFor(m => m.objElectrical.A1_Pumping_TotalHP_Reserve)</td>
+                    </tr>
+                    <tr>
+                        <td>(v) Coal washing, screening or handling plants</td>
+                        <td>@Html.DisplayFor(m => m.objElectrical.A1_Coalwashing_NoOfUnit_Use)</td>
+                        <td>@Html.DisplayFor(m => m.objElectrical.A1_Coalwashing_TotalHP_Use)</td>
+                        <td>@Html.DisplayFor(m => m.objElectrical.A1_Coalwashing_NoOfUnit_Reserve)</td>
+                        <td>@Html.DisplayFor(m => m.objElectrical.A1_Coalwashing_TotalHP_Reserve)</td>
+                    </tr>
+                    <tr>
+                        <td>(vi) Workshops including foundry, smithy etc.</td>
+                        <td>@Html.DisplayFor(m => m.objElectrical.A1_Workshops_NoOfUnit_Use)</td>
+                        <td>@Html.DisplayFor(m => m.objElectrical.A1_Workshops_TotalHP_Use)</td>
+                        <td>@Html.DisplayFor(m => m.objElectrical.A1_Workshops_NoOfUnit_Reserve)</td>
+                        <td>@Html.DisplayFor(m => m.objElectrical.A1_Workshops_TotalHP_Reserve)</td>
+                    </tr>
+                    <tr>
+                        <td>(vii) Miscellaneous (specify) @Html.DisplayFor(m => m.objElectrical.A1_Miscellaneous)</td>
+                        <td>@Html.DisplayFor(m => m.objElectrical.A1_Miscellaneous_NoOfUnit_Use)</td>
+                        <td>@Html.DisplayFor(m => m.objElectrical.A1_Miscellaneous_TotalHP_Use)</td>
+                        <td>@Html.DisplayFor(m => m.objElectrical.A1_Miscellaneous_NoOfUnit_Reserve)</td>
+                        <td>@Html.DisplayFor(m => m.objElectrical.A1_Miscellaneous_TotalHP_Reserve)</td>
+                    </tr>
+
+                    <tr class="border_bottom">
+                        <td>Total :</td>
+                        <td>@Html.DisplayFor(m => m.objElectrical.A1_Total_NoOfUnit_Use)</td>
+                        <td>@Html.DisplayFor(m => m.objElectrical.A1_Total_TotalHP_Use)</td>
+                        <td>@Html.DisplayFor(m => m.objElectrical.A1_Total_NoOfUnit_Reserve)</td>
+                        <td>@Html.DisplayFor(m => m.objElectrical.A1_Total_TotalHP_Reserve)</td>
+                    </tr>
+                    <tr>
+                        <td colspan="5">(a) Installed above ground for :</td>
+
+                    </tr>
+                    <tr>
+                        <td>(i) Winding</td>
+                        <td>@Html.DisplayFor(m => m.objElectrical.A2_Winding_NoOfUnit_Use)</td>
+                        <td>@Html.DisplayFor(m => m.objElectrical.A2_Winding_TotalHP_Use)</td>
+                        <td>@Html.DisplayFor(m => m.objElectrical.A2_Winding_NoOfUnit_Reserve)</td>
+                        <td>@Html.DisplayFor(m => m.objElectrical.A2_Winding_TotalHP_Reserve)</td>
+
+                    </tr>
+                    <tr>
+                        <td>(ii) Haulage</td>
+                        <td>@Html.DisplayFor(m => m.objElectrical.A2_Haulage_NoOfUnit_Use)</td>
+                        <td>@Html.DisplayFor(m => m.objElectrical.A2_Haulage_TotalHP_Use)</td>
+                        <td>@Html.DisplayFor(m => m.objElectrical.A2_Haulage_NoOfUnit_Reserve)</td>
+                        <td>@Html.DisplayFor(m => m.objElectrical.A2_Haulage_TotalHP_Reserve)</td>
+
+                    </tr>
+                    <tr>
+                        <td>(iii) Ventilation</td>
+                        <td>@Html.DisplayFor(m => m.objElectrical.A2_Ventilation_NoOfUnit_Use)</td>
+                        <td>@Html.DisplayFor(m => m.objElectrical.A2_Ventilation_TotalHP_Use)</td>
+                        <td>@Html.DisplayFor(m => m.objElectrical.A2_Ventilation_NoOfUnit_Reserve)</td>
+                        <td>@Html.DisplayFor(m => m.objElectrical.A2_Ventilation_TotalHP_Reserve)</td>
+                    </tr>
+
+                    <tr>
+                        <td>(iv) Pumping</td>
+                        <td>@Html.DisplayFor(m => m.objElectrical.A2_Pumping_NoOfUnit_Use)</td>
+                        <td>@Html.DisplayFor(m => m.objElectrical.A2_Pumping_TotalHP_Use)</td>
+                        <td>@Html.DisplayFor(m => m.objElectrical.A2_Pumping_NoOfUnit_Reserve)</td>
+                        <td>@Html.DisplayFor(m => m.objElectrical.A2_Pumping_TotalHP_Reserve)</td>
+                    </tr>
+                    <tr>
+                        <td>(v) Other portable machines (drill, etc.)</td>
+                        <td>@Html.DisplayFor(m => m.objElectrical.A2_Other_NoOfUnit_Use)</td>
+                        <td>@Html.DisplayFor(m => m.objElectrical.A2_Other_TotalHP_Use)</td>
+                        <td>@Html.DisplayFor(m => m.objElectrical.A2_Other_NoOfUnit_Reserve)</td>
+                        <td>@Html.DisplayFor(m => m.objElectrical.A2_Other_TotalHP_Reserve)</td>
+                    </tr>
+                    <tr>
+                        <td>(vi) Conveyors, loaders, scrapers, etc.</td>
+                        <td>@Html.DisplayFor(m => m.objElectrical.A2_Conveyors_NoOfUnit_Use)</td>
+                        <td>@Html.DisplayFor(m => m.objElectrical.A2_Conveyors_TotalHP_Use)</td>
+                        <td>@Html.DisplayFor(m => m.objElectrical.A2_Conveyors_NoOfUnit_Reserve)</td>
+                        <td>@Html.DisplayFor(m => m.objElectrical.A2_Conveyors_TotalHP_Reserve)</td>
+                    </tr>
+                    <tr>
+                        <td>(vii) Electric traction (locomotives, etc.)</td>
+                        <td>@Html.DisplayFor(m => m.objElectrical.A2_Electric_NoOfUnit_Use)</td>
+                        <td>@Html.DisplayFor(m => m.objElectrical.A2_Electric_TotalHP_Use)</td>
+                        <td>@Html.DisplayFor(m => m.objElectrical.A2_Electric_NoOfUnit_Reserve)</td>
+                        <td>@Html.DisplayFor(m => m.objElectrical.A2_Electric_TotalHP_Reserve)</td>
+                    </tr>
+                    <tr>
+                        <td>(viii) Miscellaneous (specify) @Html.DisplayFor(m => m.objElectrical.A2_Miscellaneous)</td>
+
+                        <td>@Html.DisplayFor(m => m.objElectrical.A2_Miscellaneous_NoOfUnit_Use)</td>
+                        <td>@Html.DisplayFor(m => m.objElectrical.A2_Miscellaneous_TotalHP_Use)</td>
+                        <td>@Html.DisplayFor(m => m.objElectrical.A2_Miscellaneous_NoOfUnit_Reserve)</td>
+                        <td>@Html.DisplayFor(m => m.objElectrical.A2_Miscellaneous_TotalHP_Reserve)</td>
+                    </tr>
+                    <tr class="border_bottom">
+                        <td>Total :</td>
+                        <td>@Html.DisplayFor(m => m.objElectrical.A2_Total_NoOfUnit_Use)</td>
+                        <td>@Html.DisplayFor(m => m.objElectrical.A2_Total_TotalHP_Use)</td>
+                        <td>@Html.DisplayFor(m => m.objElectrical.A2_Total_NoOfUnit_Reserve)</td>
+                        <td>@Html.DisplayFor(m => m.objElectrical.A2_Total_TotalHP_Reserve)</td>
+                    </tr>
+                    <tr>
+                        <td colspan="5">(a) Installed above ground for :</td>
+                    </tr>
+                    <tr>
+                        <td>(i) Haulage</td>
+
+                        <td>@Html.DisplayFor(m => m.objElectrical.B_Haulage_NoOfUnit_Use)</td>
+                        <td>@Html.DisplayFor(m => m.objElectrical.B_Haulage_TotalHP_Use)</td>
+                        <td>@Html.DisplayFor(m => m.objElectrical.B_Haulage_NoOfUnit_Reserve)</td>
+                        <td>@Html.DisplayFor(m => m.objElectrical.B_Haulage_TotalHP_Reserve)</td>
+
+
+                    </tr>
+                    <tr>
+                        <td>(ii) Ventilation</td>
+                        <td>@Html.DisplayFor(m => m.objElectrical.B_Ventilation_NoOfUnit_Use)</td>
+                        <td>@Html.DisplayFor(m => m.objElectrical.B_Ventilation_TotalHP_Use)</td>
+                        <td>@Html.DisplayFor(m => m.objElectrical.B_Ventilation_NoOfUnit_Reserve)</td>
+                        <td>@Html.DisplayFor(m => m.objElectrical.B_Ventilation_TotalHP_Reserve)</td>
+
+
+                    </tr>
+
+                    <tr>
+                        <td>(iii) Pumping</td>
+
+                        <td>@Html.DisplayFor(m => m.objElectrical.B_Pumping_NoOfUnit_Use)</td>
+                        <td>@Html.DisplayFor(m => m.objElectrical.B_Pumping_TotalHP_Use)</td>
+                        <td>@Html.DisplayFor(m => m.objElectrical.B_Pumping_NoOfUnit_Reserve)</td>
+                        <td>@Html.DisplayFor(m => m.objElectrical.B_Pumping_TotalHP_Reserve)</td>
+
+
+                    </tr>
+
+                    <tr>
+                        <td>(iv) Coal-cutting machine</td>
+                        <td>@Html.DisplayFor(m => m.objElectrical.B_Coal_cutting_NoOfUnit_Use)</td>
+                        <td>@Html.DisplayFor(m => m.objElectrical.B_Coal_cutting_TotalHP_Use)</td>
+                        <td>@Html.DisplayFor(m => m.objElectrical.B_Coal_cutting_NoOfUnit_Reserve)</td>
+                        <td>@Html.DisplayFor(m => m.objElectrical.B_Coal_cutting_TotalHP_Reserve)</td>
+
+
+
+                    </tr>
+                    <tr>
+                        <td>(v) Other portable machines (drill, etc.)</td>
+                        <td>@Html.DisplayFor(m => m.objElectrical.B_Other_NoOfUnit_Use)</td>
+                        <td>@Html.DisplayFor(m => m.objElectrical.B_Other_TotalHP_Use)</td>
+                        <td>@Html.DisplayFor(m => m.objElectrical.B_Other_NoOfUnit_Reserve)</td>
+                        <td>@Html.DisplayFor(m => m.objElectrical.B_Other_TotalHP_Reserve)</td>
+                    </tr>
+                    <tr>
+                        <td>(vi) Conveyors, loaders, scrapers, etc.</td>
+                        <td>@Html.DisplayFor(m => m.objElectrical.B_Conveyors_NoOfUnit_Use)</td>
+                        <td>@Html.DisplayFor(m => m.objElectrical.B_Conveyors_TotalHP_Use)</td>
+                        <td>@Html.DisplayFor(m => m.objElectrical.B_Conveyors_NoOfUnit_Reserve)</td>
+                        <td>@Html.DisplayFor(m => m.objElectrical.B_Conveyors_TotalHP_Reserve)</td>
+                    </tr>
+                    <tr>
+                        <td>(vii) Electric traction (locomotives, etc.)</td>
+                        <td>@Html.DisplayFor(m => m.objElectrical.B_Electric_NoOfUnit_Use)</td>
+                        <td>@Html.DisplayFor(m => m.objElectrical.B_Electric_TotalHP_Use)</td>
+                        <td>@Html.DisplayFor(m => m.objElectrical.B_Electric_NoOfUnit_Reserve)</td>
+                        <td>@Html.DisplayFor(m => m.objElectrical.B_Electric_TotalHP_Reserve)</td>
+                    </tr>
+                    <tr>
+
+                        <td>(viii) Miscellaneous (specify)@Html.DisplayFor(m => m.objElectrical.B_Miscellaneous)</td>
+                        <td>@Html.DisplayFor(m => m.objElectrical.B_Miscellaneous_NoOfUnit_Use)</td>
+                        <td>@Html.DisplayFor(m => m.objElectrical.B_Miscellaneous_TotalHP_Use)</td>
+                        <td>@Html.DisplayFor(m => m.objElectrical.B_Miscellaneous_NoOfUnit_Reserve)</td>
+                        <td>@Html.DisplayFor(m => m.objElectrical.B_Miscellaneous_TotalHP_Reserve)</td>
+                    </tr>
+                    <tr class="border_bottom">
+                        <td>Total :</td>
+                        <td>@Html.DisplayFor(m => m.objElectrical.B_Total_NoOfUnit_Use)</td>
+                        <td>@Html.DisplayFor(m => m.objElectrical.B_Total_TotalHP_Use)</td>
+                        <td>@Html.DisplayFor(m => m.objElectrical.B_Total_NoOfUnit_Reserve)</td>
+                        <td>@Html.DisplayFor(m => m.objElectrical.B_Total_TotalHP_Reserve)</td>
+                    </tr>
+
+                </table>
+
+                <p>
+                    INSTRUCTIONS
+                    (a) Give day of the week and the date and month.
+                    (b) Obtained by adding the daily attendance for the whole year.
+                    (c) Obtained by dividing the number of man-days worked by the number of working days.
+                    The total shown in column (4D) should agree with the quotient obtained by dividing the
+                    total shown in column (2C) by the number of working days shown in column (3)
+                    (d) Includes all cash payments including bonuses. Employer’s contributions to provident
+                    funds, welfare activities, etc., and concessions in kind should not be included.
+                    (e) Persons employed in the removal of overburden should be included among “Others” and
+                    not among “Miners and Loaders”.
+                </p>
+            </div>
+            <span class="page-break"></span>
+            <br />
+            @*TABLE C- TYPE AND AGGREGATE HORSE-POWER OF MACHINERY AND EQUIPMENT (OTHER THAN ELECTRICAL APPARATUS)*@
+            <div>
+                <p class="text-center"><b>TABLE C- TYPE AND AGGREGATE HORSE-POWER OF MACHINERY AND EQUIPMENT (OTHER THAN ELECTRICAL APPARATUS)</b></p>
+                <br />
+                <table style="width: 100%" border="1">
+                    <tr>
+                        <td></td>
+                        <td colspan="2">In use</td>
+                        <td colspan="2">In reserve</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td>Number of units</td>
+                        <td>Total h.p.</td>
+                        <td>Number of units</td>
+                        <td>Total h.p.</td>
+                    </tr>
+                    <tr>
+                        <td>(I) Power generators :</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>(a) Boilers</td>
+                        <td>@Html.DisplayFor(m => m.objMachinery.Boilers_NoOfUnit_Use)</td>
+                        <td>@Html.DisplayFor(m => m.objMachinery.Boilers_TotalHP_Use)</td>
+                        <td>@Html.DisplayFor(m => m.objMachinery.Boilers_NoOfUnit_Reserve)</td>
+                        <td>@Html.DisplayFor(m => m.objMachinery.Boilers_TotalHP_Reserve)</td>
+                    </tr>
+                    <tr>
+                        <td>(b) Steam Turbines</td>
+                        <td>@Html.DisplayFor(m => m.objMachinery.SteamTurbines_NoOfUnit_Use)</td>
+                        <td>@Html.DisplayFor(m => m.objMachinery.SteamTurbines_TotalHP_Use)</td>
+                        <td>@Html.DisplayFor(m => m.objMachinery.SteamTurbines_NoOfUnit_Reserve)</td>
+                        <td>@Html.DisplayFor(m => m.objMachinery.SteamTurbines_TotalHP_Reserve)</td>
+                    </tr>
+                    <tr>
+                        <td>(c) Diesel Engines</td>
+                        <td>@Html.DisplayFor(m => m.objMachinery.DieselEngines_NoOfUnit_Use)</td>
+                        <td>@Html.DisplayFor(m => m.objMachinery.DieselEngines_TotalHP_Use)</td>
+                        <td>@Html.DisplayFor(m => m.objMachinery.DieselEngines_NoOfUnit_Reserve)</td>
+                        <td>@Html.DisplayFor(m => m.objMachinery.DieselEngines_TotalHP_Reserve)</td>
+                    </tr>
+                    <tr>
+                        <td>(d) Gasoline, Gas or Oil Engines other than Diesel Engines</td>
+                        <td>@Html.DisplayFor(m => m.objMachinery.Gasoline_NoOfUnit_Use)</td>
+                        <td>@Html.DisplayFor(m => m.objMachinery.Gasoline_TotalHP_Use)</td>
+                        <td>@Html.DisplayFor(m => m.objMachinery.Gasoline_NoOfUnit_Reserve)</td>
+                        <td>@Html.DisplayFor(m => m.objMachinery.Gasoline_TotalHP_Reserve)</td>
+                    </tr>
+                    <tr>
+                        <td>(e) Hydraulic Turbines or Water Wheels</td>
+                        <td>@Html.DisplayFor(m => m.objMachinery.HydraulicTurbines_NoOfUnit_Use)</td>
+                        <td>@Html.DisplayFor(m => m.objMachinery.HydraulicTurbines_TotalHP_Use)</td>
+                        <td>@Html.DisplayFor(m => m.objMachinery.HydraulicTurbines_NoOfUnit_Reserve)</td>
+                        <td>@Html.DisplayFor(m => m.objMachinery.HydraulicTurbines_TotalHP_Reserve)</td>
+                    </tr>
+
+                    <tr>
+                        <td>(f) Air Compressors</td>
+                        <td>@Html.DisplayFor(m => m.objMachinery.AirCompressors_NoOfUnit_Use)</td>
+                        <td>@Html.DisplayFor(m => m.objMachinery.AirCompressors_TotalHP_Use)</td>
+                        <td>@Html.DisplayFor(m => m.objMachinery.AirCompressors_NoOfUnit_Reserve)</td>
+                        <td>@Html.DisplayFor(m => m.objMachinery.AirCompressors_TotalHP_Reserve)</td>
+                    </tr>
+                    <tr class="border_bottom">
+                        <td>Total :</td>
+                        <td>@Html.DisplayFor(m => m.objMachinery.A1_Total_NoOfUnit_Use)</td>
+                        <td>@Html.DisplayFor(m => m.objMachinery.A1_Total_TotalHP_Use)</td>
+                        <td>@Html.DisplayFor(m => m.objMachinery.A1_Total_NoOfUnit_Reserve)</td>
+                        <td>@Html.DisplayFor(m => m.objMachinery.A1_Total_TotalHP_Reserve)</td>
+                    </tr>
+                    <tr>
+                        <td>(II)Machinery Installed above ground for :</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>(i) Winding</td>
+                        <td>@Html.DisplayFor(m => m.objMachinery.Winding_NoOfUnit_Use)</td>
+                        <td>@Html.DisplayFor(m => m.objMachinery.Winding_TotalHP_Use)</td>
+                        <td>@Html.DisplayFor(m => m.objMachinery.Winding_NoOfUnit_Reserve)</td>
+                        <td>@Html.DisplayFor(m => m.objMachinery.Winding_TotalHP_Reserve)</td>
+                    </tr>
+                    <tr>
+                        <td>(ii) Ventilation</td>
+                        <td>@Html.DisplayFor(m => m.objMachinery.A1Ventilation_NoOfUnit_Use)</td>
+                        <td>@Html.DisplayFor(m => m.objMachinery.A1Ventilation_TotalHP_Use)</td>
+                        <td>@Html.DisplayFor(m => m.objMachinery.A1Ventilation_NoOfUnit_Reserve)</td>
+                        <td>@Html.DisplayFor(m => m.objMachinery.A1Ventilation_TotalHP_Reserve)</td>
+                    </tr>
+                    <tr>
+                        <td>(iii) Haulage</td>
+                        <td>@Html.DisplayFor(m => m.objMachinery.A1Haulage_NoOfUnit_Use)</td>
+                        <td>@Html.DisplayFor(m => m.objMachinery.A1Haulage_TotalHP_Use)</td>
+                        <td>@Html.DisplayFor(m => m.objMachinery.A1Haulage_NoOfUnit_Reserve)</td>
+                        <td>@Html.DisplayFor(m => m.objMachinery.A1Haulage_TotalHP_Reserve)</td>
+                    </tr>
+
+                    <tr>
+                        <td>(iv) Pumping</td>
+                        <td>@Html.DisplayFor(m => m.objMachinery.A1Pumping_NoOfUnit_Use)</td>
+                        <td>@Html.DisplayFor(m => m.objMachinery.A1Pumping_TotalHP_Use)</td>
+                        <td>@Html.DisplayFor(m => m.objMachinery.A1Pumping_NoOfUnit_Reserve)</td>
+                        <td>@Html.DisplayFor(m => m.objMachinery.A1Pumping_TotalHP_Reserve)</td>
+                    </tr>
+                    <tr>
+                        <td>(v) Mineral dressing plants</td>
+                        <td>@Html.DisplayFor(m => m.objMachinery.Dressing_NoOfUnit_Use)</td>
+                        <td>@Html.DisplayFor(m => m.objMachinery.Dressing_TotalHP_Use)</td>
+                        <td>@Html.DisplayFor(m => m.objMachinery.Dressing_NoOfUnit_Reserve)</td>
+                        <td>@Html.DisplayFor(m => m.objMachinery.Dressing_TotalHP_Reserve)</td>
+                    </tr>
+                    <tr>
+                        <td>(vi) Workshops including foundry, smithy etc.</td>
+                        <td>@Html.DisplayFor(m => m.objMachinery.Workshops_NoOfUnit_Use)</td>
+                        <td>@Html.DisplayFor(m => m.objMachinery.Workshops_TotalHP_Use)</td>
+                        <td>@Html.DisplayFor(m => m.objMachinery.Workshops_NoOfUnit_Reserve)</td>
+                        <td>@Html.DisplayFor(m => m.objMachinery.Workshops_TotalHP_Reserve)</td>
+                    </tr>
+                    <tr>
+                        <td>(vii) Miscellaneous (specify)@Html.DisplayFor(m => m.objMachinery.A1_Miscellaneous)</td>
+                        <td>@Html.DisplayFor(m => m.objMachinery.A1Miscellaneous_NoOfUnit_Use)</td>
+                        <td>@Html.DisplayFor(m => m.objMachinery.A1Miscellaneous_TotalHP_Use)</td>
+                        <td>@Html.DisplayFor(m => m.objMachinery.A1Miscellaneous_NoOfUnit_Reserve)</td>
+                        <td>@Html.DisplayFor(m => m.objMachinery.A1Miscellaneous_TotalHP_Reserve)</td>
+                    </tr>
+
+                    <tr class="border_bottom">
+                        <td>Total :</td>
+                        <td>@Html.DisplayFor(m => m.objMachinery.A2_Total_NoOfUnit_Use)</td>
+                        <td>@Html.DisplayFor(m => m.objMachinery.A2_Total_TotalHP_Use)</td>
+                        <td>@Html.DisplayFor(m => m.objMachinery.A2_Total_NoOfUnit_Reserve)</td>
+                        <td>@Html.DisplayFor(m => m.objMachinery.A2_Total_TotalHP_Reserve)</td>
+                    </tr>
+                    <tr>
+                        <td>(III)Machinery Installed above ground for :</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>(i) Haulage</td>
+                        <td>@Html.DisplayFor(m => m.objMachinery.A2Haulage_NoOfUnit_Use)</td>
+                        <td>@Html.DisplayFor(m => m.objMachinery.A2Haulage_TotalHP_Use)</td>
+                        <td>@Html.DisplayFor(m => m.objMachinery.A2Haulage_NoOfUnit_Reserve)</td>
+                        <td>@Html.DisplayFor(m => m.objMachinery.A2Haulage_TotalHP_Reserve)</td>
+                    </tr>
+                    <tr>
+                        <td>(ii) Ventilation</td>
+                        <td>@Html.DisplayFor(m => m.objMachinery.A2Ventilation_NoOfUnit_Use)</td>
+                        <td>@Html.DisplayFor(m => m.objMachinery.A2Ventilation_TotalHP_Use)</td>
+                        <td>@Html.DisplayFor(m => m.objMachinery.A2Ventilation_NoOfUnit_Reserve)</td>
+                        <td>@Html.DisplayFor(m => m.objMachinery.A2Ventilation_TotalHP_Reserve)</td>
+                    </tr>
+
+                    <tr>
+                        <td>(iii) Pumping</td>
+                        <td>@Html.DisplayFor(m => m.objMachinery.A2Pumping_NoOfUnit_Use)</td>
+                        <td>@Html.DisplayFor(m => m.objMachinery.A2Pumping_TotalHP_Use)</td>
+                        <td>@Html.DisplayFor(m => m.objMachinery.A2Pumping_NoOfUnit_Reserve)</td>
+                        <td>@Html.DisplayFor(m => m.objMachinery.A2Pumping_TotalHP_Reserve)</td>
+                    </tr>
+
+                    <tr>
+                        <td>(iv) locomotives, etc.</td>
+                        <td>@Html.DisplayFor(m => m.objMachinery.locomotives_NoOfUnit_Use)</td>
+                        <td>@Html.DisplayFor(m => m.objMachinery.locomotives_TotalHP_Use)</td>
+                        <td>@Html.DisplayFor(m => m.objMachinery.locomotives_NoOfUnit_Reserve)</td>
+                        <td>@Html.DisplayFor(m => m.objMachinery.locomotives_TotalHP_Reserve)</td>
+                    </tr>
+                    <tr>
+                        <td>(v) Miscellaneous (specify)@Html.DisplayFor(m => m.objMachinery.A2_Miscellaneous)</td>
+                        <td>@Html.DisplayFor(m => m.objMachinery.A2Miscellaneous_NoOfUnit_Use)</td>
+                        <td>@Html.DisplayFor(m => m.objMachinery.A2Miscellaneous_TotalHP_Use)</td>
+                        <td>@Html.DisplayFor(m => m.objMachinery.A2Miscellaneous_NoOfUnit_Reserve)</td>
+                        <td>@Html.DisplayFor(m => m.objMachinery.A2Miscellaneous_TotalHP_Reserve)</td>
+                    </tr>
+                    <tr class="border_bottom">
+                        <td>Total :</td>
+                        <td>@Html.DisplayFor(m => m.objMachinery.A3_Total_NoOfUnit_Use)</td>
+                        <td>@Html.DisplayFor(m => m.objMachinery.A3_Total_TotalHP_Use)</td>
+                        <td>@Html.DisplayFor(m => m.objMachinery.A3_Total_NoOfUnit_Reserve)</td>
+                        <td>@Html.DisplayFor(m => m.objMachinery.A3_Total_TotalHP_Reserve)</td>
+                    </tr>
+
+                </table>
+            </div>
+            <br />
+            @*TABLE D – EXPLOSIVES, SAFETY LAMPS, ROCK DRILLS AND MECHANICAL VENTILATORS*@
+            <div>
+                <p class="text-center"><b>TABLE D – EXPLOSIVES, SAFETY LAMPS, ROCK DRILLS AND MECHANICAL VENTILATORS</b></p>
+                <div class="">
+                    @Html.Label("1 Explosives :")
+                    <table style="width: 100%" border="1">
+                        <tr>
+                            <td rowspan="2">Name of explosive</td>
+                            <td rowspan="2">Quantity used (in kgm)</td>
+                            <td colspan="2">Number of detonators used</td>
+                        </tr>
+                        <tr>
+                            <td>Electric</td>
+                            <td>Ordinary</td>
+                        </tr>
+                        <tr>
+                            <td>@Html.DisplayFor(m => m.objVentilators.Nameofexplosive)</td>
+                            <td>@Html.DisplayFor(m => m.objVentilators.Quantity_used)</td>
+                            <td>@Html.DisplayFor(m => m.objVentilators.Electric)</td>
+                            <td>@Html.DisplayFor(m => m.objVentilators.Ordinary)</td>
+                        </tr>
+                    </table>
+                </div>
+                <br />
+                <div class="">
+                    @Html.Label("2 Safety Lamps :")
+                    <table style="width: 100%" border="1">
+                        <tr>
+                            <td rowspan="2">Name and type of safety lamps*</td>
+                            <td colspan="3">Number of safety lamps according to method of locking</td>
+                        </tr>
+                        <tr>
+                            <td>Lead rivet</td>
+                            <td>Magnetic</td>
+                            <td>Other</td>
+                        </tr>
+                        <tr>
+                            <td>@Html.DisplayFor(m => m.objVentilators.Safety_Lamps)</td>
+                            <td>@Html.DisplayFor(m => m.objVentilators.Lead_Rivet)</td>
+                            <td>@Html.DisplayFor(m => m.objVentilators.Magnetic)</td>
+                            <td>@Html.DisplayFor(m => m.objVentilators.Other)</td>
+                        </tr>
+                    </table>
+                    @Html.Label("* Mention type, such as flame type, electric hand type, electric cap, etc")
+                </div>
+                <br />
+                <div class="">
+                    @Html.Label("3 Mechanical Ventilators")
+                    <table style="width: 100%" border="1">
+                        <tr>
+                            <td>Name and size of Mechanical Ventilator</td>
+                            <td>Position where installed</td>
+                            <td>Average total quantity of air delivered per minute</td>
+                            <td>Water gauge obtained (in centimeters)</td>
+                        </tr>
+                        <tr>
+                            <td>@Html.DisplayFor(m => m.objVentilators.Mechanical_Ventilator)</td>
+                            <td>@Html.DisplayFor(m => m.objVentilators.Position)</td>
+                            <td>@Html.DisplayFor(m => m.objVentilators.Avg_Totalqty)</td>
+                            <td>@Html.DisplayFor(m => m.objVentilators.Water_gauge)</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            <span class="page-break"></span>
+            <br />
+            @*E – EXPLOSIVES, SAFETY LAMPS, ROCK DRILLS AND MECHANICAL VENTILATORS*@
+            <div>
+
+                <p class="text-center"><b>TABLE E – EXPLOSIVES, SAFETY LAMPS, ROCK DRILLS AND MECHANICAL VENTILATORS</b></p>
+                <br />
+                <p class="text-center"><b>For Coal (including Rubble and Slack)</b></p>
+
+            </div>
+            <table id="tblFor_Coal" style="width: 100%" border="1">
+                <tr>
+                    <th>Grade (a)</th>
+                    <th>Opening stocks on 1st January, @ViewBag.Year</th>
+                    <th>Coal raised (including colliery consumption & coal used for coke making)</th>
+                    <th>Total value of rasing (b) (in Rupees)</th>
+                    <th>Total of columns 2 and 3 (c)</th>
+                    <th>Coal despatched (including coal despatched to coke factories which should be indicated separately)</th>
+                    <th>Colliery consumption (exclusive of coal used for coke making)</th>
+                    <th>Coal used for coking, if any, on colliery</th>
+                    <th>Shortage due to fire, rains and other causes</th>
+                    <th>Closing stockson 31st December, @ViewBag.Year</th>
+                    <th>Total of columns 6,7,8,9 and 10 (c)</th>
+
+                </tr>
+                <tr>
+                    <th>1</th>
+                    <th>2</th>
+                    <th>3</th>
+                    <th>4</th>
+                    <th>5</th>
+                    <th>6</th>
+                    <th>7</th>
+                    <th>8</th>
+                    <th>9</th>
+                    <th>10</th>
+                    <th>11</th>
+                </tr>
+                @{
+                    foreach (var item in Model.obje_EXPLOSIVEs)
+                    {
+                        <tr>
+                            <td style="width: 10%;">
+                                @item.MineralGrade
+                            </td>
+                            <td style="width: 9%; text-align: left; border-left: 1px solid #70ADD6;">
+                                @item.Opening_stocks
+                            </td>
+                            <td style="width: 9%; text-align: left; border-left: 1px solid #70ADD6;">
+                                @item.Coal_raised
+                            </td>
+                            <td style="width: 9%; text-align: left; border-left: 1px solid #70ADD6;">
+                                @item.Totalvalueofrasing
+                            </td>
+                            <td style="width: 9%; text-align: left; border-left: 1px solid #70ADD6;">
+                                @item.TotalI
+                            </td>
+                            <td style="width: 9%; text-align: left; border-left: 1px solid #70ADD6;">
+                                @item.Coaldespatched
+                            </td>
+                            <td style="width: 9%; text-align: left; border-left: 1px solid #70ADD6;">
+                                @item.Collieryconsumption
+                            </td>
+                            <td style="width:9%; text-align: left; border-left: 1px solid #70ADD6;">
+                                @item.Coalusedforcoking
+                            </td>
+                            <td style="width: 9%; text-align: left; border-left: 1px solid #70ADD6;">
+                                @item.Shortagedueto_Causes
+                            </td>
+                            <td style="width: 9%; text-align: left; border-left: 1px solid #70ADD6;">
+                                @item.Closingstocks
+                            </td>
+                            <td style="width: 9%; text-align: left; border-left: 1px solid #70ADD6;">
+                                @item.TotalII
+                            </td>
+                        </tr>
+                    }
+                }
+            </table>
+
+            <p>
+                <b>INSTRUCTIONS </b>
+                <br />
+                (a) FIGURES SHOULD BE GIVEN SEPARATELY FOR EACH GRADE OF COAL RAISED.
+                <br />
+                (b) Value means the pit-head value, actual or estimated
+                <br />
+                (c) The total in column 5 must be the same as that in column 11.
+            </p>
+            <br />
+
+            <p class="text-center"><b>(b) For Coke</b></p>
+            <br />
+            <table style="width: 100%" border="1">
+                <tr>
+                    <td>Type of coke</td>
+                    <td>Opening stocks on 1st January</td>
+                    <td>Coke manufactured</td>
+                    <td>Total value of coke made (a) (in Rupees)</td>
+                    <td>Total of columns 2 and 3 (b)</td>
+                    <td>Coke despatched</td>
+                    <td>Colliery consumption</td>
+                    <td>Shortage, if any</td>
+                    <td>Closing stocks on 31st December</td>
+                    <td>Total of columns 6,7,8,9 (b)</td>
+                </tr>
+                <tr>
+                    <td>1</td>
+                    <td>2</td>
+                    <td>3</td>
+                    <td>4</td>
+                    <td>5</td>
+                    <td>6</td>
+                    <td>7</td>
+                    <td>8</td>
+                    <td>9</td>
+                    <td>10</td>
+                </tr>
+                <tr>
+                    <td>Coke (hard)</td>
+                    <td>@Html.DisplayFor(m => m.objE_Explosives_b.OpeningStocks_hard)</td>
+                    <td>@Html.DisplayFor(m => m.objE_Explosives_b.Cokemanufactured_hard)</td>
+                    <td>@Html.DisplayFor(m => m.objE_Explosives_b.Totalvalueofcokemade_hard)</td>
+                    <td>@Html.DisplayFor(m => m.objE_Explosives_b.TotalI_hard)</td>
+                    <td>@Html.DisplayFor(m => m.objE_Explosives_b.Cokedespatched_hard)</td>
+                    <td>@Html.DisplayFor(m => m.objE_Explosives_b.Collieryconsumption_hard)</td>
+                    <td>@Html.DisplayFor(m => m.objE_Explosives_b.Shortage_hard)</td>
+                    <td>@Html.DisplayFor(m => m.objE_Explosives_b.Closingstocks_hard)</td>
+                    <td>@Html.DisplayFor(m => m.objE_Explosives_b.TotalII_hard)</td>
+                </tr>
+                <tr>
+                    <td>Coke (soft)</td>
+                    <td>@Html.DisplayFor(m => m.objE_Explosives_b.OpeningStocks_soft)</td>
+                    <td>@Html.DisplayFor(m => m.objE_Explosives_b.Cokemanufactured_soft)</td>
+                    <td>@Html.DisplayFor(m => m.objE_Explosives_b.Totalvalueofcokemade_soft)</td>
+                    <td>@Html.DisplayFor(m => m.objE_Explosives_b.TotalI_soft)</td>
+                    <td>@Html.DisplayFor(m => m.objE_Explosives_b.Cokedespatched_soft)</td>
+                    <td>@Html.DisplayFor(m => m.objE_Explosives_b.Collieryconsumption_soft)</td>
+                    <td>@Html.DisplayFor(m => m.objE_Explosives_b.Shortage_soft)</td>
+                    <td>@Html.DisplayFor(m => m.objE_Explosives_b.Closingstocks_soft)</td>
+                    <td>@Html.DisplayFor(m => m.objE_Explosives_b.TotalII_soft)</td>
+                </tr>
+            </table>
+
+            <br />
+            <p>
+                <b>INSTRUCTIONS</b>
+                <br />
+                (a) Value means the ex-mine value.<br />
+                (b) The total in column 5 must be the same as that in column 10.
+            </p>
+        </div>
+        <input id="SavePathName" type="hidden" value="@ViewBag.DSCReadFilePath" />
+        <input id="fName" type="hidden" />
+        <input id="fid" type="hidden" />
+    }
+
+</body>
+</html>
+<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.3.3/jspdf.min.js"></script>
+<script src="https://html2canvas.hertzen.com/dist/html2canvas.js"></script>
+<script>
+     function getPDF() {
+        debugger;
+         var HTML_Width = $("#eReturnYearly").width();
+         var HTML_Height = $("#eReturnYearly").height();
+        var top_left_margin = 15;
+        var PDF_Width = HTML_Width + (top_left_margin * 2);
+        var PDF_Height = (PDF_Width * 1.5) + (top_left_margin * 2);
+        var canvas_image_width = HTML_Width;
+        var canvas_image_height = HTML_Height;
+
+        var totalPDFPages = Math.ceil(HTML_Height / PDF_Height) - 1;
+
+
+         html2canvas($("#eReturnYearly")[0], { allowTaint: true }).then(function (canvas) {
+            debugger;
+            canvas.getContext('2d');
+
+            console.log(canvas.height + "  " + canvas.width);
+
+           // var data = canvas.toDataURL();
+            var data = canvas.toDataURL("image/JPEG", 1.0);
+            var pdf = new jsPDF('p', 'pt', [PDF_Width, PDF_Height]);
+            pdf.addImage(data, 'JPEG', top_left_margin, top_left_margin, canvas_image_width, canvas_image_height);
+
+
+            for (var i = 1; i <= totalPDFPages; i++) {
+                pdf.addPage(PDF_Width, PDF_Height);
+                pdf.addImage(data, 'JPEG', top_left_margin, -(PDF_Height * i) + (top_left_margin * 4), canvas_image_width, canvas_image_height);
+            }
+            //data = data.replace('data:image/png;base64,', '');
+            data = pdf.output("datauristring").replace('data:application/pdf;base64,', '');
+
+             //-----------------
+                     try {
+
+                         var dt = new Date();
+                         var FNID = $('#objMine_Coal_Year_Id').val();
+                         var FileName = FNID + "CoalYearlyReturn" + dt.getDate() + "" + (dt.getMonth() + 1) + "" + dt.getFullYear() + "_" + dt.getHours() + "_" + dt.getMinutes() + "_" + dt.getSeconds() + ".pdf";
+                         $("#fName").val(FileName).change();
+
+
+                          $.ajax({
+                              url: "/EReturnCoal/EReturnCoal/SaveNormalPdfFile",
+                              type: "POST",
+                              async: false,
+                              data: { base64BinaryStr: data, fileName: $("#fName").val(), ID: $('#objMine_Coal_Year_Id').val(), UpdateIn: "CoalYearlyReturn" },
+                              success: function (msg) {
+                                  debugger;
+                                  if (msg == "SUCCESS") {
+
+                                      var FPath = '@ViewBag.DSCReadFilePath' + $("#fName").val();
+                                      var OutPath = "";
+                                      var Postdata = 'action=signpdf' + "\n" + 'datatosign=' + FPath + '' + "\n" + 'signaction=2' + "\n" + 'outputpath=' + OutPath + '' + "\n" + 'signtype=sign' + "\n" + 'expirycheck=true' + "\n" + 'coordinate=400,100,1000,50' + "\n" + 'issuername=' + "\n" + 'certtype=ALL' + "\n" + 'certclass=0';
+                                      connection.send(Postdata);
+                                      connection.onerror = function (error) {
+                                          debugger;
+                                          alert('Please check the server connection: ' + error);
+                                          alert(error);
+                                      };
+
+                                      connection.onmessage = function (e) { // when DSC is success then following function executed.
+                                          debugger;
+                                          if (e.data.indexOf("subProtocol") == -1) {
+                                              $("#DSCResponse").val(e.data).change();
+                                              $.ajax(
+                                              {
+                                                  url: "/EReturnCoal/EReturnCoal/CheckVerifyResponse",
+                                                      type: "POST",
+                                                  data: { contentType: "pkcs7", signDataBase64Encoded: e.data, responseType: "plain" },
+                                                  async: false,
+                                                      success: function (msg) {
+                                                          debugger;
+                                                      if (msg == "SUCCESS") {
+                                                          var FNID = $("#fName").val();
+                                                          var Month_Year = $("#Year").val();
+                                                          var LicenseAppId = $("#objMine_Coal_Year_Id").val();
+                                                          var signData = e.data;
+                                                          $.ajax({
+                                                              url:"/EReturnCoal/EReturnCoal/SavePdfFile",
+                                                              type: "POST",
+                                                              async: false,
+                                                              data: { base64BinaryStr: e.data, fileName: FNID, ID: LicenseAppId, UpdateIn: "CoalYearlyReturn" },
+                                                              success: function (msg) {
+
+                                                                  if (msg == "SUCCESS") {
+                                                                      window.location.href = "/EReturnCoal/EReturnCoal/Print_FORMIII?Financial_Year=" + Month_Year;
+
+                                                                  }
+                                                                  else {
+                                                                      alert(msg);
+                                                                  }
+                                                              }
+                                                          });
+                                                      }
+                                                  }
+                                              });
+                                          }
+                                          else {
+                                              alert(e.data);
+                                          }
+                                      };
+                                  }
+                                  else {
+                                      alert(msg);
+
+                                  }
+                              }
+                          });
+                      }
+                      catch (e) {
+                          alert("Your DSC Connection is not working. Please try after some time.");
+                      }
+                    //-------------------------
+           // pdf.save("HTML-Document.pdf");
+        });
+    };
+
+
+    //following code is for DSC Signature
+    try {
+        var connection = new WebSocket('wss://localhost.emudhra.com:8080');
+
+        connection.onopen = function () {
+            console.log('Connection Opened');
+        };
+        connection.onerror = function (error) {
+            //  alert('Please check the DSC connection: ' + error);
+        };
+        connection.onmessage = function (e) {
+            if (e.data.indexOf("subProtocol") == -1) {
+                //  alert(e.data);
+            }
+        };
+    }
+    catch (e) {
+        alert("No DSC Connection Found");
+    }
+    //-----------------------------
+</script>

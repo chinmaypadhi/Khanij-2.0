@@ -1,0 +1,54 @@
+﻿@using HelpdeskApp.Web;
+@using HelpDeskEF;
+@using Microsoft.Extensions.Options;
+@using Microsoft.Extensions.Configuration
+@using Microsoft.AspNetCore.Http;
+@inject IConfiguration configuration
+@inject IHttpContextAccessor HttpContextAccessor
+@inject IOptions<KeyList> _objKeyList
+@{
+    List<MenuEF> leftsider = HttpContextAccessor.HttpContext.Session.Get<List<MenuEF>>("Index");
+}
+<div class="page-sidebar-wrapper" id="main-menu-wrapper">
+    <nav class="navbar">
+        <div class="left-user-details">
+            <div class="img-div">
+                <img src='@Url.Content("~/img/profile.jpg")' alt="user-image" class="">
+            </div>
+            <p>Administrator </p>
+        </div>
+        <div class="navbar-collapse" id="basicExampleNav">
+            <ul class="navbar-nav" id="menu">
+                @{
+                    if (leftsider != null)
+                    {
+                        foreach (var item in leftsider)
+                        {
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle active" id="navbarDropdownMenuLink&@item.MenuName" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="background: #b48385;color: #ececec;">
+                                    <i class="@item.SvgPath"></i>
+                                    <span>@item.MenuName</span>
+                                </a>
+                                <div class="dropdown-menu" id="DIV&@item.MenuName" aria-labelledby="navbarDropdownMenuLink">
+                                    @{
+                                        var count = 1;
+                                        foreach (var items in item.childMenuList)
+                                        {
+                                            var slno = item.MenuName + count;
+                                            <a id="@slno" onclick="Menu(this.id,'navbarDropdownMenuLink&@item.MenuName','DIV&@item.MenuName');" class="dropdown-item" href="@_objKeyList.Value.ActionVerb://@items.url@_objKeyList.Value.DomenNAme/@items.Area/@items.Controller/@items.ActionName">
+                                                <i class="@items.GifIcon"></i>
+                                                @items.MenuName
+                                            </a>
+                                            count++;
+                                        }
+                                    }
+                                </div>
+                            </li>
+                        }
+                    }
+                }
+            </ul>
+        </div>
+    </nav>
+</div>
+

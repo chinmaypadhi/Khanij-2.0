@@ -1,0 +1,1003 @@
+﻿
+
+@{
+    ViewData["Title"] = "MineralReceive";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+
+<h1>MineralReceive</h1>
+@model EpassEF.EndUser_ETransitPassModel;
+@if ((TempData["UserMessage"] != null))
+
+{
+    <script>
+        if ('@TempData["UserMessage"]' != null) {
+                swal("", '@TempData["UserMessage"]', "warning");
+
+
+        }
+    </script>
+}
+<style>
+    .font-height-set {
+        font-size: 4.9em;
+    }
+
+    .custom-input {
+        width: 100%;
+        font-size: 3em;
+        height: 70px;
+    }
+
+    .panel {
+        margin-bottom: 5px;
+    }
+
+    .panel-body {
+        padding: 5px;
+    }
+
+    .form-control {
+        width: 100%;
+    }
+</style>
+<script>
+    $(function () {
+
+        PermitNoBind();
+
+    })
+
+ //Added by suroj on 30-jul-2021 to bind Permit No Application
+        function PermitNoBind() {
+            var counter = 0;
+            $.ajax({
+
+                type: "GET",
+                url: '@Url.Content("~/Epass/eTransitpass/PermitNoBind")',
+                data: { },
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (SList) {
+
+
+                    $('#VehicleId').empty().append('<option selected="selected" value="0">Select Permit No</option>');
+                    $.each(SList, function (i, item) {
+                        counter = counter + 1;
+                        $("#VehicleId").append($("<option></option>").val(item.vehicleId).html(item.vehicleNumber));
+
+                    });
+                    $("#Upcomming_Trips").val(counter);
+                },
+
+                error: function () {
+                    alert('Error');
+
+                }
+            });
+        }</script>
+
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        @Html.Partial("_CMSnavigation")
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="Adde-TransitPassTP.aspx">
+                                Add
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link" href="Viewe-TransitPassTP.aspx">
+                                View
+                            </a>
+                        </li>
+
+                    </ul>
+                    @Html.Partial("_CMSutil")
+                </div>
+
+                <section class="box form-container">
+                    <div class="content-body">
+                        @using (Html.BeginForm("ReceiveMineral", "eTransitpass", FormMethod.Post, new { @class = "form-horizontal bordered-row", @id = "frmReceiveMineral" }))
+                        {
+                            @Html.AntiForgeryToken()
+                            @Html.HiddenFor(x => x.TransitPass_Type)
+                            @Html.HiddenFor(x => x.TransitPassID)
+                            @Html.HiddenFor(x => x.TransitPassNo)
+                            @Html.HiddenFor(x => x.TypeOfCoalDispatched)
+                            @Html.HiddenFor(x => x.TotalReceivedQuantity)
+                            @Html.HiddenFor(x => x.EcQuantity)
+                            <div class="row panel-heading-setting">
+                                <div class="col-xs-12">
+                                    <div class="panel panel-primary">
+                                        <div class="panel-body">
+                                            <div class="row">
+                                                <div class="col-md-4" id="Epass">
+                                                    <div class="panel panel-default " style="height: 155px">
+                                                        <div class="panel-heading">
+                                                            <h5>e-Transit Pass</h5>
+                                                        </div>
+                                                        <div class="panel-body">
+                                                            <div class="row">
+                                                                <div class="col-sm-6" style="width: 200px">
+                                                                    @Html.DropDownListFor(m => m.VehicleId, new SelectList(Enumerable.Empty<SelectListItem>(), "Value", "Text"), "Select Licensee Type", new { @class = "form-control form-control-sm searchableselect" })
+                                                                </div>
+                                                                <div class="col-md-6 col-md-offset-2">
+                                                                    <button type="button" id="btnGet" class="btn btn-primary">Get Data</button>
+                                                                </div>
+                                                            </div>
+                                                            <div class="row" id="SeAction" style="display: none">
+                                                                <div class="col-md-12">
+                                                                    <input type="radio" id="Received" name="transfer" value="Received" tabindex="1" />
+                                                                    Received
+                                                                    <input type="radio" id="Transfer" name="transfer" value="Transfer" />
+                                                                    Transfer
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-2">
+                                                    <div class="panel panel-default">
+                                                        <div class="panel-heading">
+                                                            <h5>Prev. Net Weight</h5>
+                                                        </div>
+                                                        <div class="panel-body" style="height: 98px;">
+                                                            @Html.TextBoxFor(x => x.NetWeight, new { @class = "form-control custom-input", @readonly = "readonly" })
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-md-2">
+                                                    <div class="panel panel-default">
+                                                        <div class="panel-heading">
+                                                            <h5>Current Net Weight</h5>
+                                                        </div>
+                                                        <div class="panel-body">
+                                                            @Html.TextBoxFor(x => x.ReceivedWeight, new { @class = "form-control custom-input", @required = "required", @min = "0", @step = "any", @type = "number" })
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-md-2">
+                                                    <div class="panel panel-default">
+                                                        <div class="panel-heading">
+                                                            <h5>Difference</h5>
+                                                        </div>
+                                                        <div class="panel-body" style="height: 98px;">
+                                                            @Html.TextBox("Difference", null, new { @class = "form-control custom-input", @readonly = "readonly" })
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-md-2">
+                                                    <div class="panel panel-default">
+                                                        <div class="panel-heading">
+                                                            <h5>Upcoming Trips</h5>
+                                                        </div>
+                                                        <div class="panel-body" style="height: 98px;">
+                                                            <a href="~/Licensee/MineralReceive/Reports">
+                                                                @Html.TextBox("Upcomming_Trips", null, new { @class = "form-control custom-input", @readonly = "readonly" })
+                                                            </a>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row" id="TransitPassInfo" style="display: none">
+                                <div class="col-xs-12">
+                                    <div class="panel panel-primary">
+                                        <div class="panel-heading">
+                                            <h3 class="panel-title" id="h3PassTitle"></h3>
+                                        </div>
+                                        <div class="panel-body">
+
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <div class="row">
+                                                        <div class="col-md-5 col-form-label">
+                                                            @Html.Label("License/Mining Area Details")
+                                                        </div>
+                                                        <div class="col-md-7 col-form-label">
+                                                            <input type="text" class="form-control" id="Address" placeholder="License/Mining Area Details" readonly="readonly">
+                                                        </div>
+                                                    </div>
+                                                    <div class="row">
+                                                        <div class="col-md-5 col-form-label">
+                                                            @Html.Label("License/Lessee Name")
+                                                        </div>
+                                                        <div class="col-md-7 col-form-label">
+                                                            <input type="text" class="form-control" id="Holder" placeholder="License/Lessee Name" readonly="readonly">
+                                                        </div>
+                                                    </div>
+                                                    <div class="row">
+                                                        <div class="col-md-5 col-form-label">
+                                                            @Html.Label("Date Of Dispatch")
+                                                        </div>
+                                                        <div class="col-md-7 col-form-label">
+                                                            <input type="text" class="form-control" id="DateOfDispatche" placeholder="Date Of Dispatch" readonly="readonly">
+                                                        </div>
+                                                    </div>
+                                                    <div class="row">
+                                                        <div class="col-md-5 col-form-label">
+                                                            @Html.Label("Mode of Transportation")
+
+                                                        </div>
+                                                        <div class="col-md-7 col-form-label">
+                                                            <input type="text" class="form-control" id="TransportationMode" placeholder="Mode of Transportation" readonly="readonly">
+                                                        </div>
+                                                    </div>
+                                                    <div class="row">
+                                                        <div class="col-md-5 col-form-label">
+                                                            @Html.Label("Destination")
+                                                        </div>
+                                                        <div class="col-md-7 col-form-label">
+                                                            <input type="text" class="form-control" id="Destination" placeholder="Destination" readonly="readonly">
+                                                        </div>
+                                                    </div>
+                                                    <div class="row" id="divDOData1">
+                                                        <div class="col-md-5 col-form-label">
+                                                            @Html.Label("DO Number")
+                                                        </div>
+                                                        <div class="col-md-7 col-form-label">
+                                                            <input type="text" class="form-control" id="DONumber2" placeholder="D.O Number" readonly="readonly">
+                                                        </div>
+                                                    </div>
+                                                    <div class="row" id="divDOData2">
+                                                        <div class="col-md-5 col-form-label">
+                                                            @Html.Label("DO Date")
+                                                        </div>
+                                                        <div class="col-md-7 col-form-label">
+                                                            <input type="text" class="form-control" id="DODate2" placeholder="D.O Date" readonly="readonly">
+                                                        </div>
+                                                    </div>
+                                                    <div class="row" id="divDriver">
+                                                        <div class="col-md-5 col-form-label">
+                                                            @Html.Label("Driver Name")
+                                                        </div>
+                                                        <div class="col-md-7 col-form-label">
+                                                            <input type="text" class="form-control" id="DriverName" placeholder="Driver Name" readonly="readonly">
+                                                        </div>
+                                                    </div>
+                                                    <div class="row">
+                                                        <div class="col-md-5 col-form-label">
+                                                            @Html.Label("Route")
+                                                        </div>
+                                                        <div class="col-md-7 col-form-label">
+                                                            <input type="text" class="form-control" id="RouteName" placeholder="Route" readonly="readonly">
+                                                        </div>
+                                                    </div>
+                                                    <div class="row">
+                                                        <div class="col-md-5 col-form-label">
+                                                            @Html.Label("Remark")
+                                                        </div>
+                                                        <div class="col-md-7 col-form-label">
+                                                            @Html.TextAreaFor(x => x.Remarks, new { @required = "required", @class = "form-control" })
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-md-6">
+                                                    <div class="row">
+                                                        <div class="col-md-5 col-form-label">
+                                                            @Html.Label("e-Permit Number")
+                                                        </div>
+                                                        <div class="col-md-7 col-form-label">
+                                                            <input type="text" class="form-control" id="BulkPermitNo" placeholder="e-Permit No" readonly="readonly">
+                                                        </div>
+                                                    </div>
+                                                    <div class="row">
+                                                        <div class="col-md-5 col-form-label">
+                                                            @Html.Label("Mineral Name")
+
+                                                        </div>
+                                                        <div class="col-md-7 col-form-label">
+                                                            <input type="text" class="form-control" id="MineralName" placeholder="Name of Mineral" readonly="readonly">
+                                                        </div>
+                                                    </div>
+                                                    <div class="row">
+                                                        <div class="col-md-5 col-form-label">
+                                                            @Html.Label("Mineral Grade")
+
+                                                        </div>
+                                                        <div class="col-md-7 col-form-label">
+                                                            <input type="text" class="form-control" id="MineralGrade" placeholder="Mineral Grade" readonly="readonly">
+                                                        </div>
+                                                    </div>
+                                                    <div class="row">
+                                                        <div class="col-md-5 col-form-label">
+                                                            @Html.Label("Mineral Unit")
+                                                        </div>
+                                                        <div class="col-md-7 col-form-label">
+                                                            <input type="text" class="form-control" id="UnitName2" placeholder="Mineral Unit" readonly="readonly">
+                                                        </div>
+                                                    </div>
+                                                    <div class="row">
+                                                        <div class="col-md-5 col-form-label">
+                                                            @Html.Label("Sale value of the Mineral")
+                                                        </div>
+                                                        <div class="col-md-7 col-form-label">
+                                                            <input type="text" class="form-control" id="AverageSalePrice" placeholder="Sale value of the Mineral" readonly="readonly">
+                                                        </div>
+                                                    </div>
+                                                    <div class="row" id="divTrans">
+                                                        <div class="col-md-5 col-form-label">
+                                                            @Html.Label("Vehicle Owner")
+                                                        </div>
+                                                        <div class="col-md-7 col-form-label">
+                                                            <input type="text" class="form-control" id="TransporterName" placeholder="Vehicle Owner" readonly="readonly">
+                                                        </div>
+                                                    </div>
+                                                    <div class="row" id="divVeh">
+                                                        <div class="col-md-5 col-form-label">
+                                                            @Html.Label("Vehicle Number")
+                                                        </div>
+                                                        <div class="col-md-7 col-form-label">
+                                                            <input type="text" class="form-control" id="VehicleNumber" placeholder="Vehicle No" readonly="readonly">
+                                                        </div>
+                                                    </div>
+                                                    <div class="row" id="divVehType">
+                                                        <div class="col-md-5 col-form-label">
+                                                            @Html.Label("Vehicle Type")
+                                                        </div>
+                                                        <div class="col-md-7 col-form-label">
+                                                            <input type="text" class="form-control" id="VehicleTypeName" placeholder="Vehicle Type" readonly="readonly">
+                                                        </div>
+                                                    </div>
+                                                    <div class="row" id="divTare">
+                                                        <div class="col-md-5 col-form-label">
+                                                            @Html.Label("Tare Weight")
+                                                        </div>
+                                                        <div class="col-md-7 col-form-label">
+                                                            <input type="text" class="form-control" id="TareWeight" placeholder="Tare Weight" readonly="readonly">
+                                                        </div>
+                                                    </div>
+                                                    <div class="row" id="divGross">
+                                                        <div class="col-md-5 col-form-label">
+                                                            @Html.Label("Gross Weight")
+                                                        </div>
+                                                        <div class="col-md-7 col-form-label">
+                                                            <input type="text" class="form-control" id="GrossWeight2" placeholder="Gross Weight" readonly="readonly">
+                                                        </div>
+                                                    </div>
+                                                    <div class="row" id="divNet">
+                                                        <div class="col-md-5 col-form-label">
+                                                            @Html.Label("Net Weight")
+                                                        </div>
+                                                        <div class="col-md-7 col-form-label">
+                                                            <input type="text" class="form-control" id="NetWeight2" placeholder="Net Weight" readonly="readonly">
+                                                        </div>
+                                                    </div>
+                                                    <div class="row" id="divNonRoad">
+                                                        <div class="col-md-5 col-form-label">
+                                                            @Html.Label("Dispatched Qty")
+                                                        </div>
+                                                        <div class="col-md-7 col-form-label">
+                                                            <input type="text" class="form-control" id="NetWeight3" placeholder="Dispatched Qty" readonly="readonly">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+
+                                            <div class="row">
+                                                <div class="col-md-2">
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="col-md-12 col-form-label">
+                                                        <input type="submit" value="Save" id="SaveEpass" class="btn btn-blue" style="width: 100px;" />
+                                                        <input type="reset" value="Cancel" id="CancelEpass" class="btn btn-primary" />
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-4">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+
+                        <div id="window">
+                            <div class="row col-md-12">
+                                <div class="row">
+                                    <div class="col-sm-3">
+                                        @(Html.Label("Name of Transferree"))
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <input type="text" id="NameofTransferree" style="width: 175px; margin-bottom: 8px;" />
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-3">
+                                        @(Html.Label("Address of Transferree "))
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <input type="text" id="AddressofTransferree" style="width: 175px; margin-bottom: 8px;" />
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-3">
+                                        @(Html.Label("District"))
+                                    </div>
+                                    <div class="col-sm-4">
+                                        @*@(Html.Kendo().ComboBox()
+                                            .Name("DistrictId")
+                                            .Placeholder("Select District")
+                                            .Filter("contains")
+                                            .MinLength(3)
+                                            .Events(e => e.Change("onDistrictSelection"))
+                                            .HtmlAttributes((new { @class = "ddlDropdown", data_value_primitive = "true", style = "width:220px;", tabindex = 13 }))
+                                            .BindTo(CHiMMS_MVC.Models.Generic.UtilityModel.GetDistrictList()))*@
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-3">
+                                        @(Html.Label("Tehsil"))
+                                    </div>
+                                    <div class="col-sm-4">
+                                        @*@(Html.Kendo().ComboBox()
+                                            .Name("TehsilId")
+                                                .DataSource(source =>
+                                                {
+                                                    source.Read(read =>
+                                                    {
+                                                        read.Action("GetTehsilDataFromDistrictID", "ApplicationRegistration", new { Area = "TransparancyPortal" }).Type(HttpVerbs.Post).Data("GetTehsil");
+                                                    })
+
+                                                    .ServerFiltering(true);
+                                                })
+                                            .Placeholder("Select Tehsil")
+                                            .Events(e => e.Change("onDistrictSelection"))
+                                            .DataTextField("TehsilName")
+                                            .DataValueField("TehsilID")
+                                            .CascadeFrom("DistrictId")
+                                            .HtmlAttributes((new { @class = "ddlDropdown", data_value_primitive = "true", style = "width:220px;", tabindex = 15 })))*@
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-3">
+                                        @(Html.Label("Village"))
+                                    </div>
+                                    <div class="col-sm-4">
+                                        @*@(Html.Kendo().ComboBox()
+                                            .Name("VillageId")
+                                            .DataSource(source =>
+                                            {
+                                                source.Read(read =>
+                                                {
+                                                    read.Action("GetVillageDataFromTehsilID", "ApplicationRegistration", new { Area = "TransparancyPortal" }).Type(HttpVerbs.Post).Data("GetVillage");
+                                                })
+
+                                                .ServerFiltering(true);
+                                            })
+                                            .Placeholder("Select Village")
+                                            .Events(e => e.Change("onDistrictSelection"))
+                                            .DataTextField("VillageName")
+                                            .DataValueField("VillageID")
+                                            .CascadeFrom("TehsilId")
+                                            .HtmlAttributes((new { @class = "ddlDropdown", data_value_primitive = "true", style = "width:220px;", tabindex = 17 })))*@
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <div class="row">
+                                        <div class="col-sm-4"></div>
+                                        <div class="col-sm-4">
+                                            <button type="button" class="btn btn-primary" id="btnUpload" onclick="Transfer()">Transfer</button>
+                                            <button type="button" class="btn btn-primary" id="btnCancel" onclick="CloseWindow()">Cancel</button>
+                                        </div>
+                                        <div class="col-sm-4"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+    $("#CancelEpass").click(function () {
+        $("#TransitPassInfo").hide();
+    })
+                    $(document).ready(function () {
+
+                        $('.searchableselect').searchableselect();
+                    });
+    function Transfer() {
+        var TransitPassNo = $("#VehicleId").val();
+        var NameofTransferree = $("#NameofTransferree").val();
+        var AddressofTransferree = $("#AddressofTransferree").val();
+
+        var DistrictId = ($("#DistrictId").val());
+        var TehsilId = ($("#TehsilId").val());
+        var VillageId = ($("#VillageId").val());
+
+
+        if (NameofTransferree == "" || NameofTransferree == "0") {
+            alert("Enter Name of Transferree");
+            return false;
+        }
+        if (AddressofTransferree == "" || AddressofTransferree == "0") {
+            alert("Enter Address of Transferree");
+            return false;
+        }
+        if (DistrictId == "") {
+            alert("Select District");
+            return false;
+        }
+        if (TehsilId == "") {
+            alert("Select Tehsil");
+            return false;
+        }
+
+        if (VillageId == "") {
+            alert("Select Village");
+            return false;
+        }
+
+        if (confirm("Are you want to Transfer This Mineral ?")) {
+
+            $.ajax({
+                url: '@Url.Action("TransferMineral", "EndUser", new { Area = "EndUser" })',
+                type: "POST",
+                cache: false,
+                processData: true,
+                data: {
+                    TransitPassNo: TransitPassNo,
+                    NameofTransferree: NameofTransferree,
+                    AddressofTransferree: AddressofTransferree,
+                    DistrictId: DistrictId,
+                    TehsilId: TehsilId,
+                    VillageId: VillageId
+                },
+                success: function (data) {
+                    if (data != null && data == "SUCCESS") {
+                        alert("You have successfully Transfer This Mineral ");
+                        //var win = $("#window").data("kendoWindow");
+                        win.center().close();
+                        $("#NameofTransferree").val("");
+                        $("#AddressofTransferree").val("");
+                        $("#District").val("");
+                        $("#TehsilId").val("");
+                        $("#VillageId").val("");
+                        //$(".k-upload-files.k-reset").find("li").parent().remove();
+                    }
+                    else if (data != null && data != "SUCCESS") {
+                        alert(data);
+                    }
+                    else {
+                        alert("Transfer failed..");
+                    }
+                }
+            });
+        }
+    }
+
+
+
+
+    function onDistrictSelection(e) {
+        var districtwidget = e.sender;
+        if (districtwidget.value() && districtwidget.select() === -1) {
+            districtwidget.value(""); //reset widget
+        }
+    }
+
+
+    function GetTehsil() {
+
+        return {
+            DistrictId: $("#DistrictId").val()
+        };
+    }
+
+    function GetVillage() {
+
+        return {
+            TehsilId: $("#TehsilId").val()
+        };
+    }
+
+    var myWindow = $("#window");
+    var win;
+    myWindow.hide();
+
+    function PopTransfer(obj) {
+        var row = $(obj).closest("tr");
+        //var win = $("#window").data("kendoWindow");
+        win.center().open();
+    }
+
+    //$(document).ready(function () {
+    //    //var myWindow = $("#window")
+    //    win = myWindow.kendoWindow({
+    //        width: "50%",
+    //        title: "Transfer",
+    //        visible: false,
+    //        scrollable: false,
+    //        modal: true,
+    //        actions: ["Close"],
+    //        close: onClose
+    //    }).data("kendoWindow").center();
+    //});
+
+    function CloseWindow() {
+        //var win = $("#window").data("kendoWindow");
+        win.center().close();
+    }
+
+    function onClose() {
+        location.reload();
+    }
+
+    $("#SaveEpass").click(function () {
+        //if ($("#ReceivedWeight").val() > 0) {
+        //    var vv = Number($("#Difference").val());
+        //    if (vv < 0) {
+        //        alert("You will not receive Qty more then Dispatched Qty!");
+        //    }
+        //    else {
+        //        if (confirm("Are you sure you want to received mineral ?")) {
+        //            $("#frmReceiveMineral").submit();
+        //        }
+        //    }
+        //}
+
+        if ($("#ReceivedWeight").val() > 0) {
+            if (confirm("Are you sure you want to received mineral ?")) {
+                $("#frmReceiveMineral").submit();
+            }
+        }
+    });
+
+    $("#Transfer").change(
+       function () {
+           if ($(this).is(':checked') && $(this).val() == 'Transfer') {
+               PopTransfer(this);
+           }
+       });
+
+
+
+    $("#Received").change(
+      function () {
+          if ($(this).is(':checked') && $(this).val() == 'Received') {
+
+              if ($("#VehicleId").val() != null && $("#VehicleId").val() != '') {
+                  $.ajax({
+                      type: "GET",
+                      url: '@Url.Action("GetEndUser_ETransitPassDetails", "MineralReceive")',
+                      data: { vehicleId: $("#VehicleId").val(), TransitPassNo: $("#VehicleId").val() },
+                      contentType: "application/json; charset=utf-8",
+                      dataType: "json",
+                      success: function (data) {
+
+                          if (data == null || data == "") {
+                              return;
+                          }
+                          if (data[0].TransitPassID == 0) {
+                              alert(data[0].TransitPass_Type);
+                              return;
+                          }
+                          $("#h3PassTitle").text("Pass Details - " + data[0].TransitPassNo);
+                          $("#GrossWeight").val(data[0].GrossWeight);
+                          //if (data.BulkPermitNo != null) {
+                          //    $("#EndUserNameA").val(data.EndUserName);
+                          $("#DateOfDispatche").val(data[0].Date_OF_Dispatche);
+                          $("#DONumber").val(data[0].DONumber);
+                          $("#DriverName").val(data[0].DriverName);
+                          $("#TareWeight").val(data[0].TareWeight);
+                          $("#TareTime").val(data[0].TareTime);
+                          $("#GrossWeight2").val(data[0].GrossWeight);
+                          $("#NetWeight2").val(data[0].NetWeight);
+                          $("#NetWeight3").val(data[0].NetWeight);
+                          $("#NetWeight").val(data[0].NetWeight);
+                          $("#BulkPermitNo").val(data[0].BulkPermitNo);
+                          $("#RouteName").val(data[0].RouteName);
+                          $("#TransportationMode").val(data[0].TransportationMode);
+                          $("#TransporterName").val(data[0].TransporterName);
+                          $("#VehicleNumber").val(data[0].VehicleNumber);
+                          $("#VehicleTypeName").val(data[0].VehicleTypeName);
+                          $("#MineralName").val(data[0].MineralName);
+                          $("#MineralGrade").val(data[0].MineralGradeName);
+                          $("#Destination").val(data[0].Destination);
+                          $("#AverageSalePrice").val(data[0].MineralSaleValue);
+                          $("#Address").val(data[0].Address);
+                          $("#AreaDetails").val(data[0].AreaDetails);
+                          $("#AreaHect").val(data[0].AreaHect);
+                          $("#LeaseValidity").val(data[0].LeaseValidity);
+                          $("#Holder").val(data[0].LesseeName);
+                          $("#chkBuyerName").val(data[0].EndUserName);
+                          $("#TransitPass_Type").val(data[0].TransitPass_Type);
+                          $("#TransitPassID").val(data[0].TransitPassID);
+                          $("#UpcommingTrips").val(data[0].UpcommingTrips);
+
+                          $("#DODate2").val(data[0].DODate);
+                          $("#DONumber2").val(data[0].DONumber);
+                          $("#UnitName2").val(data[0].UnitName);
+
+                          $("#TotalReceivedQuantity").val(data[0].TotalReceivedQuantity);
+                          $("#EcQuantity").val(data[0].EcQuantity);
+
+                          if (data[0].MineralName == "Coal") {
+                              $("#divDOData1").show();
+                              $("#divDOData2").show();
+                          }
+                          else {
+                              $("#divDOData1").hide();
+                              $("#divDOData2").hide();
+                          }
+                          $("#TransitPassInfo")[0].style.display = "block";
+
+                          var sum = $("#NetWeight").val() - $("#ReceivedWeight").val();
+
+                          $("#Difference").val(sum);
+
+                          if (data[0].TransportationMode == "Road" || data[0].TransportationMode == "Road-Rail") {
+                              $("#divTrans").show();
+                              $("#divVeh").show();
+                              $("#divVehType").show();
+                              $("#divTare").show();
+                              $("#divGross").show();
+                              $("#divNet").show();
+                              $("#divDriver").show();
+                              $("#divNonRoad").hide();
+                          }
+                          else {
+                              $("#divTrans").hide();
+                              $("#divVeh").hide();
+                              $("#divVehType").hide();
+                              $("#divTare").hide();
+                              $("#divGross").hide();
+                              $("#divNet").hide();
+                              $("#divDriver").hide();
+                              $("#divNonRoad").show();
+                          }
+                      },
+
+
+                      failure: function (msg) {
+                          alert(msg);
+                      }
+                  });
+              }
+
+
+          }
+      });
+
+
+
+
+
+                    $("#btnGet").click(function () {
+                        var value = $("#VehicleId option:selected");
+
+          if ($("#VehicleId").val() != null && $("#VehicleId").val() != '') {
+              $.ajax({
+                  type: "GET",
+                  url: '@Url.Content("~/Epass/eTransitpass/GetEndUser_ETransitPassDetails")',
+                  data: { TrnasitPassNO: value.text() },
+                  contentType: "application/json; charset=utf-8",
+                  dataType: "json",
+                  success: function (data) {
+                      debugger;
+                      if (data == null || data == "") {
+                          return;
+                      }
+                      if (data.transitPassID == 0) {
+                          alert(data.transitPass_Type);
+                          return;
+                      }
+                      $("#TypeOfCoalDispatched").val(data.typeOfCoalDispatched);
+
+                      if ('Spot e-Auction' == data.typeOfCoalDispatched) {
+                          $("#SeAction").show();
+                          //PopTransfer(this);
+                      }
+                      else {
+                          debugger;
+                          $("#SeAction").hide();
+
+                          $("#h3PassTitle").text("Pass Details - " + data[0].transitPassNo);
+                          $("#GrossWeight").val(data[0].grossWeight);
+                          //if (data.BulkPermitNo != null) {
+                          //    $("#EndUserNameA").val(data.EndUserName);
+                          $("#DateOfDispatche").val(data[0].date_OF_Dispatche);
+                          $("#DONumber").val(data[0].dONumber);
+                          $("#DriverName").val(data[0].driverName);
+                          $("#TareWeight").val(data[0].tareWeight);
+                          $("#TareTime").val(data[0].tareTime);
+                          $("#GrossWeight2").val(data[0].grossWeight);
+                          $("#NetWeight2").val(data[0].netWeight);
+                          $("#NetWeight3").val(data[0].netWeight);
+                          $("#NetWeight").val(data[0].netWeight);
+                          $("#BulkPermitNo").val(data[0].bulkPermitNo);
+                          $("#RouteName").val(data[0].routeName);
+                          $("#TransportationMode").val(data[0].transportationMode);
+                          $("#TransporterName").val(data[0].transporterName);
+                          $("#VehicleNumber").val(data[0].vehicleNumber);
+                          $("#VehicleTypeName").val(data[0].vehicleTypeName);
+                          $("#MineralName").val(data[0].mineralName);
+                          $("#MineralGrade").val(data[0].mineralGradeName);
+                          $("#Destination").val(data[0].destination);
+                          $("#AverageSalePrice").val(data[0].mineralSaleValue);
+                          $("#Address").val(data[0].address);
+                          $("#AreaDetails").val(data[0].areaDetails);
+                          $("#AreaHect").val(data[0].areaHect);
+                          $("#LeaseValidity").val(data[0].leaseValidity);
+                          $("#Holder").val(data[0].lesseeName);
+                          $("#chkBuyerName").val(data[0].endUserName);
+                          $("#TransitPass_Type").val(data[0].transitPass_Type);
+                          $("#TransitPassID").val(data[0].transitPassID);
+                          $("#UpcommingTrips").val(data[0].upcommingTrips);
+
+                          $("#DODate2").val(data[0].dODate);
+                          $("#DONumber2").val(data[0].dONumber);
+                          $("#UnitName2").val(data[0].unitName);
+
+                          $("#TotalReceivedQuantity").val(data[0].totalReceivedQuantity);
+                          $("#EcQuantity").val(data[0].ecQuantity);
+
+                          if (data[0].MineralName == "Coal") {
+                              $("#divDOData1").show();
+                              $("#divDOData2").show();
+                          }
+                          else {
+                              $("#divDOData1").hide();
+                              $("#divDOData2").hide();
+                          }
+                          $("#TransitPassInfo")[0].style.display = "block";
+
+                          var sum = $("#NetWeight").val() - $("#ReceivedWeight").val();
+
+                          $("#Difference").val(sum);
+
+                          if (data[0].transportationMode == "Road" || data[0].transportationMode == "Road-Rail") {
+                              $("#divTrans").show();
+                              $("#divVeh").show();
+                              $("#divVehType").show();
+                              $("#divTare").show();
+                              $("#divGross").show();
+                              $("#divNet").show();
+                              $("#divDriver").show();
+                              $("#divNonRoad").hide();
+                          }
+                          else {
+                              $("#divTrans").hide();
+                              $("#divVeh").hide();
+                              $("#divVehType").hide();
+                              $("#divTare").hide();
+                              $("#divGross").hide();
+                              $("#divNet").hide();
+                              $("#divDriver").hide();
+                              $("#divNonRoad").show();
+                          }
+                      }
+
+
+
+                      //if ('Spot e-Auction' == data[0].TypeOfCoalDispatched) {
+                      //    PopTransfer(this);
+                      //}
+
+                      //    else {
+                      //        $("#h3PassTitle").text("Pass Details - " + data[0].TransitPassNo);
+                      //        $("#GrossWeight").val(data[0].GrossWeight);
+                      //        //if (data.BulkPermitNo != null) {
+                      //        //    $("#EndUserNameA").val(data.EndUserName);
+                      //        $("#DateOfDispatche").val(data[0].Date_OF_Dispatche);
+                      //        $("#DONumber").val(data[0].DONumber);
+                      //        $("#DriverName").val(data[0].DriverName);
+                      //        $("#TareWeight").val(data[0].TareWeight);
+                      //        $("#TareTime").val(data[0].TareTime);
+                      //        $("#GrossWeight2").val(data[0].GrossWeight);
+                      //        $("#NetWeight2").val(data[0].NetWeight);
+                      //        $("#NetWeight3").val(data[0].NetWeight);
+                      //        $("#NetWeight").val(data[0].NetWeight);
+                      //        $("#BulkPermitNo").val(data[0].BulkPermitNo);
+                      //        $("#RouteName").val(data[0].RouteName);
+                      //        $("#TransportationMode").val(data[0].TransportationMode);
+                      //        $("#TransporterName").val(data[0].TransporterName);
+                      //        $("#VehicleNumber").val(data[0].VehicleNumber);
+                      //        $("#VehicleTypeName").val(data[0].VehicleTypeName);
+                      //        $("#MineralName").val(data[0].MineralName);
+                      //        $("#MineralGrade").val(data[0].MineralGradeName);
+                      //        $("#Destination").val(data[0].Destination);
+                      //        $("#AverageSalePrice").val(data[0].MineralSaleValue);
+                      //        $("#Address").val(data[0].Address);
+                      //        $("#AreaDetails").val(data[0].AreaDetails);
+                      //        $("#AreaHect").val(data[0].AreaHect);
+                      //        $("#LeaseValidity").val(data[0].LeaseValidity);
+                      //        $("#Holder").val(data[0].LesseeName);
+                      //        $("#chkBuyerName").val(data[0].EndUserName);
+                      //        $("#TransitPass_Type").val(data[0].TransitPass_Type);
+                      //        $("#TransitPassID").val(data[0].TransitPassID);
+                      //        $("#UpcommingTrips").val(data[0].UpcommingTrips);
+
+                      //        $("#DODate2").val(data[0].DODate);
+                      //        $("#DONumber2").val(data[0].DONumber);
+                      //        $("#UnitName2").val(data[0].UnitName);
+
+                      //        if (data[0].MineralName == "Coal") {
+                      //            $("#divDOData1").show();
+                      //            $("#divDOData2").show();
+                      //        }
+                      //        else {
+                      //            $("#divDOData1").hide();
+                      //            $("#divDOData2").hide();
+                      //        }
+                      //        $("#TransitPassInfo")[0].style.display = "block";
+
+                      //        var sum = $("#NetWeight").val() - $("#ReceivedWeight").val();
+
+                      //        $("#Difference").val(sum);
+
+                      //        if (data[0].TransportationMode == "Road" || data[0].TransportationMode == "Road-Rail") {
+                      //            $("#divTrans").show();
+                      //            $("#divVeh").show();
+                      //            $("#divVehType").show();
+                      //            $("#divTare").show();
+                      //            $("#divGross").show();
+                      //            $("#divNet").show();
+                      //            $("#divDriver").show();
+                      //            $("#divNonRoad").hide();
+                      //        }
+                      //        else {
+                      //            $("#divTrans").hide();
+                      //            $("#divVeh").hide();
+                      //            $("#divVehType").hide();
+                      //            $("#divTare").hide();
+                      //            $("#divGross").hide();
+                      //            $("#divNet").hide();
+                      //            $("#divDriver").hide();
+                      //            $("#divNonRoad").show();
+                      //        }
+                      //    }
+                      //},
+                  },
+                  failure: function (msg) {
+                      alert(msg);
+                  }
+              });
+          }
+          else {
+              alert("Please Select Pass !!");
+          }
+      })
+
+      $(document).ready(function () {
+          $("#LicenseeHeaderDetails").text("Licensee - Mineral Receipt");
+
+          $('#ReceivedWeight').blur(function () {
+              alert('x');
+              var sum = $("#NetWeight").val() - $("#ReceivedWeight").val();
+              $("#Difference").val(sum);
+          });
+
+          if ('@TempData["UserMessage"]' != '') {
+            alert('@TempData["UserMessage"]');
+        }
+    });
+
+</script>
+
+
+
+
+

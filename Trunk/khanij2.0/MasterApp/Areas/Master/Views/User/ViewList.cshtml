@@ -1,0 +1,186 @@
+﻿@model IEnumerable<MasterEF.ViewUserCreationModel>
+@{
+    ViewData["Title"] = "ViewList";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+@using MasterApp.Web;
+
+@if (TempData["msg"] != null)
+{
+    <script>
+        swal("",'@TempData["msg"]',"success");
+    </script>
+}
+<script>
+    $(document).ready(function () {
+        loadNavigation('ViewList', 'glRoleRes', 'plUser', 'tl', 'Master', 'User Creation', ' ');
+        $('.searchableselect').searchableselect();
+    });
+</script>
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        @Html.Partial("_CMSnavigation")
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link" href="Add">
+                                Add
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="javascript:void(0);">
+                                View
+                            </a>
+                        </li>
+                    </ul>
+                    @Html.Partial("_CMSutil")
+                </div>
+                <section class="box form-container">
+                    <div class="content-body">
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="legend-box">
+                                    <ul class="d-flex mb-1 justify-content-end list-unstyled">
+                                        <li><span class="bg-success"></span> Active</li>
+                                        <li><span class="bg-warning"></span> Inactive</li>
+                                    </ul>
+                                </div>
+                                <table id="table-exports" class="table table-sm table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th width="30">Sl#</th>
+                                            <th>
+                                                Login id
+                                            </th>
+                                            <th>
+                                                User Name
+                                            </th>
+                                            <th>
+                                                Department
+                                            </th>
+                                            <th>
+                                                Designation
+                                            </th>
+                                            <th>
+                                                State
+                                            </th>
+                                            <th>
+                                                District
+                                            </th>
+                                            <th>
+                                                Address
+                                            </th>
+                                            <th>
+                                                Pin Code
+                                            </th>
+                                            <th>
+                                                Mobile
+                                            </th>
+                                            <th>
+                                                E Mail
+                                            </th>
+                                            <th>
+                                                Status
+                                            </th>
+                                            <th width="100" class="noprint text-center">Edit</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @{
+                                            var count = 0;
+                                            foreach (var item in Model)
+                                            {
+                                                count++;
+                                                var dyclass = @item.IsActive == true ? "active-row" : "inactive-row";
+                                                <tr class="@dyclass">
+                                                    <td>@count</td>
+                                                    <td>@item.UserName</td>
+                                                    <td>@item.ApplicantName</td>
+                                                    <td>@item.RoleTypeName</td>
+                                                    <td>@item.RoleName</td>
+                                                    <td>@item.StateName</td>
+                                                    <td>@item.DistrictName</td>
+                                                    <td>@item.Address</td>
+                                                    <td>@item.PinCode</td>
+                                                    <td>@item.MobileNo</td>
+                                                    <td>@item.EMailId</td>
+                                                    @if (item.IsActive == true)
+                                                    {
+                                                        <td class="text-success">Active</td>
+                                                    }
+                                                    else
+                                                    {
+                                                        <td class="text-orange">InActive</td>
+                                                    }
+
+                                                    <td class="text-center noprint">
+                                                        <a href="@CustomQueryStringHelper.EncryptString("Master","Add","User",new {id=item.UserId })"
+                                                           class="btn-floating btn-outline-primary btn-sm" title="Edit">
+                                                            <i class="icon-pencil-alt-solid"></i>
+                                                        </a>
+                                                        <a href="@CustomQueryStringHelper.EncryptString("Master","Delete","User",new {id=item.UserId })"
+                                                           class="btn-floating btn-outline-danger btn-sm" title="Delete"
+                                                           onclick="return confirm('Are you sure to delete?')"><i class="icon-trash-alt-solid"></i></a>
+                                                    </td>
+                                                </tr>
+                                            }
+                                        }
+                                        @*<tr class="active-row">
+                                                <td>1</td>
+                                                <td>5012000110</td>
+                                                <td>Ajay Kumar Chandrakar</td>
+                                                <td>Licensee</td>
+                                                <td>Licensee</td>
+                                                <td>Odisha</td>
+                                                <td>Raipur</td>
+                                                <td>Address</td>
+                                                <td>745231</td>
+                                                <td>7974561235</td>
+                                                <td>prakashbiswal@gmail.com</td>
+                                                <td>Active</td>
+                                                <td class="noprint text-center">
+                                                    <a href="#"
+                                                       class="btn-floating btn-outline-primary btn-sm"
+                                                       title="Edit"><i class="icon-pencil-alt-solid"></i></a>
+                                                    <a href="#"
+                                                       class="btn-floating btn-outline-danger btn-sm"
+                                                       title="Delete" onclick="return confirm('Are you sure to Delete?')"><i class="icon-trash-alt-solid"></i></a>
+                                                </td>
+                                            </tr>
+                                            <tr class="inactive-row">
+                                                <td>2</td>
+                                                <td>5012000110</td>
+                                                <td>Lafarge India Pvt Ltd</td>
+                                                <td>Lessee</td>
+                                                <td>Lessee</td>
+                                                <td>Odisha</td>
+                                                <td>Jashpur</td>
+                                                <td>Address</td>
+                                                <td>745231</td>
+                                                <td>7974561235</td>
+                                                <td>abc@gmail.com</td>
+                                                <td>Active</td>
+                                                <td class="noprint text-center">
+                                                    <a href="#"
+                                                       class="btn-floating btn-outline-primary btn-sm"
+                                                       title="Edit"><i class="icon-pencil-alt-solid"></i></a>
+                                                    <a href="#"
+                                                       class="btn-floating btn-outline-danger btn-sm"
+                                                       title="Delete" onclick="return confirm('Are you sure to Delete?')"><i class="icon-trash-alt-solid"></i></a>
+                                                </td>
+                                            </tr>*@
+
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+    <!-- MAIN CONTENT AREA ENDS -->
+</section>

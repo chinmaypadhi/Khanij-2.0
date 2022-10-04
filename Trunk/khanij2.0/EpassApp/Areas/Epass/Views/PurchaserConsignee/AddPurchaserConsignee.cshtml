@@ -1,0 +1,1341 @@
+﻿@*// *********************************************************************************************************
+    //  View Name                : AddpurchaseConsignee
+    //  Desciption               : To Save and Update, Forward, Approve and Reject consignee details
+    //  Created By               : Suroj kumar pradhan
+    //  Created On               : 24 jun 2021
+    // ********************************************************************************************************
+*@
+@model EpassEF.PurchaserConsigneePermitModel
+@{
+    ViewData["Title"] = "Add";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+@{ var data = ViewBag.model as EpassEF.PurchaserConsigneePermitModel; }
+@{ var TempUserId = ViewBag.userid;
+    var TempUserType = ViewBag.userType;
+
+
+}
+@inject EpassApp.KhanijSecurity.KhanijIDataProtection protector;
+<script src="~/js/select2.min.js"></script>
+<link href="~/css/select2.min.css" rel="stylesheet" />
+<style>
+    .width_50_inlineblock {
+        width: 49%;
+        float: left;
+    }
+
+    .k-widget.k-window {
+        height: 580px !important;
+    }
+
+    .k-edit-form-container {
+        height: 100% !important;
+    }
+</style>
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        <!-- MAIN CONTENT AREA STARTS -->
+        @Html.Partial("_CMSnavigation")
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="javascript:void(0);">
+                                Add
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="PurchaserConsigneeByPermitId">
+                                View
+                            </a>
+                        </li>
+                    </ul>
+                    @Html.Partial("_CMSutil")
+                    @*<uc1:util runat="server" ID="util" />*@
+                </div>
+
+                <section class="box form-container">
+                    <div class="content-body">
+                        @using (Html.BeginForm("Add", "PurchaserConsignee", FormMethod.Post, new { AUTOCOMPLETE = "Off", id = "form1", enctype = "multipart/form-data" }))
+                        {
+
+                            @(Html.HiddenFor(x => x.BulkPermitId))
+                            @Html.Hidden("MineralType")
+                            @Html.Hidden("RCR_RTP_BY")
+                            @Html.Hidden("UserType")
+                            @Html.Hidden("OtherOption")
+                            @* @(Html.HiddenFor(x => x.IsOtherParty))
+                                @(Html.HiddenFor(x => x.DispatchType))*@
+                            <div class="row">
+
+
+                                <div class="col-sm-6">
+                                    <div class="form-group row">
+                                        <label class="col-sm-4 col-form-label font-weight-bolder"> @(Html.LabelFor(model => model.MineralName, "Mineral Name"))</label>
+                                        <div class="col-sm-7">
+
+                                            @Html.TextBoxFor(model => model.MineralName, new { @class = "form-control", @autofocus = "autofocus", @width = "50%" })
+                                            @*@(Html.TextBoxFor(model => model.MineralName).Enable(false).HtmlAttributes(new { style = "width:100%" }))*@
+                                            @(Html.ValidationMessageFor(model => model.MineralName))
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group row">
+                                        <label class="col-sm-4 col-form-label font-weight-bolder"> @(Html.LabelFor(model => model.MineralNature, "Mineral Form"))</label>
+                                        <div class="col-sm-7">
+
+                                            @Html.TextBoxFor(model => model.MineralNature, new { @class = "form-control", @autofocus = "autofocus", @width = "50%" })
+                                            @*@(Html.TextBoxFor(model => model.MineralNature).Enable(false).HtmlAttributes(new { style = "width:100%" }))*@
+                                            @(Html.ValidationMessageFor(model => model.MineralNature))
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group row">
+                                        <label class="col-sm-4 col-form-label font-weight-bolder"> @(Html.LabelFor(model => model.MineralGrade, "Mineral Grade"))</label>
+                                        <div class="col-sm-7">
+
+                                            @Html.TextBoxFor(model => model.MineralGrade, new { @class = "form-control", @autofocus = "autofocus", @width = "100%" })
+                                            @*@(Html.TextBoxFor(model => model.MineralGrade).Enable(false).HtmlAttributes(new { style = "width:100%" }))*@
+                                            @(Html.ValidationMessageFor(model => model.MineralGrade))
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group row">
+                                        <label class="col-sm-4 col-form-label font-weight-bolder">  @(Html.LabelFor(model => model.ApprovedQty))</label>
+                                        <div class="col-sm-7">
+
+                                            @Html.TextBoxFor(model => model.ApprovedQty, new { @class = "form-control", @autofocus = "autofocus", @width = "100%" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group row">
+                                        <label class="col-sm-4 col-form-label font-weight-bolder">  @(Html.LabelFor(model => model.RemainingQty))</label>
+                                        <div class="col-sm-7">
+
+                                            @Html.TextBoxFor(model => model.RemainingQty, new { @class = "form-control", @autofocus = "autofocus", @width = "100%" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group row">
+                                        <label class="col-sm-4 col-form-label font-weight-bolder"> @(Html.Label("Select Type"))</label>
+                                        <div class="col-sm-7">
+
+                                            <input type="radio" id="EndUser" name="DispatchType" value="EndUser" checked="checked" onchange="onRadioChange()" />
+
+                                            EndUser
+                                            <input type="radio" id="Licensee" name="DispatchType" value="Licensee" onchange="onRadioChange()" />
+                                            Licensee
+                                            <span id="OthersDisp">
+                                                <input type="radio" id="Others" name="DispatchType" value="Others" onchange="onRadioChange()" />
+                                                Others
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row" id="EndUserDiv">
+                                <div class="col-sm-6">
+                                    <div class="form-group row">
+                                        <label class="col-sm-4 col-form-label font-weight-bolder">  @(Html.LabelFor(model => model.StateId, "State"))</label>
+                                        <div class="col-sm-7">
+
+                                            @Html.DropDownListFor(m => m.StateId, ViewBag.State as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control searchableselect pointer" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group row">
+                                        <label class="col-sm-4 col-form-label font-weight-bolder">  @(Html.LabelFor(model => model.PurchaserConsigneeDistrictId, "District"))</label>
+                                        <div class="col-sm-7">
+
+                                            @Html.DropDownListFor(m => m.PurchaserConsigneeDistrictId, ViewBag.District as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control form-control-sm searchableselect" })
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+
+                                    <div class="form-group row">
+                                        <label class="col-sm-4 col-form-label font-weight-bolder">
+                                            @(Html.LabelFor(model => model.PurchaserConsigneeId, "Purchaser Consignee"))
+                                            <span class="text-danger">*</span>
+                                        </label>
+
+                                        <div class="col-sm-7">
+
+                                            @Html.DropDownListFor(m => m.PurchaserConsigneeId, ViewBag.PurchaserConsigneeId as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control form-control-sm searchableselect" })
+
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-6">
+                                    <div class="form-group row">
+                                        <label class="col-sm-4 col-form-label font-weight-bolder">
+                                            @(Html.LabelFor(model => model.Route))
+                                            <span class="text-danger">*</span>
+                                        </label>
+
+                                        <div class="col-sm-7">
+                                            @Html.DropDownListFor(m => m.RouteId, ViewBag.RouteId as IEnumerable<SelectListItem>, "Select Route", new { @class = "form-control form-control-sm searchableselect" })
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row" id="LicenseeDiv">
+                                <div class="col-sm-6">
+                                    <div class="form-group row">
+                                        <label class="col-sm-4 col-form-label font-weight-bolder">
+                                            @(Html.LabelFor(model => model.LicenseeDistrictId, "District"))
+                                            <span class="text-danger">*</span>
+                                        </label>
+                                        <div class="col-sm-7">
+
+                                            @Html.DropDownListFor(m => m.LicenseeDistrictId, ViewBag.LState as IEnumerable<SelectListItem>, "Select District", new { @class = "form-control", onchange = "check();" })
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group row">
+                                        <label class="col-sm-4 col-form-label font-weight-bolder"> @(Html.LabelFor(model => model.LicenseeTypeId, "Licensee Type"))</label>
+                                        <div class="col-sm-7">
+                                            @Html.DropDownListFor(m => m.LicenseeTypeId, new SelectList(Enumerable.Empty<SelectListItem>(), "Value", "Text"), "Select Licensee Type", new { @class = "form-control", onchange = "return lessetypechange(); " })
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group row">
+                                        <label class="col-sm-4 col-form-label font-weight-bolder">
+                                            @(Html.LabelFor(model => model.LicenseeId, "Licensee"))
+                                            <span class="text-danger">*</span>
+
+                                        </label>
+
+                                        <div class="col-sm-7">
+
+                                            @Html.DropDownListFor(m => m.LicenseeId, new SelectList(Enumerable.Empty<SelectListItem>(), "Value", "Text"), "Select Licensee", new { @class = "form-control" })
+
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-6">
+                                    <div class="form-group row">
+                                        <label class="col-sm-4 col-form-label font-weight-bolder">
+                                            @(Html.LabelFor(model => model.Route1, "Route"))
+                                            <span class="text-danger">*</span>
+                                        </label>
+
+                                        <div class="col-sm-7">
+                                            @Html.DropDownListFor(m => m.RouteId, ViewBag.RouteId as IEnumerable<SelectListItem>, "Select Route", new { @class = "form-control" })
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="OthersDiv">
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                        <div class="form-group row">
+                                            <label class="col-sm-4 col-form-label font-weight-bolder">
+                                                @(Html.LabelFor(model => model.Yes_No, "Purchaser Type"))
+                                                <span class="text-danger">*</span>
+                                            </label>
+                                            <div class="col-sm-7">
+                                                <input type="radio" id="Yes" name="Yes_No" value="Yes" checked="checked" onchange="Yes_NoChange()" />
+                                                Registered
+                                                <input type="radio" id="No" name="Yes_No" value="No" onchange="Yes_NoChange()" />
+                                                Un-Registered
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div id="Other_Yes">
+                                    <div class="row">
+
+                                        <div class="col-sm-6">
+                                            <div class="form-group row">
+                                                <label class="col-sm-4 col-form-label font-weight-bolder">Registered User Type</label>
+                                                <div class="col-sm-7">
+                                                    <input type="radio" id="UserType_EndUser" name="UserType" value="EndUser" onchange="onRegisteredUserType()" />
+                                                    EndUser
+                                                    <input type="radio" id="UserType_Licensee" name="UserType" value="Licensee" checked onchange="onRegisteredUserType()" />
+
+                                                    Licensee
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6" id="licenseeDistId">
+                                            <div class="form-group row">
+                                                <label class="col-sm-4 col-form-label font-weight-bolder"> @(Html.LabelFor(model => model.Other_PurchaserConsigneeDistrictId, "District"))</label>
+                                                <span class="text-danger">*</span>
+                                                <div class="col-sm-7">
+                                                    @Html.DropDownListFor(m => m.Other_PurchaserConsigneeDistrictId, ViewBag.LState as IEnumerable<SelectListItem>, "Select District", new { @class = "form-control", onchange = "return othercheck();" })
+
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-sm-6" id="stateDDl" style="display:none;">
+                                            <div class="form-group row">
+                                                <label class="col-sm-4 col-form-label font-weight-bolder">
+                                                    @(Html.LabelFor(model => model.Other_StateId, "State"))
+                                                    <span class="text-danger">*</span>
+                                                </label>
+
+                                                <div class="col-sm-7">
+                                                    @Html.DropDownListFor(m => m.Other_StateId, ViewBag.State as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control pointer" })
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-sm-6" id="endUserStateId" style="display:none;">
+                                            <div class="form-group row">
+                                                <label class="col-sm-4 col-form-label font-weight-bolder">
+                                                    @(Html.LabelFor(model => model.Other_PurchaserConsigneeEndUserDistrictId, "District"))
+                                                    <span class="text-danger">*</span>
+                                                </label>
+
+                                                <div class="col-sm-7">
+                                                    @Html.DropDownListFor(m => m.Other_PurchaserConsigneeEndUserDistrictId, new SelectList(Enumerable.Empty<SelectListItem>(), "Value", "Text"), "--Select--", new { @class = "form-control" })
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6" id="LtypeOther">
+                                            <div class="form-group row">
+                                                <label class="col-sm-4 col-form-label font-weight-bolder">
+                                                    @(Html.LabelFor(model => model.Other_LicenseeTypeId, "Licensee Type"))
+                                                    <span class="text-danger">*</span>
+                                                </label>
+
+                                                <div class="col-sm-7">
+                                                    @Html.DropDownListFor(m => m.Other_LicenseeTypeId, new SelectList(Enumerable.Empty<SelectListItem>(), "Value", "Text"), "Select Licensee", new { @class = "form-control" })
+
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6" id="purchserLinceseOther">
+                                            <div class="form-group row">
+                                                <label class="col-sm-4 col-form-label font-weight-bolder">
+                                                    @(Html.LabelFor(model => model.Other_PurchaserConsigneeId, "Purchaser Consignee"))
+                                                    <span class="text-danger">*</span>
+                                                </label>
+
+                                                <div class="col-sm-7">
+                                                    @Html.DropDownListFor(m => m.Other_PurchaserConsigneeId, new SelectList(Enumerable.Empty<SelectListItem>(), "Value", "Text"), "Select Purchaser Consignee", new { @class = "form-control" })
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6" id="purchaserOtherEnduser" style="display:none;">
+                                            <div class="form-group row">
+                                                <label class="col-sm-4 col-form-label font-weight-bolder">
+                                                    @(Html.LabelFor(model => model.Other_PurchaserConsigneeEnduserId, "Purchaser Consignee"))
+
+                                                    <span class="text-danger">*</span>
+                                                </label>
+
+                                                <div class="col-sm-7">
+                                                    @Html.DropDownListFor(m => m.Other_PurchaserConsigneeEnduserId, new SelectList(Enumerable.Empty<SelectListItem>(), "Value", "Text"), "Select Purchaser Consignee", new { @class = "form-control" })
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div id="Other_No">
+                                    <div class="row">
+                                        @if (TempUserType != "Licensee")
+                                        {
+                                            <div class="col-sm-6">
+                                                <div class="form-group row">
+                                                    <label class="col-sm-4 col-form-label font-weight-bolder">
+                                                        @(Html.LabelFor(model => model.PartyCode, "SECL Party Code"))
+
+                                                        <span class="text-danger">*</span>
+                                                    </label>
+
+                                                    <div class="col-sm-7">
+                                                        @(Html.TextBoxFor(model => model.PartyCode, new { @class = "form-control pointer", style = "width:100%" }))
+
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        }
+                                        <div class="col-sm-6">
+                                            <div class="form-group row">
+                                                <label class="col-sm-4 col-form-label font-weight-bolder">
+                                                    @if (TempUserType == "Licensee")
+                                                    {
+                                                        @(Html.LabelFor(model => model.PartyName, "Purchaser Consignee Name"))
+                                                    }
+                                                    else
+                                                    {
+
+                                                        @(Html.LabelFor(model => model.PartyName, "DO Holder Name"))
+                                                    }
+
+
+                                                    <span class="text-danger">*</span>
+                                                </label>
+
+                                                <div class="col-sm-7">
+                                                    @(Html.TextBoxFor(model => model.PartyName, new { @class = "form-control pointer", style = "width:100%" }))
+
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <div class="form-group row">
+                                                <label class="col-sm-4 col-form-label font-weight-bolder">
+                                                    @if (TempUserType == "Licensee")
+                                                    {
+                                                        @(Html.LabelFor(model => model.PartyMobile, "Purchaser Consignee Mobile Number"))
+                                                    }
+                                                    else
+                                                    {
+                                                        @(Html.LabelFor(model => model.PartyMobile, "DO Holder Mobile"))
+                                                    }
+
+
+                                                    <span class="text-danger">*</span>
+                                                </label>
+
+                                                <div class="col-sm-7">
+                                                    @(Html.TextBoxFor(model => model.PartyMobile, new { @class = "form-control pointer", style = "width:100%" }))
+
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <div class="form-group row">
+                                                <label class="col-sm-4 col-form-label font-weight-bolder">
+                                                    @(Html.LabelFor(model => model.CheckPostName, "Checkpost"))
+
+                                                    <span class="text-danger">*</span>
+                                                </label>
+
+                                                <div class="col-sm-7">
+                                                    <input type="hidden" class="Mid" id="Mid" name="MineralIdList" />
+                                                    <select class="ChkName" style="width:350px" multiple></select>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row" id="WasheryDiv" style="display: none;">
+                                <div class="col-sm-6" id="LtypeOther">
+                                    <div class="form-group row">
+                                        <label class="col-sm-4 col-form-label font-weight-bolder">
+                                            @(Html.Label("Through Licensee"))
+                                            <span class="text-danger">*</span>
+                                        </label>
+
+                                        <div class="col-sm-7">
+                                            <input type="radio" id="ThroughWasheryNO" name="ThroughIsCoalWashery" value="0" onchange="onWasheryRadioChange()" checked="checked" />
+                                            No
+                                            <input type="radio" id="ThroughWasheryYES" name="ThroughIsCoalWashery" value="1" onchange="onWasheryRadioChange()" />
+                                            Yes
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row" id="WasheryDivDetails" style="display: none;" class="pointer">
+                                <div class="col-sm-6">
+                                    <div class="form-group row">
+                                        <label class="col-sm-4 col-form-label font-weight-bolder">
+                                            @(Html.LabelFor(model => model.ThroughCoalWasheryDistrictId, "Select Licensee District"))
+                                            <span class="text-danger">*</span>
+                                        </label>
+
+                                        <div class="col-sm-7">
+                                            @Html.DropDownListFor(m => m.ThroughCoalWasheryDistrictId, ViewBag.LState as IEnumerable<SelectListItem>, "Select Licensee District", new { @class = "form-control " })
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group row">
+                                        <label class="col-sm-4 col-form-label font-weight-bolder">
+                                            @(Html.LabelFor(model => model.ThroughCoalWasheryLicenseeTypeId, "Select Licensee Type"))
+                                            <span class="text-danger">*</span>
+                                        </label>
+
+                                        <div class="col-sm-7">
+                                            @Html.DropDownListFor(m => m.ThroughCoalWasheryLicenseeTypeId, new SelectList(Enumerable.Empty<SelectListItem>(), "Value", "Text"), "Select Licensee Type", new { @class = "form-control " })
+
+
+                                            @(Html.ValidationMessageFor(model => model.ThroughCoalWasheryLicenseeTypeId))
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group row">
+                                        <label class="col-sm-4 col-form-label font-weight-bolder">
+                                            @(Html.LabelFor(model => model.ThroughCoalWasheryId, "Select Licensee Plant"))
+                                            <span class="text-danger">*</span>
+                                        </label>
+
+                                        <div class="col-sm-7">
+                                            @Html.DropDownListFor(m => m.ThroughCoalWasheryId, new SelectList(Enumerable.Empty<SelectListItem>(), "Value", "Text"), "Select Licensee Plant", new { @class = "form-control " })
+
+
+                                            @(Html.ValidationMessageFor(model => model.ThroughCoalWasheryId))
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <div class="form-group row">
+                                        <label class="col-sm-4 col-form-label font-weight-bolder">
+                                            @(Html.LabelFor(model => model.Destination, "Destination"))
+                                            <span class="text-danger">*</span>
+                                        </label>
+
+                                        <div class="col-sm-7">
+                                            @(Html.TextAreaFor(model => model.Destination, new { @class = "form-control", style = "width:100%" }))
+                                            @(Html.ValidationMessageFor(model => model.Destination))
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6" id="AverageSalePriceDiv">
+                                    <div class="form-group row">
+                                        <label class="col-sm-4 col-form-label font-weight-bolder">
+                                            @(Html.LabelFor(model => model.TransportationModeId, "Mode Of Transportation"))
+                                            <span class="text-danger">*</span>
+                                        </label>
+
+                                        <div class="col-sm-7">
+                                            @Html.DropDownListFor(m => m.TransportationModeId, ViewBag.TransportationModeId as IEnumerable<SelectListItem>, "Select Transportation Mode", new { @class = "form-control form-control-sm searchableselect", onchange = "return TransportationModeChange();" })
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6" id="RCRDiv" style="display:none;">
+                                    <div class="form-group row">
+                                        <label class="col-sm-4 col-form-label font-weight-bolder">
+                                            @(Html.Label("RTP will be Generated By"))
+                                            <span class="text-danger">*</span>
+                                        </label>
+
+                                        <div class="col-sm-7">
+                                            <input type="radio" id="RCRSource" name="RCRDivSelection" value="Source" checked />
+                                            Seller(Source)
+                                            <input type="radio" id="RCRDestination" name="RCRDivSelection" value="Destination" />
+                                            Purchaser(Destination)
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            <div>
+
+
+
+
+                            </div>
+
+
+
+                            <input type="submit" value="Submit" class="btn btn-primary" name="Submit" id="Cancel" onclick="return checkfields();" />
+                        }
+                    </div>
+
+            </div>
+
+        </div>
+
+    </div>
+</section>
+
+<script>
+    //For other users register user type change evt.
+    function onRegisteredUserType() {
+
+        if ($('#UserType_EndUser').is(':checked')) {
+
+            $('#LtypeOther').css("display", "none");
+            $('#stateDDl').css("display", "block");
+            $('#endUserStateId').css("display", "block");
+            $('#licenseeDistId').css("display", "none");
+            $('#purchaserOtherEnduser').css("display", "block");
+            $('#purchserLinceseOther').css("display", "none");
+            $('#OtherRouteEnd').css("display", "block");
+            $('#OtherRouteLicense').css("display", "none");
+
+            $('#UserType').val('EndUser').change();
+
+
+        }
+        else {
+            $('#LtypeOther').css("display", "block");
+            $('#stateDDl').css("display", "none");
+            $('#endUserStateId').css("display", "none");
+            $('#purchaserOtherEnduser').css("display", "none");
+            $('#licenseeDistId').css("display", "block");
+            $('#purchserLinceseOther').css("display", "block");
+            $('#OtherRouteEnd').css("display", "none");
+            $('#OtherRouteLicense').css("display", "block");
+
+            $('#UserType').val('Licensee').change();
+
+        }
+    }
+    var userTp = '@TempUserType';
+    function TransportationModeChange() {
+        var yes_noVal1 = $('input[name="Yes_No"]:checked').val();
+        var DispatchType1 = $('input[name="DispatchType"]:checked').val();
+
+        if (userTp == "Lessee") {
+            if (yes_noVal1 == "Yes" && DispatchType1 == "Others") {
+                if ($("#TransportationModeId").val() == 14) // RCR Mode Selection check
+                {
+                    $("#RCRDiv").show();
+                }
+                else {
+                    $("#RCRDiv").hide();
+                }
+            }
+            else if (yes_noVal1 == "No" && DispatchType1 == "Others") {
+                $("#RCRDiv").hide();
+            }
+            else {
+                if ($("#TransportationModeId").val() == 14) // RCR Mode Selection check
+                {
+                    $("#RCRDiv").show();
+                }
+                else {
+                    $("#RCRDiv").hide();
+                }
+            }
+        }
+    }
+   //despatch by other licensee users district change evt
+    $("#ThroughCoalWasheryDistrictId").change(function () {
+        $.ajax({
+
+            type: "POST",
+            url: '@Url.Content("~/Epass/PurchaserConsignee/GetEndUserLisenseeTypeForWasheryDetails")',
+            data: {
+                "BulkPermitId": $('#BulkPermitId').val(),
+                "MineralName": $('#MineralName').val()
+            },
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            success: function (SList) {
+
+                $('#ThroughCoalWasheryLicenseeTypeId').empty().append('<option selected="selected" value="0">Select Licensee Type </option>');
+                $.each(SList, function (i, item) {
+                    $('#ThroughCoalWasheryLicenseeTypeId').attr("disabled", false);
+                    $("#ThroughCoalWasheryLicenseeTypeId").append($("<option></option>").val(item.purchaserConsigneeId).html(item.purchaserConsigneeName));
+
+                });
+            },
+
+            error: function () {
+                alert('Error');
+
+            }
+        });
+    });
+
+    $("#ThroughCoalWasheryLicenseeTypeId").change(function () {
+        var bulkid=$('#BulkPermitId').val();
+         var licenseedistid = $('#ThroughCoalWasheryDistrictId').val();
+         var linceseetypeid = $('#ThroughCoalWasheryLicenseeTypeId').val();
+         var linceseid = $('#LicenseeId').val();
+$.ajax({
+
+            type: "POST",
+            url: '@Url.Content("~/Epass/PurchaserConsignee/GetEndUserLisenseeWasheryDetails")',
+            data: {
+
+                "LicenseeDistrictId": licenseedistid,
+                "ApplicationType_Id": linceseetypeid,
+                "BulkPermitId": bulkid,
+                "LicenseeId": linceseid
+            },
+
+            dataType: "json",
+            success: function (SList) {
+
+                $('#ThroughCoalWasheryId').empty().append('<option selected="selected" value="0">Select Licensee Plant</option>');
+                $.each(SList, function (i, item) {
+                    $('#ThroughCoalWasheryId').attr("disabled", false);
+                    $("#ThroughCoalWasheryId").append($("<option></option>").val(item.purchaserConsigneeId).html(item.purchaserConsigneeName));
+
+                });
+            },
+
+            error: function () {
+                alert('Error');
+
+            }
+        });
+    })
+    function checkfields() {
+
+        var istrue = 0;
+        if ($('#EndUser').is(':checked')) {
+            if ($("#StateId").val() == "") {
+                alert("Please select State.");
+                istrue = 1;
+                return false;
+            }
+
+            if ($("#PurchaserConsigneeDistrictId").val() == "") {
+                alert("Please select district.");
+                istrue = 1;
+                return false;
+            }
+
+            if ($("#PurchaserConsigneeId").val() == "") {
+                alert("Please select purchaser consignee.");
+                istrue = 1;
+                return false;
+            }
+
+            if ($("#PurchaserConsigneeId").val() == "") {
+                alert("Please select purchaser consignee.");
+                istrue = 1;
+                return false;
+            }
+
+            if ($('#ThroughWasheryYES').is(':checked')) {
+
+                if ($("#ThroughCoalWasheryDistrictId").val() == "") {
+                    alert("Please select call washery district.");
+                    istrue = 1;
+                    return false;
+                }
+
+                if ($("#ThroughCoalWasheryId").val() == "") {
+                    alert("Please select call washery name .");
+                    istrue = 1;
+                    return false;
+                }
+
+            }
+
+
+
+        }
+        else if ($('#Licensee').is(':checked')) {
+
+            if ($("#LicenseeTypeId").val() == "") {
+                alert("Please select Purchaser Consignee.");
+                istrue = 1;
+                return false;
+            }
+
+            if ($("#LicenseeDistrictId").val() == "") {
+                alert("Please select Licensee District.");
+                istrue = 1;
+                return false;
+            }
+
+            if ($("#LicenseeId").val() == "") {
+                alert("Please select Licensee.");
+                istrue = 1;
+                return false;
+            }
+
+            if ($('#ThroughWasheryYES').is(':checked')) {
+
+                if ($("#ThroughCoalWasheryDistrictId").val() == "") {
+                    alert("Please select call washery district.");
+                    istrue = 1;
+                    return false;
+                }
+
+                if ($("#ThroughCoalWasheryId").val() == "") {
+                    alert("Please select call washery name .");
+                    istrue = 1;
+                    return false;
+                }
+
+            }
+
+
+        }
+        else {
+            debugger;
+            if ($("#PartyCode").val() == "") {
+                alert("Please enter Party Code.");
+                istrue = 1;
+                return false;
+            }
+            if ($("#PartyName").val() == "") {
+                alert("Please enter Party Name.");
+                istrue = 1;
+                return false;
+            }
+
+        }
+
+        if (istrue == 0) {
+            $("#frmPurchaserConsignee").submit();
+        }
+
+
+    }
+    //licensee district change evt
+    function check() {
+
+        $.ajax({
+
+            type: "POST",
+            url: '@Url.Content("~/Epass/PurchaserConsignee/GetLicenseeTypeList")',
+            data: {
+                "Bulkpermitid": $('#BulkPermitId').val()
+            },
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            success: function (SList) {
+
+                $('#LicenseeTypeId').empty().append('<option selected="selected" value="0">Select Licensee Type</option>');
+                $.each(SList, function (i, item) {
+                    $('#LicenseeTypeId').attr("disabled", false);
+                    $("#LicenseeTypeId").append($("<option></option>").val(item.id).html(item.name));
+
+                });
+            },
+
+            error: function () {
+                alert('Error');
+
+            }
+        });
+    }
+    //Other licesense type bind
+    function othercheck() {
+
+        $.ajax({
+
+            type: "POST",
+            url: '@Url.Content("~/Epass/PurchaserConsignee/GetLicenseeTypeList")',
+            data: {
+                "Bulkpermitid": $('#BulkPermitId').val()
+            },
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            success: function (SList) {
+
+                $('#Other_LicenseeTypeId').empty().append('<option selected="selected" value="0">Select Licensee Type</option>');
+                $.each(SList, function (i, item) {
+                    $('#Other_LicenseeTypeId').attr("disabled", false);
+                    $("#Other_LicenseeTypeId").append($("<option></option>").val(item.id).html(item.name));
+
+                });
+            },
+
+            error: function () {
+                alert('Error');
+
+            }
+        });
+        debugger;
+
+         $.ajax({
+                                        type: "POST",
+                                        url: '@Url.Content("~/Epass/PurchaserConsignee/GetOtherEndUserLisenseeDetails")',
+
+                                        data: {
+                                            "LicenseeDistrictId": $('#Other_PurchaserConsigneeDistrictId').val(),
+                                            "ApplicationType_Id": "-1",
+                                            "BulkPermitId": $('#BulkPermitId').val(),
+                                            "OtherUserType": $('input[name=UserType]:checked').val()
+
+                                        },
+                                        dataType: "json",
+                                        success: function (data) {
+                                            $("#Other_PurchaserConsigneeId").empty();
+                                            debugger;
+
+                                            var ops = '<option value="">Select</option>';
+                                            for (var i = 0; i < data.length; i++) {
+                                                ops += '<option value="' + data[i].endUserId + '">' + data[i].endUserName + '</option>';
+                                            }
+                                            $("#Other_PurchaserConsigneeId").html(ops);
+                                            $("#Other_PurchaserConsigneeId").attr("disabled", false);
+                                        },
+                                        error: function()
+                                        {
+                                            alert('Error');
+
+                                        }
+         });
+
+
+        $.ajax({
+                                        type: "POST",
+                                        url: '@Url.Content("~/Epass/PurchaserConsignee/Route")',
+
+                                        data: {
+                                            "LicenseeDistrictId": $('#Other_PurchaserConsigneeDistrictId').val()
+
+
+                                        },
+                                        dataType: "json",
+                                        success: function (data) {
+                                            $("#Other_Route").empty();
+                                            debugger;
+                                            //console.log(data);
+                                            //alert(data);
+                                            var ops = '<option value="">Select</option>';
+                                            for (var i = 0; i < data.length; i++) {
+                                                ops += '<option value="' + data[i].value + '">' + data[i].text + '</option>';
+                                            }
+                                            $("#Other_Route").html(ops);
+
+                                        },
+                                        error: function()
+                                        {
+                                            alert('Error');
+
+                                        }
+                                    });
+    }
+    //Other users state change event
+    $("#Other_StateId").change(function () {
+
+                                    $.ajax({
+                                        type: "POST",
+                                        url: '@Url.Content("~/Epass/PurchaserConsignee/District")',
+                                        data: {
+                                            "Stateid": $('#Other_StateId').val()
+                                        },
+                                        dataType: "json",
+                                        success: function (data) {
+                                            $("#Other_PurchaserConsigneeEndUserDistrictId").empty();
+                                            var ops = '<option value="">Select</option>';
+                                            for (var i = 0; i < data.length; i++) {
+                                                ops += '<option value="' + data[i].value + '">' + data[i].text + '</option>';
+                                            }
+                                            $("#Other_PurchaserConsigneeEndUserDistrictId").html(ops);
+                                            $('#Other_PurchaserConsigneeEndUserDistrictId').attr("disabled", false);
+                                        },
+                                        error: function()
+                                        {
+                                            alert('Error');
+
+                                        }
+                                    });
+
+    });
+
+    $("#Other_PurchaserConsigneeEndUserDistrictId").change(function () {
+                                    debugger;
+                                    $.ajax({
+                                        type: "POST",
+                                        url: '@Url.Content("~/Epass/PurchaserConsignee/GetOtherEndUserLisenseeDetails")',
+
+                                        data: {
+                                            "LicenseeDistrictId": $('#Other_PurchaserConsigneeEndUserDistrictId').val(),
+                                            "ApplicationType_Id": "-1",
+                                            "BulkPermitId": $('#BulkPermitId').val()
+
+
+                                        },
+                                        dataType: "json",
+                                        success: function (data) {
+                                            $("#Other_PurchaserConsigneeEnduserId").empty();
+                                            debugger;
+                                            //console.log(data);
+                                            //alert(data);
+                                            var ops = '<option value="">Select</option>';
+                                            for (var i = 0; i < data.length; i++) {
+                                                ops += '<option value="' + data[i].endUserId + '">' + data[i].endUserName + '</option>';
+                                            }
+                                            $("#Other_PurchaserConsigneeEnduserId").html(ops);
+                                            $("#Other_PurchaserConsigneeEnduserId").attr("disabled", false);
+                                        },
+                                        error: function()
+                                        {
+                                            alert('Error');
+
+                                        }
+                                    });
+        /* ----------Fill Route-----*/
+             $.ajax({
+                                        type: "POST",
+                                        url: '@Url.Content("~/Epass/PurchaserConsignee/Route")',
+
+                                        data: {
+                                            "LicenseeDistrictId": $('#PurchaserConsigneeDistrictId').val()
+
+
+                                        },
+                                        dataType: "json",
+                                        success: function (data) {
+                                            $("#RouteId").empty();
+                                            debugger;
+                                            //console.log(data);
+                                            //alert(data);
+                                            var ops = '<option value="">Select</option>';
+                                            for (var i = 0; i < data.length; i++) {
+                                                ops += '<option value="' + data[i].value + '">' + data[i].text + '</option>';
+                                            }
+                                            $("#RouteId").html(ops);
+
+                                        },
+                                        error: function()
+                                        {
+                                            alert('Error');
+
+                                        }
+                                    });
+            /*----------end route-----------*/
+        });
+
+    @*@lesse dropdown chnge event to bind licensee@*@
+    function lessetypechange() {
+        var bulkid=$('#BulkPermitId').val();
+        var licenseedid=$('#LicenseeDistrictId').val();
+        var linceseetypeid=$('#LicenseeTypeId').val();
+$.ajax({
+
+            type: "POST",
+            url: '@Url.Content("~/Epass/PurchaserConsignee/GetEndUserLisensee")',
+            data: {
+
+                "LicenseeDistrictId": licenseedid,
+                "ApplicationType_Id": linceseetypeid,
+                "Bulkpermitid": bulkid
+            },
+
+            dataType: "json",
+            success: function (SList) {
+
+                $('#LicenseeId').empty().append('<option selected="selected" value="0">Select Licensee</option>');
+                $.each(SList, function (i, item) {
+                    $('#LicenseeId').attr("disabled", false);
+                    $("#LicenseeId").append($("<option></option>").val(item.purchaserConsigneeId).html(item.purchaserConsigneeName));
+
+                });
+            },
+
+            error: function () {
+                alert('Error');
+
+            }
+        });
+    }
+    $(document).ready(function () {
+        debugger;
+        if (($("#MineralName").val() == "Coal" && '@ViewBag.Otheroption' == "1") || ('@TempUserType' == "Licensee" && $("#MineralType").val() == "Major Mineral" && $("#MineralGrade").val() != 'Low Grade - Limestone')) {
+            $('#OthersDisp').show();
+            $("#WasheryDiv").hide();
+        }
+        else {
+            $('#OthersDisp').hide();
+            $("#WasheryDiv").show();
+        }
+        onRadioChange();
+        $('#LicenseeTypeId').attr("disabled", true);
+        $('#LicenseeId').attr("disabled", true);
+        $('#ThroughCoalWasheryId').attr("disabled", true);
+        $('#ThroughCoalWasheryLicenseeTypeId').attr("disabled", true);
+        var TempUserType = "Lessee";
+
+        if ($('#Type').val() == "ThroughLicensee") {
+            $('#btnAdd').hide();
+        } else {
+            $('#btnAdd').show();
+        }
+
+        $('.searchableselect').searchableselect();
+        /*Bind district by select of state*/
+        $("#StateId").change(function () {
+
+                                    $.ajax({
+                                        type: "POST",
+                                        url: '@Url.Content("~/Epass/PurchaserConsignee/District")',
+                                        data: {
+                                            "Stateid": $('#StateId').val()
+                                        },
+                                        dataType: "json",
+                                        success: function (data) {
+                                            $("#PurchaserConsigneeDistrictId").empty();
+                                            var ops = '<option value="">Select</option>';
+                                            for (var i = 0; i < data.length; i++) {
+                                                ops += '<option value="' + data[i].value + '">' + data[i].text + '</option>';
+                                            }
+                                            $("#PurchaserConsigneeDistrictId").html(ops);
+                                            $('#PurchaserConsigneeDistrictId').attr("disabled", false);
+                                        },
+                                        error: function()
+                                        {
+                                            alert('Error');
+
+                                        }
+                                    });
+
+                                });
+
+    /*Bind purchaser consignee by select of district*/
+        $("#PurchaserConsigneeDistrictId").change(function () {
+                                    debugger;
+                                    $.ajax({
+                                        type: "POST",
+                                        url: '@Url.Content("~/Epass/PurchaserConsignee/GetEndUserLisenseeDetails")',
+
+                                        data: {
+                                            "LicenseeDistrictId": $('#PurchaserConsigneeDistrictId').val(),
+                                            "ApplicationType_Id": "-1",
+                                            "BulkPermitId": $('#BulkPermitId').val()
+
+
+                                        },
+                                        dataType: "json",
+                                        success: function (data) {
+                                            $("#PurchaserConsigneeId").empty();
+                                            debugger;
+                                            //console.log(data);
+                                            //alert(data);
+                                            var ops = '<option value="">Select</option>';
+                                            for (var i = 0; i < data.length; i++) {
+                                                ops += '<option value="' + data[i].endUserId + '">' + data[i].endUserName + '</option>';
+                                            }
+                                            $("#PurchaserConsigneeId").html(ops);
+                                            $("#PurchaserConsigneeId").attr("disabled", false);
+                                        },
+                                        error: function()
+                                        {
+                                            alert('Error');
+
+                                        }
+                                    });
+        /* ----------Fill Route-----*/
+             $.ajax({
+                                        type: "POST",
+                                        url: '@Url.Content("~/Epass/PurchaserConsignee/Route")',
+
+                                        data: {
+                                            "LicenseeDistrictId": $('#PurchaserConsigneeDistrictId').val()
+
+
+                                        },
+                                        dataType: "json",
+                                        success: function (data) {
+                                            $("#RouteId").empty();
+                                            debugger;
+                                            //console.log(data);
+                                            //alert(data);
+                                            var ops = '<option value="">Select</option>';
+                                            for (var i = 0; i < data.length; i++) {
+                                                ops += '<option value="' + data[i].value + '">' + data[i].text + '</option>';
+                                            }
+                                            $("#RouteId").html(ops);
+
+                                        },
+                                        error: function()
+                                        {
+                                            alert('Error');
+
+                                        }
+                                    });
+            /*----------end route-----------*/
+        });
+
+
+
+    /*Bind destination by select of purchaser consignee*/
+
+        $("#PurchaserConsigneeId").change(function () {
+
+            var purchaserconsigneeid = "";
+
+            //$("#ThroughCoalWasheryDistrictId").data("kendoDropDownList").select(-1);
+            var tt = "0";
+            if ($('#EndUser').is(':checked')) {
+                purchaserconsigneeid = $("#PurchaserConsigneeId").val();
+                tt = "1";
+            }
+            else if ($('#Others').is(':checked')) {
+                tt = "3";
+            }
+            else {
+
+                purchaserconsigneeid = $("#LicenseeId").val();
+                tt = "2";
+            }
+
+                                    debugger;
+                                    $.ajax({
+                                        type: "POST",
+                                        url: '@Url.Content("~/Epass/PurchaserConsignee/GetDataByPurchaserConsigneeId")',
+
+                                        data: {
+                                            "id": purchaserconsigneeid,
+                                            "TT": tt
+                                        },
+                                        dataType: "json",
+                                        success: function (data) {
+                                            $("#Destination").empty();
+                                            debugger;
+                                            //console.log(data.address);
+                                            //alert(data);
+                                            //var ops = '<option value="">Select</option>';
+                                            //for (var i = 0; i < data.length; i++) {
+                                            //    ops += '<option value="' + data[i].endUserId + '">' + data[i].endUserName + '</option>';
+                                            //}
+                                            $("#Destination").html(data.address);
+
+                                        },
+                                        error: function()
+                                        {
+                                            alert('Error');
+
+                                        }
+                                    });
+
+        });
+
+
+         @* it will compare with below licensee condition '@CHiMMS_MVC.Models.Generic.SessionWrapper.UserType.ToString()' == "Licensee"*@
+        if (('@data.MineralName' == "Coal" && '@ViewBag.Otheroption' == "1") || ('@TempUserType' == "Licensee" && $("#MineralType").val() == "Major Mineral" && $("#MineralGrade").val() != 'Low Grade - Limestone')) {
+            $('#OthersDisp').show();
+            //$("#WasheryDiv").hide();
+        }
+        else {
+            $('#OthersDisp').hide();
+            //$("#WasheryDiv").show();
+        }
+    });
+
+    function onRadioChange() {
+        debugger;
+        //$("#Destination").val('').change();
+        onWasheryRadioChange();
+        if ($('#EndUser').is(':checked')) {
+            $("#EndUserDiv").show();
+            $("#LicenseeDiv").hide();
+            $("#OthersDiv").hide();
+            $("#WasheryDiv").show();
+
+
+
+        }
+        else if ($('#Licensee').is(':checked')) {
+            $("#EndUserDiv").hide();
+            $("#LicenseeDiv").show();
+            $("#OthersDiv").hide();
+            $("#WasheryDiv").show();
+            $('#LtypeOther').css("display", "block");
+            $('#UserType').val('Licensee').change();
+
+        }
+        else {
+            //$("#Destination").val('').change();
+            $("#EndUserDiv").hide();
+            $("#LicenseeDiv").hide();
+            $("#OthersDiv").show();
+            $("#WasheryDiv").hide();
+            $("#WasheryDivDetails").hide();
+            //  $('#ThroughWasheryYES').is(':checked') = false;
+            $('#ThroughWasheryYES').prop('checked', false);
+            Yes_NoChange();
+
+        }
+    }
+
+    $('.ChkName').change(function () {
+
+        var $hidden = $("#Mid");
+        $hidden.val($(this).find('option:selected').map(function () {
+            return $(this).val();
+        }).get().join(", "));
+    });
+    function checkpostbind() {
+
+        $(".ChkName").select2({
+            placeholder: "Checkpost Name",
+            theme: "classic",
+            ajax: {
+                 url: '@Url.Content("~/Epass/PurchaserConsignee/Getcheckpost")',
+                type: "POST",
+                dataType: "json",
+                data: function (params) {
+
+                    return {
+
+                        searchTerm: params.term
+                    };
+                },
+                processResults: function (data, params) {
+                    return {
+
+                        results: data
+                    };
+                    $("#Mid").val(data);
+                }
+            }
+        });
+
+
+    }
+    function Yes_NoChange() {
+
+        if ($('#Yes').is(':checked')) {
+
+            $('#Other_Yes').css("display", "block");
+            $('#Other_No').css("display", "none");
+            document.getElementById("UserType_Licensee").checked = true;
+            $('#UserType').val('Licensee').change();
+            $('#UserType').trigger('click');
+
+        }
+        else if ($('#No').is(':checked')) {
+
+            $('#Other_Yes').css("display", "none");
+            $('#Other_No').css("display", "block");
+            document.getElementById("UserType_Licensee").checked = false;
+            $('#UserType').val('').change();
+            checkpostbind();
+        }
+        else {
+            $('#Other_Yes').css("display", "none");
+            $('#Other_No').css("display", "none");
+            document.getElementById("UserType_Licensee").checked = false;
+            $('#UserType').val('').change();
+        }
+    }
+    function onWasheryRadioChange() {
+
+        if ($('#ThroughWasheryYES').is(':checked')) {
+
+            $("#WasheryDivDetails").show();
+            //$("#Destination").val('').change();
+
+        }
+        else {
+            $("#WasheryDivDetails").hide();
+
+        }
+    }
+
+</script>
+
+
+
+

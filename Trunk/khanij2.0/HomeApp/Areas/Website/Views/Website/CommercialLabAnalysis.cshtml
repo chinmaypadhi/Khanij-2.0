@@ -1,0 +1,512 @@
+﻿@using Microsoft.AspNetCore.Mvc.Localization
+@using HomeEF;
+@using Microsoft.Extensions.Options;
+@using HomeApp.Services;
+@using HomeApp;
+@inject IOptions<KeyList> _objKeyList
+@inject IHtmlLocalizer<CommonResources> SharedLocalizer
+@inject CommonLocalizationService commonlocalizer
+@{
+    ViewData["Title"] = "CommercialLabAnalysis";
+    Layout = "~/Views/Shared/_WebHeaderLayout.cshtml";
+}
+
+<style>
+    @@media screen and (max-width: 768px) {
+        .colon {
+            display: none;
+        }
+    }
+</style>
+<div class="inner-naviagtion">
+    <div class="container">
+        <nav aria-label="breadcrumb mb-0">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="@_objKeyList.Value.HomeUrl"><span class="fas fa-home"></span></a></li>
+                <li class="breadcrumb-item"><a href="#">Others</a></li>
+                <li class="breadcrumb-item active text-white" aria-current="page">@SharedLocalizer["Commercial Lab Analysis"]</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+<div class="inner-content">
+    <div class="container">
+        <h3 class="heading">Application for Analysis of Mineral Sample</h3>
+        <div class="row">
+            <div class="mt-4 col-lg-12"><h4 class="text-primary">Applicant Details</h4><hr></div>
+
+            <label class="col-lg-3 col-md-5 col-12 col-form-label">Applicant Name <span class="text-danger">*</span></label>
+            <div class="col-lg-3 col-md-6">
+                <div class="form-group">
+                    <input type="text" class="form-control">
+                </div>
+            </div>
+
+
+            <label class="col-lg-3 col-md-5 col-12 col-form-label">Organization Name<span class="text-danger">*</span></label>
+            <div class="col-lg-3 col-md-6">
+                <div class="form-group">
+                    <input type="text" class="form-control">
+                </div>
+            </div>
+
+
+            <label class="col-lg-3 col-md-5 col-12 col-form-label">Phone No.<span class="text-danger">*</span></label>
+            <div class="col-lg-3 col-md-6">
+                <div class="form-group">
+                    <input type="text" class="form-control">
+                </div>
+            </div>
+
+            <label class="col-lg-3 col-md-5 col-12 col-form-label">E-mail<span class="text-danger">*</span></label>
+            <div class="col-lg-3 col-md-6">
+                <div class="form-group">
+                    <input type="text" class="form-control">
+                </div>
+            </div>
+
+
+            <label class="col-lg-3 col-md-5 col-12 col-form-label">District  <span class="text-danger">*</span></label>
+            <div class="col-lg-3 col-md-6 col-12">
+                <div class="form-group">
+                    <select class="form-control">
+                        <option>Select</option>
+                    </select>
+                </div>
+            </div>
+
+            <label class="col-lg-3 col-md-5 col-12 col-form-label">Block  <span class="text-danger">*</span></label>
+            <div class="col-lg-3 col-md-6 col-12">
+                <div class="form-group">
+                    <select class="form-control">
+                        <option>Select</option>
+                    </select>
+                </div>
+            </div>
+
+            <label class="col-lg-3 col-md-5 col-12 col-form-label">State  <span class="text-danger">*</span></label>
+            <div class="col-lg-3 col-md-6 col-12">
+                <div class="form-group">
+                    <select class="form-control">
+                        <option>Select</option>
+                    </select>
+                </div>
+            </div>
+
+            <label class="col-lg-3 col-md-5 col-12 col-form-label">Pin Code <span class="text-danger">*</span></label>
+            <div class="col-lg-3 col-md-6">
+                <div class="form-group">
+                    <input type="number" class="form-control">
+                </div>
+            </div>
+
+            <label class="col-lg-3 col-md-5 col-12 col-form-label">Complete postal address<span class="text-danger">*</span></label>
+            <div class="col-lg-3 col-md-6">
+                <div class="form-group">
+                    <textarea class="form-control" rows="2"></textarea>
+                    <small class="text-danger">Maximum character should be <strong>500</strong></small>
+                </div>
+            </div>
+
+            <label class="col-lg-3 col-md-5 col-12 col-form-label">Area in Hectares<span class="text-danger">*</span></label>
+            <div class="col-lg-3 col-md-6">
+                <div class="form-group">
+                    <input type="number" class="form-control">
+                </div>
+            </div>
+
+
+            <div class="mt-4 col-lg-12"><h4 class="text-primary">Sample Details</h4><hr></div>
+
+
+            <label class="col-lg-3 col-md-5 col-12 col-form-label">Sample No.<span class="text-danger">*</span></label>
+            <div class="col-lg-3 col-md-6">
+                <div class="form-group">
+                    <input type="text" class="form-control">
+                </div>
+            </div>
+
+
+            <label class="col-lg-3 col-md-5 col-12 col-form-label">Type of Sample<span class="text-danger">*</span></label>
+            <div class="col-lg-3 col-md-6">
+                <div class="form-group">
+                    <select class="form-control">
+                        <option>Select</option>
+                        <option>Rock</option>
+                        <option>Soil</option>
+                        <option>Core</option>
+                        <option>Pit</option>
+                        <option>other</option>
+                    </select>
+                </div>
+            </div>
+
+            <label class="col-lg-3 col-md-5 col-12 col-form-label">
+                Sample Description <span class="text-danger">*</span>
+            </label>
+            <div class="col-lg-3 col-md-6">
+                <div class="form-group">
+                    <textarea class="form-control" rows="2"></textarea>
+                    <small class="text-danger">Maximum character should be <strong>500</strong></small>
+                </div>
+            </div>
+
+
+            <label class="col-lg-3 col-md-5 col-12 col-form-label">
+                Desire Radical / Element in Sample<span class="text-danger">*</span>
+            </label>
+            <div class="col-lg-3 col-md-6">
+                <div class="form-group">
+                    <select class="form-control">
+                        <option>Select</option>
+                    </select>
+                </div>
+            </div>
+
+            <label class="col-lg-3 col-md-5 col-12 col-form-label">
+                Sample Received Place <span class="text-danger">*</span>
+            </label>
+            <div class="col-lg-3 col-md-6">
+                <div class="form-group">
+                    <input type="text" class="form-control">
+                </div>
+            </div>
+
+            <label class="col-lg-3 col-md-5 col-12 col-form-label">
+                If Sample collected from any mines <span class="text-danger">*</span>
+            </label>
+            <div class="col-lg-3 col-md-6">
+                <div class="form-group">
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" value="option1" name="exampleRadios2" id="defaultCheck4" checked="">
+                        <label class="form-check-label" for="defaultCheck4">
+                            Yes
+                        </label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" value="option2" name="exampleRadios2" id="defaultCheck5">
+                        <label class="form-check-label" for="defaultCheck5">
+                            No
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <label class="col-lg-3 col-md-5 col-12 col-form-label">Mines Name<span class="text-danger">*</span></label>
+            <div class="col-lg-3 col-md-6">
+                <div class="form-group">
+                    <input type="text" class="form-control">
+                </div>
+            </div>
+
+            <label class="col-lg-3 col-md-5 col-12 col-form-label">Grant Order No.<span class="text-danger">*</span></label>
+            <div class="col-lg-3 col-md-6">
+                <div class="form-group">
+                    <input type="text" class="form-control">
+                </div>
+            </div>
+
+
+            <label class="col-lg-3 col-md-5 col-12 col-form-label">Grant Order Date<span class="text-danger">*</span></label>
+            <div class="col-lg-3 col-md-6">
+                <div class="form-group">
+                    <div class="input-group">
+                        <input type="text" class="form-control datepicker" id="date1">
+                        <div class="input-group-prepend">
+                            <label class="input-group-text" for="date2"><i class="far fa-calendar"></i></label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <label class="col-lg-3 col-md-5 col-12 col-form-label">
+                R.P / Gram/ Tahshil/ District/ Area <span class="text-danger">*</span>
+
+            </label>
+            <div class="col-lg-3 col-md-6">
+                <div class="form-group">
+                    <div class="input-group">
+                        <input type="text" class="form-control">
+                        <div class="input-group-prepend">
+                            <div class="input-group-text">K.M</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-6 col-md-6">
+
+            </div>
+
+            <label class="col-lg-3 col-md-5 col-12 col-form-label">
+                Aim of research work/ Survey/ Mining<span class="text-danger">*</span>
+            </label>
+            <div class="col-lg-3 col-md-6">
+                <div class="form-group">
+                    <div class="py-2">
+                        <div class="form-group">
+                            <textarea class="form-control" rows="2"></textarea>
+                            <small class="text-danger">Maximum character should be <strong>500</strong></small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <label class="col-lg-3 col-md-5 col-12 col-form-label">
+                Remarks<span class="text-danger">*</span>
+
+            </label>
+            <div class="col-lg-3 col-md-6">
+                <div class="form-group">
+                    <textarea class="form-control" rows="2"></textarea>
+                    <small class="text-danger">Maximum character should be <strong>500</strong></small>
+                </div>
+            </div>
+
+            <div class="col-lg-3 col-md-6">
+                <div class="form-group">
+                    <button type="button" class="btn btn-success">Add More</button>
+                </div>
+            </div>
+
+            <div class="col-lg-12">
+                <div class="table-responsive mt-3">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Sl#</th>
+                                <th>Sample No.</th>
+                                <th>Type of Sample/Description /Rock/Soil/Core/Pit/other</th>
+                                <th>Desire Radical / Element in Sample</th>
+                                <th>Sample Received Place</th>
+                                <th>If Sample collected from any mines then( Order number and date/ Borehole /Pit /Trench)</th>
+                                <th>If R.P /Gram/Tahshil/District /Area in K.M</th>
+                                <th>Aim of research work/Survey/Mining</th>
+                                <th>Remarks</th>
+                                <th width="100px">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>1</td>
+                                <td>SB41/09</td>
+                                <td>Limestone/Ca0</td>
+                                <td>Sahgoon Limestone mine (43184a) Teh-Dhamdha  Dist-Durga </td>
+                                <td>Sahgoon Limestone mine (43184a) Lessee-SMT-suman singh</td>
+                                <td>2244556<br />22-Jan-2022</td>
+                                <td>NA Granted Lease</td>
+                                <td>Exploration & Reserve estimation</td>
+                                <td>-</td>
+                                <td><a class="btn btn-danger text-light btn-sm" title="Remove Row"><i class="fas fa-trash"></i></a></td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                </div>
+            </div>
+
+
+        </div>
+
+        <div class="form-group row">
+            <label class="col-lg-3 col-md-5 col-12 col-form-label ">Enter OTP <span class="text-danger">*</span></label>
+            <div class="col-lg-3 col-md-7 col-12">
+                <div class="form-group">
+                    <input type="text" class="form-control">
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group row">
+            <label class="col-lg-3 col-md-5 col-12 col-form-label ">Enter Captcha <span class="text-danger">*</span></label>
+            <div class="col-lg-3 col-md-7 col-12">
+                <div class="form-group">
+                    <input type="text" class="form-control">
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-7 col-12">
+                <img src="/img/captcha.png" alt="captcha image">
+                <a href="#" class="refesh-btn"><span class="fas fa-sync"></span></a>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-lg-12">
+                <button type="button" class="btn btn-success btn-lg mr-2" data-toggle="modal" data-target="#coal-lesse-details">Preview</button>
+                <button type="button" class="btn btn-success btn-lg mr-2" data-toggle="modal" data-target="#succcess-msg">Submit</button>
+                <button type="button" class="btn btn-danger btn-lg">Reset</button>
+            </div>
+        </div>
+
+
+
+
+    </div>
+</div>
+
+<div class="modal fade" id="succcess-msg" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-body text-center">
+                <i class="fas fa-check-circle" style="color: #76b333;font-size:5rem;"></i>
+                <h5 class=" mt-4"> <strong>User id</strong>  and <strong>Password</strong> has send to your provided <strong>Email Id</strong> and <strong>Mobile Number</strong>.</h5>
+            </div>
+            <div class="modal-footer justify-content-center">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Ok</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="coal-lesse-details" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h6 class="modal-title" id="exampleModalLabel">
+                    View Details
+                </h6>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body mineral-concesion-details">
+                <div class="row">
+                    <div class="col-12"><h5>Applicant Details</h5></div>
+
+                    <label class="col-lg-3 col-12 col-form-label">Applicant Name</label>
+                    <div class="col-lg-3 col-12">
+                        <label class="form-control-plaintext"><span class="colon">:</span> Amitabh Ishwarchandra Mishra</label>
+                    </div>
+
+                    <label class="col-lg-3 col-12 col-form-label">Organization Name</label>
+                    <div class="col-lg-3 col-12">
+                        <label class="form-control-plaintext">
+                            <span class="colon">:</span>
+                            ...
+                        </label>
+                    </div>
+
+                    <label class="col-lg-3 col-12 col-form-label">Phone No.</label>
+                    <div class="col-lg-3 col-12">
+                        <label class="form-control-plaintext">
+                            <span class="colon">:</span>
+                            ...
+                        </label>
+                    </div>
+
+                    <label class="col-lg-3 col-12 col-form-label">E-mail</label>
+                    <div class="col-lg-3 col-12">
+                        <label class="form-control-plaintext">
+                            <span class="colon">:</span>
+                            ...
+                        </label>
+                    </div>
+
+                    <label class="col-lg-3 col-12 col-form-label">District</label>
+                    <div class="col-lg-3 col-12">
+                        <label class="form-control-plaintext">
+                            <span class="colon">:</span>
+                            ...
+                        </label>
+                    </div>
+
+                    <label class="col-lg-3 col-12 col-form-label">Block</label>
+                    <div class="col-lg-3 col-12">
+                        <label class="form-control-plaintext">
+                            <span class="colon">:</span>
+                            ...
+                        </label>
+                    </div>
+
+                    <label class="col-lg-3 col-12 col-form-label">State</label>
+                    <div class="col-lg-3 col-12">
+                        <label class="form-control-plaintext">
+                            <span class="colon">:</span>
+                            ...
+                        </label>
+                    </div>
+
+                    <label class="col-lg-3 col-12 col-form-label">
+                        Pin Code
+                    </label>
+                    <div class="col-lg-3 col-12">
+                        <label class="form-control-plaintext">
+                            <span class="colon">:</span>
+                            234547
+                        </label>
+                    </div>
+
+
+                    <label class="col-lg-3 col-12 col-form-label">Complete postal address</label>
+                    <div class="col-lg-3 col-12">
+                        <label class="form-control-plaintext">
+                            <span class="colon">:</span>
+                            CG Natural Resources Private Limited Adani Corporate House Shantigram,
+                            S.G Highway Ahmedabad-382421
+                        </label>
+                    </div>
+
+
+                    <label class="col-lg-3 col-12 col-form-label">Area in Hectares</label>
+                    <div class="col-lg-3 col-12">
+                        <label class="form-control-plaintext">
+                            <span class="colon">:</span>
+                            1200
+                        </label>
+                    </div>
+
+                    <div class="col-12"><h5>Sample Details</h5></div>
+
+                    <div class="col-lg-12">
+                        <div class="table-responsive mt-3">
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>Sl#</th>
+                                        <th>Sample No.</th>
+                                        <th>Type of Sample</th>
+                                        <th>Sample Description</th>
+                                        <th>Desire Radical / Element in Sample</th>
+                                        <th>Sample Received Place</th>
+                                        <th>If Sample collected from any mines then( Order number and date/ Borehole /Pit /Trench)</th>
+                                        <th>R.P / Gram/ Tahshil/ District/ Area</th>
+                                        <th>Aim of research work/ Survey/ Mining</th>
+                                        <th>Remarks</th>
+
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>1</td>
+                                        <td>SB41/09</td>
+                                        <td>Limestone</td>
+                                        <td>Ca0</td>
+                                        <td>Sahgoon Limestone mine (43184a) Teh-Dhamdha  Dist-Durga </td>
+                                        <td>Sahgoon Limestone mine (43184a) Lessee-SMT-suman singh</td>
+                                        <td>2244556/22-Jan-2022</td>
+                                        <td>NA Granted Lease</td>
+                                        <td>Exploration &amp; Reserve estimation</td>
+                                        <td>-</td>
+
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-success">Edit</button>
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+
+

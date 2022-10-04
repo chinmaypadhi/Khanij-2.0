@@ -1,0 +1,315 @@
+﻿@addTagHelper*, Microsoft.AspNetCore.Mvc.TagHelpers
+@model IEnumerable<userregistrationEF.CommonRailwaySidingInboxEF_Query>
+@{
+    ViewData["Title"] = "CommonRailwaySidingInbox";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer localizer
+
+
+@if (TempData["msg"] != null)
+{
+    <script>
+        var vv = '@TempData["msg"]';
+        if (vv == 1) {
+            swal("", "Railway siding saved successfully.", "success");
+        }
+        else if (vv == 2) {
+            swal("", "Railway siding   allready exists.", "warning");
+        }
+        else if (vv == 3) {
+            swal("", "Railway siding  updated sucessfully", "success");
+        }
+        else if (vv == 4) {
+            swal("", "Railway siding   deleted sucessfully", "success");
+        }
+        else {
+            swal("", "Something Errror occured. Please Try After Sometime!!", "error");
+        }
+    </script>
+
+    TempData["msg"] = null;
+
+}
+
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        @Html.Partial("_CMSnavigation")
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="javascript:void(0);">
+                                @localizer[""] Common Railway Siding Inbox
+                            </a>
+
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="@Url.Content("~/CommonRailwaySiding/CommonRailwaySiding/CommonRailwaySidingInboxView")">
+                                @localizer[""] View Common Railway Siding Inbox
+                            </a>
+
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="@Url.Content("~/CommonRailwaySiding/CommonRailwaySiding/Fileupload")">
+                                @localizer[""] File Upload
+                            </a>
+
+                        </li>
+                        @Html.Partial("_CMSutil")
+                    </ul>
+                </div>
+
+                <div class="util-group d-flex align-items-center float-right">
+                    <a href="javascript:void(0);" id="backIcon" onclick="goBack();" data-toggle="tooltip" data-placement="top" data-original-title="Back" style=""><i class="icon-arrow-left-solid"></i></a>
+                </div>
+                <section class="box form-container">
+                    <div class="content-body pt-0">
+
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <input type="hidden" id="txtarea" />
+                                <input type="hidden" id="txtdist" />
+                                <input type="hidden" id="txtreprename" />
+
+                                <input type="hidden" id="txtmob" />
+                                <input type="hidden" id="txtmail" />
+                                <input type="hidden" id="txtcreatby" />
+                                <table id="table-landscape" class="table table-sm table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th width="30px"> @localizer["Sl#"] </th>
+                                            <th> @localizer["Area"] </th>
+                                            <th> @localizer["District Name"] </th>
+                                            <th> @localizer["Representative Name"] </th>
+                                            <th> @localizer["Railway Zone"] </th>
+                                            <th> @localizer["Railway Siding"] </th>
+                                            <th> @localizer["RS Address"] </th>
+                                            <th> @localizer["RS Latitute"] </th>
+                                            <th> @localizer["RS Longitute"] </th>
+                                            <th> @localizer["Mineral Grade"] </th>
+                                            <th> @localizer["Lessee"] </th>
+                                            <th> @localizer["Mobile Number"] </th>
+                                            <th> @localizer["Email Id"] </th>
+                                            <th> @localizer["Created By"] </th>
+                                            <th> @localizer["Created On"] </th>
+                                            <th> @localizer["Doc DownLoad"] </th>
+                                            <th> @localizer["Status"] </th>
+                                            <th width="60px" class="noprint"> @localizer["Take Action"] </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @{
+                                            var count = 0;
+                                            foreach (var item in Model)
+                                            {
+                                                count++;
+
+                                                <tr class="active-row">
+                                                    <td>@count</td>
+                                                    <td>@item.Area</td>
+                                                    <td>@item.DistrictName</td>
+                                                    <td>@item.RepresentitiveName</td>
+                                                    <td>@item.RailwayZone</td>
+                                                    <td>@item.RailwaySiding</td>
+                                                    <td>@item.RSAddress</td>
+                                                    <td>@item.RSLatitute</td>
+                                                    <td>@item.RSLongitute</td>
+                                                    <td>@item.MineralGrade</td>
+                                                    <td>@item.LesseeList</td>
+                                                    <td>@item.MobileNo</td>
+                                                    <td>@item.EmailId</td>
+                                                    <td>@item.CreatedBy</td>
+                                                    <td>@item.CreatedOn</td>
+                                                    <td>
+                                                        <label class="form-control-plaintext">
+                                                            @item.RSGradeDoc
+                                                            @if (item.RSGradeDoc != null && item.RSGradeDoc.Trim() != "")
+                                                            {
+                                                                <a href='~/@item.RsGradeDocPath' title="" class="ml-2" data-original-title="Download Document" target="_blank"><i class="icon-file-pdf-solid h5 text-danger"></i></a>
+                                                            }
+                                                        </label>
+
+                                                    </td>
+                                                    <td>@item.Status</td>
+                                                    <td class="noprint">
+                                                        <a class="btn btn-danger btn-md" id="btnTakeAction" onclick="TakeAction('@item.CRSId', '@item.Area', '@item.DistrictId', '@item.RepresentitiveName', '@item.MobileNo', '@item.EmailId', '@item.CreatedBy');"> @localizer["Take Action"] </a>
+                                                    </td>
+
+                                                </tr>
+                                            }
+                                        }
+                                    </tbody>
+                                </table>
+
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+            <div class="modal fade" id="divModal" tabindex="-1" role="dialog" aria-labelledby="basicModal" aria-hidden="true">
+                <div class="modal-dialog  modal-dialog-centered modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title"> @localizer["Take Action"] </h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="table-responsive">
+                                <table id="tblHistory" class="table table-sm table-bordered">
+                                    <tr>
+
+                                        <td>
+                                            @localizer["Status"]
+                                            <input type="hidden" id="hidCRSId" />
+                                        </td>
+
+                                        <td>
+                                            <input type="radio" id="RdApprove" name="Status" value="2" checked="checked" /> @localizer["Approve"]
+                                            <input type="radio" id="RdReject" name="Status" value="3" /> @localizer["Reject"]
+
+
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>@localizer["Remarks"]</td>
+
+                                        <td>
+                                            <textarea class="form-control" id="txtRemarks" maxlength="500"></textarea>
+                                        </td>
+                                    </tr>
+
+                                    <tr>
+                                        <td colspan="2">
+                                            <a class="btn btn-primary btn-md ml-0 waves-effect waves-light" id="btnSubmit">@localizer["Submit"]</a>
+                                            @*<a href="~/master/RoyaltyApproved/RoyaltyApproved" class="btn btn-danger btn-md">Cancel</a>*@
+                                        </td>
+
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- MAIN CONTENT AREA ENDS -->
+</section>
+
+<script>
+
+    $(document).ready(function () {
+
+        backIcon = "yes";
+        loadNavigation('CommonRailwaySiding Inbox', 'glholiday', 'plappleav', 'tl', 'CommonRailwaySiding', 'CommonRailwaySiding Inbox', ' ');
+
+        $('.searchableselect').searchableselect();
+
+        $('.shorting-lnk').click(function () {
+            $('.shorting-lnk i').toggleClass('fa-sort-amount-up-alt fa-sort-amount-down-alt ');
+        });
+
+        $("#btnSubmit").click(function () {
+            if ($("#txtRemarks").val() == "") {
+                swal("", "Enter the remarks", "warning");
+                return;
+            }
+            var status = null;
+            var statusText = null;
+            if ($("#RdApprove").is(":checked")) {
+                status = $("#RdApprove").val();
+                statusText = "Approved sucessfully";
+            }
+            else
+            {
+                status = $("#RdReject").val();
+                statusText = "Reject sucessfully";
+            }
+            var district = $("#txtdist").val();
+            var represntnm =  $("#txtreprename").text();
+            var mob = $("#txtmob").val();
+            var mail = $("#txtmail").val();
+            var creat = $("#txtcreatby").val();
+
+            $.ajax(
+                {
+                    url: '@Url.Action("TakeAction", "CommonRailwaySiding", new { Area = "CommonRailwaySiding" })',
+                    type: "POST",
+                    data: {
+                        CRSId: $("#hidCRSId").text(),
+                        StatusId: status,
+                        Remarks: $("#txtRemarks").val(),
+                        districtid: district,
+                        representname: represntnm,
+                        mobile: mob,
+                        Email: mail,
+                        createdby: creat
+                    },
+                    dataType: "json",
+                    success: function (result)
+                    {
+
+                        swal({
+                            title: "Are you sure ??",
+                            icon: "warning",
+                            buttons: ["No", "Yes"],
+                        })
+                            .then((submit) => {
+                                if (submit) {
+
+                                    swal({
+                                        title: "Action Taken Successfully!",
+                                        icon: "success",
+                                    }).then(function () {
+                                        var url = '@Url.Action("CommonRailwaySidingInboxView", "CommonRailwaySiding", new { Area = "CommonRailwaySiding" })';
+                                   window.location.href = url;
+                                    }
+                                    );
+
+
+                                   @*var url = '@Url.Action("CommonRailwaySidingInboxView", "CommonRailwaySiding", new { Area = "CommonRailwaySiding" })';
+                                   window.location.href = url;*@
+                                }
+                            });
+                        @*var url = '@Url.Action("CommonRailwaySidingInbox","CommonRailwaySiding", new { Area = "CommonRailwaySiding" })';
+                        window.location.href = url;*@
+                    },
+                    error: function ()
+                    {
+                        alert('Error');
+                    }
+                });
+        });
+
+
+    });
+
+    function TakeAction(id, area, dist, renm, mob, mail, cret)
+    {
+        $("#txtdist").val(0);
+        $("#txtreprename").text('');
+        $("#txtmob").text('');
+        $("#txtmail").text('');
+        $("#txtcreatby").text('');
+        $("#hidCRSId").text(id);
+
+        $("#txtdist").val(dist);
+        $("#txtreprename").text(renm);
+        $("#txtmob").val(mob);
+        $("#txtmail").val(mail);
+        $("#txtcreatby").val(cret);
+
+
+
+        $("#divModal").modal('show');
+
+    }
+
+</script>
+

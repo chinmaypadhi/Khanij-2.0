@@ -1,0 +1,455 @@
+﻿@*// *********************************************************************************************************
+    //  View Name                : PublicGrievance
+    //  Desciption               : Add Public Grievance
+    //  Created By               : Debaraj Swain
+    //  Created On               : 12 May 2021
+    // ********************************************************************************************************
+*@
+
+@model SupportEF.PublicGrievanceModel
+@using Microsoft.AspNetCore.Mvc.Localization
+@using SupportEF;
+@using Microsoft.Extensions.Options;
+@using SupportApp.Services;
+@using SupportApp;
+@inject IOptions<KeyList> _objKeyList
+@inject IHtmlLocalizer<CommonResources> SharedLocalizer
+@inject CommonLocalizationService commonlocalizer
+@{
+    ViewData["Title"] = "ProfileView";
+    Layout = "~/Views/Shared/_HeaderLayout.cshtml";
+}
+@if (TempData["Message"] != null)
+{
+<script>
+        swal("",'@TempData["Message"]',"success");
+</script>
+}
+<script type="text/javascript">
+    function numericOnly() {
+       
+        var keycode = event.which;
+        if (!(event.shiftKey == false && (keycode == 8 || keycode == 37 || keycode == 39 || (keycode >= 48 && keycode <= 57)))) {
+            event.preventDefault();
+            return false;
+        }
+    }
+    var specialKeys = new Array();
+    specialKeys.push(8); //Backspace
+    function numericdotOnly(elementRef) {
+        var keyCodeEntered = (event.which) ? event.which : (window.event.keyCode) ? window.event.keyCode : -1;
+        if ((keyCodeEntered >= 48) && (keyCodeEntered <= 57)) {
+            return true;
+        }
+        // '.' decimal point...
+        else if (keyCodeEntered == 46) {
+            // Allow only 1 decimal point ('.')...
+            if ((elementRef.value) && (elementRef.value.indexOf('.') >= 0))
+                return false;
+            else
+                return true;
+        }
+        return false;
+    }
+    function lettersOnly() {
+        var regex = new RegExp("^[a-zA-Z ]+$");
+        var key = String.fromCharCode(!event.charCode ? event.which : event.charCode);
+        if (!regex.test(key)) {
+            event.preventDefault();
+            return false;
+        }
+    }
+</script>
+<div class="inner-naviagtion">
+    <div class="container">
+        <div class="">
+            <nav aria-label="breadcrumb mb-0">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="@_objKeyList.Value.HomeUrl"><span class="fas fa-home"></span></a></li>
+                    <li class="breadcrumb-item active text-white" aria-current="page">@SharedLocalizer["Grievance"]</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+</div>
+<div class="inner-content ">
+    <div class="container">
+        <span class="text-danger float-right indicates">(*) indicates mandatory</span>
+        <div>
+
+       
+            @using (Html.BeginForm("PublicGrievanceAed", "Grievance", FormMethod.Post, new { AUTOCOMPLETE = "Off", id = "__EUAntiForgeryForm", @enctype = "multipart/form-data", @class = "form-horizontal bordered-row" }))
+            {
+            <div class="inner-forms">
+                <h3 class="text-dark font-weight-bold mb-10"> Details of the complainer</h3>
+                <div class="my-5">
+                    <div class="row">
+                        <div class="col-md-6 col-lg-4">
+                            <div class="form-group">
+                                <label>User Code <span class="text-danger">*</span></label>
+                                @Html.TextBoxFor(x => x.USER_CODE_OF_COMPLAINER, new { @class = "form-control", @maxlength = "50" })
+                            </div>
+                        </div>
+
+                        <div class="col-md-6 col-lg-4">
+                            <div class="form-group">
+                                <label>Name  <span class="text-danger">*</span></label>
+                                @Html.TextBoxFor(x => x.NAME_OF_COMPLAINER, new { @class = "form-control", @maxlength = "100", onkeypress = "lettersOnly();" })
+                                @Html.ValidationMessageFor(x => x.NAME_OF_COMPLAINER, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-lg-4">
+                            <div class="form-group">
+                                <label>Email-Id  <span class="text-danger">*</span></label>
+                                @Html.TextBoxFor(x => x.EMAIL_ADDRESS_OF_COMPLAINER, new { @class = "form-control", @maxlength = "50" })
+                                @Html.ValidationMessageFor(x => x.EMAIL_ADDRESS_OF_COMPLAINER, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-lg-4">
+                            <div class="form-group">
+                                <label>Mobile Number  <span class="text-danger">*</span></label>
+                                @Html.TextBoxFor(x => x.MOBILE_NUMBER_OF_COMPLAINER, new { @maxlength = "10", @class = "form-control", @minlength = "10", onkeypress = "numericOnly();" })
+                                @Html.ValidationMessageFor(x => x.MOBILE_NUMBER_OF_COMPLAINER, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-lg-4">
+                            <div class="form-group">
+                                <label>District  <span class="text-danger">*</span></label>
+                                @Html.DropDownListFor(model => model.DISTRICT, ViewBag.ViewDistList as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control searchableselect", autofocus = "autofocus" })
+                                @Html.ValidationMessageFor(x => x.DISTRICT, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-lg-4">
+                            <div class="form-group">
+                                <label>Pincode <span class="text-danger">*</span></label>
+                                @Html.TextBoxFor(x => x.PINCODE, new { @maxlength = "6", @class = "form-control", @minlength = "6" })
+                                @Html.ValidationMessageFor(x => x.PINCODE, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label>Complete Address  <span class="text-danger">*</span></label>
+                                @Html.TextAreaFor(x => x.COMPLETE_ADDRESS, new { @class = "form-control", @maxlength = "500", style = "resize:none;", @rows = 3 })
+                                @Html.ValidationMessageFor(x => x.COMPLETE_ADDRESS, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="separator separator-dashed my-10"></div>
+                <h3 class="text-dark font-weight-bold mb-10"> Details of Complain</h3>
+                <div class="my-5">
+                    <div class="row">
+                        <div class="col-md-6 col-lg-4">
+                            <div class="form-group">
+                                <label>Subject  <span class="text-danger">*</span></label>
+                                @Html.DropDownListFor(model => model.SUBJECT_OF_COMPLAINT, ViewBag.ViewCType as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control", autofocus = "autofocus" })
+                                @Html.ValidationMessageFor(x => x.SUBJECT_OF_COMPLAINT, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-lg-4">
+                            <div class="form-group">
+                                <label>In Brief  <span class="text-danger">*</span></label>
+                                @Html.TextAreaFor(x => x.COMPLAINT_IN_BRIEF, new { @class = "form-control", @maxlength = "500" })
+                                @Html.ValidationMessageFor(x => x.COMPLAINT_IN_BRIEF, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-lg-4">
+                            <div class="form-group">
+                                <label>Related to Person / Area / Vehicle No.  <span class="text-danger">*</span></label>
+                                @Html.TextAreaFor(x => x.ADDRESS, new { @class = "form-control", @maxlength = "500" })
+                                @Html.ValidationMessageFor(x => x.ADDRESS, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-lg-4">
+                            <div class="form-group">
+                                <label>Complaint to District  <span class="text-danger">*</span></label>
+                                @Html.DropDownListFor(model => model.C_DISTRICT, ViewBag.ViewDistList as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control", autofocus = "autofocus" })
+                                @Html.ValidationMessageFor(x => x.C_DISTRICT, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-lg-4">
+                            <div class="form-group">
+                                <label>Action Required  <span class="text-danger">*</span></label>
+                                @Html.TextBoxFor(x => x.Action_Against, new { @class = "form-control", @maxlength = "200" })
+                                @Html.ValidationMessageFor(x => x.Action_Against, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-lg-4">
+                            <div class="form-group">
+                                <label>Upload  @*<span class="text-danger">*</span>*@</label>
+                                <div class="position-relative">
+                                    <input name="ATTACHMENT" type="file" class="form-control custom-file-input" id="ATTACHMENT">
+                                    <label class="custom-file-label">Choose Files</label>
+                                </div>
+                                <small class="text-danger">Only <strong> jpg, jpeg, png, pdf, tif</strong> file with Max size <strong>2 MB </strong>.</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="separator separator-dashed my-10"></div>
+                <div class="my-5">
+                    <div class="form-group row">
+                        <label for="dropdownDepart" class="col-sm-4 col-form-label text-right"> Enter OTP  <span class="text-danger">*</span></label>
+                        <div class="col-sm-4">
+                            @Html.TextBox("VerifyOTP", null, new { @class = "form-control", id = "VerifyOTP" })
+                        </div>
+                        <div class="col-sm-3">
+                            <input type="button" class="btn btn-primary btn-md ml-0" id="btnsendOtp" value="Send OTP">
+                        </div>
+                    </div>
+                </div>
+                <div class="separator separator-dashed my-10"></div>
+                <div class="d-flex justify-content-center">
+                    <input type="button" value="Submit" id="btnSubmit" onclick="return btnSubmitClick();" class="btn btn-primary width100 mr-2" />
+                    <a href="~/Grievance/Grievance/PublicGrievance" class="btn btn-danger width100">Clear</a>
+                </div>
+            </div>
+            }
+        </div>
+    </div>
+</div>
+
+@if (!String.IsNullOrEmpty(ViewBag.ResponseMessage))
+{
+<script>
+ swal("", "@ViewBag.ResponseMessage", "success");
+</script>
+}
+<script>
+    $(document).ready(function () {
+        $('#ATTACHMENT').on("change", function () {
+           
+            var label = $(this).siblings('.custom-file-label');
+            var files = $(this)[0].files;
+            var Size = files[0].size;
+            if (Size < 2048000) {
+                label.html(files[0].name);
+                Aadhaar_FileSize = files.length;
+            }
+            else {
+                swal("", "Please make sure your  Doc is less than 2 MB!", "warning");
+                $('#doc').focus();
+            }
+        });
+    });
+</script>
+<script>
+    $("#MOBILE_NUMBER_OF_COMPLAINER").focusout(function () {
+        $('#VerifyOTP').val('');
+    });
+    $("#EMAIL_ADDRESS_OF_COMPLAINER").focusout(function () {
+        $('#VerifyOTP').val('');
+    });
+    $("#MOBILE_NUMBER_OF_COMPLAINER").keydown(function (e) {
+
+        if ($.inArray(e.keyCode, [46, 8, 9, 27, 13, 110, 190]) !== -1 ||
+            // Allow: Ctrl+A, Command+A
+            (e.keyCode === 65 && (e.ctrlKey === true || e.metaKey === true)) ||
+            // Allow: home, end, left, right, down, up
+            (e.keyCode >= 35 && e.keyCode <= 40)) {
+            // let it happen, don't do anything
+            return;
+        }
+        // Ensure that it is a number and stop the keypress
+        if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) {
+            e.preventDefault();
+        }
+    });
+    $("#MOBILE_NUMBER").keydown(function (e) {
+        // Allow: backspace, delete, tab, escape, enter and .
+        if ($.inArray(e.keyCode, [46, 8, 9, 27, 13, 110, 190]) !== -1 ||
+            // Allow: Ctrl+A, Command+A
+            (e.keyCode === 65 && (e.ctrlKey === true || e.metaKey === true)) ||
+            // Allow: home, end, left, right, down, up
+            (e.keyCode >= 35 && e.keyCode <= 40)) {
+            // let it happen, don't do anything
+            return;
+        }
+        // Ensure that it is a number and stop the keypress
+        if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) {
+            e.preventDefault();
+        }
+
+    });
+    $("#PINCODE").keydown(function (e) {
+        // Allow: backspace, delete, tab, escape, enter and .
+        if ($.inArray(e.keyCode, [46, 8, 9, 27, 13, 110, 190]) !== -1 ||
+            // Allow: Ctrl+A, Command+A
+            (e.keyCode === 65 && (e.ctrlKey === true || e.metaKey === true)) ||
+            // Allow: home, end, left, right, down, up
+            (e.keyCode >= 35 && e.keyCode <= 40)) {
+            // let it happen, don't do anything
+            return;
+        }
+        // Ensure that it is a number and stop the keypress
+        if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) {
+            e.preventDefault();
+        }
+    });
+    $("#btnsendOtp").click(function () {
+        debugger;
+        if (ValidateForm()) {
+            var mobileNumber = $("#MOBILE_NUMBER_OF_COMPLAINER").val();
+            var EmailID = $("#EMAIL_ADDRESS_OF_COMPLAINER").val();
+            $.ajax({
+                url: '@Url.Content("~/Grievance/Grievance/SendOTP")',
+                dataType: "json",
+                type: "GET",
+                //cache: false,
+                //async: false,
+                //contentType: false,
+                //processData: false,
+                data: {
+                    MobileNumber: mobileNumber,
+                    EmailID: EmailID
+                },
+                success: function (data) {
+                    var result = data.data;
+                    debugger;
+                    //console.log(data);
+                    if (result != null) {
+
+                        if (result == "SUCCESS") {
+                               swal("","Enter Verification Code received on submitted Mobile/Email Id" , "success");
+                        }
+                        else {
+                            swal("", result,"error");
+                        }
+                    }
+                }
+            })
+        }
+    });
+    function btnSubmitClick() {
+        if (ValidateForm()) {
+            $.ajax({
+                url: '@Url.Content("~/Grievance/Grievance/VerifyOTP")',
+                data: {
+                    OTP: $('#VerifyOTP').val(),
+                    MobileNumber: $("#MOBILE_NUMBER_OF_COMPLAINER").val(),
+                    EmailID: $("#EMAIL_ADDRESS_OF_COMPLAINER").val()
+                },
+                success: function (data) {
+                   
+                    var result = data;
+                    if (result == "SUCCESS") {
+                        debugger;
+                        $("#__EUAntiForgeryForm").submit();
+                       /* return true;*/
+                    }
+                    else if (result == "REQUIRED") {
+                        swal("", "Please Enter OTP !", "warning");
+                        return false;
+                    }
+                    else {
+                        swal("", "This OTP is already used.Please send another OTP and try again !", "warning");
+                        return false;
+                    }
+                },
+                error: function (result) {
+                    swal("", "OTP Verification failed.Please try again !", "warning");
+                }
+            });
+        }
+    };
+    function isEmail(email) {
+        var regex = /^([a-zA-Z0-9_.+-])+\@@(([a-zA-Z0-9-])+\.)+([a-zA-Z0-9]{2,4})+$/;
+        return regex.test(email);
+    }
+    $("#MOBILE_NUMBER_OF_COMPLAINER").keydown(function (e) {
+        // Allow: backspace, delete, tab, escape, enter and .
+        if ($.inArray(e.keyCode, [46, 8, 9, 27, 13, 110, 190]) !== -1 ||
+            // Allow: Ctrl+A, Command+A
+            (e.keyCode === 65 && (e.ctrlKey === true || e.metaKey === true)) ||
+            // Allow: home, end, left, right, down, up
+            (e.keyCode >= 35 && e.keyCode <= 40)) {
+            // let it happen, don't do anything
+            return;
+        }
+        // Ensure that it is a number and stop the keypress
+        if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) {
+            e.preventDefault();
+        }
+    });
+    function ValidateForm() {
+
+        
+        if (!blankFieldValidation("USER_CODE_OF_COMPLAINER", "User Code")) {
+            return false;
+        }
+        if (!blankFieldValidation("NAME_OF_COMPLAINER", "complainer's Name")) {
+            return false;
+        }
+        if (!blankFieldValidation("EMAIL_ADDRESS_OF_COMPLAINER", "email address of complainer")) {
+            return false;
+        }
+        else {
+
+            if (isEmail($("#EMAIL_ADDRESS_OF_COMPLAINER").val()) == false) {
+                swal("", "Please enter proper email id of complainer", "warning");
+                $("#Email").focus();
+                return false;
+            }
+        }
+        if (!blankFieldValidation("MOBILE_NUMBER_OF_COMPLAINER", "mobile number of complainer")) {
+            return false;
+        }
+        if ($("#MOBILE_NUMBER_OF_COMPLAINER").val() != "") {
+            if ($("#MOBILE_NUMBER_OF_COMPLAINER").val().length != 10) {
+                swal("", "Please enter valid mobile number", "warning");
+                $("#MOBILE_NUMBER_OF_COMPLAINER").focus();
+                return false;
+            }
+        }
+
+        if (!blankFieldValidation("DISTRICT", "district")) {
+            return false;
+        }
+        if (!blankFieldValidation("DISTRICT", "district")) {
+            return false;
+        }
+        if (!blankFieldValidation("PINCODE", "PINCODE")) {
+            return false;
+        }
+        if ($("#PINCODE").val() != "") {
+            if ($("#PINCODE").val().length != 6) {
+                swal("", "Please enter Valid pincode", "warning");
+                $("#PINCODE").focus();
+                return false;
+            }
+
+        }
+        
+        if (!blankFieldValidation("COMPLETE_ADDRESS", "Complete Address")) {
+            return false;
+        }
+
+       
+
+        if (!blankFieldValidation("SUBJECT_OF_COMPLAINT", "SUBJECT OF COMPLAINT")) {
+            return false;
+        }
+
+
+        if (!blankFieldValidation("COMPLAINT_IN_BRIEF", "COMPLAINT IN BRIEF")) {
+            return false;
+        }
+
+
+        if (!blankFieldValidation("ADDRESS", "ADDRESS")) {
+            return false;
+        }
+
+        if (!blankFieldValidation("C_DISTRICT", "Complaint DISTRICT")) {
+            return false;
+        }
+
+        if (!blankFieldValidation("Action_Against", "Action Against")) {
+            return false;
+        }
+        return true;
+    }
+</script>
+
+
+

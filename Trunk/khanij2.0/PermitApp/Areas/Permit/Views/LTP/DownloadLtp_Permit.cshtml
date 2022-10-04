@@ -1,0 +1,522 @@
+﻿@model PermitEF.ListofLTP
+@using PermitEF;
+@using PermitApp.Web;
+@using PermitApp.Helper
+@using Microsoft.Extensions.Configuration;
+@inject IConfiguration Configuration
+@using  Microsoft.AspNetCore.Http;
+@{
+    ViewBag.Title = "LTP Application";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+
+
+<style>
+    #Calculation {
+        text-align: center;
+        position: absolute;
+        white-space: nowrap;
+        padding: 1em;
+        cursor: pointer;
+    }
+</style>
+<section class="wrapper main-wrapper row">
+
+    <div class="col-12" id="mainDiv">
+        @Html.Partial("_CMSnavigation")
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        @if (Model == null || (Model.LTPFilePath == null || Model.LTPFilePath == ""))
+                        {
+                            if (Model.LTPPermitId == null || Model.LTPPermitId == 0)
+                            {
+                                <li class="nav-item">
+                                    <a href="javascript:void(0);" title="Generate Permit" id="btnSaveDraft" onclick="DownloadForm();" class="btn btn-success btn-md  mb-2  waves-effect waves-light rounded-0">Save e-LTP Permit Application Draft Copy</a>
+                                </li>
+                            }
+                            else
+                            {
+                                <li class="nav-item">
+                                    <a href="javascript:void(0);" title="Generate Permit" id="btnSave" onclick="getPDF();" class="btn btn-success btn-md  mb-2  waves-effect waves-light rounded-0">Generate e-LTP Permit Application</a>
+                                </li>
+                            }
+                        }
+                        else
+                        {
+                            <li class="nav-item">
+                                <a href="@Model.LTPFilePath" title="Download e-Permit" id="btnDownload" class="btn btn-success btn-md  mb-2  waves-effect waves-light rounded-0">Download e-LTP Permit Application</a>
+                            </li>
+                        }
+                    </ul>
+                    @Html.Partial("_CMSutil")
+                </div>
+
+
+                <section class="box form-container">
+                    <div class="content-body">
+                        <table id="tablePRint" class="table  table-responsive" style="width: 800px; margin: 0 auto;">
+                            @(Html.HiddenFor(model => model.LTPPermitId))
+                            @(Html.HiddenFor(model => model.LTPFilePath))
+                            @(Html.HiddenFor(model => model.LTPApplicationNo))
+
+
+                            <tr>
+                                <td style="padding: 0;">
+
+                                    <table id="tablePRint2" class="table table-bordered">
+                                        <tr>
+                                            <th colspan="4" style="text-align: center; border-top: 1px solid black; border-left: 1px solid black;">
+                                                <img id="imgLogo" src="/CMSimg/LogoPrintNew.png" height="80" alt="LOGO">
+
+
+                                            </th>
+
+                                        </tr>
+                                        <tr>
+                                            <td style="text-align: center; font-weight: 700; font-size: 20px;" colspan="2">
+                                                Form-11
+                                                <br />
+                                                [See rule 4(6) (2)]
+                                                <br />
+                                                @*e-LTP Permit Application*@
+                                                Application for Obtaining e-LTP for Transportation of Minerals from Railway Siding
+
+                                            </td>
+
+                                        </tr>
+                                        <tr>
+
+                                            <td style="font-weight:700;" width="40%">
+                                                Name of Applicant
+                                            </td>
+                                            <td>
+                                                @(Html.DisplayFor(model => model.ApplicantName))
+                                            </td>
+                                        </tr>
+
+
+                                        <tr>
+
+                                            <td style="font-weight:700;">
+                                                Designation(In Case of Company or Firm)
+                                            </td>
+                                            <td>
+                                                @(Html.DisplayFor(model => model.Designation))
+                                            </td>
+                                        </tr>
+                                        <tr>
+
+                                            <td style="font-weight:700;">
+                                                Mobile Number
+                                            </td>
+                                            <td>
+                                                @(Html.DisplayFor(model => model.MobileNo))
+                                            </td>
+                                        </tr>
+
+                                        <tr>
+
+                                            <td style="font-weight:700;">
+                                                Name of The Mineral
+                                            </td>
+                                            <td>
+                                                @(Html.DisplayFor(model => model.MineralName)) ,@(Html.DisplayFor(model => model.MineralForm)) , @(Html.DisplayFor(model => model.MineralGrade))
+                                            </td>
+                                        </tr>
+
+                                        <tr>
+
+                                            <td style="font-weight:700;">
+                                                Quantity of The Mineral To Be Brought By Way of Railway Transportation (Cubic Meter/Ton)
+                                            </td>
+                                            <td>
+                                                @(Html.DisplayFor(model => model.ProposedqtybyRailway))
+                                            </td>
+                                        </tr>
+
+
+                                        <tr>
+
+                                            <td style="font-weight:700;">
+                                                Name of The Railway Siding (From Where The Mineral Is To Be Transported)
+                                            </td>
+                                            <td>
+                                                @(Html.DisplayFor(model => model.FromStationSideName))
+                                            </td>
+                                        </tr>
+
+                                        <tr>
+
+                                            <td style="font-weight:700;">
+                                                Name of The Recipient of The Mineral
+                                            </td>
+                                            <td>
+                                                @(Html.DisplayFor(model => model.NameofMineralReceipt))
+                                            </td>
+                                        </tr>
+
+                                        <tr>
+
+                                            <td style="font-weight:700;">
+                                                Address
+                                            </td>
+                                            <td>
+                                                @(Html.DisplayFor(model => model.Address))
+                                            </td>
+                                        </tr>
+
+                                        <tr>
+
+                                            <td style="font-weight:700;">
+                                                Name of The Railway Siding (Where The Mineral Is To Be Unloaded)
+                                            </td>
+                                            <td>
+                                                @(Html.DisplayFor(model => model.ToStationSideName))
+                                            </td>
+                                        </tr>
+
+
+                                        <tr>
+
+                                            <td style="font-weight:700;">
+                                                Purpose (Private Plant / Processing Plant / Licensed Place / Other)
+                                            </td>
+                                            <td>
+                                                @(Html.DisplayFor(model => model.Purpose))
+                                            </td>
+                                        </tr>
+                                        <tr>
+
+                                            <td style="font-weight:700;">
+                                                Complete Address of the Destination
+                                            </td>
+                                            <td>
+                                                @(Html.DisplayFor(model => model.DestinationAddress))
+                                            </td>
+                                        </tr>
+                                        <tr>
+
+                                            <td style="font-weight:700;">
+                                                Transportation Route via
+                                            </td>
+                                            <td>
+                                                @(Html.DisplayFor(model => model.TransportationRoute))
+                                            </td>
+                                        </tr>
+
+                                        <tr>
+
+                                            <td style="font-weight:700;">
+                                                Expected Number Of E-Local Transit Pass
+                                            </td>
+                                            <td>
+                                                @(Html.DisplayFor(model => model.ExpectedNoOfLtp))
+                                            </td>
+                                        </tr>
+
+
+                                        <tr>
+
+                                            <td style="font-weight:700;">
+                                                Other Details
+                                            </td>
+                                            <td>
+                                                @(Html.DisplayFor(model => model.OtherDetails))
+                                            </td>
+                                        </tr>
+
+                                        <tr>
+
+                                            <td style="font-weight:700;">
+                                                Details of Railway Receipt
+                                            </td>
+                                            <td>
+                                                @(Html.DisplayFor(model => model.DetailOfRailwayReceipt))
+                                            </td>
+                                        </tr>
+                                        <tr>
+
+                                            <td style="font-weight:700;">
+                                                Generated By
+                                            </td>
+                                            <td>
+                                                @(Html.DisplayFor(model => model.DSCgeneratedby))
+
+                                            </td>
+                                        </tr>
+
+                                        <tr>
+
+                                            <td style="font-weight:700;">
+                                                Generated Designation
+                                            </td>
+                                            <td>
+                                                @(Html.DisplayFor(model => model.DSCgeneratedDesgination))
+                                            </td>
+                                        </tr>
+                                        <tr>
+
+                                            <td style="font-weight:700;">
+                                                Generated Date and Time
+                                            </td>
+                                            <td>
+                                                @(System.DateTime.Now.ToString("dd/MM/yyyy hh:mm:ss tt"))
+                                            </td>
+                                        </tr>
+                                        <tr>
+
+                                            <td style="font-weight:700;">
+                                                DSC
+                                            </td>
+                                            <td></td>
+                                        </tr>
+
+                                    </table>
+                                </td>
+                            </tr>
+                        </table>
+
+
+                        <div id="javaRequiredDiv">
+                        </div>
+                        @*comment by sanjay*@
+                        @*<input id="SavePathName" type="hidden" value="@Path.Combine(System.Web.HttpContext.Current.Server.MapPath(System.Configuration.ConfigurationManager.AppSettings["FNDSCCreateFilePATH"]))" />*@
+                        <input id="fName" type="hidden" />
+                        <input id="fid" type="hidden" />
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+    <!-- MAIN CONTENT AREA ENDS -->
+</section>
+
+<script>
+    backMe = "yes"
+    $(document).ready(function () {
+        loadNavigation('balancequantitye-permit', 'glepermit', 'Epermit', 'tl', 'E-Permit', 'Preview', ' ');
+        $('.searchableselect').searchableselect();
+
+
+
+
+        $('.shorting-lnk').click(function () {
+            $('.shorting-lnk i').toggleClass('fa-sort-amount-up-alt fa-sort-amount-down-alt ');
+        });
+        $('.filter-dropdown').hide();
+        $('.filter-lnk').click(function () {
+            $(this).toggleClass('active');
+            $(this).siblings('.filter-dropdown').slideToggle();
+        });
+        $('.filter-btn').click(function () {
+            $(this).parent('.shorting-cell .filter-dropdown').slideUp();
+            if ($(this).parent().parent('.shorting-cell').find('.filter-lnk').hasClass('active')) {
+                $(this).parent().siblings('.filter-lnk').removeClass('active');
+            }
+        });
+
+
+    });
+
+
+</script>
+@*<script>
+        $(document).ready(function () {
+            $('.datepicker').datetimepicker({
+                format: 'LT',
+                format: 'DD-MM-YYYY',
+
+            });
+        });
+    </script>*@
+<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.3.3/jspdf.min.js"></script>
+<script src="https://html2canvas.hertzen.com/dist/html2canvas.js"></script>
+@*<script src="~/CMSjs/html2canvas.js"></script>
+    <script src="~/CMSjs/jquery-1.12.4.js"></script>
+    <script src="~/CMSjs/jspdf.min.js"></script>*@
+<script>
+    function DownloadForm() {
+        debugger;
+        var HTML_Width = $("#tablePRint").width();
+        var HTML_Height = $("#tablePRint").height();
+        var top_left_margin = 15;
+        var PDF_Width = HTML_Width + (top_left_margin * 2);
+        var PDF_Height = (PDF_Width * 1.5) + (top_left_margin * 2);
+        var canvas_image_width = HTML_Width;
+        var canvas_image_height = HTML_Height;
+
+        var totalPDFPages = Math.ceil(HTML_Height / PDF_Height) - 1;
+
+
+        html2canvas($("#tablePRint")[0], { allowTaint: true }).then(function (canvas) {
+
+            canvas.getContext('2d');
+
+            console.log(canvas.height + "  " + canvas.width);
+
+            // var data = canvas.toDataURL();
+            var data = canvas.toDataURL("image/JPEG", 1.0);
+            var pdf = new jsPDF('p', 'pt', [PDF_Width, PDF_Height]);
+            pdf.addImage(data, 'JPEG', top_left_margin, top_left_margin, canvas_image_width, canvas_image_height);
+
+
+            for (var i = 1; i <= totalPDFPages; i++) {
+                pdf.addPage(PDF_Width, PDF_Height);
+                pdf.addImage(data, 'JPEG', top_left_margin, -(PDF_Height * i) + (top_left_margin * 4), canvas_image_width, canvas_image_height);
+            }
+            //data = data.replace('data:image/png;base64,', '');
+            data = pdf.save($("#TransactionalID").val() + ".pdf");
+
+        });
+
+    }
+
+    function getPDF() {
+
+
+        var HTML_Width = $("#tablePRint").width();
+        var HTML_Height = $("#tablePRint").height();
+        var top_left_margin = 15;
+        var PDF_Width = HTML_Width + (top_left_margin * 2);
+        var PDF_Height = (PDF_Width * 1.5) + (top_left_margin * 2);
+        var canvas_image_width = HTML_Width;
+        var canvas_image_height = HTML_Height;
+
+        var totalPDFPages = Math.ceil(HTML_Height / PDF_Height) - 1;
+
+
+        html2canvas($("#tablePRint")[0], { allowTaint: true }).then(function (canvas) {
+
+            canvas.getContext('2d');
+
+            console.log(canvas.height + "  " + canvas.width);
+
+            // var data = canvas.toDataURL();
+            var data = canvas.toDataURL("image/JPEG", 1.0);
+            var pdf = new jsPDF('p', 'pt', [PDF_Width, PDF_Height]);
+            pdf.addImage(data, 'JPEG', top_left_margin, top_left_margin, canvas_image_width, canvas_image_height);
+
+
+            for (var i = 1; i <= totalPDFPages; i++) {
+                pdf.addPage(PDF_Width, PDF_Height);
+                pdf.addImage(data, 'JPEG', top_left_margin, -(PDF_Height * i) + (top_left_margin * 4), canvas_image_width, canvas_image_height);
+            }
+            //data = data.replace('data:image/png;base64,', '');
+            data = pdf.output("datauristring").replace('data:application/pdf;base64,', '');
+                    //-----------------
+            try {
+                debugger;
+                    var dt = new Date();
+                         var FNID = $("#LTPPermitId").val();
+                         var FileName = "LTP_" + FNID + "_" + dt.getDate() + "" + (dt.getMonth() + 1) + "" + dt.getFullYear() + "_" + dt.getHours() + "_" + dt.getMinutes() + "_" + dt.getSeconds() + ".pdf";
+                    $("#fName").val(FileName).change();
+                    $.ajax({
+                        url: "/Permit/Transit/SaveNormalPdfFile",
+                        data: { base64BinaryStr: data, fileName: $("#fName").val(), ID: $("#LTPPermitId").val(), UpdateIn: "LTP_PERMIT" },
+                        type: "post",
+                        dataType:'json',
+                        success: function (msg) {
+
+                            if (msg == "SUCCESS") {
+
+                                var FPath = '@Configuration["DSCReadFilePath"]' + $("#fName").val();
+                                var OutPath = "";
+                                var Postdata = 'action=signpdf' + "\n" + 'datatosign=' + FPath + '' + "\n" + 'signaction=2' + "\n" + 'outputpath=' + OutPath + '' + "\n" + 'signtype=sign' + "\n" + 'expirycheck=false' + "\n" + 'coordinate=600,100,1300,50' + "\n" + 'issuername=' + "\n" + 'certtype=ALL' + "\n" + 'certclass=0';
+                                connection.send(Postdata);
+                                connection.onerror = function (error) {
+                                    alert('Please check the server connection: ' + error);
+                                    alert(error);
+                                };
+
+                                connection.onmessage = function (e) { // when DSC is success then following function executed.
+
+                                    if (e.data.indexOf("subProtocol") == -1) {
+
+                                        $.ajax(
+                                            {
+                                                url: "/Permit/Transit/CheckVerifyResponse",
+                                                type: "POST",
+                                                data: { contentType: "pkcs7", signDataBase64Encoded: e.data, responseType: "plain" },
+                                                async: false,
+                                                success: function (msg) {
+
+                                                    if (msg == "SUCCESS") {
+
+                                                        var FNID = $("#fName").val();
+                                                        var BulkPermitId = $("#LTPPermitId").val();
+                                                        var signData = e.data;
+                                                        $.ajax({
+                                                            url:"/Permit/Transit/SavePdfFile",
+                                                            type: "POST",
+                                                            async: false,
+                                                            data: { base64BinaryStr: e.data, fileName: FNID, ID: BulkPermitId, UpdateIn: "LTP_PERMIT" },
+                                                            success: function (msg) {
+                                                                if (msg == "SUCCESS") {
+                                                                    alert("You have successfully generate permit.");
+                                                                    window.location.href = "/Permit/LTP/Permit_List";
+                                                                }
+                                                                else {
+                                                                    alert(msg);
+                                                                }
+                                                            }
+                                                        });
+                                                    }
+                                                }
+                                            });
+                                    }
+                                    else {
+                                        alert(e.data);
+                                    }
+                                };
+                            }
+                            else {
+                                alert(msg);
+
+                            }
+                        }
+                    });
+                }
+                catch (e) {
+                    alert("Your DSC Connection is not working. Please try after some time.");
+                }
+                    //-------------------------
+
+
+
+        });
+
+
+
+    }
+    //following code is for DSC Signature
+    try {
+        var connection = new WebSocket('wss://localhost.emudhra.com:8080');
+
+        connection.onopen = function () {
+            console.log('Connection Opened');
+        };
+        connection.onerror = function (error) {
+            //  alert('Please check the DSC connection: ' + error);
+        };
+        connection.onmessage = function (e) {
+            if (e.data.indexOf("subProtocol") == -1) {
+                //  alert(e.data);
+            }
+        };
+    }
+    catch (e) {
+        alert("No DSC Connection Found");
+    }
+    //-----------------------------
+</script>
+
+
+
+
+
+
+

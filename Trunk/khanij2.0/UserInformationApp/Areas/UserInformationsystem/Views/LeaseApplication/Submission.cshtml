@@ -1,0 +1,885 @@
+﻿@model UserInformationEF.LeaseApplicationModel
+@{
+    ViewData["Title"] = "Add";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<link rel="stylesheet" href="~/css/bootstrap-datetimepicker.min.css" type="text/css" />
+<script src="~/js/moment.min.js"></script>
+<script src="~/js/bootstrap-datetimepicker.min.js"></script>
+<h1>Submission</h1>
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        <uc1:navigation runat="server" ID="navigation" />
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="javascript:void(0);">
+                                Online Lease Application
+                            </a>
+                        </li>
+                    </ul>
+                    <uc1:util runat="server" ID="util" />
+                </div>
+
+                <section class="box form-container">
+                    @using (Html.BeginForm("Submission", "LeaseApplication", FormMethod.Post, new { id = "__AntiForgeryForm", @enctype = "multipart/form-data", @class = "form-horizontal bordered-row" }))
+                    {
+                        @Html.HiddenFor(x => x.Status)
+                        @Html.HiddenFor(x => x.SpMode)
+                        @Html.HiddenFor(x => x.DSCResponse)
+                        @Html.HiddenFor(x => x.LesseeLOI)
+                        @if (Convert.ToInt16(Model.Status) == 3)
+                        {
+                            <div class="content-body">
+                                <div class="col-sm-6">
+                                    <div class="form-group row">
+                                        <label for="Submission_of_Clearances" style="color: #089c4c;font-size: 1rem;font-weight:bold">Pay First Installment</label>
+                                    </div>
+                                </div>
+
+                                <div class="container footer">
+                                    <div class="d-flex justify-content-between">
+                                        <div class="p-1">
+
+                                        </div>
+                                        <div class="p-1">
+                                            <label for="inputPassword" class="col-sm-13 col-form-label font-weight-bolder">Name of Authorized Person</label>
+
+                                        </div>
+                                        <div class="p-1">
+                                            <label for="inputPassword" class="col-sm-13 col-form-label font-weight-bolder">@Model.NameOfApplicant</label>
+                                        </div>
+                                        <div class="p-1">
+
+                                        </div>
+                                    </div>
+                                    <div class="d-flex justify-content-between">
+                                        <div class="p-1">
+
+                                        </div>
+                                        <div class="p-1">
+                                            <label for="inputPassword" class="col-sm-13 col-form-label font-weight-bolder">Company</label>
+
+                                        </div>
+                                        <div class="p-1">
+                                            <label for="inputPassword" class="col-sm-13 col-form-label font-weight-bolder">@Model.CompanyName</label>
+                                        </div>
+                                        <div class="p-1">
+
+                                        </div>
+                                    </div>
+                                    <div class="d-flex justify-content-between">
+                                        <div class="p-1">
+
+                                        </div>
+                                        <div class="p-1">
+                                            <label for="inputPassword" class=" font-weight-bolder">Firm Type</label>
+
+                                        </div>
+                                        <div class="p-1">
+                                            <label for="inputPassword" class=" font-weight-bolder">@Model.CategoryOfLicensee</label>
+                                        </div>
+                                        <div class="p-1">
+
+                                        </div>
+                                    </div>
+                                    <div class="d-flex justify-content-between">
+                                        <div class="p-1">
+
+                                        </div>
+                                        <div class="p-1">
+                                            <label for="inputPassword" class="col-sm-13 col-form-labe font-weight-bolder">Amount</label>
+
+                                        </div>
+                                        <div class="p-1">
+                                            <label for="inputPassword" class=" font-weight-bolder">Rs . @Model.totalPayable</label>
+                                            @Html.Hidden("ClientTransactionID")
+                                            @Html.Hidden("totalPayable")
+                                        </div>
+                                        <div class="p-1">
+
+                                        </div>
+                                    </div>
+                                    <div class="d-flex justify-content-between">
+                                        <div class="p-1">
+
+                                        </div>
+                                        <div class="p-1">
+                                            <label for="inputPassword" class=" font-weight-bolder">Due Date</label>
+
+                                        </div>
+                                        <div class="p-1">
+                                            <label for="inputPassword" class=" font-weight-bolder">@Model.First_Installment_ScheduleDate</label>
+                                        </div>
+                                        <div class="p-1">
+
+                                        </div>
+                                    </div>
+                                    <div class="d-flex justify-content-between">
+                                        <div class="p-1">
+
+                                        </div>
+                                        <div class="p-1">
+
+                                            <img src=@Url.Content("~/img/b.jpg") alt="SBI" style="width:100px;height:50px;">
+                                            <input name="BankSelection" id="chkSBI" type="radio" value="SBI" checked="checked">
+                                        </div>
+                                        <div class="p-1">
+                                            <img src=@Url.Content("~/img/ICICI.png") alt="SBI" style="width:100px;height:50px;">
+                                            <input name="BankSelection" id="chkICICI" type="radio" value="ICICI">
+                                        </div>
+                                        <div class="p-1">
+
+                                        </div>
+                                    </div>
+                                    <div class="justify-content-between row" id="divPaymentOption" style="display: none">
+                                        <div class="p-1">
+
+                                        </div>
+                                        <div class="p-1">
+
+                                            @(Html.Label("Net Banking"))
+                                            <input name="ModeSelection" type="radio" id="chkICICINetBanking" value="NetBanking" />
+                                        </div>
+                                        <div class="p-1">
+                                            @(Html.Label("NEFT/RTGS"))
+                                            <input name="ModeSelection" type="radio" id="chkNEFT" value="NEFT" checked="checked" />
+                                        </div>
+                                        <div class="p-1">
+
+                                        </div>
+                                    </div>
+                                    <div class="justify-content-between row" id="divNetBankingPayment" style="display: none">
+                                        <div class="p-1">
+
+                                        </div>
+                                        <div class="p-1">
+
+                                            @(Html.Label("Corporate"))
+                                            <input name="NetBankingSelection" type="radio" value="Corporate" checked="checked" />
+                                        </div>
+                                        <div class="p-1">
+                                            @(Html.Label("Retail"))
+                                            <input name="NetBankingSelection" type="radio" value="Retail" />
+                                        </div>
+                                        <div class="p-1">
+
+                                        </div>
+                                    </div>
+
+
+
+                                </div>
+                            </div>
+
+
+                            <div class="col-sm-6 offset-sm-6">
+                                <input type="button" value="Submit" id="btnSubmit" class="btn  btn-primary" onclick="onMakePayment();" style="margin-right: 10px; width: 200px;" />
+
+                            </div>
+                        }
+                        //STATUS=4 WHEN LESSEE MAKE 1ST INSTALLMENT STATUS=8 WHEN MRD ISSUANCE OGF LOI REJECTED
+                        @if (Convert.ToInt16(Model.Status) == 4 || Convert.ToInt16(Model.Status) == 7)
+                        {
+                            <section class="box form-container">
+
+                                <div class="content-body">
+                                    <div class="col-sm-12">
+                                        <div class="form-group row">
+                                            <label for="Submission_of_Clearances" class="col-md-8 col-form-label text-md-right " style="color: #089c4c;font-size: 1.3rem;font-weight:bold">Approved Preferred Bidder Information</label>
+                                        </div>
+                                    </div>
+                                    <div class="cotainer">
+                                        <div class="row justify-content-center">
+                                            <div class="col-md-8">
+                                                <div class="form-group row">
+                                                    <label for="email_address" class="col-md-4 col-form-label text-md-right font-weight-bolder">Firm Type</label>
+                                                    <div class="col-md-8">
+                                                        <label for="email_address">@Model.CategoryOfLicensee</label>
+                                                    </div>
+                                                </div>
+
+                                                <div class="form-group row">
+                                                    <label for="email_address" class="col-md-4 col-form-label text-md-right font-weight-bolder">Comapny</label>
+                                                    <div class="col-md-6">
+                                                        <label for="email_address">@Model.CompanyName</label>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group row">
+                                                    <label for="email_address" class="col-md-4 col-form-label text-md-right font-weight-bolder">Name of Authorized Person</label>
+                                                    <div class="col-md-6">
+                                                        <label for="email_address">@Model.NameOfApplicant</label>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group row">
+                                                    <label for="email_address" class="col-md-4 col-form-label text-md-right font-weight-bolder">Amount Paid</label>
+                                                    <div class="col-md-6">
+                                                        <label for="email_address">@Model.First_Installment_Amount</label>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group row">
+                                                    <label for="email_address" class="col-md-4 col-form-label text-md-right font-weight-bolder">Payment Date</label>
+                                                    <div class="col-md-6">
+                                                        <label for="email_address">@Model.First_Installment_DateOfDiposite</label>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group row">
+                                                    <label for="email_address" class="col-md-4 col-form-label text-md-right font-weight-bolder">Remarks</label>
+                                                    <div class="col-md-6">
+                                                        @Html.TextAreaFor(x => x.Remarks, new { @class = "form-control", @maxlength = 1000, style = "width: 100%;height: 100px;" })
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6 offset-sm-6">
+                                            <input type="button" value="Submit" id="btnSubmit" class="btn  btn-primary" onclick="onMakePayment();" style="margin-right: 10px; width: 200px;" />
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </section>
+                        }
+                        //STATUS=5 WHEN DGM APPROVED 1ST PAYMENT INSTALLMENT
+                        @if (Convert.ToInt16(Model.Status) == 5)
+                        {
+                            <div class="col-sm-12">
+                                <div class="form-group row">
+                                    <label for="Submission_of_Clearances" class="col-md-8 col-form-label text-md-right " style="color: #089c4c;font-size: 1.3rem;font-weight:bold">Issuance of LOI Holder</label>
+                                </div>
+                            </div>
+                            <div class="cotainer">
+                                <div class="row justify-content-center">
+                                    <div class="col-md-8">
+                                        <div class="form-group row">
+                                            <label for="email_address" class="col-md-4 col-form-label text-md-right font-weight-bolder">Firm Type</label>
+                                            <div class="col-md-8">
+                                                <label for="email_address">@Model.CategoryOfLicensee</label>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group row">
+                                            <label for="email_address" class="col-md-4 col-form-label text-md-right font-weight-bolder">Comapny</label>
+                                            <div class="col-md-6">
+                                                <label for="email_address">@Model.CompanyName</label>
+                                            </div>
+                                        </div>
+                                        <div class="form-group row">
+                                            <label for="email_address" class="col-md-4 col-form-label text-md-right font-weight-bolder">Name of Authorized Person</label>
+                                            <div class="col-md-6">
+                                                <label for="email_address">@Model.NameOfApplicant</label>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group row">
+                                            <label for="email_address" class="col-md-4 col-form-label text-md-right font-weight-bolder">Remarks</label>
+                                            <div class="col-md-6">
+                                                @Html.TextAreaFor(x => x.Remarks, new { @class = "form-control", @maxlength = 1000, style = "width: 100%;height: 100px;" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-sm-6 offset-sm-6">
+                                <input type="button" value="Approve" id="btnSubmit" class="btn  btn-primary" onclick="onMakePayment('Approve');" style="margin-right: 10px; width: 200px;" />
+                                <input type="button" value="Reject" id="btnSubmit" class="btn  btn-primary" onclick="onMakePayment('Reject');" style="margin-right: 10px; width: 200px;" />
+                            </div>
+                        }
+                        //STATUS=6 WHEN MRD ISSUANCE OF LOI HOLDER APPROVE
+                        @if (Model.Status == 6)
+                        {
+                            <div class="content-body">
+                                <div class="col-sm-12">
+                                    <div class="form-group row">
+                                        <label for="Submission_of_Clearances" class="col-md-8 col-form-label text-md-right " style="color: #089c4c;font-size: 1.3rem;font-weight:bold">Approved LOI Holder Information</label>
+                                    </div>
+                                </div>
+                                <div class="cotainer">
+                                    <div class="row justify-content-center">
+                                        <div class="col-md-8">
+                                            <div class="form-group row">
+                                                <label for="email_address" class="col-md-4 col-form-label text-md-right font-weight-bolder">Date of LOI *</label>
+                                                <div class="col-md-6">
+                                                    @Html.TextBoxFor(x => x.DateOfLOI, "{0:yyyy-MM-dd}", new { @class = "form-control datetime pointer", @style = "width:100%;", onkeydown = "return false;" })
+
+                                                    <div class="input-group-prepend">
+
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-group row">
+                                                <label for="email_address" class="col-md-4 col-form-label text-md-right font-weight-bolder">Firm Type</label>
+                                                <div class="col-md-8">
+                                                    <label for="email_address">@Model.CategoryOfLicensee</label>
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group row">
+                                                <label for="email_address" class="col-md-4 col-form-label text-md-right font-weight-bolder">Comapny</label>
+                                                <div class="col-md-6">
+                                                    <label for="email_address">@Model.CompanyName</label>
+                                                </div>
+                                            </div>
+                                            <div class="form-group row">
+                                                <label for="email_address" class="col-md-4 col-form-label text-md-right font-weight-bolder">Name of Authorized Person</label>
+                                                <div class="col-md-6">
+                                                    <label for="email_address">@Model.NameOfApplicant</label>
+                                                </div>
+                                            </div>
+                                            <div class="form-group row">
+                                                <label for="email_address" class="col-md-4 col-form-label text-md-right font-weight-bolder">Upload LOI Letter *</label>
+                                                <div class="col-md-6">
+                                                    <input type="file" class="custom-file-input" id="filesupport" name="@Html.NameFor(Model => Model.MLA)">
+                                                    <label class="custom-file-label" for="customFile">Choose Files</label>
+                                                    <span class="text-danger font-smaller">Only jpg, jpeg, png, pdf, tif file types are allowed.</span>
+                                                </div>
+
+                                            </div>
+
+                                            <div class="form-group row">
+                                                <label for="email_address" class="col-md-4 col-form-label text-md-right font-weight-bolder">Remarks</label>
+                                                <div class="col-md-6">
+                                                    @Html.TextAreaFor(x => x.Remarks, new { @class = "kform-control", @maxlength = 1000, style = "width: 100%;height: 100px;" })
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <input type="button" value="Submit" onclick="return onMakePayment('Approve');" id="btnSubmit" class="btn  btn-primary" style="margin-right: 10px; width: 200px;" />
+
+                            </div>
+
+                        }
+                        //STATUS =10 MEANS SUBMISSION OF CLEARANCE BY LESSSEE
+                        @if (Model.Status == 10)
+                        {
+
+                            <div class="content-body">
+                                <h1 class="text-center"> Forwarding of Successful Bidder Order</h1>
+                                <div class="cotainer">
+                                    <div class="row justify-content-center">
+                                        <div class="col-md-8">
+
+                                            <div class="form-group row">
+                                                <label for="email_address" class="col-md-4 col-form-label text-md-right font-weight-bolder">Firm Type</label>
+                                                <div class="col-md-8">
+                                                    <label for="email_address">@Model.CategoryOfLicensee</label>
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group row">
+                                                <label for="email_address" class="col-md-4 col-form-label text-md-right font-weight-bolder">Comapny</label>
+                                                <div class="col-md-6">
+                                                    <label for="email_address">@Model.CompanyName</label>
+                                                </div>
+                                            </div>
+                                            <div class="form-group row">
+                                                <label for="email_address" class="col-md-4 col-form-label text-md-right font-weight-bolder">Name of Authorized Person</label>
+                                                <div class="col-md-6">
+                                                    <label for="email_address">@Model.NameOfApplicant</label>
+                                                </div>
+                                            </div>
+
+
+                                            <div class="form-group row">
+                                                <label for="email_address" class="col-md-4 col-form-label text-md-right font-weight-bolder">Remarks</label>
+                                                <div class="col-md-6">
+                                                    @Html.TextAreaFor(x => x.Remarks, new { @class = "form-control", @maxlength = 1000, style = "width: 100%;height: 100px;" })
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div style="color: black; font-weight: 600; font-size: medium">
+                                            Note :
+                                            <ol type="1">
+                                                <li>Successful Bidder Order will be issued 10 days after the submission of all necessary clearances.</li>
+                                                <li>Execution of MDPA will be done 10 days after the Issuance of Successful Bidder Order.</li>
+                                                <li>Signing of Lease Deed will be done 30 days after the Payment of 3rd instalment (80% of Upfront Payment).</li>
+                                            </ol>
+                                        </div>
+                                        <div style="color: red; font-weight: 900; font-size: small">
+                                            Note : Issuance of order by State Government acknowledging Preferred Bidder as the Successful Bidder subject to compliance with all the terms and conditions of eligibilit.
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                            </div>
+                            <div class="col-sm-6 offset-sm-6">
+                                <input type="button" value="Submit" id="btnSubmit" class="btn  btn-primary" onclick="onMakePayment();" style="margin-right: 10px; width: 200px;" />
+
+                            </div>
+                        }
+                        //STATUS=101 WHEN DGM SUCCESSFULLY BIDDER ORDER APPROVED
+                        @if (Model.Status == 101)
+                        {
+
+                            <h1 class="text-center"> Approval of Successful Bidder Order</h1>
+                            <div class="cotainer">
+                                <div class="row justify-content-center">
+                                    <div class="col-md-8">
+
+                                        <div class="form-group row">
+                                            <label for="email_address" class="col-md-4 col-form-label text-md-right font-weight-bolder">Firm Type</label>
+                                            <div class="col-md-8">
+                                                <label for="email_address">@Model.CategoryOfLicensee</label>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group row">
+                                            <label for="email_address" class="col-md-4 col-form-label text-md-right font-weight-bolder">Comapny</label>
+                                            <div class="col-md-6">
+                                                <label for="email_address">@Model.CompanyName</label>
+                                            </div>
+                                        </div>
+                                        <div class="form-group row">
+                                            <label for="email_address" class="col-md-4 col-form-label text-md-right font-weight-bolder">Name of Authorized Person</label>
+                                            <div class="col-md-6">
+                                                <label for="email_address">@Model.NameOfApplicant</label>
+                                            </div>
+                                        </div>
+
+
+                                        <div class="form-group row">
+                                            <label for="email_address" class="col-md-4 col-form-label text-md-right font-weight-bolder">Remarks</label>
+                                            <div class="col-md-6">
+                                                @Html.TextAreaFor(x => x.Remarks, new { @class = "form-control", @maxlength = 1000, style = "width: 100%;height: 100px;" })
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div style="color: black; font-weight: 600; font-size: medium">
+                                        Note :
+                                        <ol type="1">
+                                            <li>Successful Bidder Order will be issued 10 days after the submission of all necessary clearances.</li>
+                                            <li>Execution of MDPA will be done 10 days after the Issuance of Successful Bidder Order.</li>
+                                            <li>Signing of Lease Deed will be done 30 days after the Payment of 3rd instalment (80% of Upfront Payment).</li>
+                                        </ol>
+                                    </div>
+                                    <div style="color: red; font-weight: 900; font-size: small">
+                                        Note : Issuance of order by State Government acknowledging Preferred Bidder as the Successful Bidder subject to compliance with all the terms and conditions of eligibilit.
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6 offset-sm-6">
+                                <input type="button" value="Approve" onclick="return onMakePayment('Approve');" id="btnSubmit" class="btn  btn-primary" style="margin-right: 10px; width: 200px;" />
+                                <input type="button" value="Reject" onclick="return onMakePayment('Reject');" id="btnSubmit" class="btn  btn-primary" style="margin-right: 10px; width: 200px;" />
+
+                            </div>
+                        }
+                        //STATUS=102 WHEN MRD APPROVED SUCCESSFULLY BIDDER ORDER
+                        @if (Model.Status == 102)
+                        {
+
+                            <div class="content-body">
+                                <h1 class="text-center"> Issuance of Successful Bidder Order</h1>
+                                <div class="cotainer">
+                                    <div class="row justify-content-center">
+                                        <div class="col-md-8">
+
+                                            <div class="form-group row">
+                                                <label for="email_address" class="col-md-4 col-form-label text-md-right font-weight-bolder">Firm Type</label>
+                                                <div class="col-md-8">
+                                                    <label for="email_address">@Model.CategoryOfLicensee</label>
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group row">
+                                                <label for="email_address" class="col-md-4 col-form-label text-md-right font-weight-bolder">Comapny</label>
+                                                <div class="col-md-6">
+                                                    <label for="email_address">@Model.CompanyName</label>
+                                                </div>
+                                            </div>
+                                            <div class="form-group row">
+                                                <label for="email_address" class="col-md-4 col-form-label text-md-right font-weight-bolder">Name of Authorized Person</label>
+                                                <div class="col-md-6">
+                                                    <label for="email_address">@Model.NameOfApplicant</label>
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group row">
+                                                <label class="col-sm-4 col-form-label text-md-right font-weight-bolder">Issuance Date *</label>
+                                                <div class="col-sm-6">
+                                                    @Html.TextBoxFor(x => x.WorkingPermissionUploadedOn, new { @class = "form-control datetime pointer", DataFormatString = "{0:yyyy-MM-dd}", onkeydown = "return false;" })
+
+
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group row">
+                                                <label for="email_address" class="col-md-4 col-form-label text-md-right font-weight-bolder">Order Letter *</label>
+                                                <div class="col-md-6">
+                                                    <div class="custom-file">
+                                                        <input type="file" class="custom-file-input" id="filesupport" name="@Html.NameFor(Model => Model.WorkingPermissionFile)">
+                                                        <label class="custom-file-label" for="customFile">Choose Files</label>
+                                                        <label><span class="text-danger text-sm">Only jpg, jpeg, png, pdf, tif file types are allowed.</span></label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-group row">
+                                                <label for="email_address" class="col-md-4 col-form-label text-md-right font-weight-bolder">Remarks</label>
+                                                <div class="col-md-6">
+                                                    @Html.TextAreaFor(x => x.Remarks, new { @class = "form-control", @maxlength = 1000, style = "width: 100%;height: 100px;" })
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div style="color: black; font-weight: 600; font-size: medium">
+                                            Note :
+                                            <ol type="1">
+                                                <li>Successful Bidder Order will be issued 10 days after the submission of all necessary clearances.</li>
+                                                <li>Execution of MDPA will be done 10 days after the Issuance of Successful Bidder Order.</li>
+                                                <li>Signing of Lease Deed will be done 30 days after the Payment of 3rd instalment (80% of Upfront Payment).</li>
+                                            </ol>
+                                        </div>
+                                        <div style="color: red; font-weight: 900; font-size: small">
+                                            Note : Issuance of order by State Government acknowledging Preferred Bidder as the Successful Bidder subject to compliance with all the terms and conditions of eligibilit.
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6 offset-sm-6">
+                                    <input type="button" value="Submit" id="btnSubmit" class="btn  btn-primary" onclick="onMakePayment();" style="margin-right: 10px; width: 200px;" />
+
+                                </div>
+
+                            </div>
+                        }
+                    }
+
+
+</div>
+
+
+        </div>
+    </div>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.22/pdfmake.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/0.4.1/html2canvas.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('.datetime').datetimepicker({
+                format: 'LT',
+                format: "DD/MM/YYYY",
+
+            }).keydown(false);
+
+
+
+        });
+        $('input[name="WorkingPermissionFile"]').bind('change', function () {
+            debugger;
+            filesize = this.files[0].size;
+            var filess = this.files;
+            var label = $(this).siblings('.custom-file-label');
+            var val = $(this).val().toLowerCase(),
+                regex = new RegExp("(.*?)\.(pdf|jpeg|jpg|png|tif)$");
+            var extension = val.substr((val.lastIndexOf('.') + 1));
+            if (!(regex.test(val))) {
+                debugger;
+                swal("", " " + extension + "  type is not an allowed file type. You can use only jpg, jpeg, png, pdf, tif types of file(s). ", "warning");
+                this.value = '';
+                label.html('');
+                $("#MLA").focus();
+                return false;
+            }
+            else {
+                label.html(filess.length + ' Files Selected');
+            }
+            return false;
+
+        });
+        var WorkingPermissionCopy_FileSize = 0;
+        $('input[name="WorkingPermissionFile"]').bind('change', function () { WorkingPermissionCopy_FileSize = this.files[0].size; return false; });
+
+
+        $('input[name="MLA"]').bind('change', function () {
+            debugger;
+            filesize = this.files[0].size;
+            var filess = this.files;
+            var label = $(this).siblings('.custom-file-label');
+            var val = $(this).val().toLowerCase(),
+                regex = new RegExp("(.*?)\.(pdf|jpeg|jpg|png|tif)$");
+            var extension = val.substr((val.lastIndexOf('.') + 1));
+            if (!(regex.test(val))) {
+                debugger;
+                swal("", " " + extension + "  type is not an allowed file type. You can use only jpg, jpeg, png, pdf, tif types of file(s). ", "warning");
+                this.value = '';
+                label.html('');
+                $("#MLA").focus();
+                return false;
+            }
+            else {
+                label.html(filess.length + ' Files Selected');
+            }
+            return false;
+
+        });
+        var MLApplicationSize = 0;
+        $('input[name="MLA"]').bind('change', function () { MLApplicationSize = this.files[0].size; return false; });
+        function onMakePayment(chk) {
+            debugger;
+            $("#PaymentMode").val(1); // set online payment mode
+            var bank = $("input:radio[name='BankSelection']:checked").val();
+            var mode = $("input:radio[name='ModeSelection']:checked").val();
+            var NetBanking = $("input:radio[name='NetBankingSelection']:checked").val();
+            var Result = false;
+            //if (confirm('Are you sure you want to submit?')) {
+
+            if ($('#Status').val() == "3") {
+
+                //alert($('#Status').val());
+                //alert($('#PaymentMode').val());
+
+                $('#SpMode').val('FirstInstallment');
+                // ApplyDsc();
+
+                if (bank == "HDFC") {
+                    $("#PaymentBank").val("HDFC");
+                    if (confirm('Are you sure to make payment ?')) {
+                        $("#__AntiForgeryForm").submit();
+                    }
+                }
+                else if (bank == "ICICI") {
+                    $("#PaymentBank").val("ICICI");
+                    if (mode == "NetBanking") {
+                        $("#PMode").val("NetBanking");
+
+                        if (NetBanking == "Corporate") {
+                            $("#NetBanking_mode").val("Corporate");
+                            if (confirm('Are you sure to make payment ?')) {
+                                $("#__AntiForgeryForm").submit();
+                            }
+                        }
+                        else if (NetBanking == "Retail") {
+                            $("#NetBanking_mode").val("Retail");
+                            if (confirm('Are you sure to make payment ?')) {
+                                $("#__AntiForgeryForm").submit();
+                            }
+                        }
+                    }
+                    else {
+                        $("#PMode").val("NEFT/RTGS");
+                        if (confirm('Are you sure to make payment ?')) {
+                            $("#__AntiForgeryForm").submit();
+                        }
+                    }
+                }
+                else if (bank == "SBI") {
+
+                    $("#PaymentBank").val("SBI");
+                    if (confirm('Are you sure to make payment ?')) {
+                        $("#__AntiForgeryForm").submit();
+                    }
+                }
+                else {
+
+                    alert("Please select bank to make payment !");
+                    return false;
+
+                }
+            }
+            else if ($('#Status').val() == "10") {
+
+                if ($("#Remarks").val() == '') {
+                    alert("Please enter remarks.");
+                    $("#Remarks").focus();
+                    return
+                }
+
+                $('#SpMode').val('Issuance Forwarding');
+                ApplyDsc();
+            }
+            else if ($('#Status').val() == "4" || $('#Status').val() == "7") {
+                if ($("#Remarks").val() == '') {
+                    alert("Please enter remarks.");
+                    $("#Remarks").focus();
+                    return
+                }
+                $('#SpMode').val('DGMForward');
+                ApplyDsc();
+
+                //$('#SpMode').val('DGMForward')
+                //$("#__AntiForgeryForm").submit();
+
+            }
+            else if ($('#Status').val() == "101") {
+
+                if ($("#Remarks").val() == '') {
+                    alert("Please enter remarks.");
+                    $("#Remarks").focus();
+                    return
+                }
+                else if (chk == "Approve") {
+
+                    $('#SpMode').val('Issuance Approval Approve');
+                    ApplyDsc()
+                    //$("#__AntiForgeryForm").submit();
+                }
+                else if (chk == "Reject") {
+                    $('#SpMode').val('Issuance Approval Reject');
+                    ApplyDsc();
+                    //$("#__AntiForgeryForm").submit();
+                }
+
+            }
+            else if ($('#Status').val() == "5") {
+                if ($("#Remarks").val() == '') {
+                    alert("Please enter remarks.");
+                    $("#Remarks").focus();
+                    return
+                }
+                else if (chk == "Approve") {
+
+                    $('#SpMode').val('GovApprove');
+                    ApplyDsc()
+                    //$("#__AntiForgeryForm").submit();
+                }
+                else if (chk == "Reject") {
+                    $('#SpMode').val('GovReject');
+                    ApplyDsc();
+                    //$("#__AntiForgeryForm").submit();
+                }
+
+            }
+                //Approved LOI Holder information
+            else if ($('#Status').val() == "6") {
+                if ($('#DateOfLOI').val() == "") {
+                    alert("Please enter Date of LOI.");
+                    $('input[name="DateOfLOI"]').focus();
+                }
+                else if (MLApplicationSize == 0) {
+                    alert("Please upload LOI Letter.")
+                    $('input[name="MLApplication"]').focus();
+                }
+                else if ($("#Remarks").val() == '') {
+                    alert("Please enter remarks.");
+                    $("#Remarks").focus();
+                    return
+                }
+                else {
+                    $('#SpMode').val('Forward');
+                    ApplyDsc();
+
+                    //$('#SpMode').val('Forward');
+                    //$("#__AntiForgeryForm").submit();
+                }
+
+            }
+//ISSUANCE OF SUCCESSFUL BIDDER ORDER BY DGM
+            else if ($('#Status').val() == "102") {
+
+                if ($('#WorkingPermissionUploadedOn').val() == "") {
+                    alert("Please Enter Issuance Date!");
+                    $('input[name="WorkingPermissionUploadedOn"]').focus();
+                    return false;
+                }
+                else if (WorkingPermissionCopy_FileSize == 0) {
+                    alert("Please Upload Order Letter!");
+                    $('input[name="WorkingPermissionCopy"]').focus();
+                    return false;
+                }
+                else if ($("#Remarks").val() == '') {
+                    alert("Please enter remarks.");
+                    $("#Remarks").focus();
+                    return false
+                }
+                else {
+                    $('#SpMode').val('Issuance');
+                    ApplyDsc();
+                    //$("#__AntiForgeryForm").submit();
+                }
+            }
+        }
+
+
+        
+        function ApplyDsc() {
+            if (confirm("Digital Signature is require for Submitting the Online Application. Are you sure to proceed?")) {
+
+                var Postdata = 'action=signdoc' + "\n" + 'datatosign=Digital Signature Required' + "\n" + 'signaction=sign' + "\n" + 'filepath=' + "\n" + 'panNumberParam=' + "\n" + 'expirycheck=false' + "\n" + 'issuername=' + "\n" + 'certclass=1|2|3' + "\n" + 'certtype=ALL';
+                connection.send(Postdata);
+
+                connection.onerror = function (error) {
+                    alert('Please check the server connection: ' + error);
+                    alert(error);
+                    return false;
+                };
+
+                connection.onmessage = function (e) { // when DSC is success then following function executed.
+                    if (e.data.indexOf("subProtocol") == -1) {
+                        //debugger;
+                        //alert(e.data);
+                        $("#DSCResponse").val(e.data).change();
+                        $.ajax(
+                            {
+
+                                url: '@Url.Action("CheckVerifyResponse", "OnlineLease", new { Area = "UserInformationsystem" })',
+                                type: "POST",
+                                data: { contentType: "pkcs7", signDataBase64Encoded: e.data, responseType: "plain" },
+                                success: function (msg) {
+                                    if (msg == "SUCCESS") {
+                                        //  debugger;
+                                        $("#__AntiForgeryForm").submit();
+                                        return true;
+
+                                    }
+
+                                }
+                            });
+                    }
+                    else {
+                        alert(e.data);
+                        return false;
+                    }
+
+                };
+
+                //$("#__AntiForgeryForm").submit();
+                //return true;
+            }
+            else {
+                return false;
+
+            }
+        }
+            try {
+                var connection = new WebSocket('wss://localhost.emudhra.com:8080');
+                connection.onopen = function () {
+                    console.log('Connection Opened');
+                };
+                connection.onerror = function (error) {
+                };
+                connection.onmessage = function (e) {
+                    if (e.data.indexOf("subProtocol") == -1) {
+                    }
+                };
+            }
+            catch (e) {
+                swal("", "No DSC Connection Found", "warning");
+            }
+        
+        $(document).ready(function () {
+            $("#chkICICI").click(function () {
+                $("#divPaymentOption").show();
+            })
+            $("#chkHDFC").click(function () {
+                $("#divPaymentOption").hide();
+            })
+            $("#chkSBI").click(function () {
+                $("#divPaymentOption").hide();
+            })
+
+
+            $("#chkICICINetBanking").click(function () {
+                $("#divNetBankingPayment").show();
+            })
+
+            $("#chkNEFT").click(function () {
+                $("#divNetBankingPayment").hide();
+            })
+        });
+
+    </script>
+</section>

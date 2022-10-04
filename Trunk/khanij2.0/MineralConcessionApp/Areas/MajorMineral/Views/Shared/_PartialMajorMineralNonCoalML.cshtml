@@ -1,0 +1,167 @@
+﻿@model MineralConcessionEF.LeaseApplicationModel;
+<link rel="stylesheet" href="~/css/bootstrap-datetimepicker.min.css" type="text/css" />
+<script src="~/js/moment.min.js"></script>
+<script src="~/js/bootstrap-datetimepicker.min.js"></script>
+<div class="row">
+    <div class="col-sm-6">
+        <div class="form-group row">
+            <label for="inputName" class="col-sm-4 col-form-label font-weight-bolder">Reserve(Metric Tonne)*</label>
+            <div class="col-sm-3">
+                @Html.TextBoxFor(x => x.Reserve, new { @class = "form-control", @style = "width:100%;" })
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6">
+        <div class="form-group row">
+            <label for="inputName" class="col-sm-4 col-form-label font-weight-bolder">ASP (Average Sale Price)</label>
+            <div class="col-sm-7">
+                @Html.TextBoxFor(x => x.PerformanceSecurity, new { @class = "form-control", @style = "width:100%;", @onBlur = "CalculateVER()" })
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6">
+        <div class="form-group row">
+            <label for="inputName" class="col-sm-4 col-form-label font-weight-bolder">Value of Estimated Reserve (VER) (In Rs.)*</label>
+            <div class="col-sm-7">
+                @Html.TextBoxFor(x => x.EVR, new { @class = "form-control", @style = "width:100%;", @onBlur = "CalculateEstimatedValueOfResouce()" })
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6">
+        <div class="form-group row">
+            <label for="inputName" class="col-sm-4 col-form-label font-weight-bolder">Final Price Offer (In %)*</label>
+            <div class="col-sm-7">
+                @Html.TextBoxFor(x => x.FinalPriceOffer, new { @class = "form-control", @style = "width:100%;" })
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6">
+        <div class="form-group row">
+            <label for="inputName" class="col-sm-4 col-form-label font-weight-bolder">Total Upfront Payment (0.5% of VER)*</label>
+            <div class="col-sm-7">
+                @Html.TextBoxFor(x => x.TotalUpfrontPayment, new { @class = "form-control", @style = "width:100%;", @onBlur = "CalculateTotalUpfrontPayment()" })
+            </div>
+        </div>
+    </div>
+</div>
+<div class="col-sm-6">
+    <div class="form-group row">
+        <label for="Submission_of_Clearances" style="color: #089c4c;font-size: 1rem;font-weight:bold">Payment Schedule</label>
+    </div>
+</div>
+<div class="row">
+    <div class="col-sm-12">
+        <div class="table-responsive" id="viewtable">
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <td>
+                            <h6>1. Upfront Payment</h6>
+                        </td>
+                        <td>
+                            <h6>Amount</h6>
+                        </td>
+                        <td>
+                            <h6>Due Date</h6>
+                        </td>
+
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            <label>1st Installment [10% of Upfront Payment]</label>
+                        </td>
+                        <td>
+                            @Html.TextBoxFor(x => x.First_Installment_Amount, new { @class = "form-control", @maxlength = 10, @style = "width:100%;overflow:both;resize:none;" })
+
+                        </td>
+                        <td>
+                            @Html.TextBoxFor(x => x.First_Installment_ScheduleDate, new { @class = "form-control datetime pointer", DataFormatString = "{0:yyyy-MM-dd}", @style = "width:100%;", onkeydown = "return false;" })
+
+
+                        </td>
+
+
+                    </tr>
+                    <tr>
+                        <td>
+                            <label>2nd Installment [10% of Upfront Payment]</label>
+                        </td>
+                        <td>
+                            @Html.TextBoxFor(x => x.Second_Installment_Amount, new { @class = "form-control", @maxlength = 10, @style = "width:100%;overflow:both;resize:none;" })
+
+                        </td>
+                        <td>
+                            @Html.TextBoxFor(x => x.Second_Installment_ScheduleDate, new { @class = "form-control datetime pointer", DataFormatString = "{0:yyyy-MM-dd}", @style = "width:100%;", onkeydown = "return false;" })
+
+
+                        </td>
+
+
+                    </tr>
+                    <tr>
+                        <td>
+                            <label>3rd Installment [80% of Upfront Payment]</label>
+                        </td>
+                        <td>
+                            @Html.TextBoxFor(x => x.Third_Installment_Amount, new { @class = "form-control", @maxlength = 10, @style = "width:100%;overflow:both;resize:none;" })
+
+                        </td>
+                        <td>
+                            @Html.TextBoxFor(x => x.Third_Installment_ScheduleDate, new { @class = "form-control datetime pointer", DataFormatString = "{0:yyyy-MM-dd}", @style = "width:100%;", onkeydown = "return false;" })
+
+
+                        </td>
+
+
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+
+    </div>
+    <div class="col-sm-12">
+        <div class="table-responsive" id="viewtable">
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <td>
+                            <h6>2. Performance Security</h6>
+                        </td>
+                        <td>
+                            <h6>Amount</h6>
+                        </td>
+                        <td>
+                            <h6>Due Date</h6>
+                        </td>
+
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            <label>Performance Security Amount (0.5% of VER)</label>
+                        </td>
+                        <td>
+                            @Html.TextBoxFor(x => x.PerformanceSecurity_Installment_Amount, new { @class = "form-control", @maxlength = 10, @style = "width:100%;overflow:both;resize:none;" })
+
+                        </td>
+                        <td>
+                            @Html.TextBoxFor(x => x.PerformanceSecurity_Installment_ScheduleDate, new { @class = "form-control datetime pointer", DataFormatString = "{0:yyyy-MM-dd}", @style = "width:100%;", onkeydown = "return false;" })
+
+
+                        </td>
+
+
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+
+
+    </div>
+</div>
+

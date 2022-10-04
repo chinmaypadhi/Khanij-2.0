@@ -1,0 +1,296 @@
+﻿@*// *********************************************************************************************************
+    //  View Name                : Create
+    //  Desciption               : To Save and Update, Forward to DD, Delete Lesee Assessment Report Details
+    //  Created By               : Lingaraj Dalai
+    //  Created On               : 29 July 2021
+    // ********************************************************************************************************
+*@
+@model MasterEF.LesseeAssessmentReportViewModel
+@using MasterEF;
+@using MasterApp.Web;
+@using Microsoft.AspNetCore.Mvc;
+@using  Microsoft.AspNetCore.Http;
+@inject IHttpContextAccessor HttpContextAccessor
+@{
+    ViewData["Title"] = "Create";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+    UserLoginSession profile = HttpContextAccessor.HttpContext.Session.Get<UserLoginSession>(KeyHelper.UserKey);
+}
+@if (TempData["Message"] != null)
+{
+<script>
+        swal("",'@TempData["Message"]',"success");
+</script>
+}
+<script>
+    indicateMe = "yes"
+    backMe = "yes"
+    $(document).ready(function () {
+        debugger;
+        loadNavigation('Create', 'glUIS', 'pllesseprof', 'tl', 'Lessee Profile', 'Assessment Report', ' ');
+        $('.datepicker').datetimepicker({
+            format: 'LT',
+            format: 'DD-MMM-YYYY',
+            daysOfWeekDisabled: [],
+            widgetPositioning: {
+                horizontal: 'auto',
+                vertical: 'bottom'
+            }
+        }).keydown(false);
+        if ($("#hdnAssessmentdate").val() != "") {
+            $("#inputRevenueDate").val($("#hdnAssessmentdate").val());
+        }
+        if ($("#hdnHalfYearAssesmentDate").val() != "") {
+            $("#inputHalfYearlyDate").val($("#hdnHalfYearAssesmentDate").val());
+        }
+        //For Disabling all DOM if  is  Forwarded to DD/DMO and Approval is Pending
+        if (@Model.Status != null && @Model.Status != "") {
+            if (@Model.Status == 1) {
+                $('.form-control').css("pointer-events", "none");
+                $('.btnsave').hide();
+            }
+        }
+        else {
+            $('.btnsave').show();
+        }
+    /*Show hide controls for Minor/Major-Coal,NonCoal*/
+        var mineraltypename = '@profile.MineralTypeName';
+        if (mineraltypename == "Minor Mineral") {
+            $(".divRevRecovery").hide();/*Field*/
+        }
+        $('input[name="RecoveryHttpBase"]').bind('change', function () {
+            $("input[type='Submit']").attr('disabled', false);
+            $("input[name='cmd']").attr('disabled', false);
+            filesize = this.files[0].size;
+            var val = $(this).val().toLowerCase(),
+                regex = new RegExp("(.*?)\.(jpeg|jpg|pdf)$");
+            if (!(regex.test(val))) {
+                swal("", ".docx, tif,xls  type is not an allowed file type. You can use only pdf, jpg, jpeg types of file(s). ", "warning");
+                this.value = '';
+                $("input[type='Submit']").attr('disabled', true);
+                $("input[name='cmd']").attr('disabled', true);
+                return false;
+            }
+            else if (filesize > 2048000) {
+                swal("", "File size must be 2 MB !", "warning");
+                $("input[type='Submit']").attr('disabled', true);
+                $("input[name='cmd']").attr('disabled', true);
+                return false;
+            }
+            else {
+                var fileName = $(this).val().split("\\").pop();
+                $(this).next('.custom-file-label').html(fileName);
+            }
+            return false;
+        });
+        $('input[name="HalfYearHttpBase"]').bind('change', function () {
+            $("input[type='Submit']").attr('disabled', false);
+            $("input[name='cmd']").attr('disabled', false);
+            filesize = this.files[0].size;
+            var val = $(this).val().toLowerCase(),
+                regex = new RegExp("(.*?)\.(jpeg|jpg|pdf)$");
+            if (!(regex.test(val))) {
+                swal("", ".docx, tif,xls  type is not an allowed file type. You can use only pdf, jpg, jpeg types of file(s). ", "warning");
+                this.value = '';
+                $("input[type='Submit']").attr('disabled', true);
+                $("input[name='cmd']").attr('disabled', true);
+                return false;
+            }
+            else if (filesize > 2048000) {
+                swal("", "File size must be 2 MB !", "warning");
+                $("input[type='Submit']").attr('disabled', true);
+                $("input[name='cmd']").attr('disabled', true);
+                return false;
+            }
+            else {
+                var fileName = $(this).val().split("\\").pop();
+                $(this).next('.custom-file-label').html(fileName);
+            }
+            return false;
+        });
+    });
+</script>
+<script>
+    function Validate() {
+        var mineraltypename = '@profile.MineralTypeName';
+        var Iss = false;
+        if (mineraltypename !="Minor Mineral" && !blankFieldValidation("inputRevenueDate", "Revenue Recovery Date")) {
+            return false;
+        }
+        else if (mineraltypename != "Minor Mineral" && $("#hdnRevenueFile").val() == "") {
+            if (!FileUploadValidation("lblRecoveryReportFileName", "Revenue Recovery Copy")) {
+                return false;
+            }
+        }
+        else if (!blankFieldValidation("inputHalfYearlyDate", "Half Yearly Date")) {
+            return false;
+        }
+        else if ($("#hdnHalfYearFile").val() == "") {
+            if (!FileUploadValidation("lblHalfyearassesmentFileName", "Half Yearly Copy")) {
+                return false;
+            }
+        }
+        Iss = true;
+        return Iss;
+    }
+    function OnForwarding(btnAction) {
+        var Type;
+        if (btnAction == 'Forward To DD') {
+            Type = 'forward';
+        }
+        if (confirm("Before " + Type + " you need to apply your Digital Signature. Are you confirmed to " + Type + " Profile??")) {
+                var Postdata = 'action=signdoc' + "\n" + 'datatosign=Digital Signature Required' + "\n" + 'signaction=sign' + "\n" + 'filepath=' + "\n" + 'panNumberParam=' + "\n" + 'expirycheck=false' + "\n" + 'issuername=' + "\n" + 'certclass=1|2|3' + "\n" + 'certtype=ALL';
+                connection.send(Postdata);
+                connection.onerror = function (error) {
+                    swal("",'Please check the server connection: ' + error+'',"warning");
+                    swal("",error,"warning");
+                };
+                connection.onmessage = function (e) { // when DSC is success then following function executed.
+                    if (e.data.indexOf("subProtocol") == -1) {
+                        //alert(e.data);
+                        $("#DSCResponse").val(e.data).change();
+                        $.ajax(
+                            {
+                               url: '@Url.Action("CheckVerifyResponse", "LesseeDetails", new { Area = "LesseeProfile" })',
+                                type: "POST",
+                                data: { contentType: "pkcs7", signDataBase64Encoded: e.data, responseType: "plain" },
+                                success: function (msg) {
+                                    if (msg == "SUCCESS") {
+                                        if (btnAction == "Forward To DD") {
+                                            $("#SubResion").val("Forward To DD");
+                                        }
+                                        $("#form1").submit();
+                                    }
+                                }
+                            });
+                    }
+                    else {
+                        alert(e.data);
+                    }
+                };
+            }
+            else {
+                return false;
+            }
+    }
+    try {
+        var connection = new WebSocket('wss://localhost.emudhra.com:8080');
+        connection.onopen = function () {
+            console.log('Connection Opened');
+        };
+        connection.onerror = function (error) {
+        };
+        connection.onmessage = function (e) {
+            if (e.data.indexOf("subProtocol") == -1) {
+            }
+        };
+    }
+    catch (e) {
+        swal("", "No DSC Connection Found", "warning");
+    }
+</script>
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        <!-- MAIN CONTENT AREA STARTS -->
+        @Html.Partial("_CMSnavigation")
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="javascript:void(0);">
+                                Add
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="~/LesseeProfile/LesseeAssessmentReportDetails/ViewList">
+                                View
+                            </a>
+                        </li>
+                    </ul>
+                    @Html.Partial("_CMSutil")
+                </div>
+                <section class="box form-container">
+                    <div class="content-body">
+                        @using (Html.BeginForm("Create", "LesseeAssessmentReportDetails", FormMethod.Post, new { AUTOCOMPLETE = "Off", id = "form1", enctype = "multipart/form-data" }))
+                        {
+                        @(Html.HiddenFor(model => model.SubResion))
+                        @(Html.HiddenFor(model => model.SubApprove))
+                        @(Html.HiddenFor(model => model.SubReject))
+                        @(Html.HiddenFor(model => model.AssessmentID))
+                        @Html.HiddenFor(x => x.CREATED_BY)
+                        @Html.HiddenFor(model => model.Status, new { id = "hdnStatus" })
+                        @Html.AntiForgeryToken()
+                        <h5 class="text-brown font-weight-bold mt-0 mb-4">Assessment Report Details</h5>
+                        <div class="row">
+                            <div class="col-lg-3 col-md-6 col-sm-12 form-group divRevRecovery">
+                                <label class="col-form-label pt-0 font-weight-bolder">Date of Revenue Recovery Assessment <span class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control datepicker" id="inputRevenueDate" name="Assessmentdate">
+                                    <div class="input-group-prepend">
+                                        <label class="input-group-text" for="inputRevenueDate"><i class="icon-calendar-alt-solid"></i></label>
+                                    </div>
+                                    @Html.HiddenFor(x => x.Assessmentdate, new { @id = "hdnAssessmentdate" })
+                                    @Html.ValidationMessageFor(m => m.Assessmentdate, "", new { @class = "text-danger" })
+                                </div>
+                            </div>
+                            <div class="col-lg-5 col-md-6 col-sm-12 form-group divRevRecovery">
+                                <label for="inputLoginId" class="col-form-label font-weight-bolder">Copy of Revenue Recovery Assessment <span class="text-danger">*</span></label>
+                                <div class="custom-file">
+                                    <input type="file" class="custom-file-input" id="RecoveryHttpBase" name="RecoveryHttpBase">
+                                    <label class="custom-file-label" for="customFile">Choose Files</label>
+                                    <small class="text-danger">Files type <strong>(.jpg , .jpeg , .pdf)</strong> with maximum <strong>2MB</strong></small>
+                                </div>
+                                @Html.ValidationMessageFor(m => m.RecoveryHttpBase, "", new { @class = "text-danger" })
+                                @if (Model.RecoveryReportFileName != null && Model.RecoveryReportFileName != "")
+                                    {
+                                <label class="form-control-plaintext" id="lblRecoveryReportFileName">@(Model.RecoveryReportFileName) <a href='~/@Model.RecoveryReportFilePath' title="" class="ml-2" data-original-title="Download Revenue Recovery Copy" target="_blank"><i class="icon-file-pdf-solid h5 text-danger"></i></a></label>
+                                    }
+                                @Html.HiddenFor(m => m.RecoveryReportFileName, new { @id = "hdnRevenueFile" })
+                            </div>
+                            @*<div class="col-lg-6 d-lg-block d-none divRevRecovery"></div>*@
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-3 col-md-6 col-sm-12 form-group">
+                                <label class="col-form-label pt-0 font-weight-bolder">Date of Half Yearly Assessment <span class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control datepicker" id="inputHalfYearlyDate" name="HalfYearAssesmentDate">
+                                    <div class="input-group-prepend">
+                                        <label class="input-group-text" for="inputHalfYearlyDate"><i class="icon-calendar-alt-solid"></i></label>
+                                    </div>
+                                    @Html.HiddenFor(x => x.HalfYearAssesmentDate, new { @id = "hdnHalfYearAssesmentDate" })
+                                    @Html.ValidationMessageFor(m => m.HalfYearAssesmentDate, "", new { @class = "text-danger" })
+                                </div>
+                            </div>
+                            <div class="col-lg-5 col-md-6 col-sm-12 form-group">
+                                <label for="inputLoginId" class="col-form-label font-weight-bolder">Copy of Half Yearly Assessment <span class="text-danger">*</span></label>
+                                <div class="custom-file">
+                                    <input type="file" class="custom-file-input" id="HalfYearHttpBase" name="HalfYearHttpBase">
+                                    <label class="custom-file-label" for="customFile">Choose Files</label>
+                                    <small class="text-danger">Files type <strong>(.jpg , .jpeg , .pdf)</strong> with maximum <strong>2MB</strong></small>
+                                </div>
+                                @Html.ValidationMessageFor(m => m.HalfYearHttpBase, "", new { @class = "text-danger" })
+                                @if (Model.HalfyearassesmentFileName != null && Model.HalfyearassesmentFileName != "")
+                                    {
+                                <label class="form-control-plaintext" id="lblHalfyearassesmentFileName">@(Model.HalfyearassesmentFileName) <a href='~/@Model.HalfyearassesmentFilePath' title="" class="ml-2" data-original-title="Download Half Yearly Copy" target="_blank"><i class="icon-file-pdf-solid h5 text-danger"></i></a></label>
+                                    }
+                                @Html.HiddenFor(m => m.HalfyearassesmentFileName, new { @id = "hdnHalfYearFile" })
+                            </div>
+                        </div>
+                        <div class="row mt-4">
+                            <div class="col-sm-12">
+                                @if (Model.Status != 5)
+                                    {
+                                <input type="submit" id="Submit" value="Save & Update" class="btn btn-success btn-md ml-0 waves-effect waves-light btnsave" onclick="return Validate()">
+                                <input type="submit" value="Delete" class="btn btn-danger btn-md ml-0 waves-effect waves-light btndelete" id="Delete" name="delete" onclick="return confirm('Are you sure to delete?')" style="display:none;" />
+                                <input type="button" title="Forward to DD" value="Forward To DD" name="cmd" class="btn btn-warning text-dark btn-md waves-effect waves-light ml-0 btnsave" onclick="if (Validate()) { return OnForwarding('Forward To DD'); }" />
+                                    }
+                            </div>
+                        </div>
+                        }
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+</section>

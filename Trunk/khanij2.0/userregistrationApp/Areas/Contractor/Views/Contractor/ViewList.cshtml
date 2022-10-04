@@ -1,0 +1,165 @@
+﻿@model IEnumerable<userregistrationEF.cls_TailingDam>
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@{
+    ViewData["Title"] = "ViewList";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+@if (TempData["Message"] != null)
+{
+    <script>
+        var vv = '@TempData["Message"]';
+        if (vv == 1) {
+            swal("", "Royalty approved successfully.", "success");
+        }
+        else if (vv == 3){
+            swal("", "Something Errror occured. Please Try After Sometime!!", "error");
+        }
+    </script>
+}
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        @Html.Partial("_CMSnavigation")
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="javascript:void(0);">
+                                View
+                            </a>
+                        </li>
+                    </ul>
+                    @Html.Partial("_CMSutil")
+                </div>
+                <section class="box form-container">
+                    <div class="content-body">
+                        <div class="row">
+                            <div class="col-lg-12 col-md-12 col-xl-12">
+                                @using (Html.BeginForm("ViewList", "Contractor", FormMethod.Post, new { AUTOCOMPLETE = "Off", id = "form1" }))
+                                {
+                                    <table id="table-exports" class="table table-sm table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th width="30"> Sl#</th>
+                                                <th>OwnerName</th>
+                                                <th>Address</th>
+                                                <th>CurrentStock</th>
+                                                <th>TypeOfSite</th>
+                                                <th>CompanyName</th>
+                                                <th>DistrictName</th>
+                                                <th>TehsilName</th>
+                                                <th>VillageName</th>
+                                                <th>MineralName</th>
+                                                <th>MineralForm</th>
+                                                <th>MineralGradeName</th>
+                                                <th>MineralType</th>
+                                                <th>UnitName</th>
+                                                <th>OrderNo</th>
+                                                <th>RoyaltyPaid</th>
+                                                <th width="100" class="noprint text-center">Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @{
+                                                var count = 0;
+                                                foreach (var b in Model)
+                                                {
+                                                    count++;
+                                                    <tr>
+                                                        <td>@count</td>
+                                                        <td>@b.OwnerName</td>
+                                                        <td>@b.Address</td>
+                                                        <td>@b.CurrentStock</td>
+                                                        <td>@b.TypeOfSite</td>
+                                                        <td>@b.CompanyName</td>
+                                                        <td>@b.DistrictName</td>
+                                                        <td>@b.TehsilName</td>
+                                                        <td>@b.VillageName</td>
+                                                        <td>@b.MineralName</td>
+                                                        <td>@b.MineralForm</td>
+                                                        <td>@b.MineralGradeName</td>
+                                                        <td>@b.MineralType</td>
+                                                        <td>@b.UnitName</td>
+                                                        <td>@b.OrderNo</td>
+                                                        <td>@b.RoyaltyPaid</td>
+                                                        <td class="noprint text-center">
+                                                            <a id="@b.TailingDumpID" onclick="GetTailingDamId(this.id)" class="btn btn-success btn-md ml-0 waves-effect waves-light btnsave" title="Take Action">Take Action</a>
+                                                            <input type="hidden" id="hdnTailingDamId" name="TailingDumpID" />
+                                                        </td>
+                                                    </tr>
+                                                }
+                                            }
+                                    </table>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+    $(document).ready(function () {
+        loadNavigation('ViewList', 'glRoleRes', 'plUser', 'tl', 'TailingDam', 'Approve', ' ');
+    });
+    function GetTailingDamId(par) {
+        $("#hdnTailingDamId").val(par);
+        var Type;
+        Type = 'approve';
+        swal({
+            title: "Before " + Type + " you need to apply your Digital Signature. Are you confirmed to " + Type + " Profile??",
+            icon: "warning",
+            buttons: ["No", "Yes"],
+        })
+            .then((forward) => {
+                if (forward) {
+                    OnForwarding();
+                }
+            });
+    }
+     function OnForwarding() {
+        var Postdata = 'action=signdoc' + "\n" + 'datatosign=Digital Signature Required' + "\n" + 'signaction=sign' + "\n" + 'filepath=' + "\n" + 'panNumberParam=' + "\n" + 'expirycheck=false' + "\n" + 'issuername=' + "\n" + 'certclass=1|2|3' + "\n" + 'certtype=ALL';
+        connection.send(Postdata);
+        connection.onerror = function (error) {
+            swal("", 'Please check the server connection: ' + error + '', "warning");
+        };
+        connection.onmessage = function (e) {
+            if (e.data.indexOf("subProtocol") == -1) {
+                $("#DSCResponse").val(e.data).change();
+                $.ajax(
+                    {
+                        url: '@Url.Action("CheckVerifyResponse", "EndUserProfile", new { Area = "EndUserRegistration" })',
+                        type: "POST",
+                        data: { contentType: "pkcs7", signDataBase64Encoded: e.data, responseType: "plain" },
+                        success: function (msg) {
+                            if (msg == "SUCCESS") {
+                                $("#form1").submit();
+                            }
+                        }
+                    });
+            }
+            else {
+                swal("", e.data, "warning");
+                return false;
+            }
+        };
+    }
+    try {
+        var connection = new WebSocket('wss://localhost.emudhra.com:8080');
+        connection.onopen = function () {
+            console.log('Connection Opened');
+        };
+        connection.onerror = function (error) {
+        };
+        connection.onmessage = function (e) {
+            if (e.data.indexOf("subProtocol") == -1) {
+            }
+        };
+    }
+    catch (e) {
+        swal("", "No DSC Connection Found", "warning");
+    }
+</script>

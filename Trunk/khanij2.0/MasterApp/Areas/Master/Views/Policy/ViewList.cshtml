@@ -1,0 +1,150 @@
+﻿@model MasterEF.Policymaster
+@using MasterApp.Web;
+@{
+    ViewData["Title"] = "ViewList";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+@if (ViewBag.msg != null)
+{
+    <script>
+        swal("",'@ViewBag.msg',"warning");
+    </script>
+}
+<script>
+    $(document).ready(function () {
+        loadNavigation('ViewList', 'glTMng', 'plPolicy', 'tl', 'Masters', 'Policy', '');
+
+        $('.searchableselect').searchableselect();
+    });
+</script>
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        @Html.Partial("_CMSnavigation")
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link" href="~/Master/Policy/Add">
+                                Add
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="javascript:void(0);">
+                                View
+                            </a>
+                        </li>
+                    </ul>
+                    @Html.Partial("_CMSutil")
+                </div>
+                <section class="box form-container">
+                    @using (Html.BeginForm("Viewlist", "Policy", FormMethod.Post, new { AUTOCOMPLETE = "Off", id = "form1" }))
+                    {
+                        @Html.AntiForgeryToken()
+                        <div class="search-box" style="display:none;">
+                            <div class="searchform px-3 pt-3">
+                                <div class="row">
+                                    <div class="col-sm-5">
+                                        <div class="form-group row">
+                                            <label for="inputText" class="col-sm-3 col-form-label">
+                                                Policy
+                                            </label>
+                                            <div class="col-sm-8">
+                                                @Html.TextBoxFor(m => m.PolicyName, new { @class = "form-control" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-5">
+                                        <div class="form-group row">
+                                            <div class="col-sm-9 offset-md-3">
+                                                <input type="submit" value="Show" name="Show1" />
+                                                @*<a href="#" class="btn btn-sm btn-success ml-0"> Show </a>*@
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                    <div class="content-body">
+                        <div class="legend-box">
+                            <ul class="d-flex mb-1 justify-content-end list-unstyled">
+                                <li><span class="bg-success"></span> Active</li>
+                                <li><span class="bg-warning"></span> Inactive</li>
+                            </ul>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <table id="table-exports" class="table table-sm table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th width="30"> Sl#</th>
+                                            <th>
+                                                Policy Type
+                                            </th>
+                                            <th>
+                                                Policy Name
+                                            </th>
+                                            <th>
+                                                Date of Published
+                                            </th>
+                                            <th>
+                                                Created On
+                                            </th>
+                                            <th>
+                                                Status
+                                            </th>
+                                            <th width="100" class="noprint text-center">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+
+                                        @{ int i = 1;
+                                        }
+                                        @foreach (var b in ViewBag.ViewList)
+                                        {
+
+                                            var dyclass = b.ActiveStatus == "Active" ? "active-row" : "inactive-row";
+
+                                            <tr class="@dyclass">
+                                                <td>
+                                                    @i
+                                                    @{ i++; }
+                                                </td>
+                                                <td>@b.RuleName</td>
+                                                <td>@b.PolicyName</td>
+                                                <td>@b.DateOfPublished.ToString($"{0:dd/MM/yyyy hh:mm tt}")</td>
+                                                <td>@b.CreatedOn.ToString($"{0:dd/MM/yyyy hh:mm tt}")</td>
+                                                @if (b.ActiveStatus == "Active")
+                                                {
+                                                    <td class="text-success">@b.ActiveStatus</td>
+                                                }
+                                                else
+                                                {
+                                                    <td class="text-orange">@b.ActiveStatus</td>
+                                                }
+                                                <td class="noprint text-center">
+                                                    <a href="@CustomQueryStringHelper.EncryptString("Master","Add","Policy",new {id=b.PolicyID })"
+                                                       class="btn-floating btn-outline-primary btn-sm"
+                                                       title="Edit"><i class="icon-pencil-alt-solid"></i></a>
+
+                                                    <a href="@CustomQueryStringHelper.EncryptString("Master","Delete","Policy",new {id=b.PolicyID })"
+                                                       class="btn-floating btn-outline-danger btn-sm" onclick="return confirm('Are you sure to Delete?')"
+                                                       title="Delete"><i class="icon-trash-alt-solid"></i></a>
+                                                </td>
+                                            </tr>
+                                        }
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+</section>
+

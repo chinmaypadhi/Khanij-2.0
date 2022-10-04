@@ -1,0 +1,1002 @@
+﻿@*// *********************************************************************************************************
+    //  View Name                : EditProfile
+    //  Desciption               : To Edit and Update VTD Vendor Profile
+    //  Created By               : Lingaraj Dalai
+    //  Created On               : 01 August 2022
+    // ********************************************************************************************************
+*@
+@model userregistrationEF.VTDVendorProfileModel
+@using userregistrationEF
+@{
+    ViewData["Title"] = "EditVTDVendorProfile";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+<style>
+    @@media screen and (max-width: 1024px) {
+        .mobile .content-body {
+            padding: 1rem;
+            background-color: #fff;
+            border-radius: 10px;
+        }
+
+        .mobile .nav-tabs {
+            display: none;
+        }
+    }
+
+    .readonly {
+        pointer-events: none;
+    }
+</style>
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        @Html.Partial("_CMSnavigation")
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item"><a class="nav-link active" href="#">Edit</a></li>
+                    </ul>
+                    @Html.Partial("_CMSutil")
+                </div>
+                <section class="box form-container">
+                    <div class="content-body">
+                        @using (Html.BeginForm("EditVTDVendorProfile", "Contractor", FormMethod.Post, new { AUTOCOMPLETE = "Off", id = "form1", enctype = "multipart/form-data" }))
+                        {
+                            @Html.HiddenFor(m => m.VTDvendorId, new { @id = "hdnVTDVendorId" })
+                            @Html.HiddenFor(m => m.CompanyId, new { @id = "hdnCompanyId" })
+                            @Html.HiddenFor(m => m.CompanyName, new { @id = "hdnCompanyName" })
+                            @Html.HiddenFor(x => x.CorpDistrictId, new { @id = "hdnCorpDistrictid" })
+                            @Html.HiddenFor(x => x.CorpStateId, new { @id = "hdnCorpStateId" })
+                            @Html.HiddenFor(x => x.LocalStateId, new { @id = "hdnLocalStateId" })
+                            @Html.HiddenFor(x => x.LocalDistrictId, new { @id = "hdnLocalDistrictId" })
+                            @Html.HiddenFor(x => x.LocalBlockId, new { @id = "hdnLocalBlockId" })
+                            <div class="row">
+                                <div class="col-lg-6 col-md-12 col-sm-12">
+                                    <div class="form-group row">
+                                        <label class="col-sm-4 col-form-label ">Company Name <span class="text-danger">*</span></label>
+                                        <div class="col-sm-7">
+                                            <select id="CompanyId" name="CompanyId" class="form-control readonly">
+                                                <option value="">Select</option>
+                                            </select>
+                                            <input type="hidden" id="CompanyName" name="CompanyName" />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 col-md-12 col-sm-12">
+                                    <div class="form-group row" id="industrytype_toggle">
+                                        <label class="col-sm-4 col-form-label ">GST <span class="text-danger">*</span></label>
+                                        <div class="col-sm-7">
+                                            <input type="text" id="GST" name="GSTNo" value="@Model.GSTNo" class="form-control">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            @*<div class="row">
+                                    <div class="col-lg-6 col-md-12 col-sm-12">
+                                        <div class="form-group">
+                                            <table id="datatable" class="table table-sm table-bordered">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Model</th>
+                                                        <th>PortNo</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>*@
+                            <div class="clearfix"></div>
+                            <h5 class="text-dark">
+                                Company's Corporate Address
+                            </h5>
+                            <hr />
+                            <div class="row">
+                                <div class="col-lg-6 col-md-12 col-sm-12">
+                                    <div class="form-group row">
+                                        <label class="col-sm-4 col-form-label ">Address <span class="text-danger">*</span></label>
+                                        <div class="col-sm-7">
+                                            <textarea id="Company_Corp_Address" name="CorpAddress" class="form-control" rows="2" maxlength="500">@Model.CorpAddress</textarea>
+                                            <small class="text-danger">Maximum <strong>500</strong> characters</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 col-md-12 col-sm-12">
+                                    <div class="form-group row" id="industrytype_toggle">
+                                        <label class="col-sm-4 col-form-label ">State <span class="text-danger">*</span></label>
+                                        <div class="col-sm-7">
+                                            <select id="Company_Corp_State" name="CorpStateName" type="text" class="form-control">
+                                                <option value="">Select</option>
+                                                @{
+                                                    List<CommonAddressDetails> lstcommonAddressDetailsCorp = (List<CommonAddressDetails>)ViewData["StateDetails"];
+                                                    if (lstcommonAddressDetailsCorp != null)
+                                                    {
+                                                        foreach (var item in lstcommonAddressDetailsCorp)
+                                                        {
+                                                            if (item.StateID != 7)
+                                                            {
+                                                                <option value="@item.StateID">@item.StateName</option>
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-6 col-md-12 col-sm-12">
+                                    <div class="form-group row">
+                                        <label class="col-sm-4 col-form-label ">District <span class="text-danger">*</span></label>
+                                        <div class="col-sm-7">
+                                            <select id="Company_Corp_District" name="CorpDistrictName" type="text" class="form-control">
+                                                <option value="">Select</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                @*<div class="col-lg-6 col-md-12 col-sm-12">
+                                        <div class="form-group row" id="industrytype_toggle">
+                                            <label class="col-sm-4 col-form-label ">Block <span class="text-danger">*</span></label>
+                                            <div class="col-sm-7">
+                                                <input id="Company_Corp_Block" name="CorpBlockName" type="text" value="@Model.CorpBlockName" class="form-control">
+                                            </div>
+                                        </div>
+                                    </div>*@
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-6 col-md-12 col-sm-12">
+                                    <div class="form-group row">
+                                        <label class="col-sm-4 col-form-label ">Pin Code <span class="text-danger">*</span></label>
+                                        <div class="col-sm-7">
+                                            <input id="Company_Corp_PinCode" name="CorpPincode" type="text" maxlength="6" class="form-control" value="@Model.CorpPincode">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="clearfix"></div>
+                            <h5 class="text-dark">
+                                Company's Local Address
+                            </h5>
+                            <hr />
+                            <div class="row">
+                                <div class="col-lg-6 col-md-12 col-sm-12">
+                                    <div class="form-group row">
+                                        <label class="col-sm-4 col-form-label ">Address <span class="text-danger">*</span></label>
+                                        <div class="col-sm-7">
+                                            <textarea id="Company_Local_Address" name="LocalAddress" class="form-control" rows="2" maxlength="500">@Model.LocalAddress</textarea>
+                                            <small class="text-danger">Maximum <strong>500</strong> characters</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 col-md-12 col-sm-12">
+                                    <div class="form-group row" id="industrytype_toggle">
+                                        <label class="col-sm-4 col-form-label ">State <span class="text-danger">*</span></label>
+                                        <div class="col-sm-7">
+                                            <select id="Company_Local_State" name="LocalStateName" class="form-control">
+                                                <option value="">Select</option>
+                                                @{
+                                                    List<CommonAddressDetails> lstcommonAddressDetails = (List<CommonAddressDetails>)ViewData["StateDetails"];
+                                                    if (lstcommonAddressDetails != null)
+                                                    {
+                                                        foreach (var item in lstcommonAddressDetails)
+                                                        {
+                                                            if (item.StateID == 7)
+                                                            {
+                                                                <option value="@item.StateID">@item.StateName</option>
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-6 col-md-12 col-sm-12">
+                                    <div class="form-group row">
+                                        <label class="col-sm-4 col-form-label ">District <span class="text-danger">*</span></label>
+                                        <div class="col-sm-7">
+                                            <select id="Company_Local_District" name="LocalDistrictName" class="form-control">
+                                                <option value="">Select</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 col-md-12 col-sm-12">
+                                    <div class="form-group row" id="industrytype_toggle">
+                                        <label class="col-sm-4 col-form-label ">Block <span class="text-danger">*</span></label>
+                                        <div class="col-sm-7">
+                                            <select id="Company_Local_Block" name="LocalBlockName" class="form-control">
+                                                <option value="">Select</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-6 col-md-12 col-sm-12">
+                                    <div class="form-group row">
+                                        <label class="col-sm-4 col-form-label ">Pin Code <span class="text-danger">*</span></label>
+                                        <div class="col-sm-7">
+                                            <input id="Company_Local_PinCode" name="LocalPincode" type="text" maxlength="6" class="form-control" value="@Model.LocalPincode">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <h5 class="text-dark">
+                                Primary Contact Details
+                            </h5>
+                            <hr />
+                            <div class="row">
+                                <div class="col-lg-6 col-md-12 col-sm-12">
+                                    <div class="form-group row">
+                                        <label class="col-sm-4 col-form-label ">Name <span class="text-danger">*</span></label>
+                                        <div class="col-sm-7">
+                                            <input id="Contact_Person_Name" name="PrimaryContactName" type="text" class="form-control" value="@Model.PrimaryContactName">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 col-md-12 col-sm-12">
+                                    <div class="form-group row" id="industrytype_toggle">
+                                        <label class="col-sm-4 col-form-label ">Mobile No <span class="text-danger">*</span></label>
+                                        <div class="col-sm-7">
+                                            <input id="Contact_Person_MobileNo" onkeypress="return isNumber(event)" name="PrimaryContactMobileNo" maxlength="10" type="text" class="form-control" value="@Model.PrimaryContactMobileNo">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-6 col-md-12 col-sm-12">
+                                    <div class="form-group row">
+                                        <label class="col-sm-4 col-form-label ">Email Id <span class="text-danger">*</span></label>
+                                        <div class="col-sm-7">
+                                            <input onkeypress="nospace(event)" id="Contact_Person_EmailId" name="PrimaryContactEmailId" type="email" class="form-control" value="@Model.PrimaryContactEmailId">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 col-md-12 col-sm-12">
+                                    <div class="form-group row" id="industrytype_toggle">
+                                        <label class="col-sm-4 col-form-label ">Designation <span class="text-danger">*</span></label>
+                                        <div class="col-sm-7">
+                                            <input id="Contact_Person_Designation" name="PrimaryContactDesignation" type="text" class="form-control" value="@Model.PrimaryContactDesignation">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <h5 class="text-dark">
+                                Secondary Contact Details
+                            </h5>
+                            <hr />
+                            <div class="row">
+                                <div class="col-lg-6 col-md-12 col-sm-12">
+                                    <div class="form-group row">
+                                        <label class="col-sm-4 col-form-label ">Name <span class="text-danger">*</span></label>
+                                        <div class="col-sm-7">
+                                            <input id="Secondary_Contact_Person_Name" name="SecondaryContactName" type="text" class="form-control" value="@Model.SecondaryContactName">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 col-md-12 col-sm-12">
+                                    <div class="form-group row" id="industrytype_toggle">
+                                        <label class="col-sm-4 col-form-label ">Mobile No <span class="text-danger">*</span></label>
+                                        <div class="col-sm-7">
+                                            <input onkeypress="return isNumber(event)" id="Secondary_Contact_Person_MobileNo" name="SecondaryContactMobileNo" maxlength="10" type="text" class="form-control" value="@Model.SecondaryContactMobileNo">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-6 col-md-12 col-sm-12">
+                                    <div class="form-group row">
+                                        <label class="col-sm-4 col-form-label ">Email Id <span class="text-danger">*</span></label>
+                                        <div class="col-sm-7">
+                                            <input onkeypress="nospace(event)" id="Secondary_Contact_Person_EmailId" name="SecondaryContactEmailId" type="email" class="form-control" value="@Model.SecondaryContactEmailId">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 col-md-12 col-sm-12">
+                                    <div class="form-group row" id="industrytype_toggle">
+                                        <label class="col-sm-4 col-form-label ">Designation <span class="text-danger">*</span></label>
+                                        <div class="col-sm-7">
+                                            <input id="Secondary_Designation" name="SecondaryContactDesignation" type="text" class="form-control" value="@Model.SecondaryContactDesignation">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            @*<div class="row">
+                                    <div class="col-lg-6 col-md-12 col-sm-12">
+                                        <div class="form-group row">
+                                            <label class="col-sm-4 col-form-label ">Transport Department Approval Letter <span class="text-danger">*</span></label>
+                                            <div class="custom-file">
+                                                <input type="file" class="custom-file-input" id="ApprovalLetter" name="ApprovalLetter">
+                                                <label class="custom-file-label" for="ApprovalLetter">Choose Files</label>
+                                            </div>
+                                            <small class="text-danger">Only <strong> jpg, jpeg, png</strong> file types size Max. <strong>2 MB </strong></small>
+                                            @if (Model.ApprovalLetterFileName != null && Model.ApprovalLetterFileName != "")
+                                                        {
+                                            <label class="form-control-plaintext" id="lblRecoveryReportFileName">@(Model.ApprovalLetterFileName) <a href='~/@Model.ApprovalLetterFilePath' title="" class="ml-2" data-original-title="Download Transport Department Approval Letter copy" target="_blank"><i class="icon-file-pdf-solid h5 text-danger"></i></a></label>
+                                                        }
+                                        </div>
+                                    </div>
+                                </div>*@
+                    <div class="row">
+                        <div class="col-lg-6 col-md-12 col-sm-12">
+                            <div class="form-group row">
+                                <label class="col-sm-4 col-form-label ">Enter Captcha <span class="text-danger">*</span></label>
+                                <div class="col-sm-7">
+                                    <input id="VTDCaptcha" type="text" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6 col-md-12 col-sm-12">
+                            <div class="form-group row">
+                                <div class="col-sm-7">
+                                    <div id="capt1" class="form-control" ondrag="return false" oncopy="return false" onselectstart="return false" oncut="return false"></div>
+                                    <label class="input-group-text" for="inputDate1"> <a href="javascript:;" onclick="updateCaptcha();"><i class="fas fa-sync-alt"></i></a> </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                            <div class="row">
+                                <div class="col-sm-6 offset-lg-2 offset-md-4">
+                                    <input type="submit" value='Update' class="btn btn-primary btn-md ml-0" name="Update" id="Update" onclick="return CheckValidation() " />
+                                    <a href="~/Contractor/Contractor/EditVTDVendorProfile" class="btn btn-danger btn-md">Reset</a>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+</section>
+<script>
+    backMe = "yes"
+    $(document).ready(function () {
+        loadNavigation('EditVTDVendorProfile', 'glTMng', 'plpaymenthead', 'tl', 'VTD Vendor', 'Edit Profile', ' ');
+        CompanyDetails();
+        //--------------------------------
+        $("#Company_Corp_PinCode").keydown(function (e) {
+            // Allow: backspace, delete, tab, escape, enter and .
+            if ($.inArray(e.keyCode, [46, 8, 9, 27, 13, 110, 190]) !== -1 ||
+                // Allow: Ctrl+A, Command+A
+                (e.keyCode === 65 && (e.ctrlKey === true || e.metaKey === true)) ||
+                // Allow: home, end, left, right, down, up
+                (e.keyCode >= 35 && e.keyCode <= 40)) {
+                // let it happen, don't do anything
+                return;
+            }
+            // Ensure that it is a number and stop the keypress
+            if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) {
+                e.preventDefault();
+            }
+        });
+
+        $("#Company_Local_PinCode").keydown(function (e) {
+            // Allow: backspace, delete, tab, escape, enter and .
+            if ($.inArray(e.keyCode, [46, 8, 9, 27, 13, 110, 190]) !== -1 ||
+                // Allow: Ctrl+A, Command+A
+                (e.keyCode === 65 && (e.ctrlKey === true || e.metaKey === true)) ||
+                // Allow: home, end, left, right, down, up
+                (e.keyCode >= 35 && e.keyCode <= 40)) {
+                // let it happen, don't do anything
+                return;
+            }
+            // Ensure that it is a number and stop the keypress
+            if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) {
+                e.preventDefault();
+            }
+        });
+
+        $("#Contact_Person_MobileNo").keydown(function (e) {
+            // Allow: backspace, delete, tab, escape, enter and .
+            if ($.inArray(e.keyCode, [46, 8, 9, 27, 13, 110, 190]) !== -1 ||
+                // Allow: Ctrl+A, Command+A
+                (e.keyCode === 65 && (e.ctrlKey === true || e.metaKey === true)) ||
+                // Allow: home, end, left, right, down, up
+                (e.keyCode >= 35 && e.keyCode <= 40)) {
+                // let it happen, don't do anything
+                return;
+            }
+            // Ensure that it is a number and stop the keypress
+            if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) {
+                e.preventDefault();
+            }
+        });
+
+        $('#ApprovalLetter').on('change', function () {
+            debugger;
+            var fileExtension = ['jpg', 'jpeg', 'png', 'pdf', 'tif'];
+            if ($.inArray($(this).val().split('.').pop().toLowerCase(), fileExtension) == -1) {
+                swal("", "Only formats are allowed : " + fileExtension.join(', '), "warning");
+                $(this).focus();
+                return false;
+            }
+
+            if (Number(this.files[0].size) > 2097152) {
+                swal("", 'Try to upload file less than 2MB!', "warning");
+                $(this).val('');
+                $(this).focus();
+                return false;
+            }
+            else {
+                var fileName = $(this).val().split("\\").pop();
+                $(this).next('.custom-file-label').html(fileName);
+            }
+
+        });
+
+        if ($('#hdnCorpStateId').val() != "") {
+            $('#Company_Corp_State').val($('#hdnCorpStateId').val());
+            BindCorpDistrict($('#hdnCorpStateId').val());
+        }
+        if ($('#hdnLocalStateId').val() != "") {
+            $('#Company_Local_State').val($('#hdnLocalStateId').val());
+            BindLocalDistrict($('#hdnLocalStateId').val());
+        }
+    });
+
+    $('#Update').click(function () {
+        if (ValidateVTDVendor()) {
+            $('#form1').submit();
+        }
+        else {
+            return false;
+        }
+    });
+
+    function ValidateVTDVendor() {
+
+        if ($('#CompanyId').val() == "") {
+            swal("", "Please Select Company", "warning");
+            $("#CompanyId").focus();
+            return false;
+        }
+
+        //if ($('#datatable tbody tr').length <= 0) {
+        //    swal("", "Model and PortNo Details Required", "warning");
+        //    return false;
+        //}
+
+        if ($('#GST').val() == "") {
+            swal("", "Please Enter GST Number", "warning");
+            $("#CompanyName").focus();
+            return false;
+        }
+
+        if (CheckSpaceAtFirstPlaceAndLastPlace($('#GST').val()) == false) {
+            swal("", "Please Check GST Number For Spaces at Beginning And End Place", "warning");
+            $("#GST").focus();
+            return false;
+        }
+
+        if ($("#GST").val() != "") {
+            if ($("#GST").val().length != 15) {
+                swal("", "Please Enter Valid GST Number !", "warning");
+                $("#GST").focus();
+                return false;
+            }
+        }
+
+        if ($('#Company_Corp_Address').val() == "") {
+            swal("", "Please Enter Corporate Address", "warning");
+            $("#Company_Corp_Address").focus();
+            return false;
+        }
+
+        if (CheckSpaceAtFirstPlaceAndLastPlace($('#Company_Corp_Address').val()) == false) {
+            swal("", "Please Check Corporate Address For Spaces at Beginning And End Place", "warning");
+            $("#Company_Corp_Address").focus();
+            return false;
+        }
+
+        if ($('#Company_Corp_State').val() == "") {
+            swal("", "Please Select Corporate State", "warning");
+            $("#Company_Corp_State").focus();
+            return false;
+        }
+
+        if ($('#Company_Corp_District').val() == "") {
+            swal("", "Please Select Corporate District", "warning");
+            $("#Company_Corp_District").focus();
+            return false;
+        }
+
+        //if ($('#Company_Corp_Block').val() == "") {
+        //    swal("", "Please Enter Corporate Block", "warning");
+        //    $("#Company_Corp_Block").focus();
+        //    return false;
+        //}
+
+        //if (CheckSpaceAtFirstPlaceAndLastPlace($('#Company_Corp_Block').val()) == false) {
+        //    swal("", "Please Check Corporate Block For Spaces at Beginning And End Place", "warning");
+        //    $("#Company_Corp_Block").focus();
+        //    return false;
+        //}
+
+        if ($('#Company_Corp_PinCode').val() == "") {
+            swal("", "Please Enter Corporate Pin", "warning");
+            $("#Company_Corp_PinCode").focus();
+            return false;
+        }
+
+        if ($('#Company_Local_Address').val() == "") {
+            swal("", "Please Enter Local Address", "warning");
+            $("#Company_Local_Address").focus();
+            return false;
+        }
+
+        if (CheckSpaceAtFirstPlaceAndLastPlace($('#Company_Local_Address').val()) == false) {
+            swal("", "Please Check Local Address For Spaces at Beginning And End Place", "warning");
+            $("#Company_Local_Address").focus();
+            return false;
+        }
+
+        if ($('#Company_Local_State').val() == "") {
+            swal("", "Please Select Local State", "warning");
+            $("#Company_Local_State").focus();
+            return false;
+        }
+
+        if ($('#Company_Local_District').val() == "") {
+            swal("", "Please Select Local District", "warning");
+            $("#Company_Local_District").focus();
+            return false;
+        }
+
+        if ($('#Company_Local_Block').val() == "") {
+            swal("", "Please Select Local Block", "warning");
+            $("#Company_Local_Block").focus();
+            return false;
+        }
+
+        if ($('#Company_Local_PinCode').val() == "") {
+            swal("", "Please Enter Local Pin", "warning");
+            $("#Company_Local_PinCode").focus();
+            return false;
+        }
+
+        if ($('#Contact_Person_Name').val() == "") {
+            swal("", "Please Enter Primary Contact Name", "warning");
+            $("#Contact_Person_Name").focus();
+            return false;
+        }
+
+        if (CheckSpaceAtFirstPlaceAndLastPlace($('#Contact_Person_Name').val()) == false) {
+            swal("", "Please Check Primary Contact Name For Spaces at Beginning And End Place", "warning");
+            $("#Contact_Person_Name").focus();
+            return false;
+        }
+
+        if ($('#Contact_Person_MobileNo').val() == "") {
+            swal("", "Please Enter Primary Mobile Number", "warning");
+            $("#Contact_Person_MobileNo").focus();
+            return false;
+        }
+
+        if ($('#Contact_Person_MobileNo').val() != "") {
+            if ($('#Contact_Person_MobileNo').val().length != 10) {
+                swal("", "Please Enter Primary Valid Mobile Number", "warning");
+                $("#Contact_Person_MobileNo").focus();
+                return false;
+            };
+        }
+
+        if ($("#Contact_Person_EmailId").val() == "") {
+            swal("", "Please Enter Primary EmailId", "warning");
+            $("#Contact_Person_EmailId").focus();
+            return false;
+        }
+
+        if (ValidateEmailAddress(document.getElementById("Contact_Person_EmailId")) == false) {
+            swal("", "Please Enter Valid Primary EmailId", "warning");
+            $("#Contact_Person_EmailId").focus();
+            return false;
+        }
+
+        if ($('#Contact_Person_Designation').val() == "") {
+            swal("", "Please Enter Primary Designation", "warning");
+            $("#Contact_Person_Designation").focus();
+            return false;
+        }
+
+        if (CheckSpaceAtFirstPlaceAndLastPlace($('#Contact_Person_Designation').val()) == false) {
+            swal("", "Please Check Primary Designation For Spaces at Beginning And End Place", "warning");
+            $("#Contact_Person_Designation").focus();
+            return false;
+        }
+
+        if ($('#Secondary_Contact_Person_Name').val() == "") {
+            swal("", "Please Enter Secondary Contact Name", "warning");
+            $("#Secondary_Contact_Person_Name").focus();
+            return false;
+        }
+
+        if (CheckSpaceAtFirstPlaceAndLastPlace($('#Secondary_Contact_Person_Name').val()) == false) {
+            swal("", "Please Check Secondary Contact Name For Spaces at Beginning And End Place", "warning");
+            $("#Secondary_Contact_Person_Name").focus();
+            return false;
+        }
+
+        if ($('#Secondary_Contact_Person_MobileNo').val() == "") {
+            swal("", "Please Enter Secondary Mobile Number", "warning");
+            $("#Secondary_Contact_Person_MobileNo").focus();
+            return false;
+        }
+
+        if ($('#Secondary_Contact_Person_MobileNo').val() != "") {
+            if ($('#Secondary_Contact_Person_MobileNo').val().length != 10) {
+                swal("", "Please Enter Secondary Valid Mobile Number", "warning");
+                $("#Secondary_Contact_Person_MobileNo").focus();
+                return false;
+            };
+        }
+
+        if ($("#Secondary_Contact_Person_EmailId").val() == "") {
+            swal("", "Please Enter Secondary EmailId", "warning");
+            $("#Secondary_Contact_Person_EmailId").focus();
+            return false;
+        }
+
+        if (ValidateEmailAddress(document.getElementById("Secondary_Contact_Person_EmailId")) == false) {
+            swal("", "Please Enter Valid Secondary EmailId", "warning");
+            $("#Secondary_Contact_Person_EmailId").focus();
+            return false;
+        }
+
+        if ($('#Secondary_Designation').val() == "") {
+            swal("", "Please Enter Secondary Designation", "warning");
+            $("#Secondary_Designation").focus();
+            return false;
+        }
+
+        if (CheckSpaceAtFirstPlaceAndLastPlace($('#Secondary_Designation').val()) == false) {
+            swal("", "Please Check Secondary Designation For Spaces at Beginning And End Place", "warning");
+            $("#Secondary_Designation").focus();
+            return false;
+        }
+
+        if ($('#ApprovalLetter').val() == "") {
+            swal("", "Please Choose Transport Department Approval Letter", "warning");
+            $("#ApprovalLetter").focus();
+            return false;
+        }
+
+        if ($('#VTDCaptcha').val() == "") {
+            swal("", "Please Enter Captcha", "warning");
+            $("#VTDCaptcha").focus();
+            return false;
+        }
+
+        if ($("#capt1").html() != $('#VTDCaptcha').val()) {
+            swal("", "Please Enter Valid Captcha", "warning");
+            $("#VTDCaptcha").focus();
+            updateCaptcha();
+            return false;
+        }
+
+        return true;
+    }
+
+    $('#Company_Local_State').change(function () {
+        debugger;
+        if ($(this).val() != "") {
+            $.ajax({
+                url: "/Contractor/Contractor/GetDistrictByStateId",
+                data: { 'StateId': $(this).val() },
+                dataType: 'json',
+                type: 'post',
+                success: function (data) {
+                    debugger;
+                    $('#Company_Local_District').html('');
+                    $('#Company_Local_District').append("<option value=''>Select</option>");
+                    $.each(data, function (ind, item) {
+                        $('#Company_Local_District').append("<option value='" + item.districtID + "'>" + item.districtName + "</option>");
+                    });
+                },
+                error: function (err) {
+
+                }
+            });
+        }
+        else {
+            $('#Company_Local_District').html('');
+            $('#Company_Local_District').append("<option value=''>Select</option>");
+            $('#Company_Local_Block').html('');
+            $('#Company_Local_Block').append("<option value=''>Select</option>");
+        }
+    });
+
+    function BindLocalDistrict(StateId) {
+        if (StateId != "") {
+            $.ajax({
+                url: "/Contractor/Contractor/GetDistrictByStateId",
+                data: { 'StateId': StateId },
+                dataType: 'json',
+                type: 'post',
+                success: function (data) {
+                    debugger;
+                    $('#Company_Local_District').html('');
+                    $('#Company_Local_District').append("<option value=''>Select</option>");
+                    $.each(data, function (ind, item) {
+                        $('#Company_Local_District').append("<option value='" + item.districtID + "'>" + item.districtName + "</option>");
+                    });
+                    if ($('#hdnLocalDistrictId').val() != "") {
+                        $('#Company_Local_District').val($('#hdnLocalDistrictId').val());
+                        BindBlock($('#hdnLocalDistrictId').val());
+                    }
+                },
+                error: function (err) {
+
+                }
+            });
+        }
+        else {
+            $('#Company_Local_District').html('');
+            $('#Company_Local_District').append("<option value=''>Select</option>");
+            $('#Company_Local_Block').html('');
+            $('#Company_Local_Block').append("<option value=''>Select</option>");
+        }
+    }
+
+    $('#Company_Local_District').change(function () {
+        debugger;
+        if ($(this).val() != "") {
+            $.ajax({
+                url: "/Contractor/Contractor/GetBlockByDistrictId",
+                data: { 'DistrictId': $(this).val() },
+                dataType: 'json',
+                type: 'post',
+                success: function (data) {
+                    debugger;
+                    $('#Company_Local_Block').html('');
+                    $('#Company_Local_Block').append("<option value=''>Select</option>");
+                    $.each(data, function (ind, item) {
+                        $('#Company_Local_Block').append("<option value='" + item.blockId + "'>" + item.blockName + "</option>");
+                    });
+                },
+                error: function (err) {
+
+                }
+            });
+        }
+        else {
+            $('#Company_Local_Block').html('');
+            $('#Company_Local_Block').append("<option value=''>Select</option>");
+        }
+    });
+
+    function BindBlock(DistrictId) {
+        if (DistrictId != "") {
+            $.ajax({
+                url: "/Contractor/Contractor/GetBlockByDistrictId",
+                data: { 'DistrictId': DistrictId },
+                dataType: 'json',
+                type: 'post',
+                success: function (data) {
+                    debugger;
+                    $('#Company_Local_Block').html('');
+                    $('#Company_Local_Block').append("<option value=''>Select</option>");
+                    $.each(data, function (ind, item) {
+                        $('#Company_Local_Block').append("<option value='" + item.blockId + "'>" + item.blockName + "</option>");
+                    });
+                    if ($('#hdnLocalBlockId').val() != "") {
+                        $('#Company_Local_Block').val($('#hdnLocalBlockId').val());
+                    }
+                },
+                error: function (err) {
+
+                }
+            });
+        }
+        else {
+            $('#Company_Local_Block').html('');
+            $('#Company_Local_Block').append("<option value=''>Select</option>");
+        }
+    }
+
+    function ChangeCheckBoxStatus() {
+        if ($('input[type="checkbox"]').is(':checked') == true) {
+            $('input[type="checkbox"]').prop('checked', false);
+        }
+    }
+
+    $('#Company_Corp_State').change(function () {
+        debugger;
+        if ($(this).val() != "") {
+            $.ajax({
+                url: "/Contractor/Contractor/GetDistrictByStateId",
+                data: { 'StateId': $(this).val() },
+                dataType: 'json',
+                type: 'post',
+                success: function (data) {
+                    debugger;
+                    $('#Company_Corp_District').html('');
+                    $('#Company_Corp_District').append("<option value=''>Select</option>");
+                    $.each(data, function (ind, item) {
+                        $('#Company_Corp_District').append("<option value='" + item.districtID + "'>" + item.districtName + "</option>");
+                    });
+                },
+                error: function (err) {
+
+                }
+            });
+        }
+        else {
+            $('#Company_Corp_District').html('');
+            $('#Company_Corp_District').append("<option value=''>Select</option>");
+        }
+    });
+
+    function BindCorpDistrict(StateId) {
+        if (StateId != "") {
+            $.ajax({
+                url: "/Contractor/Contractor/GetDistrictByStateId",
+                data: { 'StateId': StateId },
+                dataType: 'json',
+                type: 'post',
+                success: function (data) {
+                    debugger;
+                    $('#Company_Corp_District').html('');
+                    $('#Company_Corp_District').append("<option value=''>Select</option>");
+                    $.each(data, function (ind, item) {
+                        $('#Company_Corp_District').append("<option value='" + item.districtID + "'>" + item.districtName + "</option>");
+                    });
+                    if ($('#hdnCorpDistrictid').val() != "") {
+                        $('#Company_Corp_District').val($('#hdnCorpDistrictid').val());
+                    }
+                },
+                error: function (err) {
+
+                }
+            });
+        }
+        else {
+            $('#Company_Corp_District').html('');
+            $('#Company_Corp_District').append("<option value=''>Select</option>");
+        }
+    }
+
+    $('#CompanyId').change(function () {
+        if ($(this).val() != "") {
+            $('#CompanyName').val($("#CompanyId option:selected").text());
+            $.ajax({
+                url: "https://vtsapi.infotracktelematics.com/v1.0/api/devicetype/Types?",
+                data: { "Manufacturer": $("#CompanyId option:selected").text() },
+                dataType: "json",
+                type: "get",
+                success: function (data) {
+                    //if (data.length > 0) {
+                    //    $('#datatable tbody').html('');
+                    //    var count = 0;
+                    //    $.each(data, function (ind, item) {
+                    //        $('#datatable tbody').append('<tr> <td><input type="text" readonly name="VTDUserModelPortDetails[' + count + '].ModelName" value="' + item.device_Type + '" /></td> <td><input type="text" readonly name="VTDUserModelPortDetails[' + count + '].PortNo" value="' + item.device_Port + '" /></td> </tr>')
+                    //        count++;
+                    //    });
+                    //}
+                },
+                error: function (err) {
+
+                }
+            });
+        }
+        else {
+            $('#CompanyId').html('');
+            $('#CompanyId').append("<option value=''>Select</option>");
+            /*$('#datatable tbody').html('');*/
+            CompanyDetails();
+        }
+    });
+
+    function BindCompany(CompanyName) {
+        if (CompanyName != "") {
+            $('#CompanyName').val($("#CompanyId option:selected").text());
+            $.ajax({
+                url: "https://vtsapi.infotracktelematics.com/v1.0/api/devicetype/Types?",
+                data: { "Manufacturer": CompanyName },
+                dataType: "json",
+                type: "get",
+                success: function (data) {
+                    //if (data.length > 0) {
+                    //    $('#datatable tbody').html('');
+                    //    var count = 0;
+                    //    $.each(data, function (ind, item) {
+                    //        $('#datatable tbody').append('<tr> <td><input type="text" readonly name="VTDUserModelPortDetails[' + count + '].ModelName" value="' + item.device_Type + '" /></td> <td><input type="text" readonly name="VTDUserModelPortDetails[' + count + '].PortNo" value="' + item.device_Port + '" /></td> </tr>')
+                    //        count++;
+                    //    });
+                    //}
+                },
+                error: function (err) {
+
+                }
+            });
+        }
+        else {
+            $('#CompanyId').html('');
+            $('#CompanyId').append("<option value=''>Select</option>");
+            /* $('#datatable tbody').html('');*/
+            CompanyDetails();
+        }
+    }
+
+    function CompanyDetails() {
+        $.ajax({
+            url: "https://vtsapi.infotracktelematics.com/v1.0/api/devicetype",
+            data: {},
+            dataType: "json",
+            type: "get",
+            success: function (data) {
+                if (data.length > 0) {
+                    $('#CompanyId').html('');
+                    $('#CompanyId').append("<option value=''>Select</option>");
+                    $.each(data, function (ind, item) {
+                        $('#CompanyId').append("<option value='" + item.deviceTypeId + "'>" + item.manufacturer + "</option>");
+                    });
+                    if ($('#hdnCompanyId').val() != "") {
+                        $('#CompanyId').val($('#hdnCompanyId').val());
+                        BindCompany($('#hdnCompanyName').val());
+                    }
+                }
+            },
+            error: function (err) {
+
+            }
+        });
+    }
+
+    function CheckSpaceAtFirstPlaceAndLastPlace(str) {
+        var regex = /^(?!\s)(?![\s\S]*\s$)[a-zA-Z0-9\s()-]+$/;
+        return regex.test(str);
+    }
+
+    $("#Contact_Person_EmailId").keydown(function (evt) {
+        debugger;
+        evt = (evt) ? evt : window.event;
+        var charCode = (evt.which) ? evt.which : evt.keyCode;
+        if (charCode == 32) {
+            return false;
+        }
+        return true;
+
+    });
+
+    $("#Secondary_Contact_Person_EmailId").keydown(function (evt) {
+        debugger;
+        evt = (evt) ? evt : window.event;
+        var charCode = (evt.which) ? evt.which : evt.keyCode;
+        if (charCode == 32) {
+            return false;
+        }
+        return true;
+
+    });
+
+    function ValidateEmailAddress(inputText) {
+        debugger;
+        var mailformat = /^\w+([\.-]?\w+)@@\w+([\.-]?\w+)(\.\w{2,3})+$/;
+        if (inputText.value.match(mailformat)) {
+            inputText.focus();
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+
+    function isNumber(evt) {
+        evt = (evt) ? evt : window.event;
+        var charCode = (evt.which) ? evt.which : evt.keyCode;
+        if (charCode > 31 && (charCode < 48 || charCode > 57)) {
+            return false;
+        }
+        return true;
+    }
+</script>
+
+

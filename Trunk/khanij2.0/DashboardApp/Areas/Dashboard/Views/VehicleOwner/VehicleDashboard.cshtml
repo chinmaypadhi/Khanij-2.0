@@ -1,0 +1,342 @@
+﻿@{
+    ViewData["Title"] = "Vehicle Dashboard";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<link rel="stylesheet" href='@Url.Content("~/css/jquery.stickytable.css")' type="text/css" />
+<link rel="stylesheet" href='@Url.Content("~/css/vehicle-dashboard.css")' type="text/css" />
+
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        <div class="row">
+            <div class="col-12">
+                <div class="row mt-lg-2 top-total-section">
+                    <div class="col-md-4">
+                        <div class="top-card bg-light-green">
+                            <div class="top-card-header">
+                                <h4 class="text-green">Total Registered Vehicles</h4>
+                                <h3 class="text-green">25</h3>
+                            </div>
+                            <div class="top-card-body">
+                                <i class="icon-check-solid"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="top-card bg-light-purple">
+                            <div class="top-card-header">
+                                <h4 class="text-purple">Total Vehicles Trip</h4>
+                                <h3 class="text-purple">8</h3>
+                            </div>
+                            <div class="top-card-body">
+                                <i class="icon-vehicle-tracking-system"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="top-card bg-light-red">
+                            <div class="top-card-header">
+                                <h4 class="text-red">Total Expired Vehicles</h4>
+                                <h3 class="text-red">7 </h3>
+                            </div>
+                            <div class="top-card-body">
+                                <i class="icon-times-solid"></i>
+                            </div>
+                        </div>
+                    </div>
+                    
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12 col-lg-6">
+                        <div class="dashboard-portlet">
+                            <div class="dashboard-portlet__header">
+                                <h5>Registered Vehicles</h5>
+
+                                <a href="#" class="btn btn-primary" title="View Details">
+                                    <span class="icon-eye-solid"></span>
+                                </a>
+                            </div>
+                            <div class="dashboard-portlet__content">
+                                <div class="dashboard-portlet__content__chart" id="RegisteredVehicles"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-12 col-lg-6">
+                        <div class="dashboard-portlet">
+                            <div class="dashboard-portlet__header">
+                                <h5>Vehicles Trip</h5>
+
+                                <a href="#" class="btn btn-primary" title="View Details">
+                                    <span class="icon-eye-solid"></span>
+                                </a>
+                            </div>
+                            <div class="dashboard-portlet__content">
+                                <div class="dashboard-portlet__content__chart" id="VehiclesTrip"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-12 col-lg-6">
+                        <div class="dashboard-portlet">
+                            <div class="dashboard-portlet__header">
+                                <h5>Expired Vehicles</h5>
+                                <a href="#" class="btn btn-primary" title="View Details">
+                                    <span class="icon-eye-solid"></span>
+                                </a>
+                            </div>
+                            <div class="dashboard-portlet__content">
+                                <div class="table-responsive ">
+                                    <div class="sticky-table sticky-ltr-cells">
+                                        <table class="table table-bordered fixtable">
+                                            <thead>
+                                                <tr class="sticky-header">
+                                                    <th width="30px">Sl#</th>
+                                                    <th>Vehicle Number</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td>1</td>
+                                                    <td>CG12S4638</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>2</td>
+                                                    <td>CG12S4695</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>3</td>
+                                                    <td>CG12S4677</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>4</td>
+                                                    <td>CG12S4653</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>5</td>
+                                                    <td>CG12S4617</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>6</td>
+                                                    <td>CG12S4643</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>7</td>
+                                                    <td>CG12S4676</td>
+                                                </tr>
+
+                                            </tbody>
+                                        </table>
+
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<script src="@Url.Content("~/js/jquery.stickytable.js")"></script>
+<script src="@Url.Content("~/js/highcharts.js")"></script>
+<script>
+    $(document).ready(function () {
+        loadNavigation('lesseedashboard', 'gldashboard', 'plLnk', 'tl', 'Vehicle Owner Dashboard', '', '');
+    });
+</script>
+<script type="text/javascript">
+    var winwidth = $(window).width();
+    var yside;
+    if (winwidth > 1440) {
+        yside = -30;
+
+    } else if ((winwidth <= 1440) && (winwidth > 1050)) {
+        yside = -40;
+
+    } else if ((winwidth <= 1050) && (winwidth > 900)) {
+        yside = -50;
+
+    } else if ((winwidth <= 901) && (winwidth > 480)) {
+        yside = -20;
+
+    } else if ((winwidth <= 420) && (winwidth > 374)) {
+        yside = -15;
+
+    } else {
+        yside = -10;
+
+    }
+
+
+    var isBig = $(window).width() >= 1366;
+
+    var legendBig = {
+        align: 'right',
+        verticalAlign: 'middle',
+        layout: 'vertical',
+        width: '170'
+    };
+
+    var legendSmall = {
+        align: 'center',
+        verticalAlign: 'bottom',
+        layout: 'horizontal',
+        
+    }
+    Highcharts.chart('RegisteredVehicles', {
+        colors: ['#7367f0', '#ff9f43', '#28c76f', '#ea5455', '#8e57cd'],
+        chart: {
+            type: 'pie',
+            backgroundColor: "rgba(0,0,0,0)",
+            plotBackgroundColor: null,
+            plotBorderWidth: null,
+            plotShadow: false,
+            spacingTop: 0,
+            spacingRight: 0,
+            spacingBottom: 0,
+            spacingLeft: 0
+        },
+        title: {
+            text: ' '
+        },
+        /*legend: {
+              align:'right',
+                verticalAlign: 'middle',
+                enabled: true,
+                width:'200'
+          },*/
+
+        legend: isBig ? legendBig : legendSmall,
+        plotOptions: {
+            pie: {
+                innerSize: 100,
+                depth: 45,
+                dataLabels: {
+                    distance: -40,
+                    enabled: true,
+                    style: {
+                        fontSize: '14px',
+                        fontFamily: 'Mulish, arial, sans-serif',
+                        textShadow: false,
+                        fontWeight: 'normal'
+                    },
+                    format: '{point.y}'
+                }
+            }
+        },
+        series: [{
+            showInLegend: true,
+            data: [
+                ['Trailer', 10],
+                ['Halwa', 5],
+                ['Truck', 5],
+                ['Tractor', 3],
+                ['Other', 2],
+            ]
+        }]
+    });
+</script>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        Highcharts.chart('VehiclesTrip', {
+            chart: {
+                type: 'column',
+                backgroundColor: 'rgba(0,0,0,0)',
+                spacingTop: 5,
+                spacingBottom: 0,
+                spacingRight: 1,
+                spacingLeft: 1,
+            },
+            colors: ['#64E572', '#f44336'],
+            title: {
+                text: ''
+            },
+            subtitle: {
+                text: ''
+            },
+            accessibility: {
+                announceNewData: {
+                    enabled: true
+                }
+            },
+            xAxis: {
+                type: 'category',
+                minorTickLength: 0,
+                tickLength: 0,
+                lineWidth: 1,
+                minorGridLineWidth: 0,
+                //lineColor: 'transparent',
+                lineColor: 'rgba(0,0,0,.05)',
+                crosshair: false,
+                gridLineColor: 'rgba(0,0,0,.05)',
+                gridLineWidth: 1,
+            },
+            yAxis: {
+                min: 0,
+                title: {
+                    text: 'No. of e- Transit Pass'
+                },
+                gridLineWidth: 1,
+                gridLineColor: 'rgba(0,0,0,.06)',
+                lineWidth: 1,
+                lineColor: 'rgba(0,0,0,.06)',
+
+            },
+            legend: {
+                enabled: false
+            },
+            plotOptions: {
+                column: {
+                    pointPadding: 0.2,
+                    borderWidth: 0,
+                    borderRadius: 10,
+
+                },
+                series: {
+                    pointWidth: 20,
+                    dataLabels: {
+
+                        enabled: true,
+                        align: 'center',
+
+                        x: 0
+                    }
+                }
+            },
+
+            tooltip: {
+                headerFormat: '<span style="font-size:11px">{series.name}</span><br>',
+                pointFormat: '<span style="color:{point.color}">{point.name}</span>: <b>{point.y:.0f}</b><br/>'
+            },
+            credits: {
+                enabled: false
+            },
+            series: [
+                {
+                    
+                    colorByPoint: true,
+                    data: [
+                        {
+                            name: "Running",
+                            y: 2,
+
+                        },
+                        {
+                            name: "Closed",
+                            y: 6,
+
+                        }
+                        
+                    ]
+                }
+            ]
+
+        });
+      
+    });
+</script>

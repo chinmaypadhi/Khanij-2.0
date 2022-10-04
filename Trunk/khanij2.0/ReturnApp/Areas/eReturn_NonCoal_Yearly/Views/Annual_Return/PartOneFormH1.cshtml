@@ -1,0 +1,1403 @@
+﻿@*// *********************************************************************************************************
+    //  View Name                : PartOneFormH1
+    //  Desciption               : Add Part1 of Yearly Return G1
+    //  Created By               : Debaraj Swain
+    //  Created On               : 05 July 2021
+    // ********************************************************************************************************
+*@
+@model ReturnEF.AnnualReturnH1ViewModel
+@{
+    ViewData["Title"] = "Part One Form G1";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+}
+@*<link rel="stylesheet" href="~/css/bootstrap-datetimepicker.min.css" type="text/css" />
+<script src="~/js/moment.min.js"></script>
+<script src="~/js/bootstrap-datetimepicker.min.js"></script>
+<script src='@Url.Content("~/js/sweetalert.min.js")'></script>
+<script src="~/js/specialChar.js"></script>
+<script src="~/js/CSMValidation.js"></script>*@
+@if (TempData["msg"] != null)
+{
+    <script>
+             swal("", "@TempData["msg"]", "success");
+    </script>
+}
+@if (TempData["result"] != null)
+{
+    <script>
+             swal("", "@TempData["result"]", "success");
+    </script>
+}
+@if (ViewBag.msg != null)
+{
+    <script>
+                      swal("",@ViewBag.msg, "success");
+    </script>
+}
+<script type="text/javascript">
+
+    $(document).ready(function () {
+
+        $('.datetime').datetimepicker({
+            format: 'LT',
+            format: "DD/MM/YYYY",
+            daysOfWeekDisabled: [],
+        });
+        $('#Dateof_Transfer').val("");
+    })
+</script>
+<style>
+    div {
+        padding: 0;
+        margin: 0;
+    }
+
+    .label-nav {
+        display: inline-block;
+        text-decoration: none;
+        color: #FCB53A;
+    }
+
+    ul {
+        padding: 0;
+        margin: 0;
+    }
+
+    .element {
+        width: 150px;
+        height: 150px;
+        background: #FCB53A;
+        -moz-border-radius: 50%;
+        -webkit-border-radius: 50%;
+        border-radius: 50%;
+        text-align: center;
+        padding-top: 50px;
+    }
+
+    .circle-text {
+        font-family: inherit;
+        line-height: 20px;
+        color: #fff;
+        text-rendering: optimizelegibility;
+    }
+
+    .btn-circle {
+        border: 2px solid #FCB53A;
+        border-radius: 50%;
+        background-color: #fff;
+    }
+
+        .btn-circle:focus {
+            border: 2px solid #FCB53A;
+            border-radius: 50%;
+            background-color: #fff;
+        }
+
+    .btn-circle-filled {
+        border: 2px solid #FCB53A;
+        border-radius: 50%;
+        background-color: #FCB53A;
+    }
+
+        .btn-circle-filled:focus {
+            border: 2px solid #FCB53A;
+            border-radius: 50%;
+            background-color: #FCB53A;
+        }
+
+    .detail-card {
+        border: 1px solid #FCB53A;
+        margin-bottom: 10px;
+    }
+
+    .details-section {
+        margin-top: 10px;
+    }
+
+    .details {
+        padding-left: 2px;
+    }
+
+    .card-section-header-text {
+        color: #FCB53A;
+    }
+
+    .liquidFillGaugeText {
+        font-family: Helvetica;
+        font-weight: bold;
+    }
+
+    p {
+        padding: 0;
+        margin: 0;
+    }
+
+    .profile-dash {
+        background-color: #d4d4d4;
+    }
+
+    .wh {
+        background-color: #fff;
+    }
+</style>
+<style>
+    .panel {
+        border: 0.5px solid #000000;
+        border-radius: 0;
+    }
+
+    .bg-gold {
+        background-color: #FCB53A;
+    }
+
+    .form-control1 {
+        border-radius: 0;
+        border-style: solid;
+        border-width: 1px;
+        font-size: 13px;
+        margin: 0 0 8px;
+        padding: 5px 3%;
+        width: 100%;
+    }
+
+    .btn.btnsave {
+        background-color: #fbb53b;
+        color: #ffffff;
+    }
+
+        .btn.btnsave:hover {
+            background-color: #fdca71;
+            color: #ffffff;
+        }
+
+    .lnk-btn {
+        color: #fff;
+        font: bold;
+        font-size: 1em;
+    }
+
+        .lnk-btn:after {
+            margin-left: 2px;
+            content: '|';
+            color: #000000;
+        }
+
+        .lnk-btn:focus {
+            color: #000000;
+        }
+
+    .slider {
+        width: 100%;
+        margin: 15px 0 30px 0;
+    }
+
+    hr {
+        display: block;
+        margin-top: 5px;
+        border-style: inset;
+        border-width: 1px;
+    }
+
+    .a1 {
+        padding: 10px 39px 8px 42px;
+        margin-left: 20px;
+        margin-right: 20px;
+    }
+</style>
+<style>
+    table, th, td {
+        border: 1px solid black;
+        border-collapse: collapse;
+    }
+
+    th, td {
+        padding: 5px;
+        text-align: left;
+    }
+</style>
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        <!-- MAIN CONTENT AREA STARTS -->
+        @Html.Partial("_CMSnavigation")
+        <div class="row">
+            <div class="col-12">
+
+
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="@Url.Action("PartOneFormH1", "Annual_Return",new { Financial_Year = @TempData["F_Y"] })">
+                                Part 1
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="partTwo" href="@Url.Action("PartTwoFormH1", "Annual_Return",new { Financial_Year = @TempData["F_Y"] })">
+
+                                Part 2
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="partTwo">
+
+                                Part 3
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="partTwo">
+
+                                Part 4
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="partTwo">
+
+                                Part 5
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="partTwo">
+
+                                Part 6
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="partTwo">
+
+                                Part 7
+                            </a>
+                        </li>
+
+
+
+
+                    </ul>
+                    @Html.Partial("_CMSutil")
+                </div>
+
+
+                <section class="box form-container">
+                    <div class="content-body">
+                        @using (Html.BeginForm("PartOneFormH1", "Annual_Return", FormMethod.Post, new { @id = "FormPart1H1", @enctype = "multipart/form-data" }))
+                        {
+                            <div class="text-center text-dark">
+                                <h6 class="font-weight-bold"> </h6>
+                                <h6 class="font-weight-bold">ANNUAL Return <small>FORM G-1</small></h6>
+                                <p class="font-weight-normal mb-0">
+                                    [To be used for minerals other than Copper, Gold, Lead, Pyrites, Tin, Tungsten, Zinc and precious and semi-precious stones]
+                                </p>
+                                <h6 class="font-weight-bold">General <small>(Part – I)</small></h6>
+
+                            </div>
+
+
+
+                            <ul class="nav nav-tabs progressbar border-0" id="myTab" role="tablist">
+                                <li class="startstep activestep1">
+                                    <a class="active" id="first-tab" data-toggle="tab" href="#MD" role="tab" aria-controls="first" aria-selected="true">Details of Mine</a>
+                                </li>
+                                <li>
+                                    <a id="second-tab" data-toggle="tab" href="#LAD" role="tab" aria-controls="second" aria-selected="false">Mine Other Details</a>
+                                </li>
+                                <li>
+                                    <a id="third-tab" data-toggle="tab" href="#RRP" role="tab" aria-controls="third" aria-selected="false"> Particulars of area operated/Lease</a>
+                                </li>
+                                <li>
+                                    <a id="four-tab" data-toggle="tab" href="#DWM" role="tab" aria-controls="four" aria-selected="false">Lease area (surface area) utilisation</a>
+                                </li>
+
+                            </ul>
+                            <div class="tab-content" id="myTabContent">
+                                <input type="hidden" value="@ViewBag.Year" name="Year" id="Year" />
+                                <input type="hidden" value="@ViewBag.Year" name="objOtherDetails.Year" id="OtherDetailsYear" />
+                                <input type="hidden" value="@ViewBag.Year" name="objParticular.Year" id="objParticularYear" />
+                                <input type="hidden" value="@ViewBag.Year" name="objLeaseArea.Year" id="objLeaseAreaYear" />
+
+                                <input type="hidden" value="@ViewBag.Month_Year" name="Month_Year" id="Month_Year" />
+                                <div class="tab-pane fade show active" id="MD" role="tabpanel" aria-labelledby="first-tab">
+
+                                    <h5 class="text-brown font-weight-bold">1 Details of the Mine </h5>
+                                    <div class="form-group row">
+                                        <div class="col-sm-4">
+                                            <label class="col-form-label font-weight-bolder">Registration No.<small> (allotted by IBM)</small> </label>
+                                            @Html.TextBoxFor(m => m.objMineDetails.Registrationnumber, new { @class = "form-control" })
+                                        </div>
+                                        <div class="col-sm-4">
+                                            <label class="col-form-label font-weight-bolder">Mine Code<small> (allotted by IBM)</small></label>
+                                            @Html.TextBoxFor(m => m.objMineDetails.MINE_CODE, new { @class = "form-control" })
+                                        </div>
+                                        <div class="col-sm-4">
+                                            <label class="col-form-label font-weight-bolder">Name of the Mineral</label>
+                                            @Html.TextBoxFor(m => m.objMineDetails.MineralName, new { @class = "form-control" })
+                                        </div>
+
+                                    </div>
+
+                                    <div class="form-group row">
+                                        <div class="col-sm-4">
+                                            <label class="col-form-label font-weight-bolder">Name of Mine</label>
+                                            @Html.TextBoxFor(m => m.objMineDetails.MineName, new { @class = "form-control" })
+                                        </div>
+                                        <div class="col-sm-4">
+                                            <label for="inputLoginId" class="col-form-label font-weight-bolder">Name(s) of other mineral(s), if any,produced from the same mine</label>
+                                            @Html.TextBoxFor(m => m.objMineDetails.OtherMineral, new { @class = "form-control" })
+                                        </div>
+
+
+                                    </div>
+
+                                    <h5 class="text-brown font-weight-bold">Location of the mine</h5>
+
+                                    <div class="form-group row">
+                                        <div class="col-sm-3">
+                                            <label class="col-form-label font-weight-bolder">Village</label>
+                                            @Html.TextBoxFor(m => m.objMineDetails.MineVillage, new { @class = "form-control" })
+                                        </div>
+                                        <div class="col-sm-3">
+                                            <label class="col-form-label font-weight-bolder">Post Office</label>
+                                            @Html.TextBoxFor(m => m.objMineDetails.MinePostOffice, new { @class = "form-control" })
+                                        </div>
+                                        <div class="col-sm-3">
+                                            <label for="inputLoginId" class="col-form-label font-weight-bolder">Tahsil/Taluk</label>
+                                            @Html.TextBoxFor(m => m.objMineDetails.MineTehsil, new { @class = "form-control" })
+                                        </div>
+                                        <div class="col-sm-3">
+                                            <label class="col-form-label font-weight-bolder">District</label>
+                                            @Html.TextBoxFor(m => m.objMineDetails.MineDistrict, new { @class = "form-control" })
+                                        </div>
+
+                                    </div>
+
+                                    <div class="form-group row">
+                                        <div class="col-sm-3">
+                                            <label class="col-form-label font-weight-bolder">State</label>
+                                            @Html.TextBoxFor(m => m.objMineDetails.MineState, new { @class = "form-control" })
+                                        </div>
+                                        <div class="col-sm-3">
+                                            <label class="col-form-label font-weight-bolder">PIN Code</label>
+                                            @Html.TextBoxFor(m => m.objMineDetails.MinePinCode, new { @maxlength = "6", @class = "form-control MinePinCode" })
+                                        </div>
+                                        <div class="col-sm-3">
+                                            <label class="col-form-label font-weight-bolder">Fax No.</label>
+                                            @Html.TextBoxFor(m => m.objMineDetails.MineFaxNo, new { @class = "form-control" })
+                                        </div>
+                                        <div class="col-sm-3">
+                                            <label class="col-form-label font-weight-bolder">E-mail Id</label>
+                                            @Html.TextBoxFor(m => m.objMineDetails.MineEmailID, new { @class = "form-control" })
+                                        </div>
+                                    </div>
+
+
+                                    <div class="row">
+                                        <div class="col-sm-3">
+                                            <label class="col-form-label font-weight-bolder">Mobile No.</label>
+                                            @Html.TextBoxFor(m => m.objMineDetails.MineMobileNo, new { @class = "form-control" })
+                                        </div>
+                                        <div class="col-sm-3">
+                                            <label class="col-form-label font-weight-bolder">Phone No.</label>
+                                            @Html.TextBoxFor(m => m.objMineDetails.MinePhoneNo, new { @class = "form-control" })
+                                        </div>
+                                    </div>
+
+
+
+
+                                    <h5 class="text-brown font-weight-bold">3 Name and address of Lessee/Owner (along with fax no and e-mail)</h5>
+                                    <div class="form-group row">
+                                        <div class="col-sm-3">
+                                            <label class="col-form-label font-weight-bolder">Name of Lessee/Owner</label>
+                                            @Html.TextBoxFor(m => m.objMineDetails.LesseeName, new { @class = "form-control" })
+                                        </div>
+                                        <div class="col-sm-3">
+                                            <label class="col-form-label font-weight-bolder">Address</label>
+                                            @Html.TextBoxFor(m => m.objMineDetails.LesseeAddress, new { @class = "form-control" })
+                                        </div>
+                                        <div class="col-sm-3">
+                                            <label for="inputLoginId" class="col-form-label font-weight-bolder">District</label>
+                                            @Html.TextBoxFor(m => m.objMineDetails.LesseeDistrictName, new { @class = "form-control" })
+                                        </div>
+                                        <div class="col-sm-3">
+                                            <label class="col-form-label font-weight-bolder">State</label>
+                                            @Html.TextBoxFor(m => m.objMineDetails.LesseeStateName, new { @class = "form-control" })
+                                        </div>
+
+                                    </div>
+                                    <div class="form-group row">
+                                        <div class="col-sm-3">
+                                            <label class="col-form-label font-weight-bolder">PIN Code</label>
+                                            @Html.TextBoxFor(m => m.objMineDetails.LesseePinCode, new { @class = "form-control" })
+                                        </div>
+                                        <div class="col-sm-3">
+                                            <label class="col-form-label font-weight-bolder">Fax no</label>
+                                            @Html.TextBoxFor(m => m.objMineDetails.LesseeFaxNo, new { @class = "form-control" })
+                                        </div>
+                                        <div class="col-sm-3">
+                                            <label for="inputLoginId" class="col-form-label font-weight-bolder">E-mail</label>
+                                            @Html.TextBoxFor(m => m.objMineDetails.LesseeEmailID, new { @class = "form-control" })
+                                        </div>
+                                        <div class="col-sm-3">
+                                            <label class="col-form-label font-weight-bolder">Mobile</label>
+                                            @Html.TextBoxFor(m => m.objMineDetails.LesseeMobileNo, new { @class = "form-control" })
+                                        </div>
+
+                                    </div>
+                                    <div class="form-group row">
+                                        <div class="col-sm-3">
+                                            <label class="col-form-label font-weight-bolder">Phone No</label>
+                                            @Html.TextBoxFor(m => m.objMineDetails.LesseePhoneNo, new { @class = "form-control" })
+                                        </div>
+
+
+                                    </div>
+
+                                    <div class="row mt-3">
+                                        <div class="col-sm-12 text-center">
+                                            <a id="second-tab" data-toggle="tab" href="#LAD" class="btn btn-primary btn-md ml-0 waves-effect waves-light btnNext" role="tab" aria-controls="second" aria-selected="false">Next</a>
+                                        </div>
+                                    </div>
+
+
+
+                                </div>
+                                <div class="tab-pane fade" id="LAD" role="tabpanel" aria-labelledby="second-tab">
+                                    @Html.HiddenFor(m => m.objOtherDetails.Flag1)
+                                    @Html.HiddenFor(m => m.objOtherDetails.OtherDetails_Id)
+                                    @Html.HiddenFor(m => m.objOtherDetails.MinePostOffice)
+                                    @Html.HiddenFor(m => m.objOtherDetails.MineFaxNo)
+                                    @Html.HiddenFor(m => m.objOtherDetails.LesseeFaxNo)
+
+                                    <div class="form-group row">
+                                        <div class="col-sm-4">
+                                            <label class="col-form-label font-weight-bolder">4 Registered Office of the Lessee</label>
+                                            @Html.TextBoxFor(m => m.objOtherDetails.RegisteredOffice, new { @class = "MineDetails form-control" })
+                                        </div>
+                                        <div class="col-sm-4">
+                                            <label class="col-form-label font-weight-bolder">5 Director in charge</label>
+                                            @Html.TextBoxFor(m => m.objOtherDetails.Director_in_charge, new { @class = "MineDetails form-control" })
+                                        </div>
+                                        <div class="col-sm-4">
+                                            <label class="col-form-label font-weight-bolder">6 Agent</label>
+                                            @Html.TextBoxFor(m => m.objOtherDetails.Agent, new { @class = "MineDetails form-control" })
+                                        </div>
+
+
+
+                                    </div>
+
+                                    <div class="form-group row">
+                                        <div class="col-sm-4">
+                                            <label for="inputLoginId" class="col-form-label font-weight-bolder">7 Manager</label>
+                                            @Html.TextBoxFor(m => m.objOtherDetails.Manager, new { @maxlength = "6", @class = "MineDetails form-control" })
+                                        </div>
+                                        <div class="col-sm-4">
+                                            <label class="col-form-label font-weight-bolder">8 Mining Engineer in charge</label>
+                                            @Html.TextBoxFor(m => m.objOtherDetails.MiningEngineer_in_charge, new { @class = "MineDetails form-control" })
+                                            <small class="text-danger">Maximum <strong>500</strong> characters</small>
+                                        </div>
+                                        <div class="col-sm-4">
+                                            <label for="inputLoginId" class="col-form-label font-weight-bolder">9 Geologist in charge</label>
+                                            @Html.TextBoxFor(m => m.objOtherDetails.Geologist_in_charge, new { maxlength = "6", @class = "MineDetails form-control" })
+                                        </div>
+
+
+
+
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-sm-4">
+                                            <label class="col-form-label font-weight-bolder">10 Transferor (previous owner), if any</label>
+                                            @Html.TextBoxFor(m => m.objOtherDetails.Transferor, new { @class = "form-control" })
+                                        </div>
+                                        <div class="col-sm-4">
+                                            <label class="col-form-label font-weight-bolder">Date of transfer</label>
+                                            <div class="input-group-prepend">
+                                                <input type="text" class="form-control datetime" id="Dateof_Transfer" name="objOtherDetails.Dateof_Transfer" />
+                                                <label class="input-group-text" for="inputDate"><i class="icon-calendar-alt-solid"></i></label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row mt-3">
+                                        <div class="col-sm-12 text-center">
+                                            <a id="second-tab" data-toggle="tab" href="#MD" class="btn btn-dark btn-md ml-0 waves-effect waves-light btnPrevious" role="tab" aria-controls="second" aria-selected="false">Previous</a>
+                                            <a id="third-tab" data-toggle="tab" href="#RRP" class="btn btn-primary btn-md ml-0 waves-effect waves-light btnNext" role="tab" aria-controls="third" aria-selected="false"> Next</a>
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <div class="tab-pane fade" id="RRP" role="tabpanel" aria-labelledby="third-tab">
+
+                                    <h5 class="text-brown font-weight-bold">3 Details of Rent/ Royalty / Dead Rent/ DMF /NMET amount paid in the month</h5>
+                                    @Html.HiddenFor(m => m.objParticular.Flag2)
+                                    @Html.Label("11 Particulars of area operated/Lease")
+                                    <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                                        <br />
+                                    </div>
+                                    <div class="">
+                                        @Html.Label("(Furnish information on items (i) to (vi) lease-wise in case mine workings cover more than one lease)")
+                                        <hr />
+                                    </div>
+                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" style="margin: 15px 0;">
+                                        <input type="button" value="Add Row" onclick="addRow('tbl_MoreThen_OneLease')" />
+                                        <input type="button" name="" value="Remove Row" onclick="RemoveRow('tbl_MoreThen_OneLease');">
+
+
+                                        <table border="1" id="tbl_MoreThen_OneLease" class="table" style="margin-top: 15px; width: 100%">
+                                            <thead>
+                                                <tr>
+                                                    <th style="border-color: black;" rowspan="2">Lease number allotted by the State Government</th>
+                                                    <th style="border-color: black;" colspan="3">Area under lease (hectares):</th>
+                                                    <th style="border-color: black;" rowspan="2">Date of execution of mining lease deed</th>
+                                                    <th style="border-color: black;" rowspan="2">Period of lease</th>
+                                                    <th style="border-color: black;" colspan="3">Area for which surface rights are held (hectares)</th>
+                                                    <th style="border-color: black;" colspan="2">Date and period of renewal (if applicable)</th>
+
+                                                </tr>
+                                                <tr>
+
+                                                    <th>Under Forest</th>
+                                                    <th>Outside Forest</th>
+                                                    <th>Total</th>
+                                                    <th>Under Forest</th>
+                                                    <th>Outside Forest</th>
+                                                    <th>Total</th>
+                                                    <th>Date (if applicable)</th>
+                                                    <th>Period of renewal</th>
+                                                </tr>
+                                            </thead>
+
+
+                                            <tr id="tr_MoreThen_OneLease">
+                                                <td>
+                                                    @Html.HiddenFor(m => m.objParticular.Particular_Id)
+                                                    @Html.TextBoxFor(m => m.objParticular.Lease_number, new { @class = "form-control" })
+                                                </td>
+                                                <td>
+                                                    @Html.TextBoxFor(m => m.objParticular.underlease_UnderForest, new { @class = "form-control" })
+                                                </td>
+                                                <td>
+
+                                                    @Html.TextBoxFor(m => m.objParticular.underlease_OutsideForest, new { @class = "form-control" })
+                                                </td>
+                                                <td>
+
+                                                    @Html.TextBoxFor(m => m.objParticular.underlease_Total, new { @class = "form-control" })
+                                                </td>
+                                                <td>
+
+                                                    @Html.TextBoxFor(m => m.objParticular.Date_of_execution, new { @class = "form-control" })
+                                                </td>
+                                                <td>
+
+                                                    @Html.TextBoxFor(m => m.objParticular.Periodoflease, new { @class = "form-control" })
+                                                </td>
+                                                <td>
+
+                                                    @Html.TextBoxFor(m => m.objParticular.Surfacerights_UnderForest, new { @class = "form-control" })
+                                                </td>
+                                                <td>
+
+                                                    @Html.TextBoxFor(m => m.objParticular.Surfacerights_OutsideForest, new { @class = "form-control" })
+                                                </td>
+                                                <td>
+
+                                                    @Html.TextBoxFor(m => m.objParticular.Surfacerights_Total, new { @class = "form-control" })
+                                                </td>
+                                                <td>
+
+                                                    @Html.TextBoxFor(m => m.objParticular.RenewalDate)
+                                                </td>
+                                                <td>
+
+                                                    @Html.TextBoxFor(m => m.objParticular.RenewalPeriod, new { @class = "form-control" })
+                                                </td>
+                                            </tr>
+
+                                        </table>
+                                    </div>
+
+                                    <div class="">
+                                        <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
+                                            @Html.Label("(vii) In case there is more than one mine in the same lease area, indicate name of mine")
+                                            @Html.TextBoxFor(m => m.objParticular.More_mine_details, new { @class = "form-control" })
+                                        </div>
+                                        <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
+                                            @Html.Label("(vii) In case there is more than one mine in the same lease area, indicate name of mineral produced")
+                                            @Html.TextBoxFor(m => m.objParticular.Mineral_produced, new { @class = "form-control" })
+                                        </div>
+                                        <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12"></div>
+                                    </div>
+
+                                    <div class="row mt-3">
+                                        <div class="col-sm-12 text-center">
+                                            <a id="third-tab" data-toggle="tab" href="#LAD" class="btn btn-dark btn-md ml-0 waves-effect waves-light btnPrevious" role="tab" aria-controls="third" aria-selected="false"> Previous</a>
+                                            <a id="third-tab" data-toggle="tab" href="#DWM" class="btn btn-primary btn-md ml-0 waves-effect waves-light btnNext" role="tab" aria-controls="third" aria-selected="false"> Next</a>
+
+                                        </div>
+                                    </div>
+
+
+                                </div>
+                                <div class="tab-pane fade" id="DWM" role="tabpanel" aria-labelledby="four-tab">
+                                    <h5 class="text-brown font-weight-bold">4 Details on working of mine</h5>
+                                    @Html.HiddenFor(m => m.objLeaseArea.Flag3)
+                                    @Html.HiddenFor(m => m.objLeaseArea.Lease_Area_Id)
+                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                        <table style="width: 100%">
+                                            <tr>
+                                                <td>@Html.Label("12 Lease area (surface area) utilisation as at the end of year (hectares)")</td>
+                                                <td>@Html.Label("Under forest")</td>
+                                                <td>@Html.Label("Outside forest")</td>
+                                                <td>@Html.Label("Total")</td>
+                                            </tr>
+                                            <tr>
+                                                <td>@Html.Label("(i) Already exploited & abandoned by opencast (O/C) mining")</td>
+                                                <td>
+                                                    @Html.TextBoxFor(m => m.objLeaseArea.UnderForest1, new { @type = "number", @class = "LeaseArea form-control", @onchange = "TextChange();" })
+                                                </td>
+                                                <td>
+                                                    @Html.TextBoxFor(m => m.objLeaseArea.Outsideforest1, new { @type = "number", @class = "LeaseArea form-control", @onchange = "TextChange();" })
+                                                </td>
+                                                <td>
+                                                    @Html.TextBoxFor(m => m.objLeaseArea.Total1, new { @readonly = "readonly", @class = "form-control" })
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>@Html.Label("(ii) Covered under current (O/C) Workings")</td>
+                                                <td>
+                                                    @Html.TextBoxFor(m => m.objLeaseArea.UnderForest2, new { @type = "number", @class = "LeaseArea form-control", @onchange = "TextChange();" })
+                                                </td>
+                                                <td>
+                                                    @Html.TextBoxFor(m => m.objLeaseArea.Outsideforest2, new { @type = "number", @class = "LeaseArea form-control", @onchange = "TextChange();" })
+                                                </td>
+                                                <td>
+                                                    @Html.TextBoxFor(m => m.objLeaseArea.Total2, new { @readonly = "readonly", @class = "form-control" })
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>@Html.Label("(iii) Reclaimed/rehabilitated")</td>
+                                                <td>
+                                                    @Html.TextBoxFor(m => m.objLeaseArea.UnderForest3, new { @type = "number", @class = "LeaseArea form-control", @onchange = "TextChange();" })
+                                                </td>
+                                                <td>
+                                                    @Html.TextBoxFor(m => m.objLeaseArea.Outsideforest3, new { @type = "number", @class = "LeaseArea form-control", @onchange = "TextChange();" })
+                                                </td>
+                                                <td>
+                                                    @Html.TextBoxFor(m => m.objLeaseArea.Total3, new { @readonly = "readonly", @class = "form-control" })
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>@Html.Label("(iv) Used for waste disposal")</td>
+                                                <td>
+                                                    @Html.TextBoxFor(m => m.objLeaseArea.UnderForest4, new { @type = "number", @class = "LeaseArea form-control", @onchange = "TextChange();" })
+                                                </td>
+                                                <td>
+                                                    @Html.TextBoxFor(m => m.objLeaseArea.Outsideforest4, new { @type = "number", @class = "LeaseArea form-control", @onchange = "TextChange();" })
+                                                </td>
+                                                <td>
+                                                    @Html.TextBoxFor(m => m.objLeaseArea.Total4, new { @readonly = "readonly", @class = "form-control" })
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>@Html.Label("(v) Occupied by plant, buildings, residential, welfare buildings & roads")</td>
+                                                <td>
+                                                    @Html.TextBoxFor(m => m.objLeaseArea.UnderForest5, new { @type = "number", @class = "LeaseArea form-control", @onchange = "TextChange();" })
+                                                </td>
+                                                <td>
+                                                    @Html.TextBoxFor(m => m.objLeaseArea.Outsideforest5, new { @type = "number", @class = "LeaseArea form-control", @onchange = "TextChange();" })
+                                                </td>
+                                                <td>
+                                                    @Html.TextBoxFor(m => m.objLeaseArea.Total5, new { @readonly = "readonly", @class = "form-control" })
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>@Html.Label("(vi) Used for any other purpose (specify)")</td>
+                                                <td>
+                                                    @Html.TextBoxFor(m => m.objLeaseArea.UnderForest6, new { @type = "number", @class = "LeaseArea form-control", @onchange = "TextChange();" })
+                                                </td>
+                                                <td>
+                                                    @Html.TextBoxFor(m => m.objLeaseArea.Outsideforest6, new { @type = "number", @class = "LeaseArea form-control", @onchange = "TextChange();" })
+                                                </td>
+                                                <td>
+                                                    @Html.TextBoxFor(m => m.objLeaseArea.Total6, new { @readonly = "readonly", @class = "form-control" })
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>@Html.Label("(vii) Work done under progressive mine closure plan during the year")</td>
+                                                <td>
+                                                    @Html.TextBoxFor(m => m.objLeaseArea.UnderForest7, new { @type = "number", @class = "LeaseArea form-control", @onchange = "TextChange();" })
+                                                </td>
+                                                <td>
+                                                    @Html.TextBoxFor(m => m.objLeaseArea.Outsideforest7, new { @type = "number", @class = "LeaseArea form-control", @onchange = "TextChange();" })
+                                                </td>
+                                                <td>
+                                                    @Html.TextBoxFor(m => m.objLeaseArea.Total7, new { @readonly = "readonly", @class = "form-control" })
+                                                </td>
+                                            </tr>
+
+                                        </table>
+                                    </div>
+                                    <div class="">
+                                        <div class="col-lg-4 col-md-6 col-sm-12 col-xs-12">
+
+                                            @Html.Label("13 Ownership/exploiting Agency of the mine")<br />
+                                            @Html.DropDownListFor(model => model.objLeaseArea.AgencyofMine, ViewBag.AgencyType as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control", autofocus = "autofocus" })
+
+                                        </div>
+                                        <div class="col-lg-4 col-md-6 col-sm-12 col-xs-12">
+                                        </div>
+                                        <div class="col-lg-4 col-md-6 col-sm-12 col-xs-12">
+                                        </div>
+
+                                    </div>
+
+
+                                    <div class="row mt-3">
+                                        <div class="col-sm-12 text-center">
+
+                                            <a id="third-tab" data-toggle="tab" href="#RRP" class="btn btn-dark btn-md ml-0 waves-effect waves-light btnPrevious" role="tab" aria-controls="third" aria-selected="false"> Previous</a>
+
+                                            <input type="button" id="btnSaveArea" value="Save" class="btn btn-success btn-md ml-0 waves-effect waves-light btnsave" onclick="return OnSaveArea();">
+                                            <input type="button" value="Update" id="btnUpdateArea" style="display: none" class="btn btn-secondary btn-md ml-0 waves-effect waves-light btnsave" onclick="return OnUpdateArea();">
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                            </div>
+                        }
+                    </div>
+                </section>
+
+            </div>
+
+            <div>
+
+            </div>
+        </div>
+
+
+
+    </div>
+</section>
+<script>
+    var totalRowsCount = 1;
+    function addRow(tableID) {
+        debugger;
+        if (parseInt(totalRowsCount) < parseInt(5)) {
+            var table = document.getElementById(tableID);
+
+            var rowCount = table.rows.length;
+            var row = table.insertRow(rowCount);
+
+            var colCount = table.rows[2].cells.length;
+
+            for (var i = 0; i < colCount; i++) {
+
+                if (i == colCount) // old was if (i == colCount - 1)
+                { }
+                else
+                {
+                    var newcell = row.insertCell(i);
+                    //var newcell2 = row.insertCell(i + 1);
+                    if (i == 0) {
+                        newcell.innerHTML = table.rows[2].cells[i].innerHTML; //rowCount;
+                        //newcell2.innerHTML = table.rows[2].cells[i + 1].innerHTML;
+                    }
+                    else {
+                        newcell.innerHTML = table.rows[2].cells[i].innerHTML;
+                    }
+
+                    switch (newcell.childNodes[0].type) {
+                        case "text":
+                            newcell.childNodes[0].value = "";
+                            break;
+                    }
+                }
+            }
+            totalRowsCount = totalRowsCount + 1;
+            var underlease_Total = document.getElementsByName('objParticular.underlease_Total');
+            var Date_of_execution = document.getElementsByName('objParticular.Date_of_execution');
+            var Periodoflease = document.getElementsByName('objParticular.Periodoflease');
+
+
+            for (var i = 0;i<underlease_Total.length;i++)
+            {
+                underlease_Total[i].value = $('#underlease_Total').val();
+                Date_of_execution[i].value = $('#Date_of_execution').val();
+                Periodoflease[i].value = $('#Periodoflease').val();
+            }
+
+
+        }
+    }
+
+    var rws;
+    function RemoveRow(obj) {
+        totalRowsCount = totalRowsCount - 1;
+
+        var Rowslength = document.getElementById("tbl_MoreThen_OneLease").getElementsByTagName("tr").length;
+
+        if (Rowslength > 3)
+            document.getElementById("tbl_MoreThen_OneLease").deleteRow(Rowslength - 1);
+    }
+
+    $('tbl_MoreThen_OneLease').on('click', 'input[type="button"]', function (e) {
+        $(this).closest('tr').remove()
+    })
+
+
+
+    $(document).ready(function () {
+
+        GetOtherDetails();
+        GetParticularsofArea();
+        GetLeasearea();
+
+    })
+
+
+
+    function GetOtherDetails() {
+        debugger;
+        var selectedYear = $("#Year").val();
+        $.ajax({
+            type: "GET",
+            url: '@Url.Action("GetMineOtherDetails", "ANNUAL_RETURN")',
+            data: { Year: selectedYear },
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            beforeSend: function () {
+                var varValue = 1;
+            },
+            success: function (data) {
+                debugger;
+                if (data.objOtherDetails.otherDetails_Id != null && data.objOtherDetails.otherDetails_Id != "" && data.objMineDetails.registrationnumber != null && data.objMineDetails.registrationnumber != "") {
+                    $("#btnUpdateOther").show();
+                    $("#btnSaveOther").hide();
+                    $('#objOtherDetails_OtherDetails_Id').val(data.objOtherDetails.otherDetails_Id);
+
+                    //-------------------------------------------------------------------------------
+
+                    $('#objMineDetails_Registrationnumber').val(data.objMineDetails.registrationnumber);
+                    $('#objMineDetails_MINE_CODE').val(data.objMineDetails.minE_CODE);
+                    $('#objMineDetails_OtherMineral').val(data.objMineDetails.otherMineral);
+                    $('#objMineDetails_MineName').val(data.objMineDetails.mineName);
+                    $('#objMineDetails_MineAddress').val(data.objMineDetails.mineAddress);
+                    $('#objMineDetails_MineVillage').val(data.objMineDetails.mineVillage);
+                    $('#objMineDetails_MineDistrict').val(data.objMineDetails.mineDistrict);
+                    $('#objMineDetails_MineState').val(data.objMineDetails.mineState);
+                    $('#objMineDetails_MineTehsil').val(data.objMineDetails.mineTehsil);
+                    $('#objMineDetails_MinePinCode').val(data.objMineDetails.minePinCode);
+                    $('#objMineDetails_MineEmailID').val(data.objMineDetails.mineEmailID);
+                    $('#objMineDetails_MineMobileNo').val(data.objMineDetails.mineMobileNo);
+                    $('#objMineDetails_MinePhoneNo').val(data.objMineDetails.minePhoneNo);
+                    $('#objMineDetails_LesseeName').val(data.objMineDetails.lesseeName);
+                    $('#objMineDetails_LesseeAddress').val(data.objMineDetails.lesseeAddress);
+                    $('#objMineDetails_LesseeVillageName').val(data.objMineDetails.lesseeVillageName);
+                    $('#objMineDetails_LesseeDistrictName').val(data.objMineDetails.lesseeDistrictName);
+                    $('#objMineDetails_LesseeStateName').val(data.objMineDetails.lesseeStateName);
+                    $('#objMineDetails_LesseePinCode').val(data.objMineDetails.lesseePinCode);
+
+                    $('#objMineDetails_LesseeTehsilName').val(data.objMineDetails.lesseeTehsilName);
+                    $('#objMineDetails_LesseeEmailID').val(data.objMineDetails.lesseeEmailID);
+                    $('#objMineDetails_LesseeMobileNo').val(data.objMineDetails.lesseeMobileNo);
+                    $('#objMineDetails_LesseePhoneNo').val(data.objMineDetails.lesseePhoneNo);
+
+                    //-------------------------------------------------------------------------------
+
+                    $('#objOtherDetails_RegisteredOffice').val(data.objOtherDetails.registeredOffice);
+                    $('#objOtherDetails_Director_in_charge').val(data.objOtherDetails.director_in_charge);
+                    $('#objOtherDetails_Agent').val(data.objOtherDetails.agent);
+                    $('#objOtherDetails_Manager').val(data.objOtherDetails.manager);
+                    $('#objOtherDetails_MiningEngineer_in_charge').val(data.objOtherDetails.miningEngineer_in_charge);
+                    $('#objOtherDetails_Geologist_in_charge').val(data.objOtherDetails.geologist_in_charge);
+                    $('#objOtherDetails_Transferor').val(data.objOtherDetails.transferor);
+                    $('#Dateof_Transfer').val(data.objOtherDetails.dateof_Transfer);
+                    $('#objMineDetails_MinePostOffice').val(data.objOtherDetails.minePostOffice);
+                    $('#objMineDetails_MineFaxNo').val(data.objOtherDetails.mineFaxNo);
+                    $('#objMineDetails_LesseeFaxNo').val(data.objOtherDetails.lesseeFaxNo);
+                    //--------------------------
+                    $('#objOtherDetails_MinePostOffice').val(data.objOtherDetails.minePostOffice);
+                    $('#objOtherDetails_MineFaxNo').val(data.objOtherDetails.mineFaxNo);
+                    $('#objOtherDetails_LesseeFaxNo').val(data.objOtherDetails.lesseeFaxNo);
+
+                }
+                else { $("#btnUpdateOther").hide(); $("#btnSaveOther").show(); }
+            }
+        });
+    }
+
+    function GetParticularsofArea() {
+        debugger;
+        var selectedYear = $("#Year").val();
+        $.ajax({
+            type: "GET",
+            url: '@Url.Action("GetParticularsofArea", "ANNUAL_RETURN")',
+            data: { Year: selectedYear },
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            beforeSend: function () {
+                var varValue = 1;
+            },
+            success: function (data) {
+
+                debugger;
+                console.log(data);
+                if (data.objParticular.particular_Id != null && data.objParticular.particular_Id != "") {
+                    $("#btnUpdateParticular").show();
+                    $("#btnSaveParticular").hide();
+                    $('#tr_MoreThen_OneLease').remove();
+                    for (var i = 0 ; i < data.objParticular.particular_Id.length; i++) {
+                        $('#tbl_MoreThen_OneLease').append('<tr><td><input type="hidden" id="Particular_Id" name="objParticular.Particular_Id" value="'
+                            + data.objParticular.particular_Id[i] + '" /><input type="text"  class="form-control1" id="Lease_number" name="objParticular.Lease_number" class="k-textbox" value="'
+                            + data.objParticular.lease_number[i] + '"  onkeypress= "return ValidateTextBox(event);" /></td><td><input type="text"  class="form-control1" id="underlease_UnderForest"  onblur="ValidateTotal()" name="objParticular.underlease_UnderForest" value="'
+                            + data.objParticular.underlease_UnderForest[i] + '"  onkeypress= "return ValidateTextBox(event);" /></td><td><input type="text"  class="form-control1" id="underlease_OutsideForest"  onblur="ValidateTotal()" name="objParticular.underlease_OutsideForest" value="'
+                            + data.objParticular.underlease_OutsideForest[i] + '"  onkeypress= "return ValidateTextBox(event);" /></td><td><input type="text"  class="form-control1" id="underlease_Total" readonly="readonly" name="objParticular.underlease_Total" value="'
+                            + data.objParticular.underlease_Total[i] + '"  onkeypress= "return ValidateTextBox(event);" /></td><td><input type="text"  class="form-control1" id="Date_of_execution" name="objParticular.Date_of_execution" value="'
+                            + data.objParticular.date_of_execution_str[i] + '"  onkeypress= "return ValidateTextBox(event);" /></td><td><input type="text"  class="form-control1" id="Periodoflease" name="objParticular.Periodoflease" value="'
+                            + data.objParticular.periodoflease[i] + '"  onkeypress= "return ValidateTextBox(event);" /></td><td><input type="text"  class="form-control1" onblur="CalcuateTotal()" id="Surfacerights_UnderForest" name="objParticular.Surfacerights_UnderForest" value="'
+                            + data.objParticular.surfacerights_UnderForest[i] + '"  onkeypress= "return ValidateTextBox(event);" /></td><td><input type="text" onblur="CalcuateTotal()" class="form-control1" id="Surfacerights_OutsideForest" name="objParticular.Surfacerights_OutsideForest" value="'
+                            + data.objParticular.surfacerights_OutsideForest[i] + '"  onkeypress= "return ValidateTextBox(event);" /></td><div class="input-group-prepend"><td><input type="text"  class="form-control1" id="Surfacerights_Total" name="objParticular.Surfacerights_Total" value="'
+                            + data.objParticular.surfacerights_Total[i] + '"  onkeypress= "return ValidateTextBox(event);" /></td><td><input type="text" class="form-control1"  id="RenewalDate" name="objParticular.RenewalDate" value="'
+                            + data.objParticular.renewalDate_str[i] + '"  onkeypress= "return ValidateTextBox(event);" /></td><td><input type="text"  class="form-control1" id="RenewalPeriod" name="objParticular.RenewalPeriod" value="'
+                            + data.objParticular.renewalPeriod[i] + '" class="k-textbox" onkeypress= "return ValidateTextBox(event);" /></td></tr>');
+                    }
+                    $('#objParticular_Mineral_produced').val(data.objParticular.mineral_produced);
+                    $('#objParticular_More_mine_details').val(data.objParticular.more_mine_details);
+                }
+                else {
+                    $('#tr_MoreThen_OneLease').remove();
+                        $('#tbl_MoreThen_OneLease').append('<tr><td><input type="hidden" id="Particular_Id" name="objParticular.Particular_Id" value="'
+                            + data.objParticular.particular_Id + '" /><input type="text"  class="form-control1" id="Lease_number" name="objParticular.Lease_number" class="k-textbox" value="'
+                            + data.objParticular.lease_number + '"  onkeypress= "return ValidateTextBox(event);" /></td><td><input type="text"  class="form-control1" id="underlease_UnderForest" onblur="ValidateTotal()"  name="objParticular.underlease_UnderForest" value="'
+                            + data.objParticular.underlease_UnderForest + '"  onkeypress= "return ValidateTextBox(event);" /></td><td><input type="text"  class="form-control1" id="underlease_OutsideForest"  onblur="ValidateTotal()" name="objParticular.underlease_OutsideForest" value="'
+                            + data.objParticular.underlease_OutsideForest + '"  onkeypress= "return ValidateTextBox(event);" /></td><td><input type="text"  class="form-control1" id="underlease_Total"  readonly="readonly"  name="objParticular.underlease_Total" value="'
+                            + data.objParticular.underlease_Total + '"  onkeypress= "return ValidateTextBox(event);" /></td><td><input type="text"  class="form-control1" id="Date_of_execution" name="objParticular.Date_of_execution" value="'
+                            + data.objParticular.date_of_execution_str + '"  onkeypress= "return ValidateTextBox(event);" /></td><td><input type="text"  class="form-control1" id="Periodoflease" name="objParticular.Periodoflease" value="'
+                            + data.objParticular.periodoflease + '"  onkeypress= "return ValidateTextBox(event);" /></td><td><input type="text"  class="form-control1" onblur="CalcuateTotal()"  id="Surfacerights_UnderForest" name="objParticular.Surfacerights_UnderForest" value="'
+                            + data.objParticular.surfacerights_UnderForest + '"  onkeypress= "return ValidateTextBox(event);" /></td><td><input type="text" onblur="CalcuateTotal()" class="form-control1" id="Surfacerights_OutsideForest" name="objParticular.Surfacerights_OutsideForest" value="'
+                            + data.objParticular.surfacerights_OutsideForest + '"  onkeypress= "return ValidateTextBox(event);" /></td><td><input type="text"  class="form-control1" id="Surfacerights_Total" name="objParticular.Surfacerights_Total" value="'
+                            + data.objParticular.surfacerights_Total + '"  onkeypress= "return ValidateTextBox(event);" /></td><td>  <input type="text" class="form-control1 datetime"   id="RenewalDate" name="objParticular.RenewalDate" value="'
+                            + data.objParticular.renewalDate_str + '"  onkeypress= "return ValidateTextBox(event);" /></td><td><input type="text"  class="form-control1" id="RenewalPeriod" name="objParticular.RenewalPeriod" value="'
+                            + data.objParticular.renewalPeriod + '" class="k-textbox" onkeypress= "return ValidateTextBox(event);" /></td></tr>');
+
+                    $("#btnUpdateParticular").hide(); $("#btnSaveParticular").show();
+                }
+            }
+        });
+    }
+
+    function GetLeasearea() {
+        debugger;
+        var selectedYear = $("#Year").val();
+        console.log(selectedYear);
+        $.ajax({
+            type: "GET",
+            url: '@Url.Action("GetLeasearea", "ANNUAL_RETURN")',
+            data: { Year: selectedYear },
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            beforeSend: function () {
+                var varValue = 1;
+            },
+            success: function (data) {
+                debugger;
+                if (data.objLeaseArea.lease_Area_Id != null && data.objLeaseArea.lease_Area_Id != "") {
+                    $("#btnUpdateArea").show();
+                    $("#btnSaveArea").hide();
+                    $('#objLeaseArea_Lease_Area_Id').val(data.objLeaseArea.lease_Area_Id);
+                    $('#objLeaseArea_UnderForest1').val(data.objLeaseArea.underForest1);
+                    $('#objLeaseArea_UnderForest2').val(data.objLeaseArea.underForest2);
+                    $('#objLeaseArea_UnderForest3').val(data.objLeaseArea.underForest3);
+                    $('#objLeaseArea_UnderForest4').val(data.objLeaseArea.underForest4);
+                    $('#objLeaseArea_UnderForest5').val(data.objLeaseArea.underForest5);
+                    $('#objLeaseArea_UnderForest6').val(data.objLeaseArea.underForest6);
+                    $('#objLeaseArea_UnderForest7').val(data.objLeaseArea.underForest7);
+
+                    $('#objLeaseArea_Outsideforest1').val(data.objLeaseArea.outsideforest1);
+                    $('#objLeaseArea_Outsideforest2').val(data.objLeaseArea.outsideforest2);
+                    $('#objLeaseArea_Outsideforest3').val(data.objLeaseArea.outsideforest3);
+                    $('#objLeaseArea_Outsideforest4').val(data.objLeaseArea.outsideforest4);
+                    $('#objLeaseArea_Outsideforest5').val(data.objLeaseArea.outsideforest5);
+                    $('#objLeaseArea_Outsideforest6').val(data.objLeaseArea.outsideforest6);
+                    $('#objLeaseArea_Outsideforest7').val(data.objLeaseArea.outsideforest7);
+
+                    $('#objLeaseArea_Total1').val(data.objLeaseArea.total1);
+                    $('#objLeaseArea_Total2').val(data.objLeaseArea.total2);
+                    $('#objLeaseArea_Total3').val(data.objLeaseArea.total3);
+                    $('#objLeaseArea_Total4').val(data.objLeaseArea.total4);
+                    $('#objLeaseArea_Total5').val(data.objLeaseArea.total5);
+                    $('#objLeaseArea_Total6').val(data.objLeaseArea.total6);
+                    $('#objLeaseArea_Total7').val(data.objLeaseArea.total7);
+                    var x = data.objLeaseArea.agencyofMine
+                    $('#objLeaseArea_AgencyofMine').val(data.objLeaseArea.agencyofMine);
+                }
+                else { $("#btnUpdateArea").hide(); $("#btnSaveArea").show(); }
+            }
+
+        });
+    }
+
+    function OnSaveMineOther() {
+        if (ValidatePartI() != false) {
+            $("#objOtherDetails_Flag1").val(2);
+            $('#objOtherDetails_MinePostOffice').val($("#objMineDetails_MinePostOffice").val());
+            $('#objOtherDetails_MineFaxNo').val($("#objMineDetails_MineFaxNo").val());
+            $('#objOtherDetails_LesseeFaxNo').val($("#objMineDetails_LesseeFaxNo").val());
+
+            $("#FormPart1H1").submit();
+        }
+    }
+
+
+    function OnUpdateMineOther() {
+        if (ValidatePartI() != false) {
+            $("#objOtherDetails_Flag1").val(1);
+
+            $('#objOtherDetails_MinePostOffice').val($("#objMineDetails_MinePostOffice").val());
+            $('#objOtherDetails_MineFaxNo').val($("#objMineDetails_MineFaxNo").val());
+            $('#objOtherDetails_LesseeFaxNo').val($("#objMineDetails_LesseeFaxNo").val());
+
+            $("#FormPart1H1").submit();
+        }
+    }
+
+
+    function OnSaveParticular() {
+        $("#objParticular_Flag2").val(2);
+        $("#FormPart1H1").submit();
+    }
+
+    function OnUpdateParticular() {
+
+        var OutsideForest = document.getElementsByName('objParticular.underlease_OutsideForest');
+        var underForest = document.getElementsByName('objParticular.underlease_UnderForest');
+        var underlease = $('#underlease_Total').val();
+        var count  =0;
+        for (var i = 0; i < underForest.length; i++)
+        {
+            var sum = parseFloat(underForest[i].value) + parseFloat(OutsideForest[i].value);
+            if (underlease != sum)
+            {
+                underForest[i].focus();
+                swal("", "Total should be sum on UnderForest + OutSideForest (Total=UnderForest + OutSideForest ) !", "warning");
+                count = count + 1;
+                return false;
+            }
+
+        }
+    }
+
+    function OnSaveArea() {
+        debugger;
+       if (ValidatePartI() != false) {
+            $("#objOtherDetails_Flag1").val(2);
+            $('#objOtherDetails_MinePostOffice').val($("#objMineDetails_MinePostOffice").val());
+            $('#objOtherDetails_MineFaxNo').val($("#objMineDetails_MineFaxNo").val());
+            $('#objOtherDetails_LesseeFaxNo').val($("#objMineDetails_LesseeFaxNo").val());
+
+            $("#objParticular_Flag2").val(2);
+
+        $("#objLeaseArea_Flag3").val(2);
+
+            $("#FormPart1H1").submit();
+        }
+    }
+
+    function OnUpdateArea() {
+        if (ValidatePartI() != false) {
+            $("#objOtherDetails_Flag1").val(1);
+            $('#objOtherDetails_MinePostOffice').val($("#objMineDetails_MinePostOffice").val());
+            $('#objOtherDetails_MineFaxNo').val($("#objMineDetails_MineFaxNo").val());
+            $('#objOtherDetails_LesseeFaxNo').val($("#objMineDetails_LesseeFaxNo").val());
+
+            $("#objParticular_Flag2").val(1);
+
+            $("#objLeaseArea_Flag3").val(1);
+            $("#FormPart1H1").submit();
+        }
+    }
+
+    function TextChangeUnderLease() {
+        var UnderForest1 = $("#objParticular_underlease_UnderForest").val();
+        if (UnderForest1 == "") {
+            UnderForest1 = 0;
+        }
+        var Outsideforest1 = $("#objParticular_underlease_OutsideForest").val();
+        if (Outsideforest1 == "") {
+            Outsideforest1 = 0;
+        }
+        var SUM = Number(UnderForest1) + Number(Outsideforest1)
+        $("#objParticular_underlease_Total").val(SUM);
+    }
+
+    function TextChangesurfacerights() {
+        var UnderForest1 = $("#objParticular_Surfacerights_UnderForest").val();
+        if (UnderForest1 == "") {
+            UnderForest1 = 0;
+        }
+        var Outsideforest1 = $("#objParticular_Surfacerights_OutsideForest").val();
+        if (Outsideforest1 == "") {
+            Outsideforest1 = 0;
+        }
+        var SUM = Number(UnderForest1) + Number(Outsideforest1)
+        $("#objParticular_Surfacerights_Total").val(SUM);
+    }
+    function TextChange() {
+        var UnderForest1 = $("#objLeaseArea_UnderForest1").val();
+        if (UnderForest1 == "") {
+            UnderForest1 = 0;
+        }
+        var Outsideforest1 = $("#objLeaseArea_Outsideforest1").val();
+        if (Outsideforest1 == "") {
+            Outsideforest1 = 0;
+        }
+        var SUM1 = Number(UnderForest1) + Number(Outsideforest1)
+        $("#objLeaseArea_Total1").val(SUM1);
+
+        //---------------------------------
+        var UnderForest2 = $("#objLeaseArea_UnderForest2").val();
+        if (UnderForest2 == "") {
+            UnderForest2 = 0;
+        }
+        var Outsideforest2 = $("#objLeaseArea_Outsideforest2").val();
+        if (Outsideforest2 == "") {
+            Outsideforest2 = 0;
+        }
+        var SUM2 = Number(UnderForest2) + Number(Outsideforest2)
+        $("#objLeaseArea_Total2").val(SUM2);
+        //--------------------------------------
+        var UnderForest3 = $("#objLeaseArea_UnderForest3").val();
+        if (UnderForest3 == "") {
+            UnderForest3 = 0;
+        }
+        var Outsideforest3 = $("#objLeaseArea_Outsideforest3").val();
+        if (Outsideforest3 == "") {
+            Outsideforest3 = 0;
+        }
+        var SUM3 = Number(UnderForest3) + Number(Outsideforest3)
+        $("#objLeaseArea_Total3").val(SUM3);
+        //--------------------------------------
+        var UnderForest4 = $("#objLeaseArea_UnderForest4").val();
+        if (UnderForest4 == "") {
+            UnderForest4 = 0;
+        }
+        var Outsideforest4 = $("#objLeaseArea_Outsideforest4").val();
+        if (Outsideforest4 == "") {
+            Outsideforest4 = 0;
+        }
+        var SUM4 = Number(UnderForest4) + Number(Outsideforest4)
+        $("#objLeaseArea_Total4").val(SUM4);
+        //--------------------------------------
+        var UnderForest5 = $("#objLeaseArea_UnderForest5").val();
+        if (UnderForest5 == "") {
+            UnderForest5 = 0;
+        }
+        var Outsideforest5 = $("#objLeaseArea_Outsideforest5").val();
+        if (Outsideforest5 == "") {
+            Outsideforest5 = 0;
+        }
+        var SUM5 = Number(UnderForest5) + Number(Outsideforest5)
+        $("#objLeaseArea_Total5").val(SUM5);
+        //---------------------------------------
+        var UnderForest6 = $("#objLeaseArea_UnderForest6").val();
+        if (UnderForest6 == "") {
+            UnderForest6 = 0;
+        }
+        var Outsideforest6 = $("#objLeaseArea_Outsideforest6").val();
+        if (Outsideforest6 == "") {
+            Outsideforest6 = 0;
+        }
+        var SUM6 = Number(UnderForest6) + Number(Outsideforest6)
+        $("#objLeaseArea_Total6").val(SUM6);
+
+        //---------------------------------------
+        var UnderForest7 = $("#objLeaseArea_UnderForest7").val();
+        if (UnderForest7 == "") {
+            UnderForest7 = 0;
+        }
+        var Outsideforest7 = $("#objLeaseArea_Outsideforest7").val();
+        if (Outsideforest7 == "") {
+            Outsideforest7 = 0;
+        }
+        var SUM7 = Number(UnderForest7) + Number(Outsideforest7)
+        $("#objLeaseArea_Total7").val(SUM7);
+    }
+
+    function makeTextboxDatePicker() {
+
+        $('input[name="objParticular.RenewalDate"]').kendoDatePicker({ format: "dd/MM/yyyy" });
+        $('input[name="objParticular.RenewalPeriod"]').kendoDatePicker({ format: "dd/MM/yyyy" });
+        $('input[name="objParticular.Date_of_execution"]').attr("readonly", "readonly");
+    }
+
+    function ValidateMineDetails()
+    {
+
+        if (!blankFieldValidation("objMineDetails_MinePinCode", "PinCode")) {
+            return false;
+        }
+        if (!blankFieldValidation("objMineDetails_LesseePinCode", "Lessee/Owner PinCode")) {
+            return false;
+        }
+        if (!blankFieldValidation("objMineDetails_LesseeFaxNo", "Lessee Fax no.")) {
+            return false;
+        }
+
+    }
+    function ValidateMineOtherDetails()
+    {
+
+
+        if (!blankFieldValidation("objOtherDetails_RegisteredOffice", "Registered Office of the Lessee")) {
+            return false;
+        }
+        if (!blankFieldValidation("objOtherDetails_Director_in_charge", "Director in charge")) {
+            return false;
+        }
+        if (!blankFieldValidation("objOtherDetails_Agent", "Agent")) {
+            return false;
+        }
+        if (!blankFieldValidation("objOtherDetails_Manager", "Manager")) {
+            return false;
+        }
+        if (!blankFieldValidation("objOtherDetails_MiningEngineer_in_charge", "Mining Engineer in charge")) {
+            return false;
+        }
+        if (!blankFieldValidation("objOtherDetails_Geologist_in_charge", "MGeologist in charge")) {
+            return false;
+        }
+
+    }
+    function ParticularArea()
+    {
+
+        var underlease_UnderForest = document.getElementsByName("objParticular.underlease_UnderForest");
+        var underlease_OutsideForest = document.getElementsByName("objParticular.underlease_OutsideForest");
+        var underlease_Total = document.getElementsByName("objParticular.underlease_Total");
+        var UnderForest, OutsideForest, Total, Sum;
+
+        for (var i = 0; i < underlease_UnderForest.length; i++) {
+            Sum = parseFloat(underlease_UnderForest[i].value) + parseFloat(underlease_OutsideForest[i].value);
+            if (parseFloat(underlease_Total[i].value) != parseFloat(Sum)) {
+                $("#DWM").removeClass("active");
+                $("#RRP").addClass("tab-pane fade in active");
+                underlease_UnderForest[i].focus();
+                swal("", "Total should be sum of Under Forest + Outside Forest (Total=Forest + Outside Forest) !", "warning");
+                return false;
+            }
+        }
+    }
+    function ValidateLeaseArea()
+    {
+
+        var LeaseArea = document.getElementsByClassName("LeaseArea");
+
+        for (var i = 0; i < LeaseArea.length; i++) {
+            if (LeaseArea[i].value == "") {
+                LeaseArea[i].focus();
+                swal("", "Please fill all Details on working of mine !", "warning");
+                return false;
+            }
+        }
+    }
+
+    function ValidatePartI()
+    {
+        debugger;
+        for (var i = 0; i < 1; i++)
+        {
+            if (ValidateMineDetails() == false)
+            {
+                return false;
+
+            }
+            else if (ValidateMineOtherDetails() == false) {
+                return false;
+            }
+            else if (ParticularArea() == false) {
+                return false;
+            }
+            else if (ValidateLeaseArea() == false) {
+                return false;
+            }
+            else { return true;}
+        }
+    }
+
+    $("#objMineDetails_MinePinCode").keydown(function (e) {
+        // Allow: backspace, delete, tab, escape, enter and .
+        if ($.inArray(e.keyCode, [46, 8, 9, 27, 13, 110, 190]) !== -1 ||
+            // Allow: Ctrl+A, Command+A
+            (e.keyCode === 65 && (e.ctrlKey === true || e.metaKey === true)) ||
+            // Allow: home, end, left, right, down, up
+            (e.keyCode >= 35 && e.keyCode <= 40)) {
+            // let it happen, don't do anything
+            return;
+        }
+        // Ensure that it is a number and stop the keypress
+        if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) {
+            e.preventDefault();
+        }
+    });
+
+    $("#objMineDetails_LesseePinCode").keydown(function (e) {
+        // Allow: backspace, delete, tab, escape, enter and .
+        if ($.inArray(e.keyCode, [46, 8, 9, 27, 13, 110, 190]) !== -1 ||
+            // Allow: Ctrl+A, Command+A
+            (e.keyCode === 65 && (e.ctrlKey === true || e.metaKey === true)) ||
+            // Allow: home, end, left, right, down, up
+            (e.keyCode >= 35 && e.keyCode <= 40)) {
+            // let it happen, don't do anything
+            return;
+        }
+        // Ensure that it is a number and stop the keypress
+        if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) {
+            e.preventDefault();
+        }
+    });
+    function ClearDatePickerValue(Name) {
+        $("#" + Name).data("kendoDatePicker").value(null);
+    }
+
+
+    function CalcuateTotal() {
+        var Surfacerights_UnderForest = document.getElementsByName("objParticular.Surfacerights_UnderForest");
+        var Surfacerights_OutsideForest = document.getElementsByName("objParticular.Surfacerights_OutsideForest");
+        var Surfacerights_Total = document.getElementsByName("objParticular.Surfacerights_Total");
+
+        var UnderForest, OutsideForest, Total;
+
+        for (var i = 0; i < Surfacerights_UnderForest.length; i++) {
+            Surfacerights_UnderForest[i].value = Surfacerights_UnderForest[i].value || 0;
+            Surfacerights_OutsideForest[i].value = Surfacerights_OutsideForest[i].value || 0;
+            Surfacerights_Total[i].value = parseFloat(Surfacerights_UnderForest[i].value) + parseFloat(Surfacerights_OutsideForest[i].value);
+            if (Surfacerights_UnderForest[i].value == 0) {
+                Surfacerights_UnderForest[i].value = "";
+            }
+            if (Surfacerights_OutsideForest[i].value == 0) {
+                Surfacerights_OutsideForest[i].value = "";
+            }
+            if (Surfacerights_Total[i].value == 0) {
+                Surfacerights_Total[i].value = "";
+            }
+        }
+
+    }
+
+
+    function ValidateTextBox(e) {
+        var regex = new RegExp("^[0-9.]+$");
+        //var regex = new RegExp("^[^,]+$");
+        var str = String.fromCharCode(!e.keyCode ? e.which : e.keyCode);
+        if (regex.test(str)) {
+            return true;
+        }
+        return false;
+    }
+
+</script>
+
+
+

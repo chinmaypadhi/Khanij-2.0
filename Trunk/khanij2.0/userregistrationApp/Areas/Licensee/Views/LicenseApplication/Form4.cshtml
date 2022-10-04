@@ -1,0 +1,1362 @@
+﻿@*// *********************************************************************************************************
+    //  View Name                : Form4
+    //  Desciption               : To Save and View Form4
+    //  Created By               : Akshaya Dalei
+    //  Created On               : 23 July 2021
+    // ********************************************************************************************************
+*@
+
+
+@{
+    Layout = "~/Views/Shared/_WebHeaderLayout.cshtml";
+    ViewBag.Title = "Licensee Application";
+}
+@inject Microsoft.Extensions.Options.IOptions<userregistrationEF.KeyList> metaOptions
+
+@{
+    var options = metaOptions.Value;
+}
+@using userregistrationApp.Helper;
+@using userregistrationEF
+@model userregistrationEF.LicenseApplication
+
+
+<div class="inner-naviagtion">
+    <div class="container">
+        <div>
+            <nav aria-label="breadcrumb mb-0">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="@options.HomeUrl"><span class="fas fa-home"></span></a></li>
+                    <li class="breadcrumb-item text-white" aria-current="page">Registrations</li>
+                    <li class="breadcrumb-item text-white" aria-current="page">License Application</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+</div>
+
+<div class="inner-content">
+    @{
+        if (ViewBag.msg != null)
+        {
+            <script>
+                swal("",'@ViewBag.msg',"success");
+            </script>
+        }
+    }
+    <div class="container">
+        <div class="mb-4">
+            <p class="text-center">
+                FORM 4<br />
+                Applicaion For Grant or Renewal of Permit For Temporary Storage/Beneficiation/Crushing plant <br />
+                Rule 7(1) of Mineral(Mining Transportation and Storage) Rules,2009
+            </p>
+        </div>
+
+        <h3 class="heading">License Application Registration</h3>
+
+        <div class="row mt-4">
+            <div class="col-lg-12"><h4 class="text-primary">Application Details</h4><hr></div>
+        </div>
+        <form id="form1" action="Form4" method="post" enctype="multipart/form-data">
+            @Html.AntiForgeryToken()
+            @Html.HiddenFor(model => model.LicenseAppId)
+            @Html.HiddenFor(model => model.FF_MineralTypeId)
+            <div class="row">
+                <div class="col-sm-6">
+                    <div class="form-group row">
+                        <label class="col-sm-4 col-form-label ">Application For District<span class="text-danger">*</span></label>
+                        <div class="col-sm-7">
+                            <select id="DistrictId" name="DistrictId" class="form-control  searchableselect">
+                                <option value="">Select District</option>
+                                @{
+                                    List<LicenseApplication> lstlicenseApplication = (List<LicenseApplication>)ViewData["ApplicationForDistrict"];
+                                    if (lstlicenseApplication != null)
+                                    {
+                                        foreach (var item in lstlicenseApplication)
+                                        {
+                                            if (Model.DistrictId == item.DistrictId)
+                                            {
+                                                <option value="@item.DistrictId" selected="selected">@item.DistrictName</option>
+                                            }
+                                            else
+                                            {
+                                                <option value="@item.DistrictId">@item.DistrictName</option>
+                                            }
+                                        }
+                                    }
+                                }
+                            </select>
+                            @Html.ValidationMessageFor(x => x.DistrictId, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="form-group row">
+                        <label class="col-sm-4 col-form-label ">License Type<span class="text-danger">*</span></label>
+                        <div class="col-sm-7">
+                            <select id="LicenseeTypeId" name="LicenseeTypeId" class="form-control  searchableselect">
+                                <option value="">Select Licensee Type</option>
+                                @{
+                                    List<LicenseApplication> lstlicenseType = (List<LicenseApplication>)ViewData["LicenseeType"];
+                                    if (lstlicenseType != null)
+                                    {
+                                        foreach (var item in lstlicenseType)
+                                        {
+                                            if (Model.LicenseType == item.LicenseeTypeId)
+                                            {
+                                                <option value="@item.LicenseeTypeId" selected="selected">@item.LicenseeTypeName</option>
+                                            }
+                                            else
+                                            {
+                                                <option value="@item.LicenseeTypeId">@item.LicenseeTypeName</option>
+                                            }
+                                        }
+                                    }
+                                }
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="form-group row">
+                        <label class="col-sm-4 col-form-label ">Mineral Type<span class="text-danger">*</span></label>
+                        <div class="col-sm-7">
+                            <select id="MineralTypeId" name="MineralTypeId" class="form-control  searchableselect">
+                                <option value="">Select Mineral Type</option>
+                                @{
+                                    List<LicenseApplication> lstMineralType = (List<LicenseApplication>)ViewData["MineralType"];
+                                    if (lstMineralType != null)
+                                    {
+                                        foreach (var item in lstMineralType)
+                                        {
+                                            if (Model.MineralTypeId == item.MineralTypeId)
+                                            {
+                                                <option value="@item.MineralTypeId" selected="selected">@item.MINERALTYPE_NAME</option>
+                                            }
+                                            else
+                                            {
+                                                <option value="@item.MineralTypeId">@item.MINERALTYPE_NAME</option>
+                                            }
+                                        }
+                                    }
+                                }
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="form-group row">
+                        <label for="dropdownState" class=" col-sm-4 col-form-label ">Mineral Name <span class="text-danger">*</span></label>
+                        <div class="col-sm-7" id="IdDivMineralName">
+                            <select id="MineralId" name="Mineral_Count" multiple data-style="bg-white" class="selectpicker form-control">
+
+                                @{
+                                    List<LicenseApplication> lstMineralName = (List<LicenseApplication>)ViewData["MineralName"];
+                                    if (lstMineralName != null)
+                                    {
+                                        foreach (var item in lstMineralName)
+                                        {
+                                            <option value="@item.MineralId">@item.MineralName</option>
+
+                                        }
+                                    }
+                                }
+
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="form-group row">
+                        <label for="dropdownState" class=" col-sm-4 col-form-label ">Mineral Form <span class="text-danger">*</span></label>
+                        <div class="col-sm-7">
+                            <select id="MineralNatureId" name="MineralFormCount" multiple data-style="bg-white" class="selectpicker form-control">
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="form-group row">
+                        <label for="dropdownState" class=" col-sm-4 col-form-label ">Mineral Grade  <span class="text-danger">*</span></label>
+                        <div class="col-sm-7">
+                            <select id="MineralGradeId" name="MineralGradeCount" multiple data-style="bg-white" class="selectpicker form-control">
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="form-group row">
+                        <label class="col-sm-4 col-form-label ">Application For<span class="text-danger">*</span></label>
+                        <div class="col-sm-7">
+                            <select id="ApplicationFor" name="ApplicationFor" class="form-control  searchableselect">
+                                <option value="">Select Application For</option>
+                                @if (Model.ApplicationFor == "New")
+                                {
+                                    <option value="New" selected="selected">New</option>
+                                }
+                                else
+                                {
+                                    <option value="New">New</option>
+                                }
+
+                                @if (Model.ApplicationFor == "Renewal")
+                                {
+                                    <option value="Renewal" selected="selected">Renewal</option>
+                                }
+                                else
+                                {
+                                    <option value="Renewal">Renewal</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="form-group row">
+                        <label for="dropdownDepart" class="col-sm-4 col-form-label ">Period<span class="text-danger">*</span></label>
+                        <div class="col-sm-7">
+                            <input type="text" id="Period" name="Period" value="@Model.Period" class="form-control" onkeypress="return isNumberKey(event);">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="form-group row">
+                        <label for="dropdownDepart" class="col-sm-4 col-form-label ">Place<span class="text-danger">*</span></label>
+                        <div class="col-sm-7">
+                            <input type="text" id="Place" name="Place" value="@Model.Place" class="form-control">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6"></div>
+                <div class="col-sm-12">
+                    <div class="row">
+
+                        <div class="col-lg-12">
+                            @(Html.Label("Quantity (Maximum capacity of Store at a time)")) (मात्रा (एक समय में स्टोर की अधिकतम क्षमता))
+                            <span class="text-danger">*</span>
+                        </div>
+
+                    </div>
+                </div>
+                <div class="col-sm-12">
+                    <div class="row">
+
+                        <div class="col-lg-8">
+                            <div class="table-responsive">
+                                <table border="1" id="CapacityTable" class="table table-bordered table-condensed">
+                                    <thead>
+                                        <tr>
+                                            <th>Mineral Name</th>
+                                            <th>Quantity(MT)</th>
+                                            <th style="visibility: hidden; display: none">MineralId</th>
+                                        </tr>
+                                        @if (Model.QuantityList != null)
+                                        {
+                                            for (int i = 0; i < Model.QuantityList.Count; i++)
+                                            {
+                                                var NO = i + 1;
+
+                                                <tr>
+                                                    <td>
+                                                        @Model.QuantityList[i].MineralName
+                                                    </td>
+                                                    <td style="">
+                                                        <input type="number" min="0" name="CapMineralQuantity" required="required" value="@Model.QuantityList[i].Quantity" />
+                                                    </td>
+                                                    <td style="visibility: hidden; display: none">
+                                                        <input type="text" name="CapMineralID" value="@Model.QuantityList[i].MineralId" />
+                                                    </td>
+                                                </tr>
+                                            }
+                                        }
+
+                                    </thead>
+                                </table>
+
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+
+                <div class="mt-4 col-lg-12"><h4 class="text-primary">Applicant Details & Documents</h4><hr></div>
+
+                <div class="col-sm-6">
+                    <div class="form-group row">
+                        <label for="dropdownDepart" class="col-sm-4 col-form-label ">Name of Applicant<span class="text-danger">*</span></label>
+                        <div class="col-sm-7">
+                            <input type="text" id="ApplicantName" name="ApplicantName" value="@Model.ApplicantName" class="form-control">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="form-group row">
+                        <label for="dropdownDepart" class="col-sm-4 col-form-label ">Mobile Number<span class="text-danger">*</span></label>
+                        <div class="col-sm-7">
+                            <input type="text" id="MobileNo" name="MobileNo" maxlength="10" value="@Model.MobileNo" class="form-control" onkeypress="return isNumberKey(event);">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="form-group row">
+                        <label for="dropdownDepart" class="col-sm-4 col-form-label ">Email Address<span class="text-danger">*</span></label>
+                        <div class="col-sm-7">
+                            <input type="text" id="EmailAddress" name="EmailAddress" value="@Model.EmailAddress" class="form-control">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="form-group row">
+                        <label for="dropdownDepart" class="col-sm-4 col-form-label ">Complete Address<span class="text-danger">*</span></label>
+                        <div class="col-sm-7">
+                            <textarea class="form-control" id="CompleteAddress" name="CompleteAddress" rows="1">@Model.CompleteAddress</textarea>
+                            <small class="text-danger">Maximum <strong>500</strong> characters</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="form-group row">
+                        <label class="col-sm-4 col-form-label ">District<span class="text-danger">*</span></label>
+                        <div class="col-sm-7">
+                            <select id="AppDistrictId" name="AppDistrictId" class="form-control  searchableselect">
+                                <option value="">Select District</option>
+                                @{
+                                    List<LicenseApplication> lstDistrict = (List<LicenseApplication>)ViewData["District"];
+                                    if (lstDistrict != null)
+                                    {
+                                        foreach (var item in lstDistrict)
+                                        {
+                                            if (Model.AppDistrictId == item.DistrictId)
+                                            {
+                                                <option value="@item.DistrictId" selected="selected">@item.DistrictName</option>
+                                            }
+                                            else
+                                            {
+                                                <option value="@item.DistrictId">@item.DistrictName</option>
+                                            }
+                                        }
+                                    }
+                                }
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="form-group row">
+                        <label class="col-sm-4 col-form-label ">Tehsil<span class="text-danger">*</span></label>
+                        <div class="col-sm-7">
+                            <select id="TehsilID" name="TehsilID" class="form-control  searchableselect">
+                                <option value="">Select Tehsil</option>
+                                @{
+                                    List<LicenseApplication> lstTehsil = (List<LicenseApplication>)ViewData["Tehsil"];
+                                    if (lstTehsil != null)
+                                    {
+                                        foreach (var item in lstTehsil)
+                                        {
+                                            if (Model.AppTehsilId == item.TehsilID)
+                                            {
+                                                <option value="@item.TehsilID" selected="selected">@item.TehsilName</option>
+                                            }
+                                            else
+                                            {
+                                                <option value="@item.TehsilID">@item.TehsilName</option>
+                                            }
+                                        }
+                                    }
+                                }
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="form-group row">
+                        <label class="col-sm-4 col-form-label ">Village<span class="text-danger">*</span></label>
+                        <div class="col-sm-7">
+                            <select id="VillageID" name="VillageID" class="form-control  searchableselect">
+                                <option value="">Select Village</option>
+                                @{
+                                    List<LicenseApplication> lstVillage = (List<LicenseApplication>)ViewData["Village"];
+                                    if (lstVillage != null)
+                                    {
+                                        foreach (var item in lstVillage)
+                                        {
+                                            if (Model.AppVillageId == item.VillageID)
+                                            {
+                                                <option value="@item.VillageID" selected="selected">@item.VillageName</option>
+                                            }
+                                            else
+                                            {
+                                                <option value="@item.VillageID">@item.VillageName</option>
+                                            }
+
+                                        }
+                                    }
+                                }
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="form-group row">
+                        <label class="col-sm-4 col-form-label ">Applicant is<span class="text-danger">*</span></label>
+                        <div class="col-sm-7">
+                            <select id="ApplicantTypeId" name="ApplicantTypeId" class="form-control  searchableselect">
+                                <option value="">Select Type</option>
+                                @{
+                                    List<LicenseApplication> lstApplicantTypeForForm4 = (List<LicenseApplication>)ViewData["ApplicantTypeForForm4"];
+                                    if (lstApplicantTypeForForm4 != null)
+                                    {
+                                        foreach (var item in lstApplicantTypeForForm4)
+                                        {
+                                            if (Model.ApplicantTypeId == item.ApplicantTypeId)
+                                            {
+                                                <option value="@item.ApplicantTypeId" selected="selected">@item.ApplicantTypeName</option>
+                                            }
+                                            else
+                                            {
+                                                <option value="@item.ApplicantTypeId">@item.ApplicantTypeName</option>
+                                            }
+                                        }
+                                    }
+                                }
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-sm-6">
+                    <div class="form-group row">
+                        <label class="col-sm-4 col-form-label ">Profession or nature of business<span class="text-danger">*</span></label>
+                        <div class="col-sm-7">
+                            <input type="text" id="NatureofBusiness" name="NatureofBusiness" value="@Model.NatureofBusiness" class="form-control">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="form-group row">
+                        <label class="col-sm-4 col-form-label ">Police Station<span class="text-danger">*</span></label>
+                        <div class="col-sm-7">
+                            <input type="text" id="PoliceStation" name="PoliceStation" value="@Model.PoliceStation" class="form-control">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="form-group row">
+                        <label class="col-sm-4 col-form-label ">Panchayat<span class="text-danger">*</span></label>
+                        <div class="col-sm-7">
+                            <input type="text" id="Panchayat" name="Panchayat" value="@Model.Panchayat" class="form-control">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6"></div>
+                <div class="col-sm-6">
+                    <div class="form-group">
+                        <label class=" col-form-label ">1. Select Company<span class="text-danger">*</span><br />If your company is not in the list please concern with your District office and add your company,then only you will be able to apply for the license application</label>
+
+                        <select id="CompanyId" name="CompanyId" class="form-control  searchableselect">
+                            <option value="">Select Company / Individual / Association / Firm</option>
+                            @{
+                                List<LicenseApplication> lstCompany = (List<LicenseApplication>)ViewData["Company"];
+                                if (lstCompany != null)
+                                {
+                                    foreach (var item in lstCompany)
+                                    {
+                                        if (Model.CompanyId == item.CompanyId)
+                                        {
+                                            <option value="@item.CompanyId" selected="selected">@item.CompanyName</option>
+                                        }
+                                        else
+                                        {
+                                            <option value="@item.CompanyId">@item.CompanyName</option>
+                                        }
+                                    }
+                                }
+                            }
+                        </select>
+
+
+
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="form-group">
+                        <label class=" col-form-label ">2. No Mining Due Certificate <span class="text-danger">*</span></label>
+                        <div class="custom-file">
+                            <input type="file" class="custom-file-input" id="NO_MINING_DUE_CERTIFICATE" name="NO_MINING_DUE_CERTIFICATE">
+                            <label class="custom-file-label" for="customFile">Choose Files</label>
+                            <small class="text-danger">Only <strong> jpg, jpeg, png, pdf, tif</strong> file types with size less than <strong>2 MB </strong> are allowed.</small>
+                            <a href="@CustomQueryStringHelper.EncryptString("Licensee","Download","LicenseApplication",new { name = Model.NO_MINING_DUE_CERTIFICATE_FILE_NAME, path = Model.NO_MINING_DUE_CERTIFICATE_FILE_PATH })" target="_blank" class="file-download-licensee">@((Model.NO_MINING_DUE_CERTIFICATE_FILE_NAME != null) ? Model.NO_MINING_DUE_CERTIFICATE_FILE_NAME : "")</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="form-group">
+                        <label class=" col-form-label ">3. If on the date of application,the applicant does not hold any mineral concession/license in the state furnish an affadavit for the same<span class="text-danger">*</span></label>
+                        <div class="custom-file">
+                            <input type="file" class="custom-file-input" id="AFFIDAVITE" name="AFFIDAVITE">
+                            <label class="custom-file-label" for="customFile">Choose Files</label>
+                            <small class="text-danger">Only <strong> jpg, jpeg, png, pdf, tif</strong> file types with size less than <strong>2 MB </strong> are allowed.</small>
+                            <a href="@CustomQueryStringHelper.EncryptString("Licensee","Download", "LicenseApplication", new { name = Model.AFFIDAVITE_FILE_NAME, path = Model.AFFIDAVITE_FILE_PATH })" target="_blank" class="file-download-licensee">@((Model.AFFIDAVITE_FILE_NAME != null) ? Model.AFFIDAVITE_FILE_NAME : "")</a>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="col-sm-6">
+                    <div class="form-group">
+                        <label class="col-form-label ">4. Mineral/Ore or its product for which the applicant intend to hold a permit<span class="text-danger">*</span></label>
+                        <input type="text" id="IntendMineralProductName" name="IntendMineralProductName" value="@Model.IntendMineralProductName" class="form-control">
+                    </div>
+
+                </div>
+                <div class="col-sm-6">
+                    <div class="form-group">
+                        <label class=" col-form-label ">5. Affidavit showing the mineral concession/licenses held or being held by other person/persons jointly with the applicant<span class="text-danger">*</span></label>
+                        <div class="custom-file">
+                            <input type="file" class="custom-file-input" id="AFFIDAVITE_JOINTLY" name="AFFIDAVITE_JOINTLY">
+                            <label class="custom-file-label" for="customFile">Choose Files</label>
+                            <small class="text-danger">Only <strong> jpg, jpeg, png, pdf, tif</strong> file types with size less than <strong>2 MB </strong> are allowed.</small>
+                            <a href="@CustomQueryStringHelper.EncryptString("Licensee","Download", "LicenseApplication", new { name = Model.AFFIDAVITE_JOINTLY_FILE_NAME, path = Model.AFFIDAVITE_JOINTLY_FILE_PATH })" target="_blank" class="file-download-licensee">@((Model.AFFIDAVITE_JOINTLY_FILE_NAME != null) ? Model.AFFIDAVITE_JOINTLY_FILE_NAME : "")</a>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="col-sm-6">
+                    <div class="form-group">
+                        <label class=" col-form-label ">5.1. Certified copy of the map<span class="text-danger">*</span></label>
+                        <div class="custom-file">
+                            <input type="file" class="custom-file-input" id="MAP_LAND_CERTIFICATE" name="MAP_LAND_CERTIFICATE">
+                            <label class="custom-file-label" for="customFile">Choose Files</label>
+                            <small class="text-danger">Only <strong> jpg, jpeg, png, pdf, tif</strong> file types with size less than <strong>2 MB </strong> are allowed.</small>
+                            <a href="@CustomQueryStringHelper.EncryptString("Licensee","Download", "LicenseApplication", new { name = Model.MAP_LAND_CERTIFICATE_FILE_NAME, path = Model.MAP_LAND_CERTIFICATE_FILE_PATH })" target="_blank" class="file-download-licensee">@((Model.MAP_LAND_CERTIFICATE_FILE_NAME != null) ? Model.MAP_LAND_CERTIFICATE_FILE_NAME : "")</a>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="col-sm-6">
+                    <div class="form-group">
+                        <label class=" col-form-label ">5.2. Latest revenue record of the land intended to be used for storing mineral or its products<span class="text-danger">*</span></label>
+                        <div class="custom-file">
+                            <input type="file" class="custom-file-input" id="LATEST_REVENEW_CERTIFICATE" name="LATEST_REVENEW_CERTIFICATE">
+                            <label class="custom-file-label" for="customFile">Choose Files</label>
+                            <small class="text-danger">Only <strong> jpg, jpeg, png, pdf, tif</strong> file types with size less than <strong>2 MB </strong> are allowed.</small>
+                            <a href="@CustomQueryStringHelper.EncryptString("Licensee","Download", "LicenseApplication", new { name = Model.LATEST_REVENEW_CERTIFICATE_FILE_NAME, path = Model.LATEST_REVENEW_CERTIFICATE_FILE_PATH })" target="_blank" class="file-download-licensee">@((Model.LATEST_REVENEW_CERTIFICATE_FILE_NAME != null) ? Model.LATEST_REVENEW_CERTIFICATE_FILE_NAME : "")</a>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="col-sm-6">
+                    <div class="form-group">
+                        <label class=" col-form-label ">5.3.Affidavit showing the surface rights/consent of the owner of the land, in case the applicant is not the owner of the land<span class="text-danger">*</span></label>
+                        <div class="custom-file">
+                            <input type="file" class="custom-file-input" id="OWNER_LAND_CERTIFICATE" name="OWNER_LAND_CERTIFICATE">
+                            <label class="custom-file-label" for="customFile">Choose Files</label>
+                            <small class="text-danger">Only <strong> jpg, jpeg, png, pdf, tif</strong> file types with size less than <strong>2 MB </strong> are allowed.</small>
+                            <a href="@CustomQueryStringHelper.EncryptString("Licensee","Download", "LicenseApplication", new { name = Model.OWNER_LAND_CERTIFICATE_FILE_NAME, path = Model.OWNER_LAND_CERTIFICATE_FILE_PATH })" target="_blank" class="file-download-licensee">@((Model.OWNER_LAND_CERTIFICATE_FILE_NAME != null) ? Model.OWNER_LAND_CERTIFICATE_FILE_NAME : "")</a>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="col-sm-6">
+                    <div class="form-group">
+                        <label class=" col-form-label ">
+                            6. Any other details the applicant wants to provide
+                            (NOC from PCB etc)<span class="text-danger">*</span>
+                        </label>
+                        <div class="custom-file">
+                            <input type="file" class="custom-file-input" id="NOC_OTHER_CERTIFICATE" name="NOC_OTHER_CERTIFICATE">
+                            <label class="custom-file-label" for="customFile">Choose Files</label>
+                            <small class="text-danger">Only <strong> jpg, jpeg, png, pdf, tif</strong> file types with size less than <strong>2 MB </strong> are allowed.</small>
+                            <a href="@CustomQueryStringHelper.EncryptString("Licensee","Download","LicenseApplication",new { name = Model.NOC_OTHER_CERTIFICATE_FILE_NAME, path = Model.NOC_OTHER_CERTIFICATE_FILE_PATH })" target="_blank" class="file-download-licensee">@((Model.NOC_OTHER_CERTIFICATE_FILE_NAME != null) ? Model.NOC_OTHER_CERTIFICATE_FILE_NAME : "")</a>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="col-sm-6"></div>
+                @if (Model.LicenseAppId > 0)
+                {
+                    <div class="col-sm-12 ">
+                        <a href="/Licensee/LicenseApplication/LicenseApprovalList" class="btn btn-success btn-md ml-0 mb-2  waves-effect waves-light rounded-0">Back</a>
+                    </div>
+                }
+                else
+                {
+                    <div class="col-sm-6">
+                        <div class="form-group row">
+                            <label for="inputMail" class="col-sm-4 col-form-label ">Enter Captcha<span class="text-danger">*</span></label>
+                            <div class="col-sm-7">
+                                <input id="captcha" name="captcha" type="text" class="form-control">
+                            </div>
+
+
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-group row">
+
+                            <div class="col-sm-4">
+                                <div class="input-group">
+                                    <div id="capt1" class="form-control" ondrag="return false" oncopy="return false" onselectstart="return false" oncut="return false"></div>
+                                    <label class="input-group-text" for="inputDate1"> <a href="javascript:;" onclick="updateCaptcha();"><i class="fas fa-sync-alt"></i></a> </label>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-group row">
+                            <label for="inputMail" class="col-sm-4 col-form-label ">Enter OTP<span class="text-danger">*</span></label>
+                            <div class="col-sm-7">
+                                <input type="text" id="VerifyOTP" name="VerifyOTP" class="form-control">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <a href="javascript:void(0);" id="btnsendOtp" class="btn btn-success btn-md ml-0 waves-effect waves-light">Send OTP</a>
+
+                    </div>
+                    <div class="col-sm-12">
+                        <div class="form-group row">
+                            <div class="custom-control custom-checkbox ml-2">
+                                <input type="checkbox" class="custom-control-input" name="chkIagree" id="chkIagree">
+                                <label class="custom-control-label text-danger" for="chkIagree">
+                                    Declaration - I declare that all the information given above is true as per my knowledge and belief. I am aware that if any of the above information is found to be false or untrue, there may be penalty / penalty under the appropriate rules.
+                                    The Department of Mineral Resources will not be responsible for authenticating any of the above information.
+                                </label>
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="col-sm-12 " id="divButtons">
+                        <a href="javascript:void(0);" id="btnSubmit" class="btn btn-success btn-md ml-0 mb-2  waves-effect waves-light rounded-0">Submit</a>
+                        <a href="/Licensee/LicenseApplication/Form4" class="btn btn-danger btn-md  mb-2  waves-effect waves-light rounded-0">Reset</a>
+                    </div>
+                }
+            </div>
+        </form>
+
+    </div>
+</div>
+
+<input type="hidden" id="hdnMineralCountString" value="@Model.MINERAL_Count_String" />
+<input type="hidden" id="hdnMineralFormString" value="@Model.MINERAL_FORM_String" />
+<input type="hidden" id="hdnMineralGradeString" value="@Model.MINERAL_GRADE_String" />
+
+<script>
+    $(document).ready(function () {
+        debugger;
+        updateCaptcha();
+        //--------------------------
+        if ($('input[name="chkIagree"]:checked').length > 0) {
+            $('#divButtons').show();
+            $(this).attr('checked', true);
+        }
+        else {
+            $('#divButtons').hide();
+            $(this).attr('checked', false);
+        }
+        //--------------------------------
+        $('.selectpicker').selectpicker();
+        $('.searchableselect').searchableselect();
+
+        if ($('#hdnMineralCountString').val() != "") {
+            var MineralCountString = $('#hdnMineralCountString').val().split(',');
+            $('#MineralId').selectpicker('val', MineralCountString);
+            GetMineralNatureByMineral();
+
+
+        }
+
+        $('#MineralTypeId').change(function () {
+            debugger;
+            if ($(this).val() != "") {
+                $.ajax({
+                    url: '/Licensee/LicenseApplication/GetCascadeMineral',
+                    data: { 'mineraltypes': $(this).val() },
+                    dataType: 'json',
+                    type: 'post',
+                    success: function (data) {
+                        debugger;
+                        $('#MineralId').html('');
+                        var row = "";
+
+                        $.each(data, function (ind, item) {
+                            row += "<option value='" + item.mineralId + "'>" + item.mineralName + "</option>";
+                        });
+                        $('#MineralId').html(row).selectpicker('refresh');
+
+
+                    },
+                    error: function (err) {
+
+                    }
+                });
+            }
+            else {
+                $('#MineralId').html(row).selectpicker('refresh');
+                $('#MineralNatureId').html(row).selectpicker('refresh');
+                $('#MineralGradeId').html(row).selectpicker('refresh');
+
+            }
+        });
+
+        $('#MineralId').change(function () {
+            debugger;
+            GetMineralNatureByMineral();
+        });
+
+        function GetMineralNatureByMineral() {
+            var selectedItem = [];
+            selectedItem = $('#MineralId').val();
+
+            if (selectedItem.length > 0) {
+
+                for (var i = 0; i < selectedItem.length; i++) {
+                    $('#MineralNatureId').html('');
+                    $.ajax({
+                        url: '/Licensee/LicenseApplication/GetCascadeMineralForm',
+                        data: { 'mineralid': selectedItem[i] },
+                        dataType: 'json',
+                        type: 'post',
+                        success: function (data) {
+                            debugger;
+
+                            var row = $('#MineralNatureId').html();;
+                            $.each(data, function (ind, item) {
+                                row += "<option value='" + item.mineralNatureId + "'>" + item.mineralNature + "</option>";
+                            });
+                            $('#MineralNatureId').html(row).selectpicker('refresh');
+                            //Edit Time Check Mineral Form String
+                            if ($('#hdnMineralFormString').val() == "")
+                                changeMineralList(this.event);
+                            else {
+                                //This section used for View
+                                var MineralFormString = $('#hdnMineralFormString').val().split(',');
+                                $('#MineralNatureId').selectpicker('val', MineralFormString);
+                                $('#MineralNatureId').change();
+                            }
+
+                        },
+                        error: function (err) {
+
+                        }
+                    });
+                }
+            }
+            else {
+                $('#MineralGradeId').html(row).selectpicker('refresh');
+                $('#MineralNatureId').html(row).selectpicker('refresh');
+
+            }
+        }
+
+        $('#MineralNatureId').change(function () {
+            debugger;
+            var selectedItem = [];
+            selectedItem = $('#MineralId').val();
+            var selectedItemMineralNatureId = [];
+            selectedItemMineralNatureId = $('#MineralNatureId').val();
+
+            if (selectedItemMineralNatureId.length > 0 && selectedItem.length > 0) {
+
+                $.ajax({
+                    url: '/Licensee/LicenseApplication/GetCascadeMineralGrade',
+                    data: { 'mineralid': selectedItem.toString(), 'MineralNatureList': selectedItemMineralNatureId.toString() },
+                    dataType: 'json',
+                    type: 'post',
+                    success: function (data) {
+                        debugger;
+                        $('#MineralGradeId').html('');
+                        var row = "";
+                        $.each(data, function (ind, item) {
+                            row += "<option value='" + item.mineralGradeId + "'>" + item.mineralGrade + "</option>";
+                        });
+                        $('#MineralGradeId').html(row).selectpicker('refresh');
+
+                        if ($('#hdnMineralGradeString').val() != "") {
+                            //This section used for View
+                            var MineralGradeString = $('#hdnMineralGradeString').val().split(',');
+                            $('#MineralGradeId').selectpicker('val', MineralGradeString);
+
+                        }
+
+
+                    },
+                    error: function (err) {
+
+                    }
+                });
+            }
+            else {
+                $('#MineralGradeId').html(row).selectpicker('refresh');
+
+            }
+        });
+
+        $('#DistrictId').change(function () {
+            if ($(this).val() != "") {
+
+                $.ajax({
+                    url: '/Licensee/LicenseApplication/GetTehsilDataFromDistrictID',
+                    data: { 'DistrictId': $(this).val() },
+                    dataType: 'json',
+                    type: 'post',
+                    success: function (data) {
+                        debugger;
+                        $('#TehsilID').html('');
+                        var row = "<option value=''>Select Tehsil</option>";
+                        $.each(data, function (ind, item) {
+                            row += "<option value='" + item.tehsilID + "'>" + item.tehsilName + "</option>";
+                        });
+                        $('#TehsilID').html(row);
+                    },
+                    error: function (err) {
+
+                    }
+                });
+            }
+            else {
+                $('#TehsilID').empty();
+                $('#TehsilID').append("<option value=''>Select Tehsil</option>");
+
+                $('#VillageID').empty();
+                $('#VillageID').html("<option value=''>Select Village</option>");
+            }
+        });
+
+        $('#TehsilID').change(function () {
+            if ($(this).val() != '') {
+                $.ajax({
+                    url: '/Licensee/LicenseApplication/GetVillageDataFromTehsilID',
+                    data: { 'TehsilId': $(this).val() },
+                    dataType: 'json',
+                    type: 'post',
+                    success: function (data) {
+                        debugger;
+                        $('#VillageID').html('');
+                        var row = "<option value=''>Select Village</option>";
+                        $.each(data, function (ind, item) {
+                            row += "<option value='" + item.villageID + "'>" + item.villageName + "</option>";
+                        });
+                        $('#VillageID').html(row);
+                    },
+                    error: function (err) {
+
+                    }
+                });
+            }
+            else {
+                $('#VillageID').empty();
+                $('#VillageID').html("<option value=''>Select Village</option>");
+            }
+        });
+
+        $('#NO_MINING_DUE_CERTIFICATE').on('change', function () {
+            debugger;
+            var fileExtension = ['jpg', 'jpeg', 'png', 'pdf', 'tif'];
+            if ($.inArray($(this).val().split('.').pop().toLowerCase(), fileExtension) == -1) {
+                swal("", "Only formats are allowed : " + fileExtension.join(', '), "warning");
+                $(this).focus();
+                return false;
+            }
+
+            if (Number(this.files[0].size) > 2097152) {
+                swal("", 'Try to upload file less than 2MB!', "warning");
+                $(this).val('');
+                $(this).focus();
+                return false;
+            }
+            else {
+                var fileName = $(this).val().split("\\").pop();
+                $(this).next('.custom-file-label').html(fileName);
+            }
+
+        });
+
+        $('#AFFIDAVITE').on('change', function () {
+            debugger;
+            var fileExtension = ['jpg', 'jpeg', 'png', 'pdf', 'tif'];
+            if ($.inArray($(this).val().split('.').pop().toLowerCase(), fileExtension) == -1) {
+                swal("", "Only formats are allowed : " + fileExtension.join(', '), "warning");
+                $(this).focus();
+                return false;
+            }
+
+            if (Number(this.files[0].size) > 2097152) {
+                swal("", 'Try to upload file less than 2MB!', "warning");
+                $(this).val('');
+                $(this).focus();
+                return false;
+            }
+            else {
+                var fileName = $(this).val().split("\\").pop();
+                $(this).next('.custom-file-label').html(fileName);
+            }
+
+        });
+
+        $('#AFFIDAVITE_JOINTLY').on('change', function () {
+            debugger;
+            var fileExtension = ['jpg', 'jpeg', 'png', 'pdf', 'tif'];
+            if ($.inArray($(this).val().split('.').pop().toLowerCase(), fileExtension) == -1) {
+                swal("", "Only formats are allowed : " + fileExtension.join(', '), "warning");
+                $(this).focus();
+                return false;
+            }
+
+            if (Number(this.files[0].size) > 2097152) {
+                swal("", 'Try to upload file less than 2MB!', "warning");
+                $(this).val('');
+                $(this).focus();
+                return false;
+            }
+            else {
+                var fileName = $(this).val().split("\\").pop();
+                $(this).next('.custom-file-label').html(fileName);
+            }
+
+        });
+
+        $('#MAP_LAND_CERTIFICATE').on('change', function () {
+            debugger;
+            var fileExtension = ['jpg', 'jpeg', 'png', 'pdf', 'tif'];
+            if ($.inArray($(this).val().split('.').pop().toLowerCase(), fileExtension) == -1) {
+                swal("", "Only formats are allowed : " + fileExtension.join(', '), "warning");
+                $(this).focus();
+                return false;
+            }
+
+            if (Number(this.files[0].size) > 2097152) {
+                swal("", 'Try to upload file less than 2MB!', "warning");
+                $(this).val('');
+                $(this).focus();
+                return false;
+            }
+            else {
+                var fileName = $(this).val().split("\\").pop();
+                $(this).next('.custom-file-label').html(fileName);
+            }
+
+        });
+
+        $('#LATEST_REVENEW_CERTIFICATE').on('change', function () {
+            debugger;
+            var fileExtension = ['jpg', 'jpeg', 'png', 'pdf', 'tif'];
+            if ($.inArray($(this).val().split('.').pop().toLowerCase(), fileExtension) == -1) {
+                swal("", "Only formats are allowed : " + fileExtension.join(', '), "warning");
+                $(this).focus();
+                return false;
+            }
+
+            if (Number(this.files[0].size) > 2097152) {
+                swal("", 'Try to upload file less than 2MB!', "warning");
+                $(this).val('');
+                $(this).focus();
+                return false;
+            }
+            else {
+                var fileName = $(this).val().split("\\").pop();
+                $(this).next('.custom-file-label').html(fileName);
+            }
+
+        });
+
+        $('#OWNER_LAND_CERTIFICATE').on('change', function () {
+            debugger;
+            var fileExtension = ['jpg', 'jpeg', 'png', 'pdf', 'tif'];
+            if ($.inArray($(this).val().split('.').pop().toLowerCase(), fileExtension) == -1) {
+                swal("", "Only formats are allowed : " + fileExtension.join(', '), "warning");
+                $(this).focus();
+                return false;
+            }
+
+            if (Number(this.files[0].size) > 2097152) {
+                swal("", 'Try to upload file less than 2MB!', "warning");
+                $(this).val('');
+                $(this).focus();
+                return false;
+            }
+            else {
+                var fileName = $(this).val().split("\\").pop();
+                $(this).next('.custom-file-label').html(fileName);
+            }
+
+        });
+
+        $('#NOC_OTHER_CERTIFICATE').on('change', function () {
+            debugger;
+            var fileExtension = ['jpg', 'jpeg', 'png', 'pdf', 'tif'];
+            if ($.inArray($(this).val().split('.').pop().toLowerCase(), fileExtension) == -1) {
+                swal("", "Only formats are allowed : " + fileExtension.join(', '), "warning");
+                $(this).focus();
+                return false;
+            }
+
+            if (Number(this.files[0].size) > 2097152) {
+                swal("", 'Try to upload file less than 2MB!', "warning");
+                $(this).val('');
+                $(this).focus();
+                return false;
+            }
+            else {
+                var fileName = $(this).val().split("\\").pop();
+                $(this).next('.custom-file-label').html(fileName);
+            }
+
+        }); 
+    });
+
+    $('#btnSubmit').click(function () {
+        debugger;
+        var checkdata = Validate();
+        if (checkdata == 1) {
+            if (confirm("Are you confirmed to submit Form 4 ?")) {
+                $('#btnSubmit').attr('readonly', 'readonly');
+                $('#form1').submit();
+            }
+            else {
+                return false;
+            }
+
+        }
+        else
+            return false;
+    });
+
+    function Validate() {
+        debugger;
+        var valid = 1;
+
+        if ($('#DistrictId').val() == null || $('#DistrictId').val() == "") {
+            swal("", "Application District required", "warning");
+            valid = 0;
+            $('#DistrictId').focus();
+            return false;
+        }
+
+        if ($('#LicenseeTypeId').val() == "") {
+            swal("", "Select Licencse Type !", "warning");
+            valid = 0;
+            $('#LicenseeTypeId').focus();
+            return false;
+        }
+
+        if ($('#MineralId').val() == "") {
+            swal("", "Minerals required.", "warning");
+            valid = 0;
+            $('#MineralId').focus();
+            return false;
+        }
+
+        var chktable = document.getElementById("CapacityTable");
+
+        var chkQty = document.getElementsByName("CapMineralQuantity");
+
+        for (var r = 1; r < chktable.rows.length; r++) {
+            if (chkQty[r - 1].value == "") {
+                swal("", "Quantity required", "warning");
+                valid = 0;
+                return false;
+            }
+        }
+
+
+        if ($('#ApplicationFor').val() == "") {
+            swal("", "Select Application For !", "warning");
+            valid = 0;
+            $('#ApplicationFor').focus();
+            return false;
+        }
+
+        if ($('#Period').val() == "") {
+            swal("", "Period required.", "warning");
+            valid = 0;
+            $('#Period').focus();
+            return false;
+        }
+
+        if ($('#Place').val() == "") {
+            swal("", "Place required.", "warning");
+            valid = 0;
+            $('#Place').focus();
+            return false;
+        }
+
+        if ($('#ApplicantName').val() == "") {
+            swal("", "Enter Applicant Name.", "warning");
+            valid = 0;
+            $('#ApplicantName').focus();
+            return false;
+        }
+
+        if ($('#MobileNo').val() == "") {
+            swal("", "Enter Mobile Number.", "warning");
+            valid = 0;
+            $('#MobileNo').focus();
+            return false;
+        }
+
+        if ($('#EmailAddress').val() == "") {
+            swal("", "Enter Email Address.", "warning");
+            valid = 0;
+            $('#EmailAddress').focus();
+            return false;
+        }
+
+        if ($('#CompleteAddress').val() == "") {
+            swal("", "Enter complete Address.", "warning");
+            valid = 0;
+            $('#CompleteAddress').focus();
+            return false;
+        }
+
+        if ($('#AppDistrictId').val() == "") {
+            swal("", "Select District.", "warning");
+            valid = 0;
+            $('#AppDistrictId').focus();
+            return false;
+        }
+
+        if ($('#TehsilID').val() == "") {
+            swal("", "Tehsil required", "warning");
+            valid = 0;
+            $('#TehsilID').focus();
+            return false;
+        }
+
+        if ($('#NatureofBusiness').val() == "") {
+            swal("", "Enter Nature of Business.", "warning");
+            valid = 0;
+            $('#NatureofBusiness').focus();
+            return false;
+        }
+
+        if ($('#PoliceStation').val() == "") {
+            swal("", "Enter Police Station.", "warning");
+            valid = 0;
+            $('#PoliceStation').focus();
+            return false;
+        }
+
+        if ($('#Panchayat').val() == "") {
+            swal("", "Enter Panchayat.", "warning");
+            valid = 0;
+            $('#Panchayat').focus();
+            return false;
+        }
+
+        if ($('#CompanyId').val() == "") {
+            swal("", "Please select Company. If your company is not in the list please contact your district officer.", "warning");
+            valid = 0;
+            $('#CompanyId').focus();
+            return false;
+        }
+
+        if ($('#NO_MINING_DUE_CERTIFICATE').val() == "") {
+
+            swal("", "Upload No Mining Due Certificate.", "warning");
+            valid = 0;
+            $('#NO_MINING_DUE_CERTIFICATE').focus();
+            return false;
+        }
+
+        if ($('#AFFIDAVITE').val() == "") {
+
+            swal("", "Upload Affidavit stating that the applicant does not hold any mineral concession/license in the state.", "warning");
+            valid = 0;
+            $('#AFFIDAVITE').focus();
+            return false;
+        }
+
+        if ($('#IntendMineralProductName').val() == "") {
+            swal("", "Please enter mineral/Ore or its product for which the applicant intend to hold a permit !", "warning");
+            valid = 0;
+            $('#IntendMineralProductName').focus();
+            return false;
+        }
+
+        if ($('#AFFIDAVITE_JOINTLY').val() == "") {
+            valid = 0;
+            swal("", "Affidavit showing the mineral concession/licenses held or being held by other person/persons jointly with the applicant.", "warning");
+            $('#AFFIDAVITE_JOINTLY').focus();
+            return false;
+        }
+
+        if ($('#MAP_LAND_CERTIFICATE').val() == "") {
+            valid = 0;
+            swal("", "Upload Certified copy of the map and latest revenue record of the land intended to be used for storing mineral or its products.", "warning");
+            $('#MAP_LAND_CERTIFICATE').focus();
+            return false;
+        }
+
+        if ($('#LATEST_REVENEW_CERTIFICATE').val() == "") {
+            valid = 0;
+            swal("", "Latest revenue record of the land intended to be used for storing mineral or its products.", "warning");
+            $('#LATEST_REVENEW_CERTIFICATE').focus();
+            return false;
+        }
+
+        if ($('#OWNER_LAND_CERTIFICATE').val() == "") {
+            valid = 0;
+            swal("", "Affidavit showing the surface rights/consent of the owner of the land, in case the applicant is not the owner of the land.", "warning");
+            $('#OWNER_LAND_CERTIFICATE').focus();
+            return false;
+        }
+
+        if ($('#NOC_OTHER_CERTIFICATE').val() == "") {
+            valid = 0;
+            alert("", "Upload Any other details the applicant wants to provide [NOC from PCB etc].", "warning");
+            $('#NOC_OTHER_CERTIFICATE').focus();
+            return false;
+        }
+        if ($("#captcha").val() == "") {
+            swal("", "Please enter captcha ", "warning");
+            $("#captcha").focus();
+            return false;
+        }
+
+        if ($("#capt1").html() != $("#captcha").val()) {
+            swal("", "In Valid captcha!", "warning");
+            $("#captcha").focus();
+            return false;
+        }
+        return valid;
+
+    }
+
+    function updateCaptcha() {
+        debugger;
+        $.ajax({
+            url: '/VehicleOwner/VehicleOwner/CaptchaImage',
+            data: {},
+            dataType: 'json',
+            type: 'post',
+            success: function (data) {
+                $("#capt1").html(data);
+            },
+            error: function (err) {
+                swal("", err.responseText, "warning");
+            }
+        });
+    }
+
+    function changeMineralList(e) {
+        debugger;
+        var minerallist = [];
+        minerallist = $('#MineralId').val();
+
+        $('#CapacityTable').find('tr').remove();
+        $('#CapacityTable').append('<tr><th style="border-color: black;text-align:center;">Mineral Name</th><th style="border-color: black;text-align:center;">Quantity</br>(MT)</th><th style="border-color: black;text-align:center; visibility: hidden; display: none">MineralId</th></tr>');
+        for (var i = 0; i < minerallist.length; i++) {
+            $('#CapacityTable').append('<tr><td style="border-color: black;">' + $("#MineralId option[value='" + minerallist[i] + "']").text() + '</td><td style="border-color: black;"><input type="number" min="0" name = "CapMineralQuantity"></td><td style="display:none;"><input type="hidden" name="CapMineralID" value="' + minerallist[i] + '"></td></tr>')
+
+        }
+
+    }
+
+    function isNumberKey(evt) {
+        var charCode = (evt.which) ? evt.which : evt.keyCode;
+        if (charCode != 46 && charCode > 31
+            && (charCode < 48 || charCode > 57))
+            return false;
+
+        return true;
+    }
+
+    $("#btnsendOtp").click(function () {
+        debugger;
+        if (Validate()) {
+            var mobileNumber = $("#MobileNo").val();
+            var EmailID = $("#EmailAddress").val();
+
+            if (mobileNumber == "") {
+                swal("", "Please enter mobile number", "warning");
+                $('#MobileNo').focus();
+                return false;
+            }
+            else {
+                $('#btnsendOtp').attr('readonly', 'readonly');
+
+                $.ajax({
+                    url: '/VehicleOwner/VehicleOwner/SendOTP',
+                    dataType: "",
+                    type: "POST",
+                    data: {
+                        MobileNumber: mobileNumber,
+                        EmailID: EmailID
+                    },
+                    success: function (data) {
+                        debugger;
+                        console.log(data);
+                        if (data != null) {
+                            $('#btnsendOtp').removeAttr('readonly');
+                            if (data == "SUCCESS") {
+                                swal("", "Enter Verification Code received on submitted Mobile/Email Id", "success");
+                            }
+                            else {
+                                swal("", data, "warning");
+                            }
+                        }
+                    }
+                })
+            }
+        }
+    });
+
+    $('#chkIagree').click(function () {
+        if (Validate()) {
+            if ($('#VerifyOTP').val() != "") {
+                $.ajax({
+                    url: '/VehicleOwner/VehicleOwner/VerifyOTP',
+                    data: {
+                        OTP: $('#VerifyOTP').val(),
+                        MobileNumber: $("#MobileNo").val(),
+                        EmailID: $("#EmailAddress").val()
+                    },
+                    success: function (result) {
+                        if (result == "SUCCESS") {
+                            if ($('input[name="chkIagree"]:checked').length > 0) {
+                                $('#divButtons').show();
+                                $(this).attr('checked', 'checked');
+
+                            }
+
+                            else {
+                                $('#divButtons').hide();
+                                ChangeCheckBoxStatus();
+                            }
+                        }
+                        else if (result == "REQUIRED") {
+                            swal("", "Please enter mobile number and e-mail and OTP !", "warning");
+                            $('#divButtons').hide();
+                            ChangeCheckBoxStatus();
+                        }
+                        else {
+                            swal("", "This OTP is already used.Please send another OTP and try again !", "warning");
+                            $('#divButtons').hide();
+                            ChangeCheckBoxStatus();
+                        }
+                    },
+                    error: function (result) {
+                        swal("", "OTP Verification failed.Please try again !", "warning");
+                        $('#divButtons').hide();
+                        ChangeCheckBoxStatus();
+                    }
+                });
+            }
+            else {
+                $('#chkIagree').prop('checked', false);
+                swal("", "Please Enter OTP", "warning");
+                $("#VerifyOTP").focus();
+                return false;
+            }
+        }
+        else {
+
+            $('#chkIagree').prop('checked', false);
+        }
+
+    });
+</script>
+

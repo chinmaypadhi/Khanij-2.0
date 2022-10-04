@@ -1,0 +1,961 @@
+﻿@*// *********************************************************************************************************
+    //  View Name                : ViewListMI
+    //  Desciption               : Lesse Assessment view details by MI
+    //  Created By               : Lingaraj Dalai
+    //  Created On               : 15 April 2021
+    // ********************************************************************************************************
+*@
+@model StarratingEF.AssessmentListmaster
+@using StarratingEF;
+@{
+    ViewData["Title"] = "ViewListMI";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+<script>
+    excelMe = "yes"
+    pdfMe = "yes"
+    printMe = "yes"
+    $(document).ready(function () {
+        loadNavigation('ViewListMI', 'glStar', 'pl', 'tl', 'Starrating', 'Star Rating Minor Minerals', '');
+        $('.searchableselect').searchableselect();
+        $('#datatable').DataTable();
+        $('.shorting-lnk').click(function () {
+            $('.shorting-lnk i').toggleClass('fa-sort-amount-up-alt fa-sort-amount-down-alt ');
+        });
+        $('.filter-dropdown').hide();
+        $('.filter-lnk').click(function () {
+            $(this).toggleClass('active');
+            $(this).siblings('.filter-dropdown').slideToggle();
+        });
+        $('.filter-btn').click(function () {
+            $(this).parent('.shorting-cell .filter-dropdown').slideUp();
+            if ($(this).parent().parent('.shorting-cell').find('.filter-lnk').hasClass('active')) {
+                $(this).parent().siblings('.filter-lnk').removeClass('active');
+            }
+        });
+        $("#excelIcon").click(function () {
+            exportTableToExcel("datatable", "text")
+        });
+        if ($("#ddlState").val() != "") {
+            BindDistrictData();
+        }
+        if ($("#hfFinancialYear").val() != "") {
+            $("#ReportingYear").val($("#hfFinancialYear").val());
+        }
+        BindFYData();
+    });
+    /*Bind District details*/
+    function BindDistrictData() {
+        debugger;
+        if ($('#ddlState').val() != "") {
+            $.ajax({
+                url: '/Starrating/Assessment/GetDistrictdetailsByRegionId',
+                data: { 'StateId': $('#ddlState').val() },
+                dataType: 'json',
+                type: 'post',
+                success: function (data) {
+                    debugger;
+                    var row = "";
+                    $('#DistrictID').html('');
+                    row += "<option value=''>Select</option>";
+                    $.each(data, function (ind, item) {
+                        row += "<option value='" + item.districtId + "'>" + item.districtName + "</option>";
+                    });
+                    $('#DistrictID').html(row);
+                    if ($("#hfDistrictId").val() != "") {
+                        $("#DistrictID").val($("#hfDistrictId").val());
+                        BindTehsilData();
+                    }
+                },
+                error: function (err) {
+                }
+            });
+        }
+        else {
+            var row = "";
+            $('#DistrictID').html('');
+            row += "<option value=''>Select</option>";
+            $('#DistrictID').html(row);
+        }
+    }
+    /*Bind Tehsil data*/
+    function BindTehsilData() {
+        debugger;
+        if ($('#DistrictID').val() != "") {
+            $.ajax({
+                url: '/Starrating/Assessment/GetTehsildetailsByDistrictId',
+                data: { 'DistrictId': $('#DistrictID').val() },
+                dataType: 'json',
+                type: 'post',
+                success: function (data) {
+                    debugger;
+                    var row = "";
+                    $('#TehsilID').html('');
+                    row += "<option value=''>Select</option>";
+                    $.each(data, function (ind, item) {
+                        row += "<option value='" + item.tehsilID + "'>" + item.tehsilName + "</option>";
+                    });
+                    $('#TehsilID').html(row);
+                    if ($("#hfTehsilId").val() != "") {
+                        $("#TehsilID").val($("#hfTehsilId").val());
+                        BindVillageData();
+                    }
+                },
+                error: function (err) {
+                }
+            });
+        }
+        else {
+            var row = "";
+            $('#TehsilID').html('');
+            row += "<option value=''>Select</option>";
+            $('#TehsilID').html(row);
+        }
+    }
+    /*Bind Vilage data*/
+    function BindVillageData() {
+        debugger;
+        if ($('#TehsilID').val() != "") {
+            $.ajax({
+                url: '/Starrating/Assessment/GetVillagedetailsByTehsilId',
+                data: { 'TehsilID': $('#TehsilID').val() },
+                dataType: 'json',
+                type: 'post',
+                success: function (data) {
+                    debugger;
+                    var row = "";
+                    $('#VillageID').html('');
+                    row += "<option value=''>Select</option>";
+                    $.each(data, function (ind, item) {
+                        row += "<option value='" + item.villageID + "'>" + item.villageName + "</option>";
+                    });
+                    $('#VillageID').html(row);
+                    if ($("#hfVillageId").val() != "") {
+                        $("#VillageID").val($("#hfVillageId").val());
+                    }
+                },
+                error: function (err) {
+                }
+            });
+        }
+        else {
+            var row = "";
+            $('#VillageID').html('');
+            row += "<option value=''>Select</option>";
+            $('#VillageID').html(row);
+        }
+    }
+    /*Bind FY details*/
+    function BindFYData() {
+        $.ajax({
+            url: '/Starrating/Assessment/GetFinancialYearlist',
+            dataType: 'json',
+            type: 'post',
+            success: function (data) {
+                debugger;
+                var row = "";
+                $('#ReportingYear').html('');
+                row += "<option value=''>Select</option>";
+                $.each(data, function (ind, item) {
+                    row += "<option value='" + item.year + "'>" + item.year + "</option>";
+                });
+                $('#ReportingYear').html(row);
+                if ($("#hfFinancialYear").val() != "") {
+                    $("#ReportingYear").val($("#hfFinancialYear").val());
+                }
+            },
+            error: function (err) {
+            }
+        });
+    }
+    /*Get Lessee Data*/
+    function GetTicketData(LesseeCode) {
+        $.ajax({
+            url: '/Starrating/Assessment/GetTicketlist',
+            data: { 'LesseeCode': LesseeCode },
+            dataType: 'json',
+            type: 'post',
+            success: function (data) {
+                debugger;
+                for (i = 0; i < data.length; i++) {
+                    $("#lblapplicantname").html(data[i].applicantName);
+                    $("#lbllesseecode").html(data[i].lessee_Code);
+                    $("#lbladdress").text(data[i].address);
+                    $("#lbldistrict").text(data[i].districtName);
+                    $("#lbltehsil").text(data[i].tehsilName);
+                    $("#lblvillage").text(data[i].villageName);
+                }
+                $("#FetchTicketDetails").modal('show');
+            },
+            error: function (err) {
+            }
+        });
+    }
+    /*Get Lessee All Details*/
+    function GetAllData(Assessmentid) {
+        $.ajax({
+            url: '/Starrating/Assessment/GetLesseeDetails',
+            data: { 'AssessmentId': Assessmentid },
+            dataType: 'json',
+            type: 'post',
+            success: function (data) {
+                debugger;
+                $("#lblApplicantName").html(data.applicantName);
+                $("#lblLessee_Code").html(data.lessee_Code);
+                $("#lblReportingYear").text(data.reporting_Year);
+                $("#lblKhasraNo").text(data.khasra_No);
+                $("#lblStateName").text(data.stateName);
+                $("#lblDistrictName").text(data.districtName);
+                $("#lblTehsilName").text(data.tehsilName);
+                $("#lblVillageName").text(data.villageName);
+                $("#lblLeasePeriodFrom").text(data.lease_Period_From);
+                $("#lblLeasePeriodTo").text(data.lease_Period_To);
+                $("#lblMinerals").text(data.mineralName);
+                $("#lblLesseeType").text(data.lessee_Type_Id);
+                $("#lblCompanyName").text(data.company_Name);
+                $("#lblDirectorName").text(data.director_Name);
+                $("#lblMobileNo").text(data.mobile_No);
+                $("#lblEmailId").text(data.email_Id);
+                $("#lblAddress").text(data.address);
+                $("#lblMiningMethod").text(data.mining_Method_Id);
+                $("#lblLeaseStatus").text(data.lease_Status_Id);
+                $("#lblNoOfWorkingDays").text(data.working_Days);
+                $("#lblNoOfDaysTemporary").text(data.discontunuance_Days);
+                $("#lblNoOfDayssuspension").text(data.suspension_Days);
+                $("#lblAgentName").text(data.contact_Person);
+                $("#lblAgentMobileNo").text(data.contact_No);
+                $("#lblAgentEmailId").text(data.contact_Mail);
+                $("#lblAgentAddress").text(data.contact_Address);
+                $("#lblApproved_Plan_Validity_From").text(data.approved_Plan_Validity_From);
+                $("#lblApproved_Plan_Validity_To").text(data.approved_Plan_Validity_To);
+                $("#lblApproved_Plan_Quantity").text(data.approved_Plan_Quantity);
+                $("#lblEnvClearanceValidityFrom").text(data.environment_Clearance_Validity_From);
+                $("#lblEnvClearanceValidityTo").text(data.environment_Clearance_Validity_To);
+                $("#lblEnvClearanceQuantityApproved").text(data.environment_Clearance_Quantity);
+                $("#lblSPCBValidityFrom").text(data.spcB_Validity_Upto);
+                $("#lblSPCBQuantityApproved").text(data.spcB_Quantity);
+                $("#lblForestClearanceValidityFrom").text(data.forest_Clearance_Validity_Upto);
+                $("#lblRoyaltyPaid").text(data.royalty_Paid);
+                $("#lblDeadRentPaid").text(data.dead_Rent_Paid);
+                $("#lblDMFContribution").text(data.contribution_To_DMF);
+                $('#MineralTable tbody tr').remove();
+                BindTableData(Assessmentid, $('#MineralTable tbody'), "Mineral");
+                $('#CoordinateTable tbody tr').remove();
+                BindTableData(Assessmentid, $('#CoordinateTable tbody'), "Coordinates");
+                $('#LeaseAreaTable tbody tr').remove();
+                BindTableData(Assessmentid, $('#LeaseAreaTable tbody'), "LeaseArea");
+                BindData(Assessmentid, "K", $("#divOther"), 0);
+                BindData(Assessmentid, "L", $("#lblWC"), 0);
+                BindData(Assessmentid, "M", $("#lblAC"), 0);
+                BindData(Assessmentid, "N", $("#lblEC"), 0);
+                BindData(Assessmentid, "O", $("#lblBlasting"), 0);
+                BindData(Assessmentid, "P", $("#lbldgms"), 0);
+                $("#FetchAllDetails").modal('show');
+            },
+            error: function (err) {
+            }
+        });
+    }
+    /*Bind Table Data details*/
+    function BindTableData(Assessmentid, id, type) {
+        var lbid = id;
+        $.ajax({
+            url: '/Starrating/Assessment/GetTableDataDetails',
+            data: { 'AssessmentId': Assessmentid, 'Type': type },
+            dataType: 'json',
+            type: 'post',
+            success: function (data) {
+                debugger;
+                for (i = 0; i < data.length; i++) {
+                    var iNum = parseInt(i) + parseInt(1);
+                    if (type == "Mineral") {
+                        $(lbid).append(
+                            '<tr><td>' + iNum + '</td><td class="text-lg-left">' + data[i].mineralName + '</td><td class="text-lg-right">' + data[i].leaseArea + '</td></tr>');
+                    }
+                    else if (type == "Coordinates") {
+                        $(lbid).append(
+                            '<tr><td>' + iNum + '</td><td class="text-lg-right">' + data[i].latitude + '</td><td class="text-lg-right">' + data[i].longitude + '</td></tr>');
+                    }
+                    else {
+                        $(lbid).append(
+                            '<tr><td>' + iNum + '</td><td class="text-lg-left">' + data[i].leaseAreaType + '</td><td class="text-lg-right">' + data[i].area_In_Hectare + '</td></tr>');
+                    }
+                }
+            }
+        });
+    }
+    /*Bind File Upload Data details*/
+    function BindData(Assessmentid, action, id, FMId) {
+        var lbid = id;
+        debugger;
+        $.ajax({
+            url: '/Starrating/Starrating/GetUploadData',
+            data: { 'AssessmentId': Assessmentid, 'Action': action, 'FMId': FMId },
+            dataType: 'json',
+            type: 'post',
+            success: function (data) {
+                debugger;
+                for (i = 0; i < data.length; i++) {
+                    if (data[i].fileName != "" && data[i].fileExtension != "") {
+                        if (FMId > 0) {
+                            $(lbid).append(
+                                '<a href="../../../Upload/SR_UploadedFiles/' + data[i].fileName + data[i].fileExtension + '" target="_blank"><i class="fas fa-file-pdf" aria-hidden="true"></i></a>');
+                        }
+                        else if (action == "K") {
+                            $(lbid).append(
+                                '<label class="col-lg-2 col-md-4 col-sm-12 font-weight-bold">' + data[i].otherName + '</label><div class="col-lg-2 col-md-8 col-sm-12 mb-2"><span class="colon">:</span> <a href="../../../Upload/SR_UploadedFiles/' + data[i].fileName + data[i].fileExtension + '" target="_blank"><i class="icon-download-solid" aria-hidden="true"></i></a></div>');
+                        }
+                        else {
+                            $(lbid).append(
+                                '<span class="colon">:</span> <a href="../../../Upload/SR_UploadedFiles/' + data[i].fileName + data[i].fileExtension + '" target="_blank"><i class="icon-download-solid" aria-hidden="true"></i></a>');
+                        }
+                    }
+                }
+            },
+            errSR_AMSR_AMor: function (err) {
+            }
+        });
+
+    }
+</script>
+<section class="wrapper main-wrapper row">
+    @if (ViewBag.msg != null)
+    {
+        <script>
+         var vv = '@ViewBag.msg';
+        if (vv >0) {
+            swal("","Assessment reviewed successfully.","success");
+        }
+        else {
+            swal("",vv,"warning");
+        }
+        </script>
+    }
+
+    <div class="col-12">
+        @Html.Partial("_CMSnavigation")
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="javascript:void(0);">
+                                View
+                            </a>
+                        </li>
+                    </ul>
+                    @Html.Partial("_CMSutil")
+                </div>
+                <section class="box form-container">
+                    @using (Html.BeginForm("ViewlistMI", "Assessment", FormMethod.Post, new { AUTOCOMPLETE = "Off", id = "form1" }))
+                    {
+                        @Html.AntiForgeryToken()
+                        <div class="search-box">
+                            <div class="searchform px-3 pt-3">
+                                <div class="row">
+                                    <div class="col-lg-4 col-md-6 col-sm-12">
+                                        <div class="form-group row">
+                                            <label for="inputText" class="col-sm-3 col-form-label">
+                                                State
+                                            </label>
+                                            <div class="col-sm-8">
+                                                @Html.DropDownListFor(m => m.StateId, ViewBag.State as IEnumerable<SelectListItem>, "Select", new { @class = "form-control  searchableselect", autofocus = "autofocus", @onchange = "BindDistrictData()", @id = "ddlState" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-4 col-md-6 col-sm-12">
+                                        <div class="form-group row">
+                                            <label for="inputText" class="col-sm-3 col-form-label">
+                                                District
+                                            </label>
+                                            <div class="col-sm-8">
+                                                <select id="DistrictID" name="DistrictID" Class="form-control searchableselect" onchange="BindTehsilData()">
+                                                    <option value="">Select</option>
+                                                    @{
+                                                        List<AssessmentListmaster> listDistrict = (List<AssessmentListmaster>)ViewData["District"];
+                                                        if (listDistrict != null)
+                                                        {
+                                                            foreach (var item in listDistrict)
+                                                            {
+                                                                <option value="@item.DistrictId">@item.DistrictName</option>
+                                                            }
+                                                        }
+                                                    }
+                                                    @Html.HiddenFor(m => m.DistrictId, new { @id = "hfDistrictId" })
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-4 col-md-6 col-sm-12">
+                                        <div class="form-group row">
+                                            <label for="inputText" class="col-sm-3 col-form-label">
+                                                Tehsil
+                                            </label>
+                                            <div class="col-sm-8">
+                                                <select id="TehsilID" name="TehsilID" Class="form-control searchableselect" onchange="BindVillageData()">
+                                                    <option value="">Select</option>
+                                                    @{
+                                                        List<AssessmentListmaster> listTehsil = (List<AssessmentListmaster>)ViewData["Tehsil"];
+                                                        if (listTehsil != null)
+                                                        {
+                                                            foreach (var item in listTehsil)
+                                                            {
+                                                                <option value="@item.TehsilID">@item.TehsilName</option>
+                                                            }
+                                                        }
+                                                    }
+                                                    @Html.HiddenFor(m => m.TehsilID, new { @id = "hfTehsilId" })
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-4 col-md-6 col-sm-12">
+                                        <div class="form-group row">
+                                            <label for="inputText" class="col-sm-3 col-form-label">
+                                                Village
+                                            </label>
+                                            <div class="col-sm-8">
+                                                <select id="VillageID" name="VillageID" Class="form-control searchableselect">
+                                                    <option value="">Select</option>
+                                                    @{
+                                                        List<AssessmentListmaster> listVillage = (List<AssessmentListmaster>)ViewData["Village"];
+                                                        if (listVillage != null)
+                                                        {
+                                                            foreach (var item in listVillage)
+                                                            {
+                                                                <option value="@item.VillageID">@item.VillageName</option>
+                                                            }
+                                                        }
+                                                    }
+                                                    @Html.HiddenFor(m => m.VillageID, new { @id = "hfVillageId" })
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-4 col-md-6 col-sm-12">
+                                        <div class="form-group row">
+                                            <label for="inputText" class="col-sm-3 col-form-label">
+                                                Financial Year
+                                            </label>
+                                            <div class="col-sm-8">
+                                                <select id="ReportingYear" name="ReportingYear" class="form-control searchableselect">
+                                                    <option value="">Select</option>
+                                                    @Html.HiddenFor(m => m.ReportingYear, new { @id = "hfFinancialYear" })
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-4 col-md-6 col-sm-12">
+                                        <div class="form-group row">
+                                            <label for="inputText" class="col-sm-3 col-form-label">
+                                                Applicant Name
+                                            </label>
+                                            <div class="col-sm-8">
+                                                @Html.TextBoxFor(m => m.ApplicantName, new { @class = "form-control", @autofocus = "autofocus", @id = "txtApplicantName" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-4 col-md-6 col-sm-12">
+                                        <div class="form-group row">
+                                            <div class="col-sm-8">
+                                                <input type="submit" class="btn btn-success btn-md ml-0" name="Show1" id="Submit" value="Search" />
+                                                <a href="@Url.Content("~/Starrating/Assessment/ViewListMI")" class="btn btn-danger btn-md" title="Rest">Reset</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="content-body">
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div id="viewtable" class="">
+                                        <table id="datatable" class="table table-sm table-bordered">
+                                            <thead>
+                                                <tr>
+                                                    <th rowspan="2" width="40px">Sl#</th>
+                                                    <th rowspan="2" width="100px">Lessee Code</th>
+                                                    <th rowspan="2">Applicant Name</th>
+                                                    <th rowspan="2">District</th>
+                                                    <th rowspan="2">Tehsil</th>
+                                                    <th rowspan="2">Village</th>
+                                                    <th colspan="5" class="text-center border-bottom">Rating Points</th>
+                                                    <th rowspan="2" width="70px" class="noprint text-center">Action</th>
+                                                </tr>
+                                                <tr>
+                                                    <th width="50px" class="text-right">Max</th>
+                                                    <th width="50px" class="text-right">Lessee </th>
+                                                    <th width="50px" class="text-right">MI </th>
+                                                    <th width="50px" class="text-right">DD </th>
+                                                    <th width="50px" class="text-right">DGM </th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @{ int i = 1;
+                                                }
+                                                @foreach (var b in ViewBag.ViewList)
+                                                {
+                                                    <tr>
+                                                        <td>
+                                                            @i
+                                                            @{ i++; }
+                                                        </td>
+                                                        <td>   <a href="javascript:void(0);" data-toggle="modal" title="View Status" data-id="@b.Lessee_Code" onclick="GetTicketData(@b.Lessee_Code)"><strong> @b.Lessee_Code</strong></a></td>
+                                                        <td>@b.ApplicantName</td>
+                                                        <td>@b.DistrictName</td>
+                                                        <td>@b.TehsilName</td>
+                                                        <td>@b.VillageName</td>
+                                                        <td class="font-weight-bold text-right">@b.RatingValue</td>
+                                                        <td class="font-weight-bold text-right">@b.PointObtained</td>
+                                                        <td class="font-weight-bold text-right">@b.MIPoint</td>
+                                                        <td class="font-weight-bold text-right">@b.DDPoint</td>
+                                                        <td class="font-weight-bold text-right">@b.DGMPoint</td>
+                                                        <td class="noprint text-center">
+                                                            <a href="javascript:void(0);" data-toggle="modal" class="btn-outline-info btn-sm mr-1" title="View Details" data-id="@b.Lessee_Code" onclick="GetAllData(@b.AssesmentID)"><i class="icon-eye"></i></a>
+                                                            <a href="@Url.Content("~/Starrating/Starrating/EditMI/")@b.AssesmentID"
+                                                               class="btn-outline-primary btn-sm"
+                                                               title="Detail"><i class="icon-eye-dropper-solid"></i></a>
+                                                            <input type="hidden" value="@b.AssesmentID" id="hfAssesmentID" />
+                                                        </td>
+                                                    </tr>
+                                                }
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true" id="FetchTicketDetails">
+                            <div class="modal-dialog modal-lg">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title mt-0" id="Comp_MHDR">Lessee Details</h5>
+                                        <button type="button" class="close" aria-label="Close" id="CloseMeeting" data-dismiss="modal">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <div class="user-info-detilas mb-3">
+                                            <div class="row">
+                                                <div class="col-md-7">
+                                                    <h6 class="m-0 mb-2"><small class="d-block mb-1 text-dark">Applicant Name</small> <label id="lblapplicantname"></label></h6>
+                                                    <p class="mb-1">Address: <span class="text-dark font-weight-bold" id="lbladdress"></span></p>
+                                                </div>
+                                                <div class="col-md-5 right-section">
+                                                    <h6 class="m-0 mb-2 text-info"><small class="d-block  mb-1 text-dark">Lessee Code</small><label id="lbllesseecode"></label></h6>
+                                                    <p class="mb-1">District: <span class="text-dark font-weight-bold" id="lbldistrict"></span></p>
+                                                    <p class="mb-1">Tehsil: <span class="text-dark font-weight-bold" id="lbltehsil"></span></p>
+                                                    <p class="mb-1">Village: <span class="text-dark font-weight-bold" id="lblvillage"> </span></p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true" id="FetchAllDetails">
+                            <div class="modal-dialog modal-lg">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title mt-0" id="Comp_MHDR">Lessee Details</h5>
+                                        <button type="button" class="close" aria-label="Close" id="CloseMeeting" data-dismiss="modal">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <div class="">
+                                            <div id="accordion2">
+                                                <div class="accordion">
+                                                    <div class="accordion-header" id="headingOne">
+                                                        <h5 class="mb-0">
+                                                            <a class="" data-toggle="collapse" data-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+                                                                Lease Details
+                                                            </a>
+                                                        </h5>
+                                                    </div>
+                                                    <div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-parent="#accordion2" style="">
+                                                        <div class="accordion-body">
+                                                            <div class="">
+                                                                <div class="">
+                                                                    <div class="row">
+                                                                        <label class="col-lg-2 col-md-4 col-sm-12 font-weight-bold">Unique Lease Id </label>
+                                                                        <div class="col-lg-2 col-md-8 col-sm-12 mb-2">
+                                                                            <label class=""><span class="colon">:</span><label id="lblLessee_Code"></label></label>
+                                                                        </div>
+                                                                        <label class="col-lg-2 col-md-4 col-sm-12 font-weight-bold">Reporting Year</label>
+                                                                        <div class="col-lg-2 col-md-8 col-sm-12 mb-2">
+                                                                            <label class=""><span class="colon">:</span><label id="lblReportingYear"></label></label>
+                                                                        </div>
+                                                                        <label class="col-lg-2 col-md-4 col-sm-12 font-weight-bold">Khasra /Survey No.</label>
+                                                                        <div class="col-lg-2 col-md-8 col-sm-12 mb-2">
+                                                                            <label class=""><span class="colon">:</span><label id="lblKhasraNo"></label></label>
+                                                                        </div>
+                                                                        <label class="col-lg-2 col-md-4 col-sm-12 font-weight-bold">State</label>
+                                                                        <div class="col-lg-2 col-md-8 col-sm-12 mb-2">
+                                                                            <label class=""><span class="colon">:</span><label id="lblStateName"></label></label>
+                                                                        </div>
+                                                                        <label class="col-lg-2 col-md-4 col-sm-12 font-weight-bold">District </label>
+                                                                        <div class="col-lg-2 col-md-8 col-sm-12 mb-2">
+                                                                            <label class=""><span class="colon">:</span><label id="lblDistrictName"></label></label>
+                                                                        </div>
+                                                                        <label class="col-lg-2 col-md-4 col-sm-12 font-weight-bold">Tehsil</label>
+                                                                        <div class="col-lg-2 col-md-8 col-sm-12 mb-2">
+                                                                            <label class=""><span class="colon">:</span><label id="lblTehsilName"></label></label>
+                                                                        </div>
+                                                                        <label class="col-lg-2 col-md-4 col-sm-12 font-weight-bold">Village</label>
+                                                                        <div class="col-lg-2 col-md-8 col-sm-12 mb-2">
+                                                                            <label class=""><span class="colon">:</span><label id="lblVillageName"></label></label>
+                                                                        </div>
+                                                                        <label class="col-lg-2 col-md-4 col-sm-12 font-weight-bold">Lease Period (From) </label>
+                                                                        <div class="col-lg-2 col-md-8 col-sm-12 mb-2">
+                                                                            <label class=""><span class="colon">:</span><label id="lblLeasePeriodFrom"></label></label>
+                                                                        </div>
+                                                                        <label class="col-lg-2 col-md-4 col-sm-12 font-weight-bold">Lease Period (To) </label>
+                                                                        <div class="col-lg-2 col-md-8 col-sm-12 mb-2">
+                                                                            <label class=""><span class="colon">:</span><label id="lblLeasePeriodTo"></label></label>
+                                                                        </div>
+                                                                        <label class="col-lg-2 col-md-4 col-sm-12 font-weight-bold">Minerals </label>
+                                                                        <div class="col-lg-6 col-md-8 col-sm-12 mb-3">
+                                                                            <label class=""><span class="colon">:</span><label id="lblMinerals"></label></label>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="separator separator-dashed "></div>
+                                                                    <div class="row ">
+                                                                        <div class="col-lg-6 col-md-12 col-sm-12">
+                                                                            <h6 class="text-brown font-weight-bold">Total Resource Available Lease Area <small>(MT)</small></h6>
+                                                                            <div class="table-responsive">
+                                                                                <table class="table table-sm table-bordered" id="MineralTable">
+                                                                                    <thead>
+                                                                                        <tr>
+                                                                                            <th width="30px">Sl#</th>
+                                                                                            <th>Mineral Name</th>
+                                                                                            <th class="text-lg-right">Total</th>
+                                                                                        </tr>
+                                                                                    </thead>
+                                                                                    <tbody>
+                                                                                        <tr id="tr_MineralTable"></tr>
+                                                                                    </tbody>
+                                                                                </table>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="row ">
+                                                                        <div class="col-lg-6 col-md-12 col-sm-12">
+                                                                            <h6 class="text-brown font-weight-bold">Lease Boundary Coordinates </h6>
+                                                                            <div class="table-responsive">
+                                                                                <table class="table table-sm table-bordered" id="CoordinateTable">
+                                                                                    <thead>
+                                                                                        <tr>
+                                                                                            <th width="30px">Sl#</th>
+                                                                                            <th class="text-lg-right">Latitudes</th>
+                                                                                            <th class="text-lg-right">Longitudes</th>
+                                                                                        </tr>
+                                                                                    </thead>
+                                                                                    <tbody>
+                                                                                        <tr id="tr_CoordinateTable"></tr>
+                                                                                    </tbody>
+                                                                                </table>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="row ">
+                                                                        <div class="col-lg-6 col-md-12 col-sm-12">
+                                                                            <h6 class="text-brown font-weight-bold">Total Lease Area <small>(in hectare)</small></h6>
+                                                                            <div class="table-responsive">
+                                                                                <table class="table table-sm table-bordered" id="LeaseAreaTable">
+                                                                                    <thead>
+                                                                                        <tr>
+                                                                                            <th width="30px">Sl#</th>
+                                                                                            <th>Land Type</th>
+                                                                                            <th class="text-lg-right">Total</th>
+                                                                                        </tr>
+                                                                                    </thead>
+                                                                                    <tbody>
+                                                                                        <tr id="tr_LeaseAreaTable"></tr>
+                                                                                    </tbody>
+                                                                                </table>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="accordion">
+                                                    <div class="accordion-header" id="headingTwo">
+                                                        <h5 class="mb-0">
+                                                            <a class="collapsed" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                                                                Lessee Details
+                                                            </a>
+                                                        </h5>
+                                                    </div>
+                                                    <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordion2" style="">
+                                                        <div class="accordion-body">
+                                                            <div class="">
+                                                                <div class="">
+                                                                    <div class="row">
+                                                                        <label class="col-lg-2 col-md-4 col-sm-12 font-weight-bold">Type of Lessee </label>
+                                                                        <div class="col-lg-2 col-md-8 col-sm-12  mb-2">
+                                                                            <label class=""><span class="colon">:</span><label id="lblLesseeType"></label></label>
+                                                                        </div>
+                                                                        <label class="col-lg-2 col-md-4 col-sm-12 font-weight-bold">Name of Person/ Company/ Partnership firm</label>
+                                                                        <div class="col-lg-2 col-md-8 col-sm-12  mb-2">
+                                                                            <label class=""><span class="colon">:</span><label id="lblCompanyName"></label></label>
+                                                                        </div>
+                                                                        <label class="col-lg-2 col-md-4 col-sm-12 font-weight-bold">Name of Managing Director / Managing Partner</label>
+                                                                        <div class="col-lg-2 col-md-8 col-sm-12  mb-2">
+                                                                            <label class=""><span class="colon">:</span><label id="lblDirectorName"></label></label>
+                                                                        </div>
+                                                                        <label class="col-lg-2 col-md-4 col-sm-12 font-weight-bold">Mobile Number</label>
+                                                                        <div class="col-lg-2 col-md-8 col-sm-12  mb-2">
+                                                                            <label class=""><span class="colon">:</span><label id="lblMobileNo"></label></label>
+                                                                        </div>
+                                                                        <label class="col-lg-2 col-md-4 col-sm-12 font-weight-bold">Email Id</label>
+                                                                        <div class="col-lg-2 col-md-8 col-sm-12  mb-2">
+                                                                            <label class=""><span class="colon">:</span><label id="lblEmailId"></label></label>
+                                                                        </div>
+                                                                        <label class="col-lg-2 col-md-4 col-sm-12 font-weight-bold">Address</label>
+                                                                        <div class="col-lg-2 col-md-8 col-sm-12  mb-2">
+                                                                            <label class=""><span class="colon">:</span><label id="lblAddress"></label></label>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="accordion">
+                                                    <div class="accordion-header" id="headingThree">
+                                                        <h5 class="mb-0">
+                                                            <a class="collapsed" data-toggle="collapse" data-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                                                                Working Details
+                                                            </a>
+                                                        </h5>
+                                                    </div>
+                                                    <div id="collapseThree" class="collapse" aria-labelledby="headingThree" data-parent="#accordion2" style="">
+                                                        <div class="accordion-body">
+                                                            <div class="">
+                                                                <div class="">
+                                                                    <div class="row">
+                                                                        <label class="col-lg-2 col-md-4 col-sm-12 font-weight-bold">Method of Mining</label>
+                                                                        <div class="col-lg-2 col-md-8 col-sm-12 mb-2">
+                                                                            <label class=""><span class="colon">:</span><label id="lblMiningMethod"></label></label>
+                                                                        </div>
+                                                                        <label class="col-lg-2 col-md-4 col-sm-12 font-weight-bold">Status of the lease on date of filing</label>
+                                                                        <div class="col-lg-2 col-md-8 col-sm-12 mb-2">
+                                                                            <label class=""><span class="colon">:</span><label id="lblLeaseStatus"></label></label>
+                                                                        </div>
+                                                                        <label class="col-lg-2 col-md-4 col-sm-12 font-weight-bold">No. of working days during Reporting Year</label>
+                                                                        <div class="col-lg-2 col-md-8 col-sm-12 mb-2">
+                                                                            <label class=""><span class="colon">:</span><label id="lblNoOfWorkingDays"></label></label>
+                                                                        </div>
+                                                                        <label class="col-lg-2 col-md-4 col-sm-12 font-weight-bold">No. of days of temporary discontinuance during Reporting Year</label>
+                                                                        <div class="col-lg-2 col-md-8 col-sm-12 mb-2">
+                                                                            <label class=""><span class="colon">:</span><label id="lblNoOfDaysTemporary"></label></label>
+                                                                        </div>
+                                                                        <label class="col-lg-2 col-md-4 col-sm-12 font-weight-bold">No. of days under suspension during Reporting Year</label>
+                                                                        <div class="col-lg-2 col-md-8 col-sm-12 mb-2">
+                                                                            <label class=""><span class="colon">:</span><label id="lblNoOfDayssuspension"></label></label>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="separator separator-dashed mt-3 w-100"></div>
+                                                                    <h6 class="font-weight-bold text-brown mb-3">
+                                                                        Details of the Agent / Manger responsible to ensure filing for Star Rating form
+                                                                        <small class="font-italic text-dark d-block">( For this purpose owner may nominate himself as a Agent / Manager)</small>
+                                                                    </h6>
+                                                                    <div class="row">
+                                                                        <label class="col-lg-2 col-md-4 col-sm-12 font-weight-bold">Name</label>
+                                                                        <div class="col-lg-2 col-md-8 col-sm-12 mb-2">
+                                                                            <label class=""><span class="colon">:</span><label id="lblAgentName"></label></label>
+                                                                        </div>
+                                                                        <label class="col-lg-2 col-md-4 col-sm-12 font-weight-bold">Phone No.</label>
+                                                                        <div class="col-lg-2 col-md-8 col-sm-12 mb-2">
+                                                                            <label class=""><span class="colon">:</span><label id="lblAgentMobileNo"></label></label>
+                                                                        </div>
+                                                                        <label class="col-lg-2 col-md-4 col-sm-12 font-weight-bold">Email Id</label>
+                                                                        <div class="col-lg-2 col-md-8 col-sm-12 mb-2">
+                                                                            <label class=""><span class="colon">:</span><label id="lblAgentEmailId"></label></label>
+                                                                        </div>
+                                                                        <label class="col-lg-2 col-md-4 col-sm-12 font-weight-bold">Address</label>
+                                                                        <div class="col-lg-8 col-md-8 col-sm-12 mb-2">
+                                                                            <label class=""><span class="colon">:</span><label id="lblAgentAddress"></label></label>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="accordion">
+                                                    <div class="accordion-header" id="headingFour">
+                                                        <h5 class="mb-0">
+                                                            <a class="collapsed" data-toggle="collapse" data-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
+                                                                Approvals/Consent obtained from govt. agencies
+                                                            </a>
+                                                        </h5>
+                                                    </div>
+                                                    <div id="collapseFour" class="collapse" aria-labelledby="headingFour" data-parent="#accordion2" style="">
+                                                        <div class="accordion-body">
+                                                            <div class="">
+                                                                <div class="">
+                                                                    <div class="row">
+                                                                        <div class="col-lg-12">
+                                                                            <h6 class="text-brown font-weight-bold mb-3 mt-0">Details of Approved Quarry Plan by the State Govt.</h6>
+                                                                            <div class="row">
+                                                                                <label class="col-lg-2 col-md-4 col-sm-12 font-weight-bold">Validity from</label>
+                                                                                <div class="col-lg-2 col-md-8 col-sm-12 mb-2">
+                                                                                    <label class=""><span class="colon">:</span><label id="lblApproved_Plan_Validity_From"></label></label>
+                                                                                </div>
+                                                                                <label class="col-lg-2 col-md-4 col-sm-12 font-weight-bold">Validity to</label>
+                                                                                <div class="col-lg-2 col-md-8 col-sm-12 mb-2">
+                                                                                    <label class=""><span class="colon">:</span><label id="lblApproved_Plan_Validity_To"></label></label>
+                                                                                </div>
+                                                                                <label class="col-lg-2 col-md-4 col-sm-12 font-weight-bold">Quantity Approved</label>
+                                                                                <div class="col-lg-2 col-md-8 col-sm-12 mb-2">
+                                                                                    <label class=""><span class="colon">:</span><label id="lblApproved_Plan_Quantity"></label></label>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="separator separator-dashed mt-3 w-100"></div>
+                                                                        <div class="col-lg-12">
+                                                                            <h6 class="text-brown font-weight-bold mb-3 mt-0">Details of Environment clearance Obtained</h6>
+                                                                            <div class="row">
+                                                                                <label class="col-lg-2 col-md-4 col-sm-12 font-weight-bold">Validity from</label>
+                                                                                <div class="col-lg-2 col-md-8 col-sm-12 mb-2">
+                                                                                    <label class=""><span class="colon">:</span><label id="lblEnvClearanceValidityFrom"></label></label>
+                                                                                </div>
+                                                                                <label class="col-lg-2 col-md-4 col-sm-12 font-weight-bold">Validity to</label>
+                                                                                <div class="col-lg-2 col-md-8 col-sm-12 mb-2">
+                                                                                    <label class=""><span class="colon">:</span><label id="lblEnvClearanceValidityTo"></label></label>
+                                                                                </div>
+                                                                                <label class="col-lg-2 col-md-4 col-sm-12 font-weight-bold">Quantity Approved</label>
+                                                                                <div class="col-lg-2 col-md-8 col-sm-12 mb-2">
+                                                                                    <label class=""><span class="colon">:</span><label id="lblEnvClearanceQuantityApproved"></label></label>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="separator separator-dashed mt-3 w-100"></div>
+                                                                        <div class="col-lg-12">
+                                                                            <h6 class="text-brown font-weight-bold mb-3 mt-0">Details of SPCB Approvals received</h6>
+                                                                            <div class="row">
+                                                                                <label class="col-lg-2 col-md-4 col-sm-12 font-weight-bold">Validity from</label>
+                                                                                <div class="col-lg-2 col-md-8 col-sm-12 mb-2">
+                                                                                    <label class=""><span class="colon">:</span><label id="lblSPCBValidityFrom"></label></label>
+                                                                                </div>
+                                                                                <label class="col-lg-2 col-md-4 col-sm-12 font-weight-bold">Quantity Approved</label>
+                                                                                <div class="col-lg-2 col-md-8 col-sm-12 mb-2">
+                                                                                    <label class=""><span class="colon">:</span><label id="lblSPCBQuantityApproved"></label></label>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="separator separator-dashed mt-3 w-100"></div>
+                                                                        <div class="col-lg-12">
+                                                                            <h6 class="text-brown font-weight-bold mb-3 mt-0">Details of Forest Clearance Obtained, If applicable</h6>
+                                                                            <div class="row">
+                                                                                <label class="col-lg-2 col-md-4 col-sm-12 font-weight-bold">Validity from</label>
+                                                                                <div class="col-lg-2 col-md-8 col-sm-12 mb-2">
+                                                                                    <label class=""><span class="colon">:</span><label id="lblForestClearanceValidityFrom"></label></label>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="separator separator-dashed mt-3 w-100"></div>
+                                                                        <div class="col-lg-12">
+                                                                            <h6 class="text-brown font-weight-bold mb-3 mt-0">Has Obtains All Required NOCs / Certificates/ Permits from Govt. Departments</h6>
+                                                                            <div class=" row">
+                                                                                <label class="col-lg-2 col-md-4 col-sm-12 font-weight-bold">DGMS</label>
+                                                                                <div class="col-lg-2 col-md-8 col-sm-12 mb-2">
+                                                                                    <label class="" id="lbldgms">
+                                                                                    </label>
+                                                                                </div>
+                                                                                <label class="col-lg-2 col-md-4 col-sm-12 font-weight-bold">Blasting License</label>
+                                                                                <div class="col-lg-2 col-md-8 col-sm-12 mb-2">
+                                                                                    <label class="" id="lblBlasting">
+                                                                                    </label>
+                                                                                </div>
+                                                                                <label class="col-lg-2 col-md-4 col-sm-12 font-weight-bold">Environment Clearance</label>
+                                                                                <div class="col-lg-2 col-md-8 col-sm-12 mb-2">
+                                                                                    <label class="" id="lblEC">
+                                                                                    </label>
+                                                                                </div>
+                                                                                <label class="col-lg-2 col-md-4 col-sm-12 font-weight-bold">Air Consent</label>
+                                                                                <div class="col-lg-2 col-md-8 col-sm-12 mb-2">
+                                                                                    <label class="" id="lblAC">
+                                                                                    </label>
+                                                                                </div>
+                                                                                <label class="col-lg-2 col-md-4 col-sm-12 font-weight-bold">Water Consent</label>
+                                                                                <div class="col-lg-2 col-md-8 col-sm-12 mb-2">
+                                                                                    <label class="" id="lblWC">
+                                                                                    </label>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="accordion">
+                                                    <div class="accordion-header" id="headingFive">
+                                                        <h5 class="mb-0">
+                                                            <a class="collapsed" data-toggle="collapse" data-target="#collapseFive" aria-expanded="false" aria-controls="collapseFive">
+                                                                Contribution to govt exchequer during financial (<small><i class="fas fa-rupee-sign ml-1"></i></small>)
+                                                            </a>
+                                                        </h5>
+                                                    </div>
+                                                    <div id="collapseFive" class="collapse" aria-labelledby="headingFive" data-parent="#accordion2" style="">
+                                                        <div class="accordion-body">
+                                                            <div class="">
+                                                                <div class="">
+                                                                    <div class="row">
+                                                                        <label class="col-lg-2 col-md-4 col-sm-12 font-weight-bold">Royalty Paid</label>
+                                                                        <div class="col-lg-2 col-md-8 col-sm-12 mb-2">
+                                                                            <label class=""><span class="colon">:</span><label id="lblRoyaltyPaid"></label></label>
+                                                                        </div>
+                                                                        <label class="col-lg-2 col-md-4 col-sm-12 font-weight-bold">Dead Rent Paid</label>
+                                                                        <div class="col-lg-2 col-md-8 col-sm-12 mb-2">
+                                                                            <label class=""><span class="colon">:</span><label id="lblDeadRentPaid"></label></label>
+                                                                        </div>
+                                                                        <label class="col-lg-2 col-md-4 col-sm-12 font-weight-bold">Contribution to DMF</label>
+                                                                        <div class="col-lg-2 col-md-8 col-sm-12 mb-2">
+                                                                            <label class=""><span class="colon">:</span><label id="lblDMFContribution"></label></label>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="accordion">
+                                                    <div class="accordion-header" id="headingSix">
+                                                        <h5 class="mb-0">
+                                                            <a class="collapsed" data-toggle="collapse" data-target="#collapseSix" aria-expanded="false" aria-controls="collapseSix">
+                                                                List Of Additional Files
+                                                            </a>
+                                                        </h5>
+                                                    </div>
+                                                    <div id="collapseSix" class="collapse" aria-labelledby="headingSix" data-parent="#accordion2" style="">
+                                                        <div class="accordion-body">
+                                                            <div class="">
+                                                                <div class="">
+                                                                    <div class="row" id="divOther">
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </section>
+            </div>
+        </div>
+    </div>
+</section>
+

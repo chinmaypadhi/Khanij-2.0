@@ -1,0 +1,220 @@
+﻿@*// *********************************************************************************************************
+    //  View Name                : ViewList
+    //  Desciption               : To View and Delete Website Gallery Details
+    //  Created By               : Lingaraj Dalai
+    //  Created On               : 29 Oct 2021
+    // ********************************************************************************************************
+*@
+@model IEnumerable<HomeEF.ViewGalleryModel>
+@{
+    ViewData["Title"] = "Archive";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+@if (TempData["Message"] != null)
+{
+<script>
+        var vv = '@TempData["Message"]';
+        if (vv == 3){
+            swal("", "Something Errror occured. Please Try After Sometime!!", "error");
+        }
+        else if (vv == 4) {
+            swal("", "Gallery Deleted Sucessfully!!", "success");
+        }
+</script>
+}
+<script>
+    deleteMe = "yes";
+    activetMe = "yes";
+    $(document).ready(function () {
+        loadNavigation('ViewList', 'glhelpdesk', 'plraiseticket', 'tl', 'CMS', 'Gallery', ' ');
+        $('.searchableselect').searchableselect();
+        $('#datatable').DataTable();
+        $('.shorting-lnk').click(function () {
+            $('.shorting-lnk i').toggleClass('fa-sort-amount-up-alt fa-sort-amount-down-alt ');
+        });
+        $("#ckbCheckAll").click(function () {
+            $(".checkBoxClass").prop('checked', $(this).prop('checked'));
+        });
+        $("#deleteIcon").click(function () {
+            var idsToSend = new Array();
+                $('table [type="checkbox"]').each(function () {
+                    if ($(this).is(':checked')) {
+                        idsToSend.push($(this).val());
+                    }
+                });
+            if (idsToSend.length <= 0) {
+                swal("", "Please select Gallery to Delete !", "warning");
+                return false;
+            }
+            else {
+                if (confirm("Are you sure to Delete?")) {
+                    $.ajax({
+                        type: "POST",
+                        url: "/Website/Gallery/Delete",
+                        data: {
+                            arr: JSON.stringify(idsToSend)
+                        },
+                        dataType: "json",
+                        success: function (result) {
+                            if (result == 4) {
+                                swal("", "Gallery Deleted Sucessfully.", "success");
+                            }
+                            else {
+                                swal("", "Something Errror occured. Please Try After Sometime!!", "error");
+                            }
+                            setTimeout(function () {
+                                window.location.href = '@Url.Action("Archive", "Gallery", new { Area = "Website" })'
+                            }, 10000);
+                        }
+                    });
+                    idsToSend = [];
+                }
+            }
+        });
+         $("#activeIcon").click(function () {
+            var idsToSend = new Array();
+                $('table [type="checkbox"]').each(function () {
+                    if ($(this).is(':checked')) {
+                        idsToSend.push($(this).val());
+                    }
+                });
+            if (idsToSend.length <= 0) {
+                swal("", "Please select Gallery to Active !", "warning");
+                return false;
+            }
+            else {
+                if (confirm("Are you sure to Active?")) {
+                    $.ajax({
+                        type: "POST",
+                        url: "/Website/Gallery/Active",
+                        data: {
+                            arr: JSON.stringify(idsToSend)
+                        },
+                        dataType: "json",
+                        success: function (result) {
+                            if (result == 4) {
+                                swal("", "Gallery Active Sucessfully!!", "success");
+                            }
+                            else {
+                                swal("", "Something Errror occured. Please Try After Sometime!!", "error");
+                            }
+                             setTimeout(function () {
+                                window.location.href = '@Url.Action("Archive", "Gallery", new { Area = "Website" })'
+                            }, 10000);
+                        }
+                    });
+                    idsToSend = [];
+                }
+            }
+        });
+    });
+
+</script>
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        @Html.Partial("_navigation")
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link" href="~/Website/Gallery/Add">
+                                Add
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="~/Website/Gallery/ViewList">
+                                View
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="javascript:void(0);">
+                                Archive
+                            </a>
+                        </li>
+                    </ul>
+                    @Html.Partial("_util")
+                </div>
+                <section class="box form-container">
+                    <div class="content-body">
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div id="viewtable">
+                                    <table id="datatable" class="table table-sm table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th width="20px" class="text-center noprint">
+                                                    <input type="checkbox" id="ckbCheckAll">
+                                                </th>
+                                                <th width="20px">Sl#</th>
+                                                <th width="100px">Content Type</th>
+                                                <th>Description</th>
+                                                <th width="130px">Thumbnail Photo</th>
+                                                <th width="130px">Enlarge Photo</th>
+                                                <th>Youtube Video</th>
+                                                <th>Sequence</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @{
+                                                var count = 0;
+                                                foreach (var item in Model)
+                                                {
+                                                    count++;
+                                                    var dyclass = @item.BIT_STATUS == "Active" ? "active-row" : "inactive-row";
+                                                <tr class="@dyclass">
+                                                    <td class="text-center noprint">
+                                                        <input id='chkData' type="checkbox" class="checkBoxClass" value="@item.INT_GALLERY_ID" />
+                                                    </td>
+                                                    <td>@count</td>
+                                                    <td>@item.VCH_CONTENT_TYPE</td>
+                                                    <td>@item.VCH_GALLERY_DESC</td>
+                                                    <td>
+                                                        <a href="~/Website/Gallery/DownloadImgFiles?filename=@item.THUMBNAIL_PATH" title="" class="ml-2" data-original-title="Download Thumbnail Image">
+                                                            <img src="~/@item.VCH_THUMBNAIL_IMG_PATH" width="50" height="50" />
+                                                        </a>
+                                                    </td>
+                                                    @if (item.VCH_CONTENT_TYPE == "Photo")
+                                                        {
+                                                    <td>
+                                                        <a href="~/Website/Gallery/DownloadImgFiles?filename=@item.LARGE_PATH" title="" class="ml-2" data-original-title="Download Image">
+                                                            <img src="~/@item.VCH_IMG_PATH" width="50" height="50" />
+                                                        </a>
+                                                    </td>
+                                                        }
+                                                        else
+                                                        {
+                                                    <td>
+                                                        <a href="~/Website/Gallery/DownloadVideoFiles?filename=@item.THUMBNAIL_PATH" title="" class="ml-2" data-original-title="Play Video">
+                                                            <img src="~/@item.VCH_THUMBNAIL_VIDEOIMG_PATH" width="50" height="50" />
+                                                        </a>
+                                                    </td>
+                                                        }
+                                                    @if (item.VCH_VIDEO_URL != "" && item.VCH_VIDEO_URL != null)
+                                                        {
+                                                    <td>
+                                                        <iframe width="260" height="215" src='@item.VCH_VIDEO_URL' title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                                                    </td>
+                                                        }
+                                                        else
+                                                        {
+                                                    <td>NA</td>
+                                                        }
+                                                    <td>@item.INT_SEQUENCE</td>
+                                                </tr>
+                                                }
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+    <!-- MAIN CONTENT AREA ENDS -->
+</section>
+

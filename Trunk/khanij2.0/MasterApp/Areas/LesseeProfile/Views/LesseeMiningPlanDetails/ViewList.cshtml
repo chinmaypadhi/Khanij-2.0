@@ -1,0 +1,124 @@
+﻿@*// *********************************************************************************************************
+    //  View Name                : ViewList
+    //  Desciption               : To View Lesee Mining Plan Details
+    //  Created By               : Lingaraj Dalai
+    //  Created On               : 02 August 2021
+    // ********************************************************************************************************
+*@
+@model MasterEF.LesseeMiningPlanViewModel;
+@using MasterEF;
+@using MasterApp.Web;
+@using  Microsoft.AspNetCore.Http;
+@inject IHttpContextAccessor HttpContextAccessor
+@{
+    ViewData["Title"] = "ViewList";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+    UserLoginSession profile = HttpContextAccessor.HttpContext.Session.Get<UserLoginSession>(KeyHelper.UserKey);
+}
+<script>
+    backMe = "yes"
+    $(document).ready(function () {
+        loadNavigation('ViewList', 'glUIS', 'pllesseprof', 'tl', 'Lessee Profile', 'Mining Plan', ' ');
+            /*Change Label text for Minor Mineral*/
+        var mineraltypename = '@profile.MineralTypeName';
+        if (mineraltypename == "Minor Mineral") {
+            $("#h5text").text('Quarry Lease Plan Details');/*Header Text*/
+            $("#lblApprovalDate").text('Quarry Lease Plan Approval Date');/*Label Text*/
+            $("#lblApprovalNo").text('Quarry Lease Plan Approval Number');/*Label Text*/
+            $("#lblValidFrom").text('Quarry Lease Plan Valid From');/*Label Text*/
+            $("#lblValidTo").text('Quarry Lease Plan Valid To');/*Label Text*/
+            $("#lblApprovalLetter").text('Quarry Plan & Approval Letter');/*Label Text*/
+        }
+        if (@profile.UserTypeId!= 7) { /*Other than Lessee Login*/
+            $("#navlinkAdd").hide(); //Hide Add tab
+            $(".ml-3").hide(); //Hide Edit button
+        }
+    });
+</script>
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        <!-- MAIN CONTENT AREA STARTS -->
+        @Html.Partial("_CMSnavigation")
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link" id="navlinkAdd" href="~/LesseeProfile/LesseeMiningPlanDetails/Create">
+                                Add
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="javascript:void(0);">
+                                View
+                            </a>
+                        </li>
+                    </ul>
+                    @Html.Partial("_CMSutil")
+                </div>
+                <section class="box form-container">
+                    <div class="content-body">
+                        <div class="message-heading">
+                            <h5 class="font-weight-bold text-brown" id="h5text">Mining Plan</h5>
+                            <div>
+                                <a href="javascript:void(0);" class="btn-dark btn-sm log-btn" data-val="collapsefillter1">Log Report<i class="icon-angle-down-solid"></i></a>
+                                <a href="@CustomQueryStringHelper.EncryptString("LesseeProfile","Create","LesseeMiningPlanDetails",new {id=Model.CREATED_BY })" class="btn-success btn-sm ml-3" data-original-title="Edit"><i class="icon-pencil-alt-solid"></i></a>
+                            </div>
+                        </div>
+                        <div class="message-highlighter">
+                            <div class="row">
+                                <label class="col-lg-3 col-md-4 col-sm-12 col-form-label" id="lblApprovalDate">Approval Date</label>
+                                <div class="col-lg-9 col-md-8 col-sm-12">
+                                    <label class="form-control-plaintext"><span class="colon">:</span>@Model.MP_APPROVE_DATE</label>
+                                </div>
+                                <label class="col-lg-3 col-md-4 col-sm-12 col-form-label" id="lblApprovalNo">Approval Number</label>
+                                <div class="col-lg-9 col-md-8 col-sm-12">
+                                    <label class="form-control-plaintext"><span class="colon">:</span>@Model.MP_APPROVAL_NO</label>
+                                </div>
+                                <label class="col-lg-3 col-md-4 col-sm-12 col-form-label" id="lblValidFrom">Valid From</label>
+                                <div class="col-lg-9 col-md-8 col-sm-12">
+                                    <label class="form-control-plaintext"><span class="colon">:</span>@Model.MP_VALID_FORM</label>
+                                </div>
+                                <label class="col-lg-3 col-md-4 col-sm-12 col-form-label" id="lblValidTo">Valid Upto</label>
+                                <div class="col-lg-9 col-md-8 col-sm-12">
+                                    <label class="form-control-plaintext"><span class="colon">:</span>@Model.MP_VALID_TO</label>
+                                </div>
+                                <label class="col-lg-3 col-md-4 col-sm-12 col-form-label" id="lblApprovalLetter">MP/SOM Approval Letter With Approved Table</label>
+                                <div class="col-lg-9 col-md-8 col-sm-12">
+                                    <label class="form-control-plaintext">
+                                        <span class="colon">:</span>@Model.MP_SOM_FileName
+                                        @if (Model.MP_SOM_FileName != null && Model.MP_SOM_FileName != "")
+                                        {
+                                            <a href='~/@Model.MP_SOM_FilePath' title="" class="ml-2" data-original-title="Download" target="_blank"><i class="icon-file-pdf-solid h5 text-danger"></i></a>
+                                        }
+                                    </label>
+                                </div>
+                                @*<label class="col-lg-3 col-md-4 col-sm-12 col-form-label">Remarks</label>
+                                <div class="col-lg-9 col-md-8 col-sm-12">
+                                    <label class="form-control-plaintext"><span class="colon">:</span>@Model.Remarks</label>
+                                </div>*@
+                            </div>
+                            <ul class='timeline custom-scroll log-box' id='collapsefillter1'>
+                                @Html.Raw((String)ViewBag.tableLA)
+                            </ul>
+                        </div>
+                        <div class="message-heading">
+                            <h5 class="font-weight-bold text-brown">Scheme of Mines</h5>
+                            <div>
+                                <a href="javascript:void(0);" class="btn-dark btn-sm log-btn" data-val="collapsefillter2">Log Report<i class="icon-angle-down-solid"></i></a>
+                                <a href="@CustomQueryStringHelper.EncryptString("LesseeProfile","Create","LesseeMiningPlanDetails",new {id=Model.CREATED_BY })" class="btn-success btn-sm ml-3" data-original-title="Edit"><i class="icon-pencil-alt-solid"></i></a>
+                            </div>
+                        </div>
+                        <div class="message-highlighter">
+                            @Html.Raw((String)ViewBag.tableLB)
+                            <ul class='timeline custom-scroll log-box' id='collapsefillter2'>
+                                @Html.Raw((String)ViewBag.tableLC)
+                            </ul>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+</section>
+

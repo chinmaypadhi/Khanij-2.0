@@ -1,0 +1,413 @@
+﻿@model HelpDeskEF.BackendModel
+@{
+    ViewData["Title"] = "Backend Ticket";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+@if (ViewBag.Ticketid != null)
+{
+<script>
+    $("body").on("change", "#UserTypeId", function () {
+        $("input[name=UserType]").val($(this).find("option:selected").text());
+    });
+</script>
+}
+<script>
+    indicateMe = "yes"
+    backMe = "yes"
+    $(document).ready(function () {
+        loadNavigation('Add', 'glRoleRes', 'plUser', 'tl', 'Helpdesk', 'Reported Ticket List', ' ');
+        $('.searchableselect').searchableselect();
+    /******************FILE UPLOAD********************************/
+        $('.custom-file-input').on("change", function () {
+            debugger;
+            $("input[type='Submit']").attr('disabled', false);
+            var label = $(this).siblings('.custom-file-label');
+            var files = $(this)[0].files;
+            var filesize = this.files[0].size;
+            var val = $(this).val().toLowerCase(),
+                regex = new RegExp("(.*?)\.(jpeg|jpg|png|pdf|tif)$");
+            if (!(regex.test(val))) {
+                swal("", "docx,xlsx,csv type is not an allowed file type. You can use only jpg, jpeg, png, pdf, tif types of file(s). ", "warning");
+                this.value = '';
+                $("input[type='Submit']").attr('disabled', true);
+                return false;
+            }
+            else if (filesize > 2048000) {
+                swal("", "File size must be 2 MB !", "warning");
+                $("input[type='Submit']").attr('disabled', true);
+                return false;
+            }
+            else if (files.length > 0) {
+                label.html(files.length + ' Files Selected');
+            }
+            else if (files.length == 0) { label.html(files[0].name); }
+        });
+    /***************END*************************/
+        $('.divDistrict').hide();
+    });
+</script>
+<script>
+    $(function () {
+        $("#DistrictId").change(function () {
+            var typeselected = $("#UserTypeId option:selected").text();
+            var Districtid = $("#DistrictId").val();
+            $('#ddlForwardedId').empty();
+            var Tid =@ViewBag.Ticketid
+                $.ajax({
+                    type: "POST",
+                    url: "/Helpdesk/Backend/FetchUser",
+                    data: {
+                        "ForwardTo": typeselected,
+                        "Ticketid": Tid,
+                        "Districtid": Districtid,
+                    },
+                    cache: false,
+                    datatype: "JSON",
+                    success: function (SList) {
+                        $("#ddlForwardedId").append($("<option>Select</option>"));
+                        $.each(SList, function (i, item) {
+                            $("#ddlForwardedId").append($("<option></option>").val(item.userid).html(item.applicantName));
+                        });
+                    },
+                    failure: function (response) {
+                        console.log(response.responseText);
+                    },
+                    error: function (jqxhr, status, exception) {
+                        swal("",'Exception:', +exception.alert+'',"warning");
+                    }
+                });
+        });
+        $("#UserTypeId").change(function () {
+            debugger;
+           var typeselected= $("#UserTypeId option:selected").text();
+                if (typeselected == 'District Office' || typeselected == 'FMS USER') {
+                    $('.divDistrict').show();
+                }
+                else {
+                    $('.divDistrict').hide();
+            }
+            var Districtid = $("#DistrictId").val();
+            $('#ddlForwardedId').empty();
+            var Tid=@ViewBag.Ticketid
+            $.ajax({
+                type: "POST",
+                url: "/Helpdesk/Backend/FetchUser",
+                data: {
+                    "ForwardTo": typeselected,
+                    "Ticketid": Tid,
+                    "Districtid": Districtid,
+                },
+                cache: false,
+                datatype: "JSON",
+                success: function (SList) {
+                    $("#ddlForwardedId").append($("<option>Select</option>"));
+                    $.each(SList, function (i, item) {
+                        $("#ddlForwardedId").append($("<option></option>").val(item.userid).html(item.applicantName));
+                    });
+                },
+                failure: function (response) {
+                    console.log(response.responseText);
+                },
+                error: function (jqxhr, status, exception) {
+                    swal("",'Exception:', +exception.alert+'',"warning");
+                }
+            });
+        });
+    });
+</script>
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        @Html.Partial("_CMSnavigation")
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="javascript:void(0);">
+                                Raise Ticket
+                            </a>
+                        </li>
+                    </ul>
+                    @Html.Partial("_CMSutil")
+                </div>
+                <section class="box form-container">
+                    <div class="content-body">
+                        @using (Html.BeginForm("BackendTicket", "Backend", FormMethod.Post, new { AUTOCOMPLETE = "Off", id = "form1", enctype = "multipart/form-data" }))
+                        {
+                        <div class="row">
+                            <label class="col-lg-3 col-md-4 col-form-label">Severity <span class="text-danger">*</span></label>
+                            <div class="col-lg-4 col-md-8">
+                                <div class="form-group">
+                                    @Html.DropDownListFor(model => model.SeverityId, ViewBag.ModuleList as IEnumerable<SelectListItem>, "Select", new { @class = "form-control searchableselect", autofocus = "autofocus" })
+                                    @Html.HiddenFor(x => x.SeverityId)
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <label class="col-lg-3 col-md-4 col-form-label">Problem Type <span class="text-danger">*</span></label>
+                            <div class="col-lg-4 col-md-8">
+                                <div class="form-group">
+                                    @Html.DropDownListFor(model => model.ProblemType, new List<SelectListItem>
+                                      {
+                                      new SelectListItem{ Text="User Side", Value = "User Side" },
+                                      new SelectListItem{ Text="Application Side", Value = "Application Side" },
+                                      }, "Select", new { @class = "form-control searchableselect", autofocus = "autofocus" })
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <label class="col-lg-3 col-md-4 col-form-label">Forwarded To <span class="text-danger">*</span></label>
+                            <div class="col-lg-4 col-md-8">
+                                <div class="form-group">
+                                    @Html.DropDownListFor(model => model.UserTypeId, ViewBag.Forwardlist as IEnumerable<SelectListItem>, "Select", new { @class = "form-control searchableselect", autofocus = "autofocus" })
+                                    @Html.HiddenFor(x => x.UserType)
+                                    @Html.HiddenFor(x => x.TicketID)
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row divDistrict">
+                            <label class="col-lg-3 col-md-4 col-form-label">District <span class="text-danger">*</span></label>
+                            <div class="col-lg-4 col-md-8">
+                                <div class="form-group">
+                                    @Html.DropDownListFor(model => model.DistrictId, ViewBag.District as IEnumerable<SelectListItem>, "Select", new { @class = "form-control searchableselect", autofocus = "autofocus" })
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <label class="col-lg-3 col-md-4 col-form-label">Select User <span class="text-danger">*</span></label>
+                            <div class="col-lg-4 col-md-8">
+                                <div class="form-group">
+                                    @Html.DropDownListFor(model => model.ForwardedId, Enumerable.Empty<SelectListItem>(), "Select", new { @class = "form-control searchableselect", autofocus = "autofocus",@id="ddlForwardedId" })
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <label class="col-lg-3 col-md-4 col-form-label">Supporting Documents</label>
+                            <div class="col-lg-4 col-md-8">
+                                <div class="form-group">
+                                    <div class="custom-file">
+                                        <input type="file" class="custom-file-input" name="@Html.NameFor(Model =>Model.Photo)" multiple>                                       
+                                        <label class="custom-file-label" for="customFile">Choose Files</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <label class="col-lg-3 col-md-4 col-form-label">Remarks <span class="text-danger">*</span></label>
+                            <div class="col-lg-4 col-md-8">
+                                <div class="form-group">
+                                    @Html.TextAreaFor(model => model.ProblemDescription, new { @class = "form-control" })
+                                </div>
+                            </div>
+                        </div>
+                        @if (Model.attachments != null)
+                        {
+                        <div class="row">
+                            <div class="col-lg-8 col-12">
+                                <div class="table-responsive">
+                                    <table class="table table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th width="30px">Sl#</th>
+                                                <th>Supporting Documents</th>
+                                                <th></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @{
+                                                    var count = 0;
+                                                    foreach (var item in Model.attachments)
+                                                    {
+                                                        count++;
+                                                <tr>
+                                                    <td>@count</td>
+                                                    <td>@item.FileName</td>
+                                                    <td><a href="@Url.Action("DownloadFiles", "RaiseTicket", new { filename = @item.FileName, foldername = "HepldeskFile" })" title="Download"><i class="icon-download-solid text-danger h4"></i></a></td>
+                                                </tr>
+                                                    }
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        }
+                        <div class="row mt-4">
+                            <div class="col-lg-10 col-md-8 offset-lg-3">
+                                @*@if (Model == null || Model.TicketID == null || Model.TicketID < 1)
+                {*@
+                                @if (ViewBag.usertype == "DGM")
+                                    {
+                                <button type="button" class="btn btn-primary" onclick="return BtnApprove(1);">Approve</button>
+                                <input type="button" onclick="return onBtnReject(2);" id="BtnReject" value="Reject" class="btn btn-danger  btn-md" />
+                                <input type="button" onclick="return onBtnForward(3);" id="BtnForward" value="Forward To" class="btn btn-warning  btn-md" />
+                                    }
+                                    else if (ViewBag.usertype == "OSU")
+                                    {
+                                <input type="submit" title="Submit" id="btnForward" onclick="return Confirmcheck();" value="Forward" class="btn btn-warning  btn-md" />
+                                <input type="reset" title="Clear" value="Clear" class="btn btn-danger  btn-md" />
+                                    }
+                                    else if (ViewBag.usertype == "FMS USER")
+                                    {
+                                <input type="submit" title="Submit" id="btnForward" onclick="return OnForward();" value="Forward" class="btn btn-warning  btn-md" />
+                                <input type="reset" title="Clear" value="Clear" class="btn btn-danger  btn-md" />
+                                    }
+                                @*else if ('@ViewBag.usertype'.Contains("District"))
+                {
+                    <input type="submit" title="Submit" id="btnForward" onclick="return OnDDForward();" value="Forward" class="btn btn-primary" />
+                    <input type="reset" title="Clear" value="Clear" class="btn btn-primary" />
+                }*@
+                                    else
+                                    {
+                                <input type="submit" title="Submit" id="btnSave" onclick="return OnForward(3);" value="Forward To" class="btn btn-warning btn-md" />
+                                <input type="button" onclick="return onBtnApprove(1);" id="BtnApproved" value="Approve" class="btn btn-success  btn-md" />
+                                <input type="button" onclick="return onBtnReject(2);" id="Btn_Reject" value="Reject" class="btn btn-danger  btn-md" />
+                                <input type="reset" title="Clear" value="Clear" id="btnPayment" class="btn btn-danger  btn-md" />
+                                    }
+                                <input type="button" onclick="return onBack();" id="btnBack" value="Back" class="btn btn-primary  btn-md" />
+                            </div>
+                        </div>
+                        }
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+    <!-- MAIN CONTENT AREA ENDS -->
+</section>
+<script>
+    function Confirmcheck() {
+        var Iss = false;
+        if (!DropDownValidation("SeverityId", "Severity")) {
+            return false;
+        }
+        if (!DropDownValidation("ProblemType", "Problem Type")) {
+            return false;
+        }
+        if (!DropDownValidation("UserTypeId", "Forwarded To")) {
+            return false;
+        }
+        if ($("#UserTypeId").val() == "5" || $("#UserTypeId").val() == "14") {
+            if (!DropDownValidation("DistrictId", "District")) {
+                return false;
+            }
+        }
+        if ($("#ddlForwardedId").val() == "Select" && $("#ddlForwardedId").val() != "") {
+            swal("", "Please Select User", "");
+            return false;
+        }
+        if ($("#ProblemDescription").val() == "Sir/Madam," && $("#ProblemDescription").val() != "") {
+            swal("", "Please Enter Remarks", "");
+            return false;
+        }
+        Iss = true;
+        return Iss;
+    }
+    function onBack() {
+        window.history.back();
+    }
+    function BtnApprove(status) {
+        debugger;
+        if ($("#ProblemDescription").val().trim() == "" || $("#ProblemDescription").val().trim() == "Sir/Madam,") {
+            swal("", 'Please enter remarks!', "warning");
+            $("#ProblemDescription").focus();
+        }
+        else {
+            if (confirm("Are you sure you want to approve?")) {
+                var Tid =@ViewBag.Ticketid
+                $.ajax({
+                    type: "POST",
+                    url: "/Helpdesk/Backend/DgmApproval",
+                    data: {
+                        "TicketId": parseInt(Tid),
+                        "type": status,
+                        "description": $("#ProblemDescription").val(),
+                    },
+                    dataType: "json",
+                    success: function (Data) {
+                        if (Data == "1") {
+                            swal("","Your ticket is approved successfully","success");
+                            setTimeout(function () {
+                                window.location.href = '@Url.Action("Nxtview", "RaiseTicket")'
+                            }, 5000);
+                        }
+                        else {
+                            swal("","Something went wrong!","warning");
+                        }
+                    }
+                });
+            }
+        }
+    }
+    function onBtnReject(status) {
+        debugger;
+        if ($("#ProblemDescription").val().trim() == "" || $("#ProblemDescription").val().trim() == "Sir/Madam,") {
+            swal("", 'Please enter remarks!', "warning");
+            $("#ProblemDescription").focus();
+        }
+        else {
+            if (confirm("Are you sure you want to Reject?")) {
+                var Tid =@ViewBag.Ticketid
+                $.ajax({
+                    type: "POST",
+                    url: "/Helpdesk/Backend/DgmApproval",
+                    data: {
+                        "TicketId": parseInt(Tid),
+                        "type": status,
+                        "description": $("#ProblemDescription").val(),
+                    },
+                    dataType: "json",
+                    success: function (Data) {
+                        if (Data == "1") {
+                            swal("","Your ticket is Rejected successfully","success");
+                            setTimeout(function () {
+                                window.location.href = '@Url.Action("Nxtview", "RaiseTicket")'
+                            }, 5000);
+                        }
+                        else {
+                            swal("", "Something went wrong!", "warning");
+                        }
+                    }
+                });
+            }
+        }
+    }
+    function onBtnForward(status) {
+        debugger;
+        if (!blankFieldValidation("ProblemDescription", "Remarks")) {
+            return false;
+        }
+        else {
+            var typeselected = $("#UserTypeId option:selected").val();
+            var ForwardedId = $("#ForwardedId option:selected").val();
+            if (confirm("Are you sure you want to Forward?")) {
+                var Tid =@ViewBag.Ticketid
+                $.ajax({
+                    type: "POST",
+                    url: "/Helpdesk/Backend/DgmApproval",
+                    data: {
+                        "TicketId": parseInt(Tid),
+                        "type": status,
+                        "description": $("#ProblemDescription").val(),
+                        "Forwardto": typeselected,
+                        "ForwardedId": ForwardedId,
+                    },
+                    dataType: "json",
+                    success: function (Data) {
+                        if (Data == "1") {
+                            swal("","Your ticket is Forwarded successfully","success");
+                            setTimeout(function () {
+                                window.location.href = '@Url.Action("Nxtview", "RaiseTicket")'
+                            }, 5000);
+                        }
+                        else {
+                            swal("", "Something went wrong!", "warning");
+                        }
+                    }
+                });
+            }
+        }
+    }
+</script>
+

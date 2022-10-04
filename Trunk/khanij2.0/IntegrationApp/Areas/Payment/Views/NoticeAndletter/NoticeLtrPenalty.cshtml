@@ -1,0 +1,400 @@
+﻿
+
+@*ViewBag.OtherPaymentTypeName = list1[0].OtherPaymentTypeName;
+    ViewBag.LesseeName = list1[0].LesseeName;
+    ViewBag.OtherPaymentAmount = list1[0].OtherPaymentAmount;
+    ViewBag.GenerationDate = list1[0].GenerationDate;*@
+
+
+@model IntegrationEF.Notice
+@{
+    ViewData["Title"] = "Payment";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var Result = ViewBag.result;
+}
+
+<style>
+    /*  bhoechie tab */
+    div.bhoechie-tab-container {
+        z-index: 10;
+        background-color: #ffffff;
+        padding: 0 !important;
+        border-radius: 4px;
+        -moz-border-radius: 4px;
+        border: 1px solid #ddd;
+        margin-top: 20px;
+        margin-left: 0px;
+        margin-bottom: 20px;
+        -webkit-box-shadow: 0 6px 12px rgba(0,0,0,.175);
+        box-shadow: 0 6px 12px rgba(0,0,0,.175);
+        -moz-box-shadow: 0 6px 12px rgba(0,0,0,.175);
+        background-clip: padding-box;
+        opacity: 0.97;
+        filter: alpha(opacity=97);
+    }
+
+    div.bhoechie-tab-menu {
+        padding-right: 0;
+        padding-left: 0;
+        padding-bottom: 0;
+    }
+
+        div.bhoechie-tab-menu div.list-group {
+            margin-bottom: 0;
+        }
+
+            div.bhoechie-tab-menu div.list-group > a {
+                margin-bottom: 0;
+            }
+
+                div.bhoechie-tab-menu div.list-group > a .glyphicon,
+                div.bhoechie-tab-menu div.list-group > a .fa {
+                    color: #5A55A3;
+                }
+
+                div.bhoechie-tab-menu div.list-group > a:first-child {
+                    border-top-right-radius: 0;
+                    -moz-border-top-right-radius: 0;
+                }
+
+                div.bhoechie-tab-menu div.list-group > a:last-child {
+                    border-bottom-right-radius: 0;
+                    -moz-border-bottom-right-radius: 0;
+                }
+
+                div.bhoechie-tab-menu div.list-group > a.active,
+                div.bhoechie-tab-menu div.list-group > a.active .glyphicon,
+                div.bhoechie-tab-menu div.list-group > a.active .fa {
+                    background-color: #5A55A3;
+                    background-image: #5A55A3;
+                    color: #ffffff;
+                }
+
+                    div.bhoechie-tab-menu div.list-group > a.active:after {
+                        content: '';
+                        position: absolute;
+                        left: 100%;
+                        top: 50%;
+                        margin-top: -13px;
+                        border-left: 0;
+                        border-bottom: 13px solid transparent;
+                        border-top: 13px solid transparent;
+                        border-left: 10px solid #5A55A3;
+                    }
+
+    div.bhoechie-tab-content {
+        background-color: #ffffff;
+        /* border: 1px solid #eeeeee; */
+        padding-left: 20px;
+        padding-top: 10px;
+    }
+
+    div.bhoechie-tab div.bhoechie-tab-content:not(.active) {
+        display: none;
+    }
+</style>
+
+
+
+<section class="wrapper main-wrapper row">
+    @using (Html.BeginForm("NoticeLtrPenalty", "NoticeAndletter", FormMethod.Post, new { id = "__AntiForgeryForm", @enctype = "multipart/form-data", @class = "form-horizontal bordered-row" }))
+    {
+        <div class="col-12">
+            <!-- MAIN CONTENT AREA STARTS -->
+            <div class="row">
+                <div class="col-12">
+                    <div class="main-tab">
+                        <ul class="nav nav-tabs">
+
+                            <li class="nav-item">
+                                <a class="nav-link active" href="javascript:void(0);">
+                                    Bulk Payment Details
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+
+
+
+
+
+                    <section class="box form-container">
+                        <div class="content-body pt-0">
+                            <div class="row">
+                                <table class="table table-responsive">
+                                    <tr>
+                                        <td>Other Payment Head</td>
+                                        <td>@Model.OtherPaymentTypeName</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Payable Amount</td>
+                                        <td>@Model.OtherPaymentAmount</td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </div>
+
+        @if (ViewBag.total != null && ViewBag.total == 0)
+        {
+            <div class="row">
+                <div class="col-lg-11 col-md-11 col-sm-11 col-xs-12 bhoechie-tab-container">
+                    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 bhoechie-tab-menu">
+                        <div class="list-group">
+                            <a href="#" class="list-group-item active text-center" id="divOnlineOption">
+                                Online Payment
+                            </a>
+                        </div>
+                    </div>
+                    <div class="col-lg-9 col-md-9 col-sm-9 col-xs-9 bhoechie-tab">
+                        <div class="bhoechie-tab-content active">
+                            <div class="row" id="divPaymentOptionOnline">
+                                <div class="col-lg-12 col-md-12 col-xs-12">
+
+                                    <div id="divOnlineChallanDetails">
+                                        <div class="col-xs-12">
+                                            You don't have any amount to pay
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                <br />
+            </div>
+        }
+        else
+        {
+            <div class="row">
+                <div class="col-lg-11 col-md-11 col-sm-11 col-xs-12 bhoechie-tab-container">
+                    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 bhoechie-tab-menu">
+                        <div class="list-group">
+                            <a href="#" class="list-group-item active text-center" id="divOnlineOption">
+                                Online Payment
+                            </a>
+                            @*  <a href="#" class="list-group-item text-center" id="divOfflineOption">Offline Payment
+                                </a>*@
+                        </div>
+                    </div>
+                    <div class="col-lg-9 col-md-9 col-sm-9 col-xs-9 bhoechie-tab">
+                        <!-- Online payment section -->
+                        <div class="bhoechie-tab-content active">
+                            <div class="row" id="divPaymentOptionOnline">
+                                <div class="col-lg-12 col-md-12 col-xs-12">
+
+                                    <div id="divOnlineChallanDetails">
+                                        <div class="col-xs-12">
+                                            <div class="col-md-4 default-form-control-style">
+                                                <img src="@Url.Content("~/img/SBI.jpg")" alt="SBI" style="width:100px;height:50px;" />
+                                                <input name="BankSelection" id="chkSBI" type="radio" value="SBI" checked="checked" />
+                                            </div>
+                                            <div class="col-md-4 default-form-control-style" style="text-align: left;">
+                                                <img src="@Url.Content("~/img/ICICI.png")" alt="ICICI" style="width:100px;height:50px;" />
+                                                <input name="BankSelection" id="chkICICI" type="radio" value="ICICI" />
+                                            </div>
+                                            @*  <div class="col-md-4 default-form-control-style">
+                                                    <img src="@Url.Content("~/Images/HDFC.jpg")" alt="HDFC" style="width:100px;height:50px;" />
+                                                    <input name="BankSelection" id="chkHDFC" type="radio" value="HDFC" />
+                                                </div> *@
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                            <div class="row" id="divPaymentOption" style="display: none">
+                                <div class="col-lg-12 col-md-12 col-xs-12">
+                                    <div id="divOnline">
+                                        <div class="col-xs-12">
+                                            <div class="col-md-4 default-form-control-style" style="text-align: left;">
+                                                @(Html.Label("Net Banking"))
+                                                <input name="ModeSelection" type="radio" value="NetBanking" id="chkICICINetBanking" checked="checked" />
+                                            </div>
+                                            <div class="col-md-4 default-form-control-style">
+                                                @(Html.Label("NEFT/RTGS"))
+                                                <input name="ModeSelection" type="radio" id="chkNEFT" value="NEFT" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row" id="divNetBankingPayment" style="display: none">
+                                <div class="col-lg-12 col-md-12 col-xs-12">
+                                    <div id="divNet">
+                                        <div class="col-xs-12">
+                                            <div class="col-md-4 default-form-control-style" style="text-align: left;">
+                                                @(Html.Label("Corporate"))
+                                                <input name="NetBankingSelection" type="radio" value="Corporate" checked="checked" />
+                                            </div>
+                                            <div class="col-md-4 default-form-control-style">
+                                                @(Html.Label("Retail"))
+                                                <input name="NetBankingSelection" type="radio" value="Retail" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Offlineline payment section -->
+
+                    </div>
+                </div>
+                <br />
+            </div>
+            @Html.HiddenFor(s => s.arr)
+            @Html.HiddenFor(s => s.TotalPayableAmount)
+            @Html.HiddenFor(s => s.PaymentMode)
+            @Html.HiddenFor(s => s.PaymentBank)
+            @Html.HiddenFor(s => s.PMode)
+            @Html.HiddenFor(s => s.NetBanking_mode)
+            <input type="hidden" value="@Model.OtherPaymentTypeName" name="OtherPaymentTypeName" />
+            <input type="hidden" value="@Model.OtherPaymentAmount" name="OtherPaymentAmount" />
+        }
+
+        <div class="row">
+            <div class="col-md-offset-5 col-xs-7 col-md-7">
+                <div class="col-sm-12">
+                    <input type="button" value="Back" id="btnBack" onclick="Oncancel();" class="btn  btn-sm btn-blue-alt" style="width: 85px;" />
+                    <input type="button" onclick="return onMakePayment();" value="Payment" id="btnPayment" class="btn  btn-sm btn-blue-alt" style="width: 100px;" />
+                </div>
+            </div>
+        </div>
+    }
+    <!-- MAIN CONTENT AREA ENDS -->
+</section>
+
+
+<script type="text/javascript">
+
+        $("#chkICICI").click(function () {
+            $("#divPaymentOption").show();
+        })
+        $("#chkHDFC").click(function () {
+            $("#divPaymentOption").hide();
+        })
+        $("#chkSBI").click(function () {
+            $("#divPaymentOption").hide();
+        })
+
+        //$("#chkICICINetBanking").click(function () {
+        //    $("#divNetBankingPayment").show();
+        //})
+
+        $("#chkNEFT").click(function () {
+            $("#divNetBankingPayment").hide();
+        })
+
+        $(document).ready(function () {
+            $("div.bhoechie-tab-menu>div.list-group>a").click(function (e) {
+                e.preventDefault();
+                $(this).siblings('a.active').removeClass("active");
+                $(this).addClass("active");
+                var index = $(this).index();
+                $("div.bhoechie-tab>div.bhoechie-tab-content").removeClass("active");
+                $("div.bhoechie-tab>div.bhoechie-tab-content").eq(index).addClass("active");
+            });
+
+
+            if ($("#dys").val() == "0") {
+                $(".clsIntrest").hide();
+            }
+            else {
+                $(".clsIntrest").show();
+            }
+        });
+
+        function onMakePayment() {
+            var isValid = 0;
+            if ($("#divOnlineOption").hasClass("active") == true) {
+                $("#PaymentMode").val(1); // set online payment mode
+
+                var bank = $("input:radio[name='BankSelection']:checked").val();
+                var mode = $("input:radio[name='ModeSelection']:checked").val();
+                var NetBanking = $("input:radio[name='NetBankingSelection']:checked").val();
+
+                if (bank == "HDFC") {
+                    $("#PaymentBank").val("HDFC");
+                    if (confirm('Are you sure to make payment ?')) {
+                        $("#__AntiForgeryForm").submit();
+                    }
+                }
+                else if (bank == "ICICI") {
+                    $("#PaymentBank").val("ICICI");
+                    if (mode == "NetBanking") {
+                        $("#PMode").val("NetBanking");
+
+                        //Updated by Avneesh for ICICI net banking
+                        if (confirm('Are you sure to make payment ?')) {
+                            $("#__AntiForgeryForm").submit();
+                        }
+
+                        //if (NetBanking == "Corporate") {
+                        //    $("#NetBanking_mode").val("Corporate");
+                        //    if (confirm('Are you sure to make payment ?')) {
+                        //        $("#__AntiForgeryForm").submit();
+                        //    }
+                        //}
+                        //else if (NetBanking == "Retail") {
+                        //    $("#NetBanking_mode").val("Retail");
+                        //    if (confirm('Are you sure to make payment ?')) {
+                        //        $("#__AntiForgeryForm").submit();
+                        //    }
+                        //}
+                    }
+                    else {
+                        $("#PMode").val("NEFT");
+                        if (confirm('Are you sure to make payment ?')) {
+                            $("#__AntiForgeryForm").submit();
+                        }
+                    }
+                }
+                else if (bank == "SBI") {
+
+                    $("#PaymentBank").val("SBI");
+                    if (confirm('Are you sure to make payment ?')) {
+                        $("#__AntiForgeryForm").submit();
+                    }
+                }
+
+
+
+                    //if (bank == "HDFC") {
+                    //    $("#PaymentBank").val("HDFC");
+                    //    if (confirm('Are you sure to make payment ?')) {
+                    //        $("#__AntiForgeryForm").submit();
+                    //    }
+                    //}
+                    //else if (bank == "ICICI") {
+                    //    $("#PaymentBank").val("ICICI");
+                    //    if (confirm('Are you sure to make payment ?')) {
+                    //        $("#__AntiForgeryForm").submit();
+                    //    }
+
+                    //}
+                    //else if (bank == "SBI") {
+
+                    //    $("#PaymentBank").val("SBI");
+                    //    if (confirm('Are you sure to make payment ?')) {
+                    //        $("#__AntiForgeryForm").submit();
+                    //    }
+                    //}
+                else {
+
+                    alert("Please select bank to make payment !");
+                    return false;
+
+                }
+            }
+        }
+        @*function Oncancel() {
+            var url = '@Url.Action("DemandNoteSummary", "DemandNotePayment", new { Area = "DemandNote" })';
+            window.location.href = url;
+        }*@
+</script>

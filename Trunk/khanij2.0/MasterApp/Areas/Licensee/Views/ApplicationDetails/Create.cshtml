@@ -1,0 +1,951 @@
+﻿@*// *********************************************************************************************************
+    //  View Name                : Create
+    //  Desciption               : To Save and Update, Forward to DD, Delete Licensee Details
+    //  Created By               : Prakash Chandra Biswal
+    //  Created On               : 01 July 2021
+    // ********************************************************************************************************
+*@
+@model MasterEF.ApplicationDetails;
+@{
+    ViewData["Title"] = "Add";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+
+@if (TempData["msg"] != null)
+{
+    <script>
+        swal("",'@TempData["msg"]',"success");
+    </script>
+}
+<style>
+    .disable {
+        /*cursor: not-allowed;*/
+        opacity: 0.4;
+        cursor: default;
+        pointer-events: none;
+    }
+
+    .progresstab li {
+        min-width: 150px;
+    }
+</style>
+<script>
+    indicateMe = "yes"
+    backMe = "yes"
+    $(document).ready(function () {
+        $('.searchableselect').searchableselect();
+        loadNavigation('Add', 'glUIS', 'pllesseprof', 'tl', 'Licensee Profile', 'Application Details',' ');
+        $('.datepicker').datetimepicker({
+            format: 'LT',
+            format: 'DD-MMM-YYYY',
+            //daysOfWeekDisabled: [0, 6],
+            daysOfWeekDisabled: [],
+            widgetPositioning: {
+                horizontal: 'auto',
+                vertical: 'bottom'
+            }
+        });
+        if ($("#hdnUnitId").val() != "") {
+            $("#ddlUnitType").val($("#hdnUnitId").val());
+        }
+        if ($("#hdnAPPLICATION_TYPE_ID").val() != "") {
+            $("#ddlLicenseeType").val($("#hdnAPPLICATION_TYPE_ID").val());
+        }
+        if ($("#hdnDATE_OF_TRANSFER").val() != "")
+            $("#inputTransferDate").val($("#hdnDATE_OF_TRANSFER").val());
+        if ($("#hdnAPPLICATION_FEES_DATE").val() != "")
+            $("#inputAppFeesDate").val($("#hdnAPPLICATION_FEES_DATE").val());
+        if ($("#hdnCHALLAN_DD_AMOUNT_DATE").val() != "")
+            $("#inputDDDate").val($("#hdnCHALLAN_DD_AMOUNT_DATE").val());
+        if ($("#hdnBANK_GUARRANTEE_DATE").val() != "")
+            $("#inputBankGuranteeDate").val($("#hdnBANK_GUARRANTEE_DATE").val());
+        if ($("#hdnSURITY_BOND_DATE").val() != "")
+            $("#inputBondDate").val($("#hdnSURITY_BOND_DATE").val());
+
+        if ($("#hdnDateOfRenewal").val() != "")
+            $("#DateOfRenewal").val($("#hdnDateOfRenewal").val());
+        if ($("#hdnPeriodOfRenewalFrom").val() != "")
+            $("#DateRenewalFrom").val($("#hdnPeriodOfRenewalFrom").val());
+        if ($("#hdnPeriodOfRenewalTo").val() != "")
+            $("#DateRenewalTo").val($("#hdnPeriodOfRenewalTo").val());
+        
+        if ($("#LeasePurpose").val() != "0")
+            //onChangeLease();
+            // CessRoyaltyChange();
+        if (@Model.STATUS == 1) {
+            $('.btnsave').hide();
+            $('.pointer').css("pointer-events", "none");
+        }
+        //else {
+        //    $('.pointer').css("pointer-events", "none");
+        //    $('.btnsave').show();
+        //}
+        $('input[type="file"]').bind('change', function () {
+            $("input[name='Submit']").attr('disabled', false);
+            filesize = this.files[0].size;
+            var val = $(this).val().toLowerCase(),
+                //regex = new RegExp("(.*?)\.(jpeg|jpg|png)$");
+                regex = new RegExp("(.*?)\.(pdf)$");
+            if (!(regex.test(val))) {
+                swal("", "only pdf file type are allowed. ", "warning");
+                this.value = '';
+                $("input[name='Submit']").attr('disabled', true);
+                return false;
+            }
+            else if (filesize > 2048000) {
+                swal("", "File size must be 2 MB !", "warning");
+                $("input[name='Submit']").attr('disabled', true);
+                return false;
+            }
+            else {
+                var fileName = $(this).val().split("\\").pop();
+                $(this).next('.custom-file-label').html(fileName);
+            }
+            return false;
+        });
+
+    });
+</script>
+<script>
+    function Validate() {
+        var Iss = false;
+
+        //if ($('#MINERAL_CATEGORY_ID').val() == "") {
+        //    swal("", "Please Select Mineral Category", "warning");
+        //    $('#MineralId').focus();
+        //    return false;
+        //}
+        //else if ($('#MineralId').val() == null) {
+        //    swal("", "Please Select Mineral Name", "warning");
+        //    $('#MineralId').focus();
+        //    return false;
+        //}
+        //else if ($('#MineralNatureId').val() == null) {
+        //    swal("", "Please Select Mineral Form", "warning");
+        //    $('#MineralId').focus();
+        //    return false;
+        //}
+        //else if ($('#MineralGradeId').val() == null) {
+        //    swal("", "Please Select Mineral Grade", "warning");
+        //    $('#MineralId').focus();
+        //    return false;
+        //}
+        
+        if (!blankFieldValidation("NAME_OF_TRANSFEREE", "Tranfseree Name")) {
+            $('#Transfer-tab').trigger('click');
+            return false;
+        }
+        if (!blankFieldValidation("ADDRESS_OF_TRANSFEREE", "Tranfseree Address")) {
+            $('#Transfer-tab').trigger('click');
+            return false;
+        }
+        
+        Iss = true;
+        return Iss;
+    }
+
+    function CountAddress() {
+        $("#lblMaxAddress").text(500 - (document.getElementById("RECONNAISSANCE_LICENSE_ADDRESS").value.length));
+        $("#lblRemarks").text(500 - (document.getElementById("Remarks").value.length));
+        $("#lblTransfereeAddress").text(500 - (document.getElementById("ADDRESS_OF_TRANSFEREE").value.length));
+    }
+   
+    
+    
+    var specialKeys = new Array();
+    specialKeys.push(8); //Backspace
+    function numericdotOnly(elementRef) {
+        var keyCodeEntered = (event.which) ? event.which : (window.event.keyCode) ? window.event.keyCode : -1;
+        if ((keyCodeEntered >= 48) && (keyCodeEntered <= 57)) {
+            return true;
+        }
+        // '.' decimal point...
+        else if (keyCodeEntered == 46) {
+            // Allow only 1 decimal point ('.')...
+            if ((elementRef.value) && (elementRef.value.indexOf('.') >= 0))
+                return false;
+            else
+                return true;
+        }
+        return false;
+    }
+    function numericOnly() {
+        var keycode = event.which;
+        if (!(event.shiftKey == false && (keycode == 8 || keycode == 37 || keycode == 39 || (keycode >= 48 && keycode <= 57)))) {
+            event.preventDefault();
+            return false;
+        }
+    }
+    function OnSave() {
+        if (validateWBandLab() != false && OnAdjuestCessSelectedAdjuestCessSelected() != false) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+
+    //-----------------------------
+    
+    function NextAttachments() {
+        $('#Attachments').trigger('click');
+        $('[href="#Attachments"]').tab('show');
+        $("#Attachments").show();
+        $('#lease').hide();
+        $("#Fees").hide();
+        $('#Transfer').hide();
+        $("#Purpose").hide();
+        $("#step2").addClass('active');
+        $("#step1").removeClass('active');
+        $("#step3").removeClass('active');
+        $("#step4").removeClass('active');
+        $("#step5").removeClass('active');
+    }
+    function NextFees() {
+        $('#Fees').trigger('click');
+        $('[href="#Fees"]').tab('show');
+        $("#Fees").show();
+        $('#lease').hide();
+        $("#Purpose").hide();
+        $('#Transfer').hide();
+        $("#Attachments").hide();
+        $("#step3").addClass('active');
+        $("#step1").removeClass('active');
+        $("#step2").removeClass('active');
+        $("#step4").removeClass('active');
+        $("#step5").removeClass('active');
+    }
+    function NextTransfer() {
+        $('#Transfer').trigger('click');
+        $('[href="#Transfer"]').tab('show');
+        $("#Transfer").show();
+        $('#lease').hide();
+        $("#Fees").hide();
+        $('#Attachments').hide();
+        $("#Purpose").hide();
+        $("#step4").addClass('active');
+        $("#step1").removeClass('active');
+        $("#step3").removeClass('active');
+        $("#step5").removeClass('active');
+        $("#step2").removeClass('active');
+    }
+    function NextPurpose() {
+        $('#Purpose').trigger('click');
+        $('[href="#Purpose"]').tab('show');
+        $("#Purpose").show();
+        $('#lease').hide();
+        $("#Attachments").hide();
+        $("#Fees").hide();
+        $('#Transfer').hide();
+        $("#step5").addClass('active');
+        $("#step1").removeClass('active');
+        $("#step3").removeClass('active');
+        $("#step4").removeClass('active');
+        $("#step2").removeClass('active');
+    }
+    function BackLease() {
+        $('#Purpose').trigger('click');
+        $('[href="#Purpose"]').tab('show');
+        $('#Purpose').show();
+        $("#lease").hide();
+        $("#Attachments").hide();
+        $('#Fees').hide();
+        $("#Transfer").hide();
+        $("#step5").addClass('active');
+        $("#step1").removeClass('active');
+        $("#step2").removeClass('active');
+        $("#step3").removeClass('active');
+        $("#step4").removeClass('active');
+    }
+    function BackPurpose() {
+        $('#Transfer').trigger('click');
+        $('[href="#Transfer"]').tab('show');
+        $('#Transfer').show();
+        $("#lease").hide();
+        $("#Attachments").hide();
+        $('#Fees').hide();
+        $("#Purpose").hide();
+        $("#step4").addClass('active');
+        $("#step1").removeClass('active');
+        $("#step2").removeClass('active');
+        $("#step3").removeClass('active');
+        $("#step5").removeClass('active');
+    }
+    function BackTransfer() {
+        $('#Fees').trigger('click');
+        $('[href="#Fees"]').tab('show');
+        $('#Fees').show();
+        $("#lease").hide();
+        $("#Attachments").hide();
+        $('#Transfer').hide();
+        $("#Purpose").hide();
+        $("#step3").addClass('active');
+        $("#step1").removeClass('active');
+        $("#step2").removeClass('active');
+        $("#step4").removeClass('active');
+        $("#step5").removeClass('active');
+    }
+    function BackFees() {
+        $('#Attachments').trigger('click');
+        $('[href="#Attachments"]').tab('show');
+        $('#Attachments').show();
+        $("#lease").hide();
+        $("#Fees").hide();
+        $('#Transfer').hide();
+        $("#Purpose").hide();
+        $("#step2").addClass('active');
+        $("#step1").removeClass('active');
+        $("#step3").removeClass('active');
+        $("#step4").removeClass('active');
+        $("#step5").removeClass('active');
+    }
+    function BackAttachments() {
+        $('#lease').trigger('click');
+        $('[href="#lease"]').tab('show');
+        $('#lease').show();
+        $("#Attachments").hide();
+        $("#Fees").hide();
+        $('#Transfer').hide();
+        $("#Purpose").hide();
+        $("#step1").addClass('active');
+        $("#step2").removeClass('active');
+        $("#step3").removeClass('active');
+        $("#step4").removeClass('active');
+        $("#step5").removeClass('active');
+    }
+</script>
+<script>
+    function OnForwarding(btnAction) {
+        var Type;
+        if (btnAction == 'Forward To DD') {
+            Type = 'forward';
+        }
+        if (confirm("Before " + Type + " you need to apply your Digital Signature. Are you confirmed to " + Type + " Profile??")) {
+                var Postdata = 'action=signdoc' + "\n" + 'datatosign=Digital Signature Required' + "\n" + 'signaction=sign' + "\n" + 'filepath=' + "\n" + 'panNumberParam=' + "\n" + 'expirycheck=false' + "\n" + 'issuername=' + "\n" + 'certclass=1|2|3' + "\n" + 'certtype=ALL';
+                connection.send(Postdata);
+                connection.onerror = function (error) {
+                    swal("",'Please check the server connection: ' + error+'',"warning");
+                    swal("",error,"warning");
+                };
+                connection.onmessage = function (e) { // when DSC is success then following function executed.
+                    if (e.data.indexOf("subProtocol") == -1) {
+                        //alert(e.data);
+                        $("#DSCResponse").val(e.data).change();
+                        $.ajax(
+                            {
+                               url: '@Url.Action("CheckVerifyResponse", "UserInformationLiensee", new { Area = "Licensee" })',
+                                type: "POST",
+                                data: { contentType: "pkcs7", signDataBase64Encoded: e.data, responseType: "plain" },
+                                success: function (msg) {
+                                    if (msg == "SUCCESS") {
+                                        if (btnAction == "Forward To DD") {
+                                            $("#SubResion").val("Forward To DD");
+                                        }
+                                        $("#form1").submit();
+                                    }
+                                }
+                            });
+                    }
+                    else {
+                        alert(e.data);
+                    }
+                };
+            }
+            else {
+                return false;
+            }
+    }
+    try {
+        var connection = new WebSocket('wss://localhost.emudhra.com:8080');
+        connection.onopen = function () {
+            console.log('Connection Opened');
+        };
+        connection.onerror = function (error) {
+        };
+        connection.onmessage = function (e) {
+            if (e.data.indexOf("subProtocol") == -1) {
+            }
+        };
+    }
+    catch (e) {
+        swal("", "No DSC Connection Found", "warning");
+    }
+
+    function ForwordToDdWithoutDS(btnAction) {
+
+        if (btnAction == "Forward To DD") {
+            $("#SubResion").val("Forward To DD");
+        }
+
+        $("#form1").submit();
+
+    }
+</script>
+
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        <!-- MAIN CONTENT AREA STARTS -->
+        @Html.Partial("_CMSnavigation")
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="javascript:void(0);">
+                                Add
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="~/Licensee/ApplicationDetails/ViewList">
+                                View
+                            </a>
+                        </li>
+                    </ul>
+                    @Html.Partial("_CMSutil")
+                </div>
+                <section class="box form-container">
+                    <div class="content-body">
+                        @using (Html.BeginForm("Create", "ApplicationDetails", FormMethod.Post, new { AUTOCOMPLETE = "Off", id = "form1", enctype = "multipart/form-data" }))
+                        {
+                            @Html.AntiForgeryToken()
+                            @Html.HiddenFor(model => model.CREATED_BY)
+                            @Html.HiddenFor(model => model.LICENSEE_APPLICATION_ID)
+                            @(Html.HiddenFor(model => model.SubResion))
+                            @(Html.HiddenFor(model => model.SubApprove))
+                            @(Html.HiddenFor(model => model.SubReject))
+
+                            <ul class="nav nav-tabs progresstab" id="myTab" role="tablist">
+                                <li class="startstep active" id="step1">
+                                    <a class="active" id="lease-tab" data-toggle="tab" href="#lease" role="tab" aria-controls="lease" aria-selected="true" onclick="BackAttachments()">Lease Information</a>
+                                </li>
+                                <li id="step2">
+                                    <a id="Attachments-tab" data-toggle="tab" href="#Attachments" role="tab" aria-controls="Attachments" aria-selected="false" onclick="BackFees()">Attachments</a>
+                                </li>
+                                <li id="step3">
+                                    <a id="Fees-tab" data-toggle="tab" href="#Fees" role="tab" aria-controls="Fees" aria-selected="false" onclick="BackTransfer()">Fees Details</a>
+                                </li>
+                                <li id="step4">
+                                    <a id="Transfer-tab" data-toggle="tab" href="#Transfer" role="tab" aria-controls="Transfer" aria-selected="false" onclick="BackPurpose()">Renewal</a>
+                                </li>
+                                <li id="step5">
+                                    <a id="Purpose-tab" data-toggle="tab" href="#Purpose" role="tab" aria-controls="Renewal" aria-selected="false" onclick="BackLease()">Transfer</a>
+                                </li>
+                            </ul>
+                            <div class="tab-content" id="myTabContent">
+                                <div href="#lease" class="tab-pane fade show active" id="lease" role="tabpanel" aria-labelledby="lease-tab">
+                                    <h5 class="text-brown font-weight-bold ">Licensee Information</h5>
+                                    <div class="row">
+
+                                        <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                            <label class="col-form-label font-weight-bolder">Licensee Capacity</label>
+                                            @Html.TextBoxFor(m => m.STORAGE_CAPACITY, new { @maxlength = "50", @class = "form-control" })
+                                            @Html.ValidationMessageFor(m => m.STORAGE_CAPACITY, "", new { @class = "text-danger" })
+                                        </div>
+                                        <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                            <label class="col-form-label font-weight-bolder">Licensee Capacity Unit</label>
+                                            @Html.DropDownListFor(m=>m.UnitId, ViewBag.Mineralunits as IEnumerable<SelectListItem>, "Select", new { @class = "form-control", autofocus = "autofocus", @id = "ddlUnitType" })
+                                            @Html.HiddenFor(m => m.UnitId, new { @id = "hdnUnitId" })
+                                        </div>
+                                        <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                            <label class="col-form-label font-weight-bolder">Application Number</label>
+                                            @Html.TextBoxFor(m => m.APPLICATION_NUMBER, new { @maxlength = "50", @class = "form-control" })
+                                        </div>
+                                        <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                            <label class="col-form-label font-weight-bolder">Application Form</label>
+                                            <div class="custom-file">
+                                                <input name="APPLICATION_FORM_COPY" type="file" class="form-control custom-file-input">
+                                                <label class="custom-file-label">Choose Files</label>
+                                            </div>
+                                            @if (Model.FILE_APPLICATION_FORM_COPY != null && Model.FILE_APPLICATION_FORM_COPY != "")
+                                            {
+                                                <label class="form-control-plaintext">@(Model.FILE_APPLICATION_FORM_COPY) <a href='~/@Model.APPLICATION_FORM_COPY_PATH' title="" class="ml-2" data-original-title="Download Application Form Copy" target="_blank"><i class="icon-file-pdf-solid h5 text-danger"></i></a></label>
+                                            }
+                                        </div>
+
+                                        <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                            <label class="col-form-label font-weight-bolder">PAN Card Number</label>
+                                            @Html.TextBoxFor(x => x.PAN_CARD_NO, new { @maxlength = "20", @class = "form-control" })
+                                        </div>
+                                        <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                            <label class="col-form-label font-weight-bolder">PAN Card Copy</label>
+                                            <div class="custom-file">
+                                                <input type="file" class="custom-file-input" name="PAN_CARD_COPY">
+                                                <label class="custom-file-label" for="customFile">Choose Files</label>
+                                            </div>
+                                            @if (Model.FILE_PAN_CARD != null && Model.FILE_PAN_CARD != "")
+                                            {
+                                                <label class="form-control-plaintext">@(Model.FILE_PAN_CARD) <a href='~/@Model.PAN_CARD_PATH' title="" class="ml-2" data-original-title="Download PAN Card Copy" target="_blank"><i class="icon-file-pdf-solid h5 text-danger"></i></a></label>
+                                            }
+                                        </div>
+                                        <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                            <label for="inputLoginId" class="col-form-label font-weight-bolder">Adhar Card Number</label>
+                                            @Html.TextBoxFor(x => x.ADHAR_CARD_NO, new { @maxlength = "12", @class = "form-control" })
+                                        </div>
+                                        <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                            <label class="col-form-label font-weight-bolder">Adhar Card Scan Copy</label>
+                                            <div class="custom-file">
+                                                <input type="file" class="custom-file-input" name="ADHAR_CARD_SCAN_COPY">
+                                                <label class="custom-file-label" for="customFile">Choose Files</label>
+                                            </div>
+                                            @if (Model.FILE_ADHAR_CARD != null && Model.FILE_ADHAR_CARD != "")
+                                            {
+                                                <label class="form-control-plaintext">@(Model.FILE_ADHAR_CARD) <a href='~/@Model.ADHAR_CARD_PATH' title="" class="ml-2" data-original-title="Download AAdhar Card Copy" target="_blank"><i class="icon-file-pdf-solid h5 text-danger"></i></a></label>
+                                            }
+                                        </div>
+                                        <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                            <label class="col-form-label font-weight-bolder">TIN Number</label>
+                                            @Html.TextBoxFor(x => x.TIN_CARD_NO, new { @maxlength = "20", @class = "form-control" })
+                                        </div>
+                                        <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                            <label class="col-form-label font-weight-bolder">Tin Scan Copy</label>
+                                            <div class="custom-file">
+                                                <input type="file" class="custom-file-input" name="TIN_CARD_SCAN_COPY">
+                                                <label class="custom-file-label" for="customFile">Choose Files</label>
+                                            </div>
+                                            @if (Model.FILE_TIN_CARD != null && Model.FILE_TIN_CARD != "")
+                                            {
+                                                <label class="form-control-plaintext">@(Model.FILE_TIN_CARD) <a href='~/@Model.TIN_CARD_PATH' title="" class="ml-2" data-original-title="Download GST Copy" target="_blank"><i class="icon-file-pdf-solid h5 text-danger"></i></a></label>
+                                            }
+                                        </div>
+                                        <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                            <label class="col-form-label font-weight-bolder">Firm Registration Deed No.</label>
+                                            @Html.TextBoxFor(x => x.FIRM_REGISTRATION_DEED_NO, new { @maxlength = "50", @class = "form-control" })
+                                        </div>
+                                        <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                            <label class="col-form-label font-weight-bolder">Firm Registration Deed Document</label>
+                                            <div class="custom-file">
+                                                <input type="file" class="custom-file-input" name="FIRM_REGISTRATION_DEED">
+                                                <label class="custom-file-label" for="customFile">Choose Files</label>
+                                            </div>
+                                            @if (Model.FILE_FIRM_REGISTRATION_DEED != null && Model.FILE_FIRM_REGISTRATION_DEED != "")
+                                            {
+                                                <label class="form-control-plaintext">@(Model.FILE_FIRM_REGISTRATION_DEED) <a href='~/@Model.FIRM_REGISTRATION_DEED_PATH' title="" class="ml-2" data-original-title="Download Firm Registration Deed Document" target="_blank"><i class="icon-file-pdf-solid h5 text-danger"></i></a></label>
+                                            }
+                                        </div>
+                                        <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                            <label class="col-form-label font-weight-bolder">Certification of Incorporation No.</label>
+                                            @Html.TextBoxFor(x => x.CERTIFICATE_OF_INCORPORATION_NO, new { @maxlength = "50", @class = "form-control" })
+                                        </div>
+                                        <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                            <label class="col-form-label font-weight-bolder">Certification of Incorporation Document</label>
+                                            <div class="custom-file">
+                                                <input type="file" class="custom-file-input" name="CERTIFICATE_OF_INCORPORATION_DOC">
+                                                <label class="custom-file-label" for="customFile">Choose Files</label>
+                                            </div>
+                                            @if (Model.FILE_CERTIFICATE_OF_INCORPORATION != null && Model.FILE_CERTIFICATE_OF_INCORPORATION != "")
+                                            {
+                                                <label class="form-control-plaintext">@(Model.FILE_CERTIFICATE_OF_INCORPORATION) <a href='~/@Model.CERTIFICATE_OF_INCORPORATION_PATH' title="" class="ml-2" data-original-title="Download Incorporation Certification Document" target="_blank"><i class="icon-file-pdf-solid h5 text-danger"></i></a></label>
+                                            }
+                                        </div>
+                                        <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                            <label class="col-form-label font-weight-bolder">Licensee Type</label>
+                                            @Html.DropDownList("ID", ViewBag.Licenesetype as IEnumerable<SelectListItem>, "Select", new { @class = "form-control", autofocus = "autofocus", @id = "ddlLicenseeType" })
+                                            @Html.HiddenFor(m => m.APPLICATION_TYPE_ID, new { @id = "hdnAPPLICATION_TYPE_ID" })
+                                        </div>
+                                        @*<div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                            <label class="col-form-label font-weight-bolder">Adjust E & I CESS from royalty </label>
+                                            <div class="py-2">
+                                                @Html.RadioButtonFor(model => model.AdjustCess, "Yes", new { id = "Yes", @class = "custom-radio", onchange = "CessRoyaltyChange(this)" }) Yes
+                                                @Html.RadioButtonFor(model => model.AdjustCess, "No", new { id = "No", @class = "custom-radio", onchange = "CessRoyaltyChange(this)", @checked = true }) No
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-4 col-md-6 col-sm-12 form-group DivCessRoyalty" style="display:none;">
+                                            <label class="col-form-label font-weight-bolder">Order of</label>
+                                            <div class="input-group">
+                                                @Html.TextBoxFor(x => x.OrderOf, new { @maxlength = "200", @class = "form-control" })
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-4 col-md-6 col-sm-12 form-group DivCessRoyalty" style="display:none;">
+                                            <label class="col-form-label font-weight-bolder">Order No</label>
+                                            <div class="input-group">
+                                                @Html.TextBoxFor(x => x.OrderNo, new { @maxlength = "200", @class = "form-control", @onkeypress = "return inputLimiter(event,'Numbers')" })
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-4 col-md-6 col-sm-12 form-group DivCessRoyalty" style="display:none;">
+                                            <label class="col-form-label font-weight-bolder">Order Date</label>
+                                            <div class="input-group">
+                                                <input type="text" class="form-control datepicker" id="inputOrderDate" name="OrderDate">
+                                                <div class="input-group-prepend">
+                                                    <label class="input-group-text" for="inputOrderDate"><i class="icon-calendar-alt-solid"></i></label>
+                                                </div>
+                                            </div>
+                                            @Html.HiddenFor(m => m.OrderDate, new { @id = "hdnOrderDate" })
+                                        </div>
+                                        <div class="col-lg-4 col-md-6 col-sm-12 form-group DivCessRoyalty" style="display:none;">
+                                            <label class="col-form-label font-weight-bolder">Order Attachment</label>
+                                            <div class="custom-file">
+                                                <input name="OrderCessRoyalty_Upload" type="file" class="form-control custom-file-input">
+                                                <label class="custom-file-label">Choose Files</label>
+                                            </div>
+                                            @if (Model.OrderAttachment_File != null && Model.OrderAttachment_File != "")
+                                            {
+                                                <label class="form-control-plaintext">@(Model.OrderAttachment_File) <a href='~/Upload/Lessee/APPLICATION/APPLICATION_FORM/@Model.OrderAttachment_File' title="" class="ml-2" data-original-title="Download Attached Order Document" target="_blank"><i class="icon-file-pdf-solid h5 text-danger"></i></a></label>
+                                            }
+                                        </div>*@
+                                    </div>
+                                    <div class="row mt-4">
+                                        <div class="col-sm-12 text-center">
+                                            <a class="btn btn-primary btn-md ml-0 waves-effect waves-light btnNext" onclick="NextAttachments()">Next</a>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div href="#Attachments" class="tab-pane fade" id="Attachments" role="tabpanel" aria-labelledby="Attachments-tab">
+                                    <h5 class="text-brown font-weight-bold">Attachments</h5>
+                                    <div class="row">
+                                        <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                            <label class="col-form-label font-weight-bolder">Power of Attorney</label>
+                                            <div class="custom-file">
+                                                <input type="file" class="custom-file-input" name="POWER_OF_ATORNY_PATH_COPY">
+                                                <label class="custom-file-label" for="customFile">Choose Files</label>
+                                            </div>
+                                            @if (Model.FILE_POWER_OF_ATORNY != null)
+                                            {
+                                                <label class="form-control-plaintext">@(Model.FILE_POWER_OF_ATORNY) <a href='~/@Model.POWER_OF_ATORNY_PATH' title="" class="ml-2" data-original-title="Download" target="_blank"><i class="icon-file-pdf-solid h5 text-danger"></i></a></label>
+                                            }
+                                        </div>
+                                        <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                            <label class="col-form-label font-weight-bolder">Affidavits / Mining Due Certificate</label>
+                                            <div class="custom-file">
+                                                <input type="file" class="custom-file-input" name="AFFIDAVITS_MINING_DUE_COPY">
+                                                <label class="custom-file-label" for="customFile">Choose Files</label>
+                                            </div>
+                                            @if (Model.FILE_AFFIDAVITS_MINING_DUE != null)
+                                            {
+                                                <label class="form-control-plaintext">@(Model.FILE_AFFIDAVITS_MINING_DUE) <a href='~/@Model.AFFIDAVITS_MINING_DUE_PATH' title="" class="ml-2" data-original-title="Download" target="_blank"><i class="icon-file-pdf-solid h5 text-danger"></i></a></label>
+                                            }
+                                        </div>
+                                        <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                            <label class="col-form-label font-weight-bolder">Khasara Panchsala</label>
+                                            <div class="custom-file">
+                                                <input type="file" class="custom-file-input" name="KHASARA_PANCHSALA_COPY">
+                                                <label class="custom-file-label" for="customFile">Choose Files</label>
+                                            </div>
+                                            @if (Model.FILE_KHASARA_PANCHSALA != null)
+                                            {
+                                                <label class="form-control-plaintext">@(Model.FILE_KHASARA_PANCHSALA) <a href='~/@Model.KHASARA_PANCHSALA_PATH' title="" class="ml-2" data-original-title="Download" target="_blank"><i class="icon-file-pdf-solid h5 text-danger"></i></a></label>
+                                            }
+                                        </div>
+                                        <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                            <label class="col-form-label font-weight-bolder">Map / Plan of applied area </label>
+                                            <div class="custom-file">
+                                                <input type="file" class="custom-file-input" name="MAP_PLAN_OF_APPLIED_AREA_COPY">
+                                                <label class="custom-file-label" for="customFile">Choose Files</label>
+                                            </div>
+                                            @if (Model.FILE_MAP_PLAN_OF_APPLIED_AREA != null)
+                                            {
+                                                <label class="form-control-plaintext">@(Model.FILE_MAP_PLAN_OF_APPLIED_AREA) <a href='~/@Model.MAP_PLAN_OF_APPLIED_AREA_PATH' title="" class="ml-2" data-original-title="Download" target="_blank"><i class="icon-file-pdf-solid h5 text-danger"></i></a></label>
+                                            }
+                                        </div>
+                                        <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                            <label for="inputLoginId" class="col-form-label font-weight-bolder">Forest Report </label>
+                                            <div class="custom-file">
+                                                <input type="file" class="custom-file-input" name="FOREST_REPORT_COPY">
+                                                <label class="custom-file-label" for="customFile">Choose Files</label>
+                                            </div>
+                                            @if (Model.FILE_FOREST_REPORT != null)
+                                            {
+                                                <label class="form-control-plaintext">@(Model.FILE_FOREST_REPORT) <a href='~/@Model.FOREST_REPORT_PATH' title="" class="ml-2" data-original-title="Download" target="_blank"><i class="icon-file-pdf-solid h5 text-danger"></i></a></label>
+                                            }
+                                        </div>
+                                        <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                            <label for="inputLoginId" class="col-form-label font-weight-bolder">Revenue Officer Report</label>
+                                            <div class="custom-file">
+                                                <input type="file" class="custom-file-input" name="REVENUE_OFFICER_REPORT_COPY">
+                                                <label class="custom-file-label" for="customFile">Choose Files</label>
+                                            </div>
+                                            @if (Model.FILE_REVENUE_OFFICER_REPORT != null)
+                                            {
+                                                <label class="form-control-plaintext">@(Model.FILE_REVENUE_OFFICER_REPORT) <a href='~/@Model.REVENUE_OFFICER_REPORT_PATH' title="" class="ml-2" data-original-title="Download" target="_blank"><i class="icon-file-pdf-solid h5 text-danger"></i></a></label>
+                                            }
+                                        </div>
+                                        <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                            <label class="col-form-label font-weight-bolder">Spot Inspection and Analysis Report</label>
+                                            <div class="custom-file">
+                                                <input type="file" class="custom-file-input" name="SPOT_INSPECTION_AND_ANALYSIS_REPORT_COPY">
+                                                <label class="custom-file-label" for="customFile">Choose Files</label>
+                                            </div>
+                                            @if (Model.FILE_SPOT_INSPECTION_AND_ANALYSIS_REPORT != null)
+                                            {
+                                                <label class="form-control-plaintext">@(Model.FILE_SPOT_INSPECTION_AND_ANALYSIS_REPORT) <a href='~/@Model.SPOT_INSPECTION_AND_ANALYSIS_REPORT_PATH' title="" class="ml-2" data-original-title="Download" target="_blank"><i class="icon-file-pdf-solid h5 text-danger"></i></a></label>
+                                            }
+                                        </div>
+                                        <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                            <label class="col-form-label font-weight-bolder">Mining Inspector Report</label>
+                                            <div class="custom-file">
+                                                <input type="file" class="custom-file-input" name="MINING_INSPECTOR_REPORT_COPY">
+                                                <label class="custom-file-label" for="customFile">Choose Files</label>
+                                            </div>
+                                            @if (Model.FILE_MININIG_INSPECTOR_REPORT != null)
+                                            {
+                                                <label class="form-control-plaintext">@(Model.FILE_MININIG_INSPECTOR_REPORT) <a href='~/@Model.MINING_INSPECTOR_REPORT_PATH' title="" class="ml-2" data-original-title="Download" target="_blank"><i class="icon-file-pdf-solid h5 text-danger"></i></a></label>
+                                            }
+                                        </div>
+                                        <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                            <label for="inputLoginId" class="col-form-label font-weight-bolder">Gram Panchayat Proposal</label>
+                                            <div class="custom-file">
+                                                <input type="file" class="custom-file-input" name="GRAM_PANCHAYAT_PROPOSAL_COPY">
+                                                <label class="custom-file-label" for="customFile">Choose Files</label>
+                                            </div>
+                                            @if (Model.FILE_GRAM_PANCHAYAT_PROPOSAL != null)
+                                            {
+                                                <label class="form-control-plaintext">@(Model.FILE_GRAM_PANCHAYAT_PROPOSAL) <a href='~/@Model.GRAM_PANCHAYAT_PROPOSAL_PATH' title="" class="ml-2" data-original-title="Download" target="_blank"><i class="icon-file-pdf-solid h5 text-danger"></i></a></label>
+                                            }
+                                        </div>
+                                    </div>
+                                    <div class="row mt-4">
+                                        <div class="col-sm-12 text-center">
+                                            <a class="btn btn-dark btn-md ml-0 waves-effect waves-light btnPrevious" onclick="BackAttachments()">Previous</a>
+                                            @*<a class="btn btn-danger btn-md ml-0 waves-effect waves-light">Reset</a>*@
+                                            <a class="btn btn-primary btn-md ml-0 waves-effect waves-light btnNext" onclick="NextFees()">Next</a>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div href="#Fees" class="tab-pane fade" id="Fees" role="tabpanel" aria-labelledby="Fees-tab">
+                                    <h5 class="text-brown font-weight-bold">Fees Details</h5>
+                                    <div class=" row">
+
+                                        <div class="col-lg-4 col-md-6 col-sm-12">
+                                            <label class="col-form-label font-weight-bolder">Application Fees (in <i class="fas fa-rupee-sign"></i>) </label>
+                                            @Html.TextBoxFor(model => model.APPLICATION_FEES, new { @maxlength = "50", @class = "form-control" })
+                                        </div>
+                                        <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                            <label class="col-form-label font-weight-bolder">Application Fees Date</label>
+                                            <div class="input-group">
+                                                <input type="text" class="form-control datepicker" id="inputAppFeesDate" name="APPLICATION_FEES_DATE">
+                                                <div class="input-group-prepend">
+                                                    <label class="input-group-text" for="inputAppFeesDate"><i class="icon-calendar-alt-solid"></i></label>
+                                                </div>
+                                            </div>
+                                            @Html.HiddenFor(m => m.APPLICATION_FEES_DATE, new { @id = "hdnAPPLICATION_FEES_DATE" })
+                                        </div>
+                                        <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                            <label class="col-form-label font-weight-bolder">Application Fees Copy</label>
+                                            <div class="custom-file">
+                                                <input type="file" class="custom-file-input" name="APPLICATION_FEES_COPY">
+                                                <label class="custom-file-label" for="customFile">Choose Files</label>
+                                            </div>
+                                            @if (Model.FILE_APPLICATION_FEES_CHALLAN != null && Model.FILE_APPLICATION_FEES_CHALLAN != "")
+                                            {
+                                                <label class="form-control-plaintext">@(Model.FILE_APPLICATION_FEES_CHALLAN) <a href='~/@Model.APPLICATION_FEES_CHALLAN_PATH' title="" class="ml-2" data-original-title="Download" target="_blank"><i class="icon-file-pdf-solid h5 text-danger"></i></a></label>
+                                            }
+                                        </div>
+                                        <div class="col-lg-4 col-md-6 col-sm-12">
+                                            <label class="col-form-label font-weight-bolder">Security Deposit Challan / DD Amount (in <i class="fas fa-rupee-sign"></i>) </label>
+                                            @Html.TextBoxFor(model => model.CHALLAN_DD_AMOUNT, new { @maxlength = "50", @class = "form-control" })
+                                        </div>
+                                        <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                            <label for="inputLoginId" class="col-form-label font-weight-bolder">Security Deposit Challan / DD Date </label>
+                                            <div class="input-group">
+                                                <input type="text" class="form-control datepicker" id="inputDDDate" name="CHALLAN_DD_DATE">
+                                                <div class="input-group-prepend">
+                                                    <label class="input-group-text" for="inputDDDate"><i class="icon-calendar-alt-solid"></i></label>
+                                                </div>
+                                            </div>
+                                            @Html.HiddenFor(m => m.CHALLAN_DD_DATE, new { @id = "hdnCHALLAN_DD_AMOUNT_DATE" })
+                                        </div>
+                                        <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                            <label for="inputLoginId" class="col-form-label font-weight-bolder">Security Deposit Challan / DD Copy</label>
+                                            <div class="custom-file">
+                                                <input type="file" class="custom-file-input" name="CHALLAN_DD_COPY">
+                                                <label class="custom-file-label" for="customFile">Choose Files</label>
+                                            </div>
+                                            @if (Model.FILE_CHALLAN_DD != null && Model.FILE_CHALLAN_DD != "")
+                                            {
+                                                <label class="form-control-plaintext">@(Model.FILE_CHALLAN_DD) <a href='~/@Model.CHALLAN_DD_PATH' title="" class="ml-2" data-original-title="Download" target="_blank"><i class="icon-file-pdf-solid h5 text-danger"></i></a></label>
+                                            }
+                                        </div>
+                                        <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                            <label class="col-form-label font-weight-bolder">Bank Guarrantee Amount (in <i class="fas fa-rupee-sign"></i>) </label>
+                                            @Html.TextBoxFor(model => model.BANK_GUARRANTEE_AMOUNT, new { @maxlength = "50", @class = "form-control" })
+                                        </div>
+                                        <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                            <label class="col-form-label font-weight-bolder">Bank Guarranty Date</label>
+                                            <div class="input-group">
+                                                <input type="text" class="form-control datepicker" id="inputBankGuranteeDate" name="BANK_GUARRANTEE_DATE">
+                                                <div class="input-group-prepend">
+                                                    <label class="input-group-text" for="inputBankGuranteeDate"><i class="icon-calendar-alt-solid"></i></label>
+                                                </div>
+                                            </div>
+                                            @Html.HiddenFor(m => m.BANK_GUARRANTEE_DATE, new { @id = "hdnBANK_GUARRANTEE_DATE" })
+                                        </div>
+                                        <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                            <label for="inputLoginId" class="col-form-label font-weight-bolder">Bank Guarranty Copy</label>
+                                            <div class="custom-file">
+                                                <input type="file" class="custom-file-input" name="BANK_GUARRANTEE_COPY">
+                                                <label class="custom-file-label" for="customFile">Choose Files</label>
+                                            </div>
+                                            @if (Model.FILE_BANK_GUARRANTEE != null && Model.FILE_BANK_GUARRANTEE != "")
+                                            {
+                                                <label class="form-control-plaintext">@(Model.FILE_BANK_GUARRANTEE) <a href='~/@Model.BANK_GUARRANTEE_PATH' title="" class="ml-2" data-original-title="Download" target="_blank"><i class="icon-file-pdf-solid h5 text-danger"></i></a></label>
+                                            }
+                                        </div>
+                                        <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                            <label class="col-form-label font-weight-bolder">Surety Bond Amount (in <i class="fas fa-rupee-sign"></i>) </label>
+                                            @Html.TextBoxFor(model => model.SURETY_BOND_AMOUNT, new { @maxlength = "50", @class = "form-control" })
+                                        </div>
+                                        <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                            <label class="col-form-label font-weight-bolder">Surety Bond Date</label>
+                                            <div class="input-group">
+                                                <input type="text" class="form-control datepicker" id="inputBondDate" name="SURETY_BOND_DATE">
+                                                <div class="input-group-prepend">
+                                                    <label class="input-group-text" for="inputBondDate"><i class="icon-calendar-alt-solid"></i></label>
+                                                </div>
+                                            </div>
+                                            @Html.HiddenFor(m => m.SURETY_BOND_DATE, new { @id = "hdnSURITY_BOND_DATE" })
+                                        </div>
+                                        <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                            <label for="inputLoginId" class="col-form-label font-weight-bolder">Surety Bond Copy</label>
+                                            <div class="custom-file">
+                                                <input type="file" class="custom-file-input" name="SURETY_BOND_COPY">
+                                                <label class="custom-file-label" for="customFile">Choose Files</label>
+                                            </div>
+                                            @if (Model.FILE_SURETY_BOND != null && Model.FILE_SURETY_BOND != "")
+                                            {
+                                                <label class="form-control-plaintext">@(Model.FILE_SURETY_BOND) <a href='~/@Model.SURETY_BOND_PATH' title="" class="ml-2" data-original-title="Download" target="_blank"><i class="icon-file-pdf-solid h5 text-danger"></i></a></label>
+                                            }
+                                        </div>
+                                        <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                            <label class="col-form-label font-weight-bolder">Fixed Deposits Monthly Income Scheme Certificate</label>
+                                            <div class="custom-file">
+                                                <input type="file" class="custom-file-input" name="FIXED_DEPOSITS_MONTHLY_INCOME_SCHEME_CERTIFICATE_COPY">
+                                                <label class="custom-file-label" for="customFile">Choose Files</label>
+                                            </div>
+                                            @if (Model.FILE_FIXED_DEPOSITS_MONTHLY_INCOME_SCHEME_CERTIFICATE != null && Model.FILE_FIXED_DEPOSITS_MONTHLY_INCOME_SCHEME_CERTIFICATE != "")
+                                            {
+                                                <label class="form-control-plaintext">@(Model.FILE_FIXED_DEPOSITS_MONTHLY_INCOME_SCHEME_CERTIFICATE) <a href='~/@Model.FIXED_DEPOSITS_MONTHLY_INCOME_SCHEME_CERTIFICATE_PATH' title="" class="ml-2" data-original-title="Download" target="_blank"><i class="icon-file-pdf-solid h5 text-danger"></i></a></label>
+                                            }
+                                        </div>
+
+                                    </div>
+                                    <div class="row mt-4">
+                                        <div class="col-sm-12 text-center">
+                                            <a class="btn btn-dark btn-md ml-0 waves-effect waves-light btnPrevious" onclick="BackFees()">Previous</a>
+                                            <a class="btn btn-primary btn-md ml-0 waves-effect waves-light btnNext" onclick="NextTransfer()">Next</a>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div href="#Transfer" class="tab-pane fade" id="Transfer" role="tabpanel" aria-labelledby="Transfer-tab">
+                                    <h5 class="text-brown font-weight-bold">Renewal Case</h5>
+                                    <div class="row">
+                                        <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                            <label for="inputLoginId" class="col-form-label font-weight-bolder">Date Of Renewal</label>
+                                            <div class="input-group">
+                                                <input type="text" class="form-control datepicker" id="DateOfRenewal" name="DateOfRenewal">
+                                                <div class="input-group-prepend">
+                                                    <label class="input-group-text" for="DateOfRenewal"><i class="icon-calendar-alt-solid"></i></label>
+                                                </div>
+                                            </div>
+                                            @Html.HiddenFor(m => m.DateOfRenewal, new { @id = "hdnDateOfRenewal" })
+                                        </div>
+                                        <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                            <label class="col-form-label font-weight-bolder">Renewal Grant Order Copy </label>
+                                            <div class="custom-file">
+                                                <input type="file" class="custom-file-input" name="Renewal_GrantOrder_COPY">
+                                                <label class="custom-file-label" for="customFile">Choose Files</label>
+                                            </div>
+                                            @if (Model.Renewal_GrantOrderCopy_File != null && Model.Renewal_GrantOrderCopy_File != "")
+                                            {
+                                                <label class="form-control-plaintext">@(Model.Renewal_GrantOrderCopy_File) <a href='~/@Model.Renewal_GrantOrderCopy_Path' title="" class="ml-2" data-original-title="Download Copy" target="_blank"><i class="icon-file-pdf-solid h5 text-danger"></i></a></label>
+                                            }
+                                        </div>
+                                        <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                            <label for="inputLoginId" class="col-form-label font-weight-bolder">Period Of Renewal From</label>
+                                            <div class="input-group">
+                                                <input type="text" class="form-control datepicker" id="DateRenewalFrom" name="PeriodOfRenewalFrom">
+                                                <div class="input-group-prepend">
+                                                    <label class="input-group-text" for="DateRenewalFrom"><i class="icon-calendar-alt-solid"></i></label>
+                                                </div>
+                                            </div>
+                                            @Html.HiddenFor(m => m.PeriodOfRenewalFrom, new { @id = "hdnPeriodOfRenewalFrom" })
+                                        </div>
+                                        <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                            <label for="inputLoginId" class="col-form-label font-weight-bolder">Period Of Renewal To</label>
+                                            <div class="input-group">
+                                                <input type="text" class="form-control datepicker" id="DateRenewalTo" name="PeriodOfRenewalTo">
+                                                <div class="input-group-prepend">
+                                                    <label class="input-group-text" for="DateRenewalTo"><i class="icon-calendar-alt-solid"></i></label>
+                                                </div>
+                                            </div>
+                                            @Html.HiddenFor(m => m.PeriodOfRenewalTo, new { @id = "hdnPeriodOfRenewalTo" })
+                                        </div>
+
+                                    </div>
+
+                                    <div class="row mt-4">
+                                        <div class="col-sm-12 text-center">
+                                            <a class="btn btn-dark btn-md ml-0 waves-effect waves-light btnPrevious" onclick="BackTransfer()">Previous</a>
+                                            @*<a class="btn btn-danger btn-md ml-0 waves-effect waves-light">Reset</a>*@
+                                            <a class="btn btn-primary btn-md ml-0 waves-effect waves-light btnNext" onclick="NextPurpose()">Next</a>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div href="#Purpose" class="tab-pane fade" id="Purpose" role="tabpanel" aria-labelledby="Purpose-tab">
+                                    <h5 class="text-brown font-weight-bold">Transfer</h5>
+                                    <div class="row">
+                                        <div class="col-lg-4 col-md-6 col-sm-12">
+                                            <label class="col-form-label font-weight-bolder">Transferee Name <span class="text-danger">*</span></label>
+                                            @Html.TextBoxFor(model => model.NameOfTransferee, new { @maxlength = "50", @class = "form-control" })
+                                            @Html.ValidationMessageFor(m => m.NameOfTransferee, "", new { @class = "text-danger" })
+                                        </div>
+                                        <div class="col-lg-4 col-md-6 col-sm-12">
+                                            <label class="col-form-label font-weight-bolder">Transferee Address <span class="text-danger">*</span></label>
+                                            @Html.TextAreaFor(model => model.AddressOfTransferee, new { @maxlength = "500", @rows = "2", @class = "form-control", @onkeyup = "CountAddress()" })
+                                            <small class="text-danger">Maximum <strong><label id="lblTransfereeAddress" class="col-form-label">500</label></strong> characters</small>
+                                            @Html.ValidationMessageFor(m => m.AddressOfTransferee, "", new { @class = "text-danger" })
+                                        </div>
+                                        <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                            <label class="col-form-label font-weight-bolder">Transfer Grant Order Copy</label>
+                                            <div class="custom-file">
+                                                <input type="file" class="custom-file-input" name="Transfer_GrantOrder_COPY">
+                                                <label class="custom-file-label" for="customFile">Choose Files</label>
+                                            </div>
+                                            @if (Model.Transfer_GrantOrderCopy_File != null && Model.Transfer_GrantOrderCopy_File != "")
+                                            {
+                                                <label class="form-control-plaintext">@(Model.Transfer_GrantOrderCopy_File) <a href='~/@Model.Transfer_GrantOrderCopy_Path' title="" class="ml-2" data-original-title="Download Copy" target="_blank"><i class="icon-file-pdf-solid h5 text-danger"></i></a></label>
+                                            }
+                                        </div>
+                                        <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                            <label class="col-form-label font-weight-bolder">Transfer Lease Deed Copy </label>
+                                            <div class="custom-file">
+                                                <input type="file" class="custom-file-input" name="Transfer_LeaseDeed_COPY">
+                                                <label class="custom-file-label" for="customFile">Choose Files</label>
+                                            </div>
+                                            @if (Model.Transfer_LeaseDeedCopy_File != null && Model.Transfer_LeaseDeedCopy_File != "")
+                                            {
+                                                <label class="form-control-plaintext">@(Model.Transfer_LeaseDeedCopy_File) <a href='~/@Model.Transfer_LeaseDeedCopy_Path' title="" class="ml-2" data-original-title="Download Copy" target="_blank"><i class="icon-file-pdf-solid h5 text-danger"></i></a></label>
+                                            }
+                                        </div>
+                                        <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                            <label for="inputLoginId" class="col-form-label font-weight-bolder">Transfer Date</label>
+                                            <div class="input-group">
+                                                <input type="text" class="form-control datepicker" id="inputTransferDate" name="DateOfTransfer">
+                                                <div class="input-group-prepend">
+                                                    <label class="input-group-text" for="inputTransferDate"><i class="icon-calendar-alt-solid"></i></label>
+                                                </div>
+                                            </div>
+                                            @Html.HiddenFor(m => m.DateOfTransfer, new { @id = "hdnDATE_OF_TRANSFER" })
+                                        </div>
+                                        @*<div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                            <label for="inputLoginId" class="col-form-label font-weight-bolder">Remarks </label>
+                                            @Html.TextAreaFor(x => x.Remarks, new { @class = "form-control", @maxlength = "500", @rows = "2", @onkeyup = "CountAddress()", @readonly = "true" })
+                                            <small class="text-danger">Maximum <strong><label id="lblRemarks" class="col-form-label">500</label></strong> characters</small>
+                                        </div>*@
+                                    </div>
+                                    <div class="row mt-4">
+                                        <div class="col-sm-12 text-center">
+                                            <a class="btn btn-dark btn-md ml-0 waves-effect waves-light btnPrevious" onclick="BackPurpose()">Previous</a>
+                                            <input type="submit" id="Submit" value="Save & Update" class="btn btn-success btn-md ml-0 waves-effect waves-light btnsave" name="Submit" onclick="return Validate()" />
+                                            <input type="submit" value="Delete" class="btn btn-danger btn-md ml-0 waves-effect waves-light btnsave" id="Delete" name="delete" onclick="return confirm('Are you sure to delete?')" style="display:none" />
+                                            <input type="button" title="Forward to DD" value="Forward To DD" name="cmd" class="btn btn-warning text-dark btn-md waves-effect waves-light btnsave" onclick="if (Validate()) { return OnForwarding('Forward To DD'); }" />
+                                            @*<input type="button" title="Forward to DD" value="Forward To DD" name="cmd" class="btn btn-warning text-dark btn-md waves-effect waves-light btnsave" onclick="if (Validate()) { return ForwordToDdWithoutDS('Forward To DD'); }" />*@
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+</section>

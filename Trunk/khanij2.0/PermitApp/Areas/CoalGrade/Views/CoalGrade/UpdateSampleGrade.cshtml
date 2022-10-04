@@ -1,0 +1,678 @@
+﻿
+@{
+    ViewData["Title"] = "UpdateSampleGrade";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+
+@model PermitEF.ePermitModel
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        @Html.Partial("_CMSnavigation")
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link" href="/CoalGrade/CoalGrade/SampleGrade">
+                                Sample Grade
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="#">
+                                Update Sample Grade
+                            </a>
+                        </li>
+                    </ul>
+                    @Html.Partial("_CMSutil")
+                </div>
+                <section class="box form-container">
+                    <div class="content-body">
+                        <h5 class="text-brown font-weight-bold mt-0">Update Grade Master</h5>
+                        <form id="frmEPermit" method="post" autocomplete="off">
+                            @Html.HiddenFor(model => model.BulkPermitId)
+                            @Html.HiddenFor(model => model.MineralTypeId)
+                            @Html.HiddenFor(model => model.LeaseInfoId)
+                            @Html.HiddenFor(model => model.PayableRoyalty)
+                            @Html.HiddenFor(model => model.NMET)
+                            @Html.HiddenFor(model => model.TCS)
+                            @Html.HiddenFor(model => model.DMF)
+                            @Html.HiddenFor(model => model.Cess)
+                            @Html.HiddenFor(model => model.eCess)
+                            @Html.HiddenFor(model => model.RoyaltyRateID)
+                            @Html.HiddenFor(model => model.MineralId)
+                            @Html.HiddenFor(model => model.MineralNatureId)
+                            @Html.HiddenFor(model => model.PaymentMode)
+                            @Html.HiddenFor(model => model.PaymentBank)
+                            @Html.HiddenFor(model => model.P_Mode)
+                            @Html.HiddenFor(model => model.NetBanking_mode)
+                            <div class="row">
+                                <div class="col-lg-4 col-md-6">
+                                    <label class="col-form-label">E-Permit No<span class="text-danger">*</span></label>
+                                    <div class="form-group">
+                                        @(Html.TextBoxFor(model => model.BulkPermitNo, new { @class = "form-control", @readonly = "readonly" }))
+                                    </div>
+                                </div>
+                                <div class="col-lg-4 col-md-6">
+                                    <label class="col-form-label">e-Permit Grade<span class="text-danger">*</span></label>
+                                    <div class="form-group">
+                                        @(Html.TextBoxFor(model => model.MineralGrade, new { @class = "form-control", @readonly = "readonly" }))
+                                    </div>
+                                </div>
+                                <div class="col-lg-4 col-md-6">
+                                    <label class="col-form-label">e-Permit Qty<span class="text-danger">*</span></label>
+                                    <div class="form-group">
+                                        @(Html.TextBoxFor(model => model.ApprovedQty, new { @class = "form-control", @readonly = "readonly" }))
+                                    </div>
+                                </div>
+                                <div class="col-lg-4 col-md-6">
+                                    <label class="col-form-label">Pending for Update Qty<span class="text-danger">*</span></label>
+                                    <div class="form-group">
+                                        @(Html.TextBoxFor(model => model.UserTotalDispatch, new { @class = "form-control", @readonly = "readonly" }))
+                                    </div>
+                                </div>
+                                <div class="col-lg-4 col-md-6">
+                                    <label class="col-form-label">Already Updated Grade Qty<span class="text-danger">*</span></label>
+                                    <div class="form-group">
+                                        @(Html.TextBoxFor(model => model.RopewayDispatch, new { @class = "form-control", @readonly = "readonly" }))
+                                    </div>
+                                </div>
+
+
+                                <div class="col-lg-4 col-md-6">
+                                    <label class="col-form-label">Update Mineral Grade *<span class="text-danger">*</span></label>
+                                    <div class="form-group">
+                                        <select id="MineralGradeId" name="MineralGradeId" class="form-control">
+                                            <option value="">Select</option>
+                                            @{
+                                                foreach (var item in (List<PermitEF.ePermitModel>)ViewData["MineralGrade"])
+                                                {
+                                                    if (Model.MineralGradeId == item.MineralGradeID)
+                                                    {
+                                                        <option value="@item.MineralGradeID" selected>@item.MineralGrade</option>
+                                                    }
+                                                    else
+                                                    {
+                                                        <option value="@item.MineralGradeID">@item.MineralGrade</option>
+                                                    }
+
+                                                }
+                                            }
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-lg-4 col-md-6">
+                                    <label class="col-form-label">Enter Updated Qty*<span class="text-danger">*</span></label>
+                                    <div class="form-group">
+                                        <input type="text" id="ProposedQty" name="ProposedQty" class="form-control" />
+                                    </div>
+                                </div>
+                                <div class="col-lg-4 col-md-6">
+                                    <label class="col-form-label">Updated Basic Price/Royalty Rate*<span class="text-danger">*</span></label>
+                                    <div class="form-group">
+                                        <input type="text" id="BasicRate" name="BasicRate" class="form-control" />
+                                    </div>
+                                </div>
+                                <div class="col-lg-4 col-md-6">
+                                    <div class="" id="PayAmLable">
+                                        @(Html.LabelFor(model => model.TotalPayableAmount, "Total Payable Amount", new { @class = "col-form-label" }))
+                                    </div>
+                                    <div class="" style="display: none;" id="CreAmLable">
+                                        @(Html.LabelFor(model => model.TotalPayableAmount, "Total Creditable Amount", new { @class = "col-form-label" }))
+                                    </div>
+                                    <div class="form-group">
+                                        <input type="text" id="TotalPayableAmount" name="TotalPayableAmount" class="form-control" readonly />
+                                    </div>
+                                </div>
+                                <div class="col-lg-4 col-md-6">
+                                </div>
+                                <div class="col-lg-4 col-md-6">
+                                </div>
+                                <div class="col-lg-4 col-md-6">
+                                    <div class="" id="Calculation" style="display: none;">
+                                        <a href="#" class="text-primary" data-toggle="modal" data-target="#View-Details">
+                                            View Calculation
+                                        </a>
+                                    </div>
+
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-12 col-md-12">
+                                    <div id="PayButton" style="display: none; padding-bottom: 10px;">
+
+                                        <div class="row" style="padding-bottom: 10px;">
+                                            <div class="col-md-12" style="margin-top: 30px;">
+                                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 bhoechie-tab-container">
+                                                    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 bhoechie-tab-menu">
+                                                        <div class="list-group">
+                                                            <a href="#" class="list-group-item  active text-center" id="divOnlineOption" style="width: 187px;">
+                                                                Online Payment
+                                                            </a>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-4 bhoechie-tab">
+                                                        <!-- Online payment section -->
+                                                        <div class="bhoechie-tab-content active ">
+                                                            <div class="row" id="divPaymentOptionOnline">
+                                                                <div class="col-md-12 ">
+                                                                    <div id="divOnlineChallanDetails">
+                                                                        <div class="col-md-12 " style="padding-left: 0px; padding-right: 0px; margin-left: 80px;">
+                                                                            <div class="col-md-6 default-form-control-style">
+                                                                                <input name="BankSelection" type="radio" id="chkSBI" value="SBI" checked="checked" />
+                                                                                <img src="@Url.Content("~/Images/SBI.jpg")" alt="SBI" style="width:100px;height:40px;" />
+
+
+
+                                                                            </div>
+                                                                            <div class="col-md-6 default-form-control-style" style="text-align: left;">
+                                                                                @*@(Html.Label("ICICI BANK"))*@
+                                                                                <input name="BankSelection" type="radio" id="chkICICI" value="ICICI" />
+                                                                                <img src="@Url.Content("~/Images/ICICI.png")" alt="ICICI" style="width:100px;height:40px;" />
+
+
+
+                                                                            </div>
+                                                                            <div class="col-md-4 default-form-control-style" style="display: none;">
+                                                                                @*@(Html.Label("HDFC BANK"))*@
+                                                                                <input name="BankSelection" type="radio" id="chkHDFC" value="HDFC" />
+                                                                                <img src="@Url.Content("~/Images/HDFC.jpg")" alt="HDFC" style="width:100px;height:50px;" />
+
+
+
+                                                                            </div>
+
+
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="row" id="divPaymentOption" style="display: none">
+                                                                        <div class="col-lg-12 col-md-12 col-xs-12">
+                                                                            <div id="divOnline">
+                                                                                <div class="col-xs-12" style="margin-left: 65px;">
+                                                                                    <div class="col-md-5 default-form-control-style" style="text-align: left;">
+                                                                                        <input name="ModeSelection" type="radio" id="chkICICINetBanking" value="NetBanking" />
+                                                                                        @(Html.Label("Net Banking"))
+
+                                                                                    </div>
+                                                                                    <div class="col-md-7 default-form-control-style">
+                                                                                        <input name="ModeSelection" type="radio" id="chkNEFT" value="NEFT" checked="checked" style="margin-left: 40px;" />
+                                                                                        @(Html.Label("NEFT/RTGS"))
+
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="row" id="divNetBankingPayment" style="display: none">
+                                                                        <div class="col-lg-12 col-md-12 col-xs-12">
+                                                                            <div id="divNet">
+                                                                                <div class="col-xs-12">
+                                                                                    <div class="col-md-4 default-form-control-style" style="text-align: left;">
+                                                                                        @(Html.Label("Corporate"))
+                                                                                        <input name="NetBankingSelection" type="radio" value="Corporate" checked="checked" />
+                                                                                    </div>
+                                                                                    <div class="col-md-4 default-form-control-style">
+                                                                                        @(Html.Label("Retail"))
+                                                                                        <input name="NetBankingSelection" type="radio" value="Retail" />
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <!-- Offlineline payment section -->
+
+                                                    </div>
+                                                </div>
+                                                <br />
+                                            </div>
+                                        </div>
+
+                                        <div class="row" style="padding-bottom: 10px;">
+
+                                            <div class="col-md-5">
+                                                <div class="">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-5">
+                                                <div class="">
+                                                    <input type="button" id="btn_GenerateTP" onclick="return postFormDetails();" value="Payment Update Grade" class="k-button k-button-icontext k-primary" />
+                                                </div>
+                                            </div>
+                                            <div class="col-md-2">
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-12 col-md-12">
+                                    <div id="CreditButton" style="display: none">
+                                        <div class="row" style="padding-bottom: 10px;">
+
+                                            <div class="col-md-4">
+                                                <div class="">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="">
+                                                    <input type="button" onclick="return postFormDetails1();" value="Submit Update Grade" class="k-button k-button-icontext k-primary" />
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+    <!-- MAIN CONTENT AREA ENDS -->
+</section>
+
+<div class="modal fade" id="View-Details" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+
+    <div class="modal-dialog modal-dialog-scrollable modal-xl" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">View Calculation</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="table-responsive">
+                    <table id="PaymentTable" class="table table-bordered table-sm">
+                        @*<thead>
+            <tr>
+                <th>Payable</th>
+                <th>Paid Amount</th>
+                <th>New Payment Amount</th>
+                <th>Credited Amount</th>
+                <th>Calculation</th>
+                <th>Head of Amount</th>
+            </tr>
+        </thead>
+        <tr>
+            <td>Payable</td>
+            <td>Paid Amount</td>
+            <td>New Payment Amount</td>
+            <td>Net Payment Amount</td>
+            <td>Calculation</td>
+            <td>Head of Amount</td>
+        </tr>*@
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    $('#ProposedQty').change(function () {
+        var AlQty = $("#UserTotalDispatch").val();
+        var pqty = $("#ProposedQty").val();
+        if (parseFloat(pqty) > parseFloat(AlQty)) {
+            alert("You have only " + propqty + " quantity to be updated. you can not enter more quantity than it.");
+        }
+        else {
+
+            var vv = getCalculation();
+            if (vv == false) {
+                //alert("Your Production Capacity Balance is : " + MiningProduction2);
+            }
+        }
+    })
+    $('#BasicRate').change(function () {
+        $("#Calculation").show();
+        var vv = getCalculation();
+        if (vv == false) {
+            //alert("Your Production Capacity Balance is : " + MiningProduction2);
+        }
+    })
+    function getCalculation() {
+        debugger
+        //resultdata = null;
+        //resultdataOld = null;
+        $("#TotalPayableAmount").val(0).change();
+        var TotalQuantity = parseFloat($("#ProposedQty").val());
+        var MiningProduction = parseFloat($("#RemainingProduction").val());
+        if (TotalQuantity > MiningProduction) {
+            $("#ProposedQty").val(0).change();
+            $("#PayableRoyalty").val(0).change();
+            alert("Your Production Capacity Balance is : " + MiningProduction);
+            return false;
+        }
+        else {
+            var BulkPermitId = $('#BulkPermitId').val();
+            var MineralNatureId = $('#MineralNatureId').val();
+            var Mineral = $('#MineralId').val();
+            var MineralGrade = $('#MineralGradeId').val();
+            var RoyaltyRate = $("#BasicRate").val();
+            //  var PropQty = $("#ProposedQty").val();
+
+
+            //var AppQuantity = 0;
+            //if (AppQuantity == "" || AppQuantity == null) { AppQuantity = "0" }
+            $.ajax({
+                type: "POST",
+                url: '@Url.Action("RevisedCalculation", "CoalGrade", new { Area = "CoalGrade" })', // for New rate
+                //data: '{"MineralNatureId": "' + MineralNatureId + '","MineralGradeId": "' + MineralGrade + '","MineralId": "' + Mineral + '","Quantity": "' + TotalQuantity + '","RoyaltyRate": "' + RoyaltyRate + '","BulkPermitId": "' + BulkPermitId + '","AluminaContent": "' + 0 + '","TinContent": "' + 0 + '"}',
+                data: { MineralNatureId: MineralNatureId,MineralGradeId: MineralGrade ,MineralId: Mineral ,Quantity: TotalQuantity ,RoyaltyRate:RoyaltyRate ,BulkPermitId:  BulkPermitId ,AluminaContent:0 ,TinContent:  0 },
+               // contentType: 'application/x-www-form-urlencoded',
+                dataType: "json",
+                success: function (result) {
+                    if (result != null) {
+                        resultdata = result;
+                        $.ajax({
+                            type: "POST",
+                            url: '@Url.Action("RevisedCalculation", "CoalGrade", new { Area = "CoalGrade" })', // for old rate
+                            data: { MineralNatureId: MineralNatureId, MineralGradeId: MineralGrade, MineralId: Mineral, Quantity: TotalQuantity, RoyaltyRate: RoyaltyRate, BulkPermitId: BulkPermitId, AluminaContent: 0, TinContent: 0 },
+                            //contentType: "application/json; charset=utf-8",
+                            dataType: "json",
+                            success: function (result1) {
+
+                                resultdataOld = result1;
+                            }
+                        });
+
+                        var isGreat = 1; // used to know that amount debited or credited
+                        var isOffline = false;
+                        $('#PaymentTable').empty();
+
+                        //$("#Calculation").show();
+
+                       // alert('New Rate :' +RoyaltyRate +' OldRate:' + oldBasicRate);
+                        debugger;
+                        if (parseFloat(result[0].TotalPayableAmount) > parseFloat(resultdataOld[0].TotalPayableAmount)) {
+                            isGreat = 0;
+                           // alert(isGreat);
+                            $("#PayButton").show();
+                            $("#CreditButton").hide();
+                            $('#PaymentTable').append('<tr><td style="width:20%;"><label style="color: red;font-size: 16px;">Payable</label></td><td style="width:15%;"><label>Paid Amount</label></td><td style="width:15%;"><label>New Payment Amount</label></td><td style="width:15%;"><label>Net Payment Amount</label></td><td style="width:20%;"><label>Calculation</label></td><td style="width:20%;"><label>Head of Account</label></td></tr>');
+                            $("#CreAmLable").hide();
+                            $("#PayAmLable").show();
+
+                            $("#NetBanking_mode").val("PAYMENT").change();
+
+                        }
+                        else {
+
+                           // alert(isGreat);
+                            $("#NetBanking_mode").val("CREDIT").change();
+                            $("#PayButton").hide();
+                            $("#CreditButton").show();
+                            $("#CreAmLable").show();
+                            $("#PayAmLable").hide();
+                            $('#PaymentTable').append('<tr><td style="width:20%;"><label style="color: red;font-size: 16px;">Payable</label></td><td style="width:15%;"><label>Paid Amount</label></td><td style="width:15%;"><label>New Payment Amount</label></td><td style="width:15%;"><label>Credited Amount</label></td><td style="width:20%;"><label>Calculation</label></td><td style="width:20%;"><label>Head of Account</label></td></tr>');
+                        }
+                        $.each(result, function (i) {
+                            if (result[i].IsApplicable == false) {
+                                if (isOffline == false) {
+                                    if (isGreat == 1) {
+                                        $('#PaymentTable').append('<tr><td style="width:100%;" colspan="6"><label style="color: red;font-size: 16px;">Shall be credited separately</label></td></tr>');
+                                    }
+                                    else {
+                                        $('#PaymentTable').append('<tr><td style="width:100%;" colspan="6"><label style="color: red;font-size: 16px;">Shall be paid separately</label></td></tr>');
+                                    }
+                                    isOffline = true;
+                                }
+                            }
+                            if (i == 0) {
+                                $("#RoyaltyRateID").val(result[0].PaymentTypeID);
+                                $("#RoyaltyRate").val(result[0].CalValue);
+                                if (isGreat == 1) {
+                                    $("#TotalPayableAmount").val(parseFloat(resultdataOld[0].TotalPayableAmount) - parseFloat(result[0].TotalPayableAmount));
+                                }
+                                else {
+                                    $("#TotalPayableAmount").val(parseFloat(result[0].TotalPayableAmount) - parseFloat(resultdataOld[0].TotalPayableAmount));
+                                }
+                                $("#PayableRoyalty").val(result[0].MappingValue);
+                                var vvRoyalty = result[i].PaymentType;
+
+                                if (vvRoyalty == "Payable Royalty") {
+                                    vvRoyalty = "Royalty";
+                                    // result[i].MappingValue = parseFloat(result[i].MappingValue) - parseFloat(PR);
+                                }
+                                var PR1 = 0;
+                                if (vvRoyalty == "Royalty") {
+
+                                    // PR = parseFloat(ApQ) * parseFloat(result[i].MappingValue) / parseFloat($("#ProposedQty").val());
+
+                                    PR1 = result[i].MappingValue;
+                                    if (isGreat == 1) {
+                                        result[i].MappingValue = parseFloat(resultdataOld[i].MappingValue) - parseFloat(result[i].MappingValue);
+                                    }
+                                    else {
+                                        result[i].MappingValue = parseFloat(result[i].MappingValue) - parseFloat(resultdataOld[i].MappingValue);
+                                    }
+                                }
+                                else if (vvRoyalty == "DMF") {
+                                    PR1 = result[i].MappingValue;
+                                    if (isGreat == 1) {
+                                        result[i].MappingValue = parseFloat(resultdataOld[i].MappingValue) - parseFloat(result[i].MappingValue);
+                                    }
+                                    else {
+                                        result[i].MappingValue = parseFloat(result[i].MappingValue) - parseFloat(resultdataOld[i].MappingValue);
+                                    }
+                                }
+                                else if (vvRoyalty == "NMET") {
+                                    PR1 = result[i].MappingValue;
+                                    if (isGreat == 1) {
+                                        result[i].MappingValue = parseFloat(resultdataOld[i].MappingValue) - parseFloat(result[i].MappingValue);
+                                    }
+                                    else {
+                                        result[i].MappingValue = parseFloat(result[i].MappingValue) - parseFloat(resultdataOld[i].MappingValue);
+                                    }
+                                }
+                                else if (vvRoyalty == "Monthly Periodic Amount") {
+                                    PR1 = result[i].MappingValue;
+                                    if (isGreat == 1) {
+                                        result[i].MappingValue = parseFloat(resultdataOld[i].MappingValue) - parseFloat(result[i].MappingValue);
+                                    }
+                                    else {
+                                        result[i].MappingValue = parseFloat(result[i].MappingValue) - parseFloat(resultdataOld[i].MappingValue);
+                                    }
+                                }
+
+                                if (result[i].CalType == "Rs / Unit") {
+                                    $('#PaymentTable').append('<tr><td style="width:20%;"><label>' + vvRoyalty + '</label></td><td style="width:15%;"><input class="form-control" readonly="readonly" type="text" value="' + resultdataOld[i].MappingValue + '"></td><td style="width:15%;"><input class="form-control" readonly="readonly" type="text" value="' + PR1 + '"></td><td style="width:15%;"><input class="form-control" readonly="readonly" type="text" value="' + result[i].MappingValue + '"></td><td style="width:20%;"><input class="form-control" readonly="readonly" type="text" value="' + result[i].RoyaltyRate + ' ' + result[i].CalType + '"></td><td style="width:20%;"><input class="form-control" readonly="readonly" type="text" value="' + result[i].HeadAccount + '"></td></tr>');
+
+                                }
+                                else if (result[i].CalType == "Fixed") {
+                                    $('#PaymentTable').append('<tr><td style="width:20%;"><label>' + vvRoyalty + '</label></td><td style="width:15%;"><input class="form-control" readonly="readonly" type="text" value="' + resultdataOld[i].MappingValue + '"></td><td style="width:15%;"><input class="form-control" readonly="readonly" type="text" value="' + PR1 + '"></td><td style="width:15%;"><input class="form-control" readonly="readonly" type="text" value="' + result[i].MappingValue + '"></td><td style="width:20%;"><input class="form-control" readonly="readonly" type="text" value="' + result[i].RoyaltyRate + ' ' + result[i].CalType + '"></td><td style="width:20%;"><input class="form-control" readonly="readonly" type="text" value="' + result[i].HeadAccount + '"></td></tr>');
+
+                                }
+                                else {
+                                    $('#PaymentTable').append('<tr><td style="width:20%;"><label>' + vvRoyalty + '</label></td><td style="width:15%;"><input class="form-control" readonly="readonly" type="text" value="' + resultdataOld[i].MappingValue + '"></td><td style="width:15%;"><input class="form-control" readonly="readonly" type="text" value="' + PR1 + '"></td><td style="width:15%;"><input class="form-control" readonly="readonly" type="text" value="' + result[i].MappingValue + '"></td><td style="width:20%;"><input class="form-control" readonly="readonly" type="text" value="' + result[i].RoyaltyRate + ' ' + result[i].CalType + ' of ' + result[i].BasisRate + '"></td><td style="width:20%;"><input class="form-control" readonly="readonly" type="text" value="' + result[i].HeadAccount + '"></td></tr>');
+                                }
+                            }
+                            else {
+
+                                var tsDm = 0;
+                                var tsDm1 = 0;
+                                if (result[i].PaymentType == "DMF") {
+                                    // tsDm = DM;
+                                    tsDm1 = result[i].MappingValue;
+                                    if (isGreat == 1) {
+                                        result[i].MappingValue = parseFloat(resultdataOld[i].MappingValue) - parseFloat(result[i].MappingValue);
+                                    }
+                                    else {
+                                        result[i].MappingValue = parseFloat(result[i].MappingValue) - parseFloat(resultdataOld[i].MappingValue);
+                                    }
+                                }
+                                else if (result[i].PaymentType == "NMET") {
+                                    // tsDm = NM;
+                                    tsDm1 = result[i].MappingValue;
+                                    if (isGreat == 1) {
+                                        result[i].MappingValue = parseFloat(resultdataOld[i].MappingValue) - parseFloat(result[i].MappingValue);
+                                    }
+                                    else {
+                                        result[i].MappingValue = parseFloat(result[i].MappingValue) - parseFloat(resultdataOld[i].MappingValue);
+                                    }
+                                }
+                                if (result[i].PaymentType == "Environmental Cess") {
+                                    //  tsDm = eC;
+                                    tsDm1 = result[i].MappingValue;
+                                    if (isGreat == 1) {
+                                        result[i].MappingValue = parseFloat(resultdataOld[i].MappingValue) - parseFloat(result[i].MappingValue);
+                                    }
+                                    else {
+                                        result[i].MappingValue = parseFloat(result[i].MappingValue) - parseFloat(resultdataOld[i].MappingValue);
+                                    }
+                                }
+                                else if (result[i].PaymentType == "Infrastructure & Development Cess") {
+                                    //  tsDm = Ce;
+                                    tsDm1 = result[i].MappingValue;
+                                    if (isGreat == 1) {
+                                        result[i].MappingValue = parseFloat(resultdataOld[i].MappingValue) - parseFloat(result[i].MappingValue);
+                                    }
+                                    else {
+                                        result[i].MappingValue = parseFloat(result[i].MappingValue) - parseFloat(resultdataOld[i].MappingValue);
+                                    }
+                                }
+                                else if (result[i].PaymentType == "TCS") {
+                                    //  tsDm = TC;
+                                    tsDm1 = result[i].MappingValue;
+                                    if (isGreat == 1) {
+                                        result[i].MappingValue = parseFloat(resultdataOld[i].MappingValue) - parseFloat(result[i].MappingValue);
+                                    }
+                                    else {
+                                        result[i].MappingValue = parseFloat(result[i].MappingValue) - parseFloat(resultdataOld[i].MappingValue);
+                                    }
+                                }
+
+                                else if (result[i].PaymentType == "Monthly Periodic Amount") {
+                                    //  tsDm = TC;
+                                    tsDm1 = result[i].MappingValue;
+                                    if (isGreat == 1) {
+                                        result[i].MappingValue = parseFloat(resultdataOld[i].MappingValue) - parseFloat(result[i].MappingValue);
+                                    }
+                                    else {
+                                        result[i].MappingValue = parseFloat(result[i].MappingValue) - parseFloat(resultdataOld[i].MappingValue);
+                                    }
+                                }
+
+
+                                $('#PaymentTable').append('<tr><td style="width:20%;"><label>' + result[i].PaymentType + '</label></td><td style="width:15%;"><input class="form-control" readonly="readonly" type="text" value="' + resultdataOld[i].MappingValue + '"></td><td style="width:15%;"><input class="form-control" readonly="readonly" type="text" value="' + tsDm1 + '"></td><td style="width:15%;"><input class="form-control" readonly="readonly" type="text" value="' + result[i].MappingValue + '"></td><td style="width:20%;"><input class="form-control" readonly="readonly" type="text" value="' + result[i].CalValue + ' ' + result[i].CalType + '"></td><td style="width:20%;"><input class="form-control" readonly="readonly" type="text" value="' + result[i].HeadAccount + '"></td></tr>');
+                            }
+                        })
+                    }
+                }
+            });
+        }
+
+    }
+    function postFormDetails1() {
+        var isSuccess = 1;
+        var vv1 = Number($("#ProposedQty").val());
+        var vvv1 = Number($("#BasicRate").val());
+        var vvvv1 = Number($("#MineralGradeId").val());
+        if (Number(vvvv1) == oldMineralGradeId) {
+            alert("You can not updated same grade which you have taken on bulkpermit. Please update new grade and proceed.");
+            $("#Calculation").hide();
+            return false;
+        }
+        if (Number(vvv1) <= 0) {
+            alert("Please enter Basic Rate.");
+            return false;
+        }
+        if (Number(vv1) <= 0) {
+            alert("Please enter Updated Quantity.");
+            return false;
+        }
+        else if (Number(vv1) <= 0 || vv1 > Number(propqty)) {
+            alert("You have only " + propqty + " quantity to be updated. you can not enter more quantity than it.");
+            return false;
+        }
+        else {
+            $("#frmEPermit").submit();
+        }
+    }
+    function postFormDetails() {
+        var isSuccess = 1;
+        var vv1 = Number($("#ProposedQty").val());
+        var vvv1 = Number($("#BasicRate").val());
+        var vvvv1 = Number($("#MineralGradeId").val());
+
+        if (Number(vvvv1) == oldMineralGradeId) {
+            alert("You can not updated same grade which you have taken on bulkpermit. Please update new grade and proceed.");
+            $("#Calculation").hide();
+            return false;
+        }
+
+        if (Number(vvv1) <= 0) {
+            alert("Please enter Basic Rate.");
+            return false;
+        }
+
+        if (Number(vv1) <= 0) {
+            alert("Please enter Updated Quantity.");
+            return false;
+        }
+        else if (Number(vv1) <= 0 || vv1 > Number(propqty)) {
+
+            alert("You have only " + propqty + " quantity to be updated. you can not enter more quantity than it.");
+            return false;
+        }
+        else {
+            var isValid = 0;
+            if ($("#divOnlineOption").hasClass("active") == true) {
+                $("#PaymentMode").val(1); // set online payment mode
+                var bank = $("input:radio[name='BankSelection']:checked").val();
+                var mode = $("input:radio[name='ModeSelection']:checked").val();
+                var NetBanking = $("input:radio[name='NetBankingSelection']:checked").val();
+                if (bank == "HDFC") {
+                    $("#PaymentBank").val("HDFC");
+                    $("#frmEPermit").submit();
+                }
+                else if (bank == "ICICI") {
+                    $("#PaymentBank").val("ICICI");
+                    if (mode == "NetBanking") {
+                        $("#P_Mode").val("NetBanking")
+                        //Updated by Avneesh for ICICI net banking
+                        if (confirm('Are you sure to make payment ?')) {
+                            $("#frmEPermit").submit();
+                        }
+                        //if (NetBanking == "Corporate") {
+                        //    $("#NetBanking_mode").val("Corporate");
+                        //    $("#frmEPermit").submit();
+                        //}
+                        //else if (NetBanking == "Retail") {
+                        //    $("#NetBanking_mode").val("Retail");
+                        //    $("#frmEPermit").submit();
+                        //}
+                    }
+                    else {
+                        $("#P_Mode").val("NEFT")
+                        $("#frmEPermit").submit();
+                    }
+
+
+
+                }
+                else if (bank == "SBI") {
+                    $("#PaymentBank").val("SBI");
+                    $("#frmEPermit").submit();
+                }
+                else {
+                    alert("Please select bank to make payment !");
+                    return false;
+                }
+            }
+            $("#frmEPermit").submit();
+        }
+
+    }
+</script>

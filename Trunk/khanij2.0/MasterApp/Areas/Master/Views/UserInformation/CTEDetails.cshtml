@@ -1,0 +1,352 @@
+﻿@model MasterEF.UserInformationEF
+@{
+    ViewData["Title"] = "CTEDetails";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@if (ViewBag.msg != null)
+{
+    <script>
+        alert('@ViewBag.msg');
+    </script>
+}
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        @Html.Partial("_navigation")
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="javascript:void(0);">
+                                Consent To Establish
+                            </a>
+                        </li>
+                    </ul>
+                    @Html.Partial("_util")
+                </div>
+                @{ string UserType = "Lessee";}
+                <section class="box form-container">
+                    <div class="content-body">
+                        @using (Html.BeginForm("CTEDetails", "UserInformation", FormMethod.Post, new { enctype = "multipart/form-data", AUTOCOMPLETE = "Off", id = "form1" }))
+                        {
+                            <h5 class="text-brown font-weight-bold mt-0">Consent To Establish</h5>
+                            <div class="row">
+                                @Html.HiddenFor(x => x.CTE_ID)
+                                <div class="col-lg-6 col-md-6 col-sm-12 form-group">
+                                    <label class="col-form-label pt-0 font-weight-bolder">CTE Approval Number<span class="text-danger">*</span></label>
+                                    @Html.TextBoxFor(x => x.CTE_ORDER_NO, new { @maxlength = "100", @class = "form-control" })
+                                </div>
+                                <div class="col-lg-6 col-md-6 col-sm-12 form-group">
+                                    <label class="col-form-label pt-0 font-weight-bolder">Consent To Establish Order Date <span class="text-danger">*</span></label>
+                                    <div class="input-group">
+                                        @Html.TextBoxFor(m => m.CTE_ORDER_DATE, new { @class = "form-control datepicker", id = "dt_CTE_Order_Date" })
+                                        <div class="input-group-prepend">
+                                            <label class="input-group-text" for="dt_CTE_Order_Date"><i class="far fa-calendar"></i></label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 col-md-6 col-sm-12 form-group">
+                                    <label class="col-form-label pt-0 font-weight-bolder">CTE Valid From<span class="text-danger">*</span></label>
+                                    <div class="input-group">
+                                        @Html.TextBoxFor(m => m.CTE_VALID_FROM, new { @class = "form-control datepicker", id = "dt_CTE_VALID_FROM" })
+                                        <div class="input-group-prepend">
+                                            <label class="input-group-text" for="dt_CTE_VALID_FROM"><i class="far fa-calendar"></i></label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-6 col-md-6 col-sm-12 form-group">
+                                    <label class="col-form-label font-weight-bolder">CTE Valid To<span class="text-danger">*</span></label>
+                                    <div class="input-group">
+                                        @Html.TextBoxFor(m => m.CTE_VALID_TO, new { @class = "form-control datepicker", id = "dt_CTE_VALID_TO" })
+                                        <div class="input-group-prepend">
+                                            <label class="input-group-text" for="dt_CTE_VALID_TO"><i class="far fa-calendar"></i></label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 col-md-6 col-sm-12 form-group">
+                                    <label for="inputLoginId" class="col-form-label font-weight-bolder">CTE Letter<span class="text-danger">*</span></label>
+                                    <div class="custom-file">
+                                        <input type="file" class="custom-file-input" id="flCTELetter" name="flCTELetter">
+                                        <label class="custom-file-label" for="customFile">Choose Files</label>
+                                    </div>
+                                    <a href="@Url.Action("Download", "UserInformation", new { name = Model.FILE_CTE_LETTER, path = Model.CTE_LETTER_PATH })" target="_blank" class="file-download-licensee">@((Model.FILE_CTE_LETTER != null) ? Model.FILE_CTE_LETTER : "")</a>
+                                </div>
+                                <div class="col-lg-6 col-md-6 col-sm-12 form-group">
+                                    <label for="inputLoginId" class="col-form-label font-weight-bolder">Remarks<span class="text-danger">*</span></label>
+                                    @Html.TextAreaFor(x => x.Remarks, new { @class = "form-control", @style = "Resize:none", @maxlength = "500" })
+                                </div>
+                            </div>
+                            @if (@Model.STATUS != 5)
+                            {
+                                <div class="row" style="position: absolute; bottom: 20px; right: 30px;">
+
+                                    <div class="col-md-12 col-sm-12">
+                                        @if (UserType.ToUpper() == "LESSEE")
+                                        {
+                                            <input type="submit" value="Save & Update" class="btn btn-success btn-md ml-0 waves-effect waves-light">
+                                            <input type="button" title="Forward to DD" value="Forward To DD" name="cmd" class="btn btn-warning text-dark btn-md waves-effect waves-light ml-0" onclick="return OnForwarding('Forward To DD');" />
+                                        }
+                                        <input type="button" value="Approve" class="btn btnsave DMO-Button" id="approve" name="approve" onclick="return OnForwarding('Approve');" style="display: none;">
+                                        <input type="button" value="Reject" class="btn btnsave DMO-Button" id="reject" name="reject" onclick="return OnForwarding('Reject');" style="display: none;">
+
+                                    </div>
+                                </div>
+                            }
+                        }
+
+
+
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+    <!-- MAIN CONTENT AREA ENDS -->
+</section>
+<uc1:footer runat="server" ID="footer" />
+<link href="../css/bootstrap-datetimepicker.min.css" rel="stylesheet">
+<script src="../js/moment.min.js"></script>
+<script src="../js/bootstrap-datetimepicker.min.js"></script>
+
+<script>
+    indicateMe = "yes"
+    backMe = "yes"
+    $(document).ready(function () {
+        loadNavigation('Consent To Establish', 'glRoleRes', 'pllesseprof', 'tl', 'Roles and Responsibity', 'Lessee Profile', ' ');
+    });
+</script>
+
+<script>
+    $(document).ready(function () {
+        $('.datepicker').datetimepicker({
+            format: 'LT',
+            format: 'DD-MM-YYYY',
+
+        });
+    });
+</script>
+<script>
+    var add = '<tr> <td id="t1"><select name="DropDownList4" class="form-control"><option value="0">Registration Data</option><option value="1">Member Data</option><option value="2">Asset</option></select><td id="t2"><select name="DropDownList5" id="DropDownList5" class="form-control"><option value="0">Age</option><option value="2">Gender</option><option value="3">Location</option><option value="4">No.of Member</option></select></td><td><button class="btn btn-danger btn-sm remove  m-0 mr-1"><i class="icon-minus-solid" aria-hidden="true"></i></button><a href="#" class="btn btn-success btn-sm add-btn  m-0 mr-1"><i class="icon-plus-solid" aria-hidden="true"></i></a></td></tr>;'
+
+    $(document).ready(function () {
+        $(document).on('click', '.add-btn', function () {
+            $("#insert").find('tbody').append(add);
+        });
+
+        $("#insert").on('click', '.remove', function () {
+            $(this).parents('tr').remove();
+        });
+    });
+</script>
+<script type="text/javascript">
+    $("input[name='lesseeProfile']").css('pointer-events', 'none')
+    function uploadFile(e) {
+        e.data = { DynamicFilePath: "Licensee\\LICENSEE_CTE_DETAILS" };
+    }
+
+    function removeFile(e) {
+        e.data = { DynamicFilePath: "\\Licensee\\LICENSEE_CTE_DETAILS" };
+    }
+    //Profile Percentage
+    var gauge1 = loadLiquidFillGauge("fillgauge1", new Number(@ViewBag.completionCount));
+    var config1 = liquidFillGaugeDefaultSettings();
+
+
+    //Slide js
+    $(document).on('ready', function () {
+        var leftpart = $('#left-part-Lessee').height($('#right-part-Lessee').height()).height();
+        var sliderHeight = $('#slider-height-page').height();
+        $('.panel').height(leftpart - sliderHeight - 16);
+
+        $(".regular").slick({
+            dots: true,
+            infinite: true,
+            /*autoplay: true,
+            autoplaySpeed: 2000,*/
+            slidesToShow: 5,
+            slidesToScroll: 1
+        });
+
+
+        $(".slick-next").css('display', 'block');
+        $(".slick-next").css('right', '0px');
+        $('.slick-prev').css('display', 'block');
+        $(".slick-prev").css('left', '0px');
+        $(".slick-prev").css('width', '44px');
+        $(".slick-next").css('width', '58px');
+        $(".slick-next").css('padding-left', '36px');
+
+        $("#reject").click(function () {
+            $("#Remarks").prop('required', true);
+        });
+        $("#approve").click(function () {
+            $('#Remarks').prop('required', false);
+        });
+    });
+    //MEssage
+    @if (TempData["Message"] != null)
+    {
+        <Text>
+    alert('@TempData["Message"]')
+    </Text>
+    }
+      @if (Model.CTE_VALID_TO_INTIMATION == "Validity Expired")
+      {
+         <Text>
+    $("#CTE_VALID_TO").addClass('TodateExpiry')
+    $("#CTE_VALID_TO").prop('title', '@Model.CTE_VALID_TO_INTIMATION')
+         </Text>
+      }
+
+      else if ((Model.CTE_VALID_TO_INTIMATION == "Done"))
+      {
+          <Text>
+    $("#CTE_VALID_TO").removeClass('TodateExpiry')
+    $("#CTE_VALID_TO").removeClass('TodateIntimation')
+         </Text>
+
+      }
+      else
+      {
+        <Text>
+    $("#CTE_VALID_TO").addClass('TodateIntimation')
+    $("#CTE_VALID_TO").prop('title', '@Model.CTE_VALID_TO_INTIMATION')
+    </Text>
+      }
+
+    @if (UserType != "District User")
+    {
+        //For Disabling all DOM if  is  Forwarded to DD/DMO and Approval is Pending
+        if (Model.STATUS == 1)
+        {
+             <Text>
+
+    $('.pointer').css("pointer-events", "none");
+    $('.btnsave').hide();
+    </Text>
+        }
+        else if (Model.STATUS == 2)
+        {
+
+        }
+            <Text>   $('#Remarks').attr('readonly', 'readonly');   </Text>
+    }
+    else  // While Approving or Rejectiong By DG/DMO
+    {
+                       <Text>
+    $("#Remarks").removeAttr("readonly");
+    $('.slider').css("pointer-events", "none");
+    </Text>
+        if (Model.STATUS == 1)
+        {
+
+        <Text>
+    $('.btnsave').hide();
+    $('.DMO-Button').show();
+    $('.pointer').css("pointer-events", "none");
+    </Text>
+        }
+        else
+        {
+         <Text>$('.pointer').css("pointer-events", "none");
+    $('.btnsave').hide();
+    $('.DMO-Button').hide();   </Text>
+        }
+    }
+
+    $(function () {
+        return { "__RequestVerificationToken": $('input[name=__RequestVerificationToken]').val() }
+    });
+
+
+</script>
+
+<script>
+
+    //create By Kavita
+    function OnForwarding(btnAction) {
+        //var checkdata = checkFields();
+        //if (checkdata == 1) {
+
+        var Type;
+        if (btnAction == 'Forward To DD') {
+            Type = 'forward';
+        }
+        else if (btnAction == 'Approve') {
+            Type = 'Approve';
+            $("#Remarks").prop('required', false);
+        }
+        if (btnAction == 'Reject') {
+            Type = 'Reject';
+            $("#Remarks").prop('required', true);
+
+            if ($("#Remarks").val() == "") {
+                $("#Remarks").focus();
+                alert('Remarks is required!')
+                return;
+            }
+        }
+
+        if (confirm("Before " + Type + " you need to apply your Digital Signature. Are you confirmed to " + Type + " Profile??")) {
+
+            var Postdata = 'action=signdoc' + "\n" + 'datatosign=Digital Signature Required' + "\n" + 'signaction=sign' + "\n" + 'filepath=' + "\n" + 'panNumberParam=' + "\n" + 'expirycheck=false' + "\n" + 'issuername=' + "\n" + 'certclass=1|2|3' + "\n" + 'certtype=ALL';
+            connection.send(Postdata);
+
+            connection.onerror = function (error) {
+                alert('Please check the server connection: ' + error);
+                alert(error);
+            };
+
+            connection.onmessage = function (e) { // when DSC is success then following function executed.
+                if (e.data.indexOf("subProtocol") == -1) {
+                    //debugger;
+                    //alert(e.data);
+                    $("#DSCResponse").val(e.data).change();
+                    $.ajax(
+                    {
+
+                        url: '@Url.Action("CheckVerifyResponse", "ForwardingNote", new { Area = "Transit" })',
+                        type: "POST",
+                        data: { contentType: "pkcs7", signDataBase64Encoded: e.data, responseType: "plain" },
+                        success: function (msg) {
+                            if (msg == "SUCCESS") {
+                                //  debugger;
+
+                                if (btnAction == "Forward To DD") {
+                                    $("#SubResion").val("Forward To DD");
+                                }
+                                else if (btnAction == "Approve") {
+                                    $("#SubApprove").val("Approve");
+                                }
+                                else if (btnAction == "Reject") {
+                                    $("#SubReject").val("Reject");
+                                }
+                                $("#frmCTEDetails").submit();
+                            }
+                        }
+                    });
+
+
+
+                }
+                else {
+                    alert(e.data);
+                }
+
+
+            };
+        }
+        else {
+            return false;
+        }
+
+        //}
+        //else {
+        //    return false;
+        //}
+    }
+
+</script>
+

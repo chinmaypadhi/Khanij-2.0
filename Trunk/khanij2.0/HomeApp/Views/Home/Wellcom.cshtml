@@ -1,0 +1,60 @@
+﻿@{
+    ViewData["Title"] = "Wellcom";
+    Layout = "~/Views/Shared/_InnerLayout.cshtml";
+}
+
+@*<h1>@ViewBag.msg</h1>*@
+<div>
+    Email :  <label style="color:green" id="Email">akshaya@@gmail.com</label><br />
+    Mobile No:  <label style="color:green" id="Mobile">8093234567</label><br />
+    Message :<label style="color:green" id="divErrorText"></label><br />
+    <button name="Submit" id="Submit" onclick="getToken();" class="btn btn-info">Get Data</button>
+    <button name="LogOff" id="LogOff" onclick="clearToken();" class="btn btn-info">Log Off</button>
+</div>
+
+
+
+
+<script>
+    $(document).ready(function () {
+        debugger;
+        if (sessionStorage.getItem("accessToken") == null) {
+            window.location.href = "/Home/Index";
+        }
+        $('#Email').text(sessionStorage.getItem("email"));
+        $('#Mobile').text(sessionStorage.getItem("mobileno"));
+    });
+
+    function getToken() {
+        debugger;
+        if ($('#UserName').val() == "") {
+            alert('Please Enter User Name');
+            return false;
+        }
+
+        if ($('#Password').val() == "") {
+            alert('Please Enter Password');
+            return false;
+        }
+
+        $.ajax({
+            url: "/Home/TestAuthorization",
+            data: { 'token': sessionStorage.getItem("accessToken") },
+            dataType: 'json',
+            type: 'post',
+            success: function (data) {
+                debugger;
+                $('#divErrorText').text(data);
+
+            },
+            error: function (err) {
+                alert(err.responseText);
+            }
+        });
+    }
+
+    function clearToken() {
+        sessionStorage.removeItem("accessToken");
+        window.location.href = "/Home/Index";
+    }
+</script>

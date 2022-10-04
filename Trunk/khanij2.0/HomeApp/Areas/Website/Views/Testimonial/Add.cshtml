@@ -1,0 +1,202 @@
+﻿@*// *********************************************************************************************************
+    //  View Name                : Add
+    //  Desciption               : To Save and Update Website Testimonial Details
+    //  Created By               : Lingaraj Dalai
+    //  Created On               : 27 Oct 2021
+    // ********************************************************************************************************
+*@
+@model HomeEF.AddTestimonialModel
+@{
+    ViewData["Title"] = "Add";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+@if (TempData["Message"] != null)
+{
+    <script>
+        var vv = '@TempData["Message"]';
+        if (vv == 1) {
+            swal("","Testimonial created successfully.","success");
+        }
+        else if (vv == 2) {
+            swal("","Testimonial already exists.","warning");
+        }
+        else if (vv == 3) {
+            swal("", "Something Errror occured. Please Try After Sometime!!", "error");
+        }
+    </script>
+}
+<script>
+    indicateMe = "yes"
+    $(document).ready(function () {
+        loadNavigation('Add', 'glhelpdesk', 'plraiseticket', 'tl', 'CMS', 'Testimonial', ' ');
+        $('.searchableselect').searchableselect();
+        var filesize = 0;
+        $('input[name="Photo"]').bind('change', function () {
+            $("input[name='Submit']").attr('disabled', false);
+            filesize = this.files[0].size;
+            var val = $(this).val().toLowerCase(),
+                regex = new RegExp("(.*?)\.(jpeg|jpg|png)$");
+            if (!(regex.test(val))) {
+                swal("", ".docx, pdf, tif,xls  type is not an allowed file type. You can use only jpg, jpeg, png types of file(s). ", "warning");
+                this.value = '';
+                $("input[name='Submit']").attr('disabled', true);
+                return false;
+            }
+            else if (filesize > 2048000) {
+                swal("", "File size must be 2 MB !", "warning");
+                $("input[name='Submit']").attr('disabled', true);
+                return false;
+            }
+            else {
+                var fileName = $(this).val().split("\\").pop();
+                $(this).next('.custom-file-label').html(fileName);
+            }
+            return false;
+        });
+    });
+    function Validate() {
+        var Iss = false;
+        if (!blankFieldValidation("VCH_TESTIMONIAL_MSG", "Message")) {
+            return false;
+        }
+        else if (!blankFieldValidation("VCH_TESTIMONIAL_NAME",  "Name")) {
+            return false;
+        }
+        else if (!blankFieldValidation("VCH_TESTIMONIAL_DESG", "Designation")) {
+            return false;
+        }
+        else if (!blankFieldValidation("VCH_TESTIMONIAL_LOCATION", "Location")) {
+            return false;
+        }
+        //else if ($("#hdnPhoto").val() == "") {
+        //    if (!FileUploadValidation("Photo", "Photo")) {
+        //        return false;
+        //    }
+        //}
+        Iss = true;
+        return Iss;
+    }
+    function CountAddress() {
+        $("#lblRemarks").text(500 - (document.getElementById("VCH_TESTIMONIAL_MSG").value.length));
+    }
+</script>
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        @Html.Partial("_navigation")
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="javascript:void(0);">
+                                Add
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link " href="~/Website/Testimonial/ViewList">
+                                View
+                            </a>
+                        </li>
+                    </ul>
+                    @Html.Partial("_util")
+                </div>
+                <section class="box form-container">
+                    <div class="content-body">
+                        <h5 class="text-brown font-weight-bold mt-0"> Testimonial Details</h5>
+                        @using (Html.BeginForm("Add", "Testimonial", FormMethod.Post, new { enctype = "multipart/form-data", AUTOCOMPLETE = "Off", id = "form1" }))
+                        {
+                            <div class="row">
+                                <div class="col-lg-4 col-md-7">
+                                    <label class="col-form-label">Upload Photo </label>
+                                    <div class="form-group ">
+                                        <div class="custom-file">
+                                            <input type="file" class="custom-file-input" id="Photo" name="Photo">
+                                            <label class="custom-file-label" for="customFile">Choose Files</label>
+                                        </div>
+                                        <small class="text-danger">Files type <strong>(.jpg , .jpeg , .png)</strong> with maximum <strong>2MB</strong></small>
+                                        @Html.ValidationMessageFor(m => m.Photo, "", new { @class = "text-danger" })
+                                        @*@if (Model.VCH_IMG_PATH != null && Model.VCH_IMG_PATH != "")
+                                        {
+                                            <label class="form-control-plaintext" id="lblPhoto"> <a href='~/@Model.VCH_IMG_PATH' data-original-title="Download Photo Copy" target="_blank"><i class="icon-file-pdf-solid h5"></i></a></label>
+                                        }*@
+                                        @Html.HiddenFor(m => m.VCH_IMG_PATH, new { @id = "hdnPhoto" })
+                                    </div>
+                                </div>
+                                @if (Model.VCH_IMG_PATH != null && Model.VCH_IMG_PATH != "")
+                                {
+                                    <div class="col-md-4">
+                                        <div class="upload-img">
+                                            <img src="~/@Model.VCH_IMG_PATH" alt="Officer image" width="150" height="150">
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-4 col-md-7">
+                                    <label class="col-form-label">Message <span class="text-danger">*</span></label>
+                                    <div class="form-group">
+                                        @Html.TextAreaFor(m => m.VCH_TESTIMONIAL_MSG, new { @class = "form-control", @rows = "5", @autofocus = "autofocus", @maxlength = "500", @onkeyup = "CountAddress()" })
+                                        @Html.ValidationMessageFor(m => m.VCH_TESTIMONIAL_MSG, "", new { @class = "text-danger" })
+                                        @Html.HiddenFor(m => m.INT_TESTIMONIAL_ID)
+                                        <small class="text-danger">Maximum <strong><label id="lblRemarks" class="text-danger">500</label></strong> characters</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-4 col-md-7">
+                                    <label class="col-form-label">Name <span class="text-danger">*</span></label>
+                                    <div class="form-group">
+                                        @Html.TextBoxFor(m => m.VCH_TESTIMONIAL_NAME, new { @class = "form-control", @autofocus = "autofocus", @Onkeypress = "return inputLimiter(event,'NameCharacters')", @maxlength = "150" })
+                                        @Html.ValidationMessageFor(m => m.VCH_TESTIMONIAL_NAME, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                                <div class="col-lg-4 col-md-7">
+                                    <label class="col-form-label">Designation <span class="text-danger">*</span></label>
+                                    <div class="form-group">
+                                        @Html.TextBoxFor(m => m.VCH_TESTIMONIAL_DESG, new { @class = "form-control", @autofocus = "autofocus",@Onkeypress = "return inputLimiter(event,'NameCharacters')", @maxlength = "100" })
+                                        @Html.ValidationMessageFor(m => m.VCH_TESTIMONIAL_DESG, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-4 col-md-7">
+                                    <label class="col-form-label">Location <span class="text-danger">*</span></label>
+                                    <div class="form-group">
+                                        @Html.TextBoxFor(m => m.VCH_TESTIMONIAL_LOCATION, new { @class = "form-control", @autofocus = "autofocus", @Onkeypress = "return inputLimiter(event,'NameCharacters')", @maxlength = "50" })
+                                        @Html.ValidationMessageFor(m => m.VCH_TESTIMONIAL_LOCATION, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                                <div class="col-lg-4  col-md-7">
+                                    <label class="col-form-label">Status</label>
+                                    <div class="form-group">
+                                        @Html.RadioButtonFor(n => n.BIT_STATUS, true, new { @class = "custom-radio", id = "Rdbtn_Active" })
+                                        <label class="radio-label mr-2">Publish</label>
+                                        @Html.RadioButtonFor(n => n.BIT_STATUS, false, new { @class = "custom-radio", id = "Rdbtn_Inactive", @checked = true })
+                                        <label class="radio-label">Unpublish</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12 col-sm-12">
+                                    <input type="submit" value='@ViewBag.Button' name="Submit" class="btn btn-success btn-md ml-0 waves-effect waves-light  btnsave" id="Submit" onclick="return Validate()">
+                                    @if (ViewBag.Button == "Update")
+                                    {
+                                        <a href="~/Website/Testimonial/ViewList" class="btn btn-danger btn-md ml-0 waves-effect waves-light btncancel">Cancel</a>
+                                    }
+                                    else
+                                    {
+                                        <a href="~/Website/Testimonial/Add" class="btn btn-danger btn-md ml-0 waves-effect waves-light btncancel">Cancel</a>
+                                    }
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+    <!-- MAIN CONTENT AREA ENDS -->
+</section>
+
+

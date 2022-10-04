@@ -1,0 +1,179 @@
+﻿@using Microsoft.Extensions.Configuration
+@inject IConfiguration configuration
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+
+<html>
+<head>
+    <link rel="stylesheet" href="~/CMScss/leaflet.css" />
+    <script src="~/CMSjs/kml-covertor.js"></script>
+    <script src="~/CMSjs/leaflet.js"></script>
+    <link rel="stylesheet" href="https://cdn.rawgit.com/openlayers/openlayers.github.io/master/en/v5.3.0/css/ol.css" type="text/css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/0.4.2/leaflet.draw.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/0.4.2/leaflet.draw.js"></script>
+    <meta name="viewport" content="initial-scale=1.0">
+    <meta charset="utf-8">
+    <title>open a kml file in google maps</title>
+
+</head>
+<body>
+    <div class="col-xl-6 map-div">
+        <div class="card  h-100">
+            <div class="row row-sm">
+                <div class="col-md-6">
+                    <label>Upload KML File</label>
+                    <input type="file" class="form-control" accept=".kml" id="kml_file" name="kml_file" />
+                    <span id="lblError" style="color: red;"></span>
+                </div>
+                <div class="col-md-6">
+                    <button type="button" id="show-map">Show on Map</button>
+                </div>
+
+                <textarea id="outputText" style="display:none;" disabled></textarea>
+            </div>
+        </div>
+    </div>
+    <div id="map" style="height:500px;width:500px" class="mapSection h-100"></div>
+    <script>
+        $(document).ready(function () {
+            var inputSpatialFormat = 'KML';
+            var outputSpatialFormat = 'GEOJSON';
+            var inputSpatialFileIs;
+            var outputSpatialFileIs;
+            var inputGeoJSONObj;
+            const spatialFormatBtn = document.getElementById('kml_file');
+            var convertBtn = document.getElementById("show-map");
+            var outputText = document.getElementById("outputText");
+            spatialFormatBtn.onchange = () => {
+                debugger;
+                if (spatialFormatBtn.files.length > 0) {
+                    const fsize = spatialFormatBtn.files.item(0).size;
+                    alert(fsize);
+                }
+                setSpatialFileIs(inputSpatialFormat, spatialFormatBtn, true);
+            }
+            function setSpatialFileIs(spatialFormat, spatialFormatBtn, isInput) {
+                let formatVal = spatialFormat;
+                let fileName = spatialFormatBtn.value;
+                fileName = fileName.split("\\")[2];
+                let n = fileName.lastIndexOf(".");
+                fileName = fileName.substring(0, n);
+
+
+                let outputFormatVal = outputSpatialFormat;
+
+                if (!window.FileReader) {
+                    alert("Your browser does not support HTML5 'FileReader' function required to open a file.");
+                } else {
+                    let fileis = spatialFormatBtn.files[0];
+                    let fileredr = new FileReader();
+                    fileredr.onload = function (fle) {
+                        let filecont = fle.target.result;
+                        inputSpatialFileIs = filecont;
+                    };
+                    if (formatVal == "KML" || formatVal == "GEOJSON") {
+                        fileredr.readAsText(fileis);
+                    }
+                }
+            };
+            convertBtn.onclick = function (e) {
+                debugger;
+                if (ValidateExtension()) {
+                    let outputFormatVal = outputSpatialFormat;
+                    //outputSpatialFormatFileExt.innerHTML=extMapper[outputFormatVal];
+
+                    (async () => {
+                        debugger;
+                        let inputGeoJSONObj = KMLStrtoGeoJSON(inputSpatialFileIs);
+                        if (outputFormatVal == "GEOJSON") {
+                            outputText.value = JSON.stringify(inputGeoJSONObj, undefined, 2);
+                        }
+                    })();
+                    var container = L.DomUtil.get('map');
+                    if (container != null) {
+                        container._leaflet_id = null;
+                    }
+                    var map = L.map('map').setView([10.310910, 77.937563], 5);
+
+                    //L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+                    //    attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+                    //}).addTo(map);
+
+                    var googleroad = L.tileLayer('https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
+                        attribution: '&copy; <a href="https://www.google.com/maps/@@13.0011956,77.5963159,15z">Google Map</a> contributors'
+                    }).addTo(map);
+
+                    // FeatureGroup is to store editable layers
+                    var drawnItems = new L.FeatureGroup();
+                    map.addLayer(drawnItems);
+                    var drawControl = new L.Control.Draw({
+                        edit: {
+                            featureGroup: drawnItems
+                        }
+                    });
+                    map.addControl(drawControl);
+                    if (outputText.value) {
+                        var drawnItems = L.geoJson(JSON.parse(outputText.value)).addTo(map); // draw map
+                    }
+                    map.on('draw:created', function (event) {
+                        var layer = event.layer,
+                            feature = layer.feature = layer.feature || {};
+
+                        feature.type = feature.type || "Feature";
+                        var props = feature.properties = feature.properties || {};
+                        drawnItems.addLayer(layer);
+
+                    });
+                }
+            };
+            function ValidateExtension() {
+                var allowedFiles = [".kml"];
+                var fileUpload = document.getElementById("kml_file");
+                var lblError = document.getElementById("lblError");
+                var regex = new RegExp("([a-zA-Z0-9\s_\\.\-:])+(" + allowedFiles.join('|') + ")$");
+                if (!regex.test(fileUpload.value.toLowerCase())) {
+                    lblError.innerHTML = "Please upload files having extensions: <b>" + allowedFiles.join(', ') + "</b> only.";
+                    return false;
+                }
+                lblError.innerHTML = "";
+                return true;
+            }
+        });
+        // function initialiseMap(){
+
+        var map = L.map('map').setView([10.310910, 77.937563], 5);
+
+        //L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+        //    attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+        //}).addTo(map);
+
+        var googleroad = L.tileLayer('https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
+            attribution: '&copy; <a href="https://www.google.com/maps/@@13.0011956,77.5963159,15z">Google Map</a> contributors'
+        }).addTo(map);
+
+        // FeatureGroup is to store editable layers
+        var drawnItems = new L.FeatureGroup();
+        map.addLayer(drawnItems);
+        var drawControl = new L.Control.Draw({
+            edit: {
+                featureGroup: drawnItems
+            }
+        });
+        map.addControl(drawControl);
+        if (outputText.value) {
+            var drawnItems = L.geoJson(JSON.parse(outputText.value)).addTo(map);
+        }
+        map.on('draw:created', function (event) {
+            var layer = event.layer,
+                feature = layer.feature = layer.feature || {};
+
+            feature.type = feature.type || "Feature";
+            var props = feature.properties = feature.properties || {};
+            drawnItems.addLayer(layer);
+
+        });
+    </script>
+</body>
+</html>

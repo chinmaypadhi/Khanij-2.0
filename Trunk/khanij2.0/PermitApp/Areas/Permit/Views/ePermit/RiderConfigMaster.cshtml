@@ -1,0 +1,389 @@
+﻿@model PermitEF.ePermitModel
+@{
+    ViewData["Title"] = "Add";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        @Html.Partial("_CMSnavigation")
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="javascript:void(0);">
+                                Add
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="~/Permit/ePermit/RiderConfigMasterView">
+                               
+                                    View
+                                </a>
+</li>
+                    </ul>
+                    @Html.Partial("_CMSutil")
+                </div>
+                <section class="box form-container">
+                    <div class="content-body">
+                        @using (Html.BeginForm("RiderConfigMaster", "ePermit", FormMethod.Post, new { enctype = "multipart/form-data", AUTOCOMPLETE = "Off", id = "form1" }))
+                        {
+                    <div class="row">
+                        <div class="col-lg-12 col-md-12 col-sm-12 form-group">
+                            <label class="col-form-label font-weight-bolder">Select Category<span class="text-danger">*</span></label>
+                            <div>
+                                @Html.RadioButtonFor(n => n.RiderType, "1", new { onchange = "onRadioChange()", @class = "mr-2" }) Mineral Wise
+                                @Html.RadioButtonFor(n => n.RiderType, "2", new { onchange = "onRadioChange()", @class = "ml-2" }) Indivisual
+                            </div>
+                           
+                        </div>
+                        <div class="col-lg-3 col-md-6 col-sm-12 form-group">
+                            <label class="col-form-label font-weight-bolder">State <span class="text-danger">*</span></label>
+                            @Html.DropDownListFor(model => model.StateID, ViewBag.ViewStateList as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control form-group", autofocus = "autofocus", required = "required", @disabled = "disabled" })
+                            @(Html.HiddenFor(model => model.StateID))
+                            @(Html.HiddenFor(model => model.RiderConfigId))
+                        </div>
+                        <div class="col-lg-3 col-md-6 col-sm-12 form-group">
+                            <label class="col-form-label  font-weight-bolder">District <span class="text-danger">*</span></label>
+                            @*@Html.DropDownListFor(model => model.DistrictId, Enumerable.Empty<SelectListItem>(), "--Select--", new { @class = "form-control form-group", autofocus = "autofocus", required = "required" })*@
+                            @Html.DropDownListFor(model => model.DistrictId, ViewBag.ViewDistrictList as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control form-group", autofocus = "autofocus", required = "required" })
+                            @(Html.HiddenFor(model => model.DistrictId))
+                        </div>
+                        <div class="col-lg-3 col-md-6 col-sm-12 form-group">
+                            <label class="col-form-label  font-weight-bolder">User Type <span class="text-danger">*</span></label>
+                            @Html.DropDownListFor(model => model.UserTypeId, ViewBag.ViewUserTypeList as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control form-group", autofocus = "autofocus", required = "required" })
+                            @(Html.HiddenFor(model => model.UserTypeId))
+                        </div>
+                        <div class="col-lg-6 col-md-6 col-sm-12 form-group" id="DivUserWise">
+                            <label class="col-form-label pt-0 font-weight-bolder">User Name <span class="text-danger">*</span></label>
+                            @Html.DropDownListFor(model => model.LesseeId, ViewBag.ViewUserNameList as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control form-group" })
+                            @(Html.HiddenFor(model => model.UserID))
+                        </div>
+                        <div class="col-lg-6 col-md-6 col-sm-12 form-group" id="DivMineralWise" style="display:none;">
+                            <label class="col-form-label  font-weight-bolder">Mineral Type <span class="text-danger">*</span></label>
+                            @Html.DropDownList("MineralTypeId", new List<SelectListItem>
+{
+new SelectListItem{ Text="Select Mineral Type", Value = "0" },
+new SelectListItem{ Text="Major Mineral", Value = "1" },
+new SelectListItem{ Text="Minor Mineral", Value = "2" },
+new SelectListItem{ Text="Both", Value = "3" },
+}, new { @class = "form-control searchableselect" })
+
+                        </div>
+                        <div class="col-lg-3 col-md-6 col-sm-12 form-group">
+                            <label class="col-form-label  font-weight-bolder">Module Type <span class="text-danger">*</span></label>
+                            @Html.DropDownListFor(model => model.ModuleId, ViewBag.ViewModuleTypeList as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control form-group", autofocus = "autofocus", required = "required" })
+                            @(Html.HiddenFor(model => model.ModuleId))
+                        </div>
+                        <div class="col-lg-3 col-md-6 col-sm-12 form-group">
+                            <label class="col-form-label  font-weight-bolder">Sub Module <span class="text-danger">*</span></label>
+                            @Html.DropDownListFor(model => model.SubModuleId, ViewBag.ViewSubModuleTypeList as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control form-group", autofocus = "autofocus", required = "required" })
+                            @(Html.HiddenFor(model => model.SubModuleId))
+                        </div>
+
+                    </div>
+                            <div class="row">
+                                <div class="col-lg-12 col-md-12 col-sm-12">
+                                    <h5 class="text-brown font-weight-bold mt-0">Clearances</h5>
+                                </div>
+                                @(Html.HiddenFor(model => model.SelectedRiderList))
+                                <div class="col-lg-6 col-md-12 col-sm-12">
+                                    <div class="table-responsive" id="viewtable">
+                                        <table id="datatable" class="table table-sm table-bordered">
+                                            <thead>
+                                                <tr>
+                                                    <th width="30">Check</th>
+                                                    <th width="30">Check</th>
+                                                    <th>Clearance Type</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                            </tbody>
+                                        </table>
+                                    </div>
+
+
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12 col-sm-12">
+                                    <input type="button" value="@ViewBag.Button" name="Submit" class="btn btn-success btn-md btnsave" id="Submit">
+                                    @if(ViewBag.Button=="Update"){
+                                    <a href="@Url.Content("~/Permit/ePermit/RiderConfigMasterView")"
+                                       class="btn btn-danger btn-md  btncancel"
+                                       title="Cancel">Cancel</a>
+                                       }
+                                    @*<a href="~/Configuration/ePermit/Add" class="btn btn-danger btn-md  btncancel">Cancel</a>*@
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+    <!-- MAIN CONTENT AREA ENDS -->
+</section>
+@*<uc1:footer runat="server" ID="footer" />*@
+<script>
+    indicateMe = "yes"
+    $(document).ready(function () {
+        loadNavigation('Add', 'glhelpdesk', 'plraiseticket', 'tl', 'E-Permit', 'Rider Master', ' ');
+        $('.datetime').datetimepicker({
+            format: "DD/MM/YYYY"
+        }).keydown(false);
+        var RiderConfigId = $('#RiderConfigId').val();
+      
+        if (RiderConfigId != 0) {
+            BindCheckList();
+            onRadioChange();
+        }
+    });
+</script>
+<script>
+    $(document).ready(function () {
+        $("#UserTypeId").change(function () {
+
+            var UserTypeId = $('#UserTypeId').val();
+            var DistrictId = $('#DistrictId').val();
+            var Configtype = $("input[name='RiderType']:checked").val();
+            if (UserTypeId == "") {
+                UserTypeId = 0;
+            }
+            if (DistrictId == "") {
+                DistrictId = 0;
+            }
+            //alert(RoleTypeId.toString());
+            $('#LesseeId').empty();
+            var v = "";
+            if (UserTypeId != 0) {
+
+                $.ajax({
+                    type: "POST",
+                    url: "/Permit/ePermit/GetUserName",
+                    data: { 'UserTypeId': UserTypeId, 'DistrictId': DistrictId, 'Configtype': Configtype },
+                    cache: false,
+                    //contentType: "application/json",
+                    datatype: "JSON",
+                    success: function (SList) {
+                        var opt = new Option('--Select--', 0);
+                        $('#LesseeId').append(opt).selectpicker('refresh');
+                        $.each(SList, function (i, item) {
+
+                            // console.log(item);
+                            var opt = new Option(item.ApplicantName + '/UserId-' + item.LesseeId, item.LesseeId);
+                            $('#LesseeId').append(opt).selectpicker('refresh');
+                        });
+
+                    }
+                });
+            }
+            else {
+                $('#LesseeId').val("");
+                alert('Select User type');
+            }
+
+        });
+        $("#ModuleId").change(function () {
+
+            var ModuleId = $('#ModuleId').val();
+            if (ModuleId == "") {
+                ModuleId = 0;
+            }
+            //alert(RoleTypeId.toString());
+            $('#SubModuleId').empty();
+            var v = "";
+            if (StateID != 0) {
+
+                $.ajax({
+                    type: "POST",
+                    url: "/Permit/ePermit/GetSubModule",
+                    data: { 'ModuleId': ModuleId },
+                    cache: false,
+                    //contentType: "application/json",
+                    datatype: "JSON",
+                    success: function (SList) {
+                        var opt = new Option('--Select--', 0);
+                        $('#SubModuleId').append(opt).selectpicker('refresh');
+                        $.each(SList, function (i, item) {
+
+                            // console.log(item);
+                            var opt = new Option(item.SubModuleName, item.SubModuleId);
+                            $('#SubModuleId').append(opt).selectpicker('refresh');
+                        });
+
+                    }
+                });
+            }
+            else {
+                $('#DistrictId').val("");
+                alert('Select State Name');
+            }
+
+        });
+
+        $("#SubModuleId").change(function () {
+
+            var ModuleId = $('#ModuleId').val();
+            var SubModuleId = $('#SubModuleId').val();
+            if (ModuleId == "") {
+                ModuleId = 0;
+            }
+            if (SubModuleId == "") {
+                SubModuleId = 0;
+            }
+            //alert(RoleTypeId.toString());
+
+            var v = "";
+            if (SubModuleId != 0) {
+
+                $.ajax({
+                    type: "POST",
+                    url: "/Permit/ePermit/GetCheckListData",
+                    data: { 'ModuleId': ModuleId, 'SubModuleId': SubModuleId },
+                    cache: false,
+                    //contentType: "application/json",
+                    datatype: "JSON",
+                    success: function (SList) {
+                        $('#datatable tbody').empty();
+                        $.each(SList, function (i, item) {
+                            $('#datatable').append('<tr> <td> <input type="checkbox" class="custom-checkbox" value=' + item.CheckListId  +' id=checklist' + item.CheckListId +'> </td> <td>' + item.CheckListId + '</td>  <td>' + item.CheckListDescription + '</td> </tr>');
+                            //var opt = new Option(item.DistrictName, item.DistrictId);
+                            //$('#DistrictId').append(opt).selectpicker('refresh');
+                        });
+
+                    }
+                });
+            }
+        });
+    });
+
+    function BindCheckList() {
+        var ModuleId = $('#ModuleId').val();
+        var RiderConfigId = $('#RiderConfigId').val();
+        var SubModuleId = $('#SubModuleId').val();
+        if (ModuleId == "") {
+            ModuleId = 0;
+        }
+        if (RiderConfigId == "") {
+            RiderConfigId = 0;
+        }
+        //alert(RoleTypeId.toString());
+
+        var v = "";
+        if (ModuleId != 0) {
+
+            $.ajax({
+                type: "POST",
+                url: "/Permit/ePermit/GetCheckListData",
+                data: { 'ModuleId': ModuleId, 'RiderConfigId': RiderConfigId, 'SubModuleId': SubModuleId },
+                cache: false,
+                //contentType: "application/json",
+                datatype: "JSON",
+                success: function (SList) {
+                    $('#datatable tbody').empty();
+                    $.each(SList, function (i, item) {
+                        $('#datatable').append('<tr> <td> <input type="checkbox" class="custom-checkbox" value=' + item.CheckListId + ' id=checklist' + item.CheckListId + '> </td> <td>' + item.CheckListId + '</td>  <td>' + item.CheckListDescription + '</td> </tr>');
+                        if (item.IsChecked ==1)
+                            $("#checklist" + item.CheckListId).prop("checked", true);
+                        else
+                            $("#checklist" + item.CheckListId).prop("checked", false);
+                        //var opt = new Option(item.DistrictName, item.DistrictId);
+                        //$('#DistrictId').append(opt).selectpicker('refresh');
+                    });
+
+                }
+            });
+        }
+   
+    }
+</script>
+
+<script>
+    function onRadioChange() {
+        var SelectedRadioVal = $("input[name='RiderType']:checked").val();
+        if (SelectedRadioVal == '1') {
+            $("#DivUserWise").hide();
+            $("#DivMineralWise").show();
+        }
+        else {
+            $("#DivUserWise").show();
+            $("#DivMineralWise").hide();
+        }
+
+    }
+    $(document).ready(function () {
+        $("#Submit").click(function () {
+            var SelectedRadioVal = $("input[name='RiderType']:checked").val();
+            let status = true;
+            //if (!DropDownValidation("StateID", "State Name")) {
+            //    return false;
+            //}
+            if ($('#DistrictId').val() == "") {
+                swal("", "Please Select District", "warning");
+                $("#DistrictId").focus();
+                status = false;
+                return false;
+            }
+            if (!DropDownValidation("UserTypeId", "User Type")) {
+                status = false;
+                return false;
+            }
+            if (SelectedRadioVal == '1') {
+                if (!DropDownValidation("MineralTypeId", "Mineral Type")) {
+                    status = false;
+                    return false;
+                }
+            }
+            else {
+                if (!DropDownValidation("LesseeId", "Lessee Name")) {
+                    status = false;
+                    return false;
+                }
+            }
+            if (!DropDownValidation("ModuleId", "Module Type")) {
+                status = false;
+                return false;
+            }
+            if (!DropDownValidation("SubModuleId", "Sub Module Type")) {
+                status = false;
+                return false;
+            }
+            var abc = "";
+            $('input[type=checkbox]').each(function () {
+                if (this.checked) {
+                    abc = abc + $(this).val() + ","
+                   
+                    //assign set value to hidden field
+
+                }
+              
+            });
+           
+            $('#SelectedRiderList').val(abc);
+
+            if (status) {
+                swal({
+                    title: "Are you sure ??",
+                    icon: "warning",
+                    buttons: ["No", "Yes"],
+                })
+                    .then((submit) => {
+                        if (submit) {
+                            $("#form1").submit();
+                        }
+                    });
+            }
+            else { return false };
+
+        });
+
+        
+    });
+     if ('@TempData["SuccMessage"]' != '' && '@TempData["SuccMessage"]' != null) {
+
+    swal("",'@TempData["SuccMessage"]',"success");
+    }
+</script>

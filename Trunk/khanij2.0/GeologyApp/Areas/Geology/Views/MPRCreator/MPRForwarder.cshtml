@@ -1,0 +1,113 @@
+﻿@model GeologyEF.MPRmaster
+@using GeologyApp.Web
+@{
+    ViewData["Title"] = "MPRForwarder";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+@if (ViewBag.msg != null)
+{
+    <script>
+          swal("",'@ViewBag.msg',"success");
+    </script>
+}
+<script>
+    $(document).ready(function () {
+        loadNavigation('MPRForwarder', 'glgeology', 'plmrpfor', 'tl', 'Geology', 'Monthly Progress Report Forwarder', ' ');
+        $('.shorting-lnk').click(function () {
+            $('.shorting-lnk i').toggleClass('fa-sort-amount-up-alt fa-sort-amount-down-alt ');
+        });
+        $('.filter-dropdown').hide();
+        $('.filter-lnk').click(function () {
+            $(this).toggleClass('active');
+            $(this).siblings('.filter-dropdown').slideToggle();
+        });
+        $('.filter-btn').click(function () {
+            $(this).parent('.shorting-cell .filter-dropdown').slideUp();
+            if ($(this).parent().parent('.shorting-cell').find('.filter-lnk').hasClass('active')) {
+                $(this).parent().siblings('.filter-lnk').removeClass('active');
+            }
+        });
+    });
+</script>
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        @Html.Partial("_CMSnavigation")
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="javascript:void(0);">
+                                View
+                            </a>
+                        </li>
+                    </ul>
+                    @Html.Partial("_CMSutil")
+                    @Html.AntiForgeryToken()
+                </div>
+                <section class="box form-container">
+                    <div class="content-body">
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <table id="table-exports" class="table table-sm table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>Sl#</th>
+                                            <th>Sender name</th>
+                                            <th>FPO Code</th>
+                                            <th>Month & Year</th>
+                                            <th>Report Type</th>
+                                            <th>Date of Submission</th>
+                                            <th>Mineral Name</th>
+                                            <th>Status</th>
+                                            <th>DGM Remarks</th>
+                                            <th class="noprint"></th>
+                                            <th class="noprint"></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @{ int i = 1;
+                                        }
+                                        @foreach (var b in ViewBag.ViewList)
+                                        {
+                                            <tr>
+                                                <td>
+                                                    @i
+                                                    @{ i++; }
+                                                </td>
+                                                <td>@b.UserName </td>
+                                                <td>@b.FPO_Code </td>
+                                                <td>@b.Report_MY </td>
+                                                <td>@b.ReportType </td>
+                                                <td>@b.SubmissionDate </td>
+                                                <td>@b.MineralName </td>
+                                                <td>@b.Status </td>
+                                                <td>@b.Remarks </td>
+                                                <td class="noprint">
+                                                    @*<a href="@Url.Content("~/Geology/MPRCreator/App_Action_ViewMPR/")@b.MPR_Id?Type=Preview"
+                                                        class="btn-primary btn-sm">Preview</a>*@
+                                                    <a href="@CustomQueryStringHelper.EncryptString("Geology","App_Action_ViewMPR","MPRCreator",new {id=@b.MPR_Id,Type="Preview" })" class="btn-primary btn-sm">Preview</a>
+                                                </td>
+                                                @if (@b.Approve_Status == 1)
+                                                {
+                                                    <td class="noprint">
+                                                        @*<a href="@Url.Content("~/Geology/MPRCreator/App_Action_ViewMPR/")@b.MPR_Id?Type=RO"
+                                                            class="btn-danger btn-sm">Take Action</a>*@
+                                                        <a href="@CustomQueryStringHelper.EncryptString("Geology","App_Action_ViewMPR","MPRCreator",new {id=@b.MPR_Id,Type="RO" })" class="btn-danger btn-sm">Take Action</a>
+                                                    </td>
+                                                }
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+</section>
+
+

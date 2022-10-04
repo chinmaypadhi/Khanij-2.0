@@ -1,0 +1,100 @@
+﻿@model MasterEF.LeaseTypeMaster
+@{
+    ViewData["Title"] = "Add";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+@if (ViewBag.msg != null)
+{
+    <script>
+        swal("",'@ViewBag.msg',"success");
+    </script>
+}
+<script>
+    indicateMe = "yes"
+    $(document).ready(function () {
+        loadNavigation('Add', 'glRoleRes', 'plUser', 'tl', 'Master', 'Lease Type', ' ');
+        $("#Submit").click(function () {
+            debugger;
+            if ($('#LeaseTypeName').val().trim() == "") {
+                swal("", "Please Enter Lease Type Name", "warning");
+                $("#LeaseTypeName").focus();
+                return false;
+            }
+            if ($('#LeaseTypeCode').val().trim() == "") {
+                swal("", "Please Enter Lease Type Code", "warning");
+                $("#LeaseTypeCode").focus();
+                return false;
+            }
+        });
+    });
+</script>
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        @Html.Partial("_CMSnavigation")
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="javascript:void(0);">
+                                Add
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="~/Master/LeaseType/Viewlist">
+                                View
+                            </a>
+                        </li>
+                    </ul>
+                    @Html.Partial("_CMSutil")
+                </div>
+                <section class="box form-container">
+                    <div class="content-body">
+                        @using (Html.BeginForm("Add", "LeaseType", FormMethod.Post, new { AUTOCOMPLETE = "Off", id = "form1" }))
+                        {
+                            @Html.AntiForgeryToken()
+                            <div class="row">
+                                <div class="col-lg-6 col-12">
+                                    <div class="form-group row">
+                                        <label for="inputLoginId" class="col-sm-4 col-form-label">Lease Type <span class="text-danger">*</span></label>
+                                        <div class="col-sm-7">
+                                            @Html.TextBoxFor(m => m.LeaseTypeName, new { @class = "form-control", @Onkeypress = "return inputLimiter(event,'NameCharactersAndNumbers')" })
+                                            @Html.HiddenFor(m => m.LeaseTypeId)
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 col-12">
+                                    <div class="form-group row">
+                                        <label for="inputName" class="col-sm-4 col-form-label">Lease Code <span class="text-danger">*</span></label>
+                                        <div class="col-sm-7">
+                                            @Html.TextBoxFor(m => m.LeaseTypeCode, new { @class = "form-control", @Onkeypress = "return inputLimiter(event,'NameCharactersAndNumbers')" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 col-12">
+                                    <div class="form-group row">
+                                        <label for="inputName" class="col-sm-4 col-form-label">Status <span class="text-danger">*</span></label>
+                                        <div class="col-sm-7">
+                                            <div class="py-2">
+                                                @Html.RadioButtonFor(n => n.IsActive, true, new { @class = "custom-radio" })
+                                                <label class="radio-label">Active</label>
+                                                @Html.RadioButtonFor(n => n.IsActive, false, new { @class = "custom-radio" })
+                                                <label class="radio-label">Inactive</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6 offset-lg-2 offset-md-4">
+                                    <input type="submit" value='@ViewBag.Button' class="btn btn-primary btn-md ml-0" name="Submit" id="Submit" />
+                                    <input type="reset" value="Reset" class="btn btn-danger btn-md" href="~/Master/LeaseType/Add"/>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+    <!-- MAIN CONTENT AREA ENDS -->
+</section>

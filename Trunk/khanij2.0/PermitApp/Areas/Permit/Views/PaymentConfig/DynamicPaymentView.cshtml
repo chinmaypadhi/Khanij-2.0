@@ -1,0 +1,256 @@
+﻿@model PermitEF.ePermitModel
+@using PermitApp.Helper;
+@{
+    ViewData["Title"] = "ViewList";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+
+<section class="wrapper main-wrapper row">
+    @if (TempData["msg"] != null)
+    {
+        <script>
+        alert('@TempData["msg"]');
+        </script>
+    }
+
+    <div class="col-12">
+        @Html.Partial("_CMSnavigation")
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link " href="@Url.Content("~/Permit/PaymentConfig/DynamicPaymentConfiguration")">
+                                Add
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="#">
+                                View
+                            </a>
+                        </li>
+
+                    </ul>
+                    @Html.Partial("_CMSutil")
+                </div>
+
+                <section class="box form-container">
+                    @using (Html.BeginForm("DynamicPaymentView", "PaymentConfig", FormMethod.Post, new { AUTOCOMPLETE = "Off", id = "form1" }))
+                    {
+
+                    }
+                    <div class="content-body pt-0">
+                        <div class="legend-box">
+                            <ul class="d-flex mb-1 justify-content-end list-unstyled">
+                                <li><span class="bg-success"></span> Active</li>
+                                <li><span class="bg-warning"></span> Inactive</li>
+                            </ul>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-12">
+
+                                <table id="table-landscape" class="table table-sm table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th width="30"> Sl#</th>
+                                            <th>Config Type</th>
+                                            <th>Mineral</th>
+                                            <th>District</th>
+                                            <th>UserType</th>
+                                            <th>Applicant Name</th>
+                                            <th>LeaseType</th>
+                                            <th>MinesType</th>
+                                            <th>LeaseExtend</th>
+                                            <th>Captive</th>
+                                            <th>ML Granted Before 12/01/2015</th>
+                                            <th>Created/Modified On</th>
+                                            <th width="100" class="noprint">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+
+                                        @{ int i = 1;
+                                        }
+                                        @foreach (var b in ViewBag.ViewList)
+                                        {
+                                        <tr>
+                                            <td>@i</td>
+                                            @*<td><p class="m-0">@b.CompanyId</p> </td>*@
+                                            <td><p class="m-0">@b.RiderTypeName</p> </td>
+                                            <td><p class="m-0">@b.MineralName</p> </td>
+                                            <td><p class="m-0">@b.DistrictName</p> </td>
+                                            <td><p class="m-0">@b.UserType</p> </td>
+                                            <td><p class="m-0">@b.ApplicantName</p> </td>
+                                            <td><p class="m-0">@b.LeaseTypeName</p> </td>
+                                            <td><p class="m-0">@b.MinesTypeName</p> </td>
+                                            <td><p class="m-0">@b.LeaseExtendText</p> </td>
+                                            <td><p class="m-0">@b.CaptiveText</p> </td>
+                                            <td><p class="m-0">@b.MLGrantedDateText</p> </td>
+                                            <td><p class="m-0">@b.DateOfGrant</p> </td>
+
+                                            <td class="noprint">
+                                                <a href="@CustomQueryStringHelper.EncryptString("Permit","DynamicPaymentConfiguration","PaymentConfig",new {q=@b.PaymentConfigID })"
+                                                   class="btn-floating btn-outline-primary btn-sm"
+                                                   title="Edit"><i class="icon-pencil-alt-solid"></i></a>
+                                                <a href="@CustomQueryStringHelper.EncryptString("Permit", "DeleteDynamicPayment", "PaymentConfig", new { q = @b.PaymentConfigID })"
+                                                   class="btn-floating btn-outline-danger btn-sm"
+                                                   title="Delete" onclick="return confirm('Are you sure to Delete?')"><i class="icon-trash-alt-solid"></i></a>
+                                                @*@CustomQueryStringHelper.EncryptString("Permit", "DetailsPayment", "PaymentConfig", new { id = @b.PaymentConfigID })*@
+                                                <a href="#" data-toggle="modal" data-target="#Paymentinformation" onclick="PaymentDetails(@b.PaymentConfigID);"
+                                                   class="btn-floating btn-outline-danger btn-sm"
+                                                   title="Details"><i class="icon-file-alt-solid"></i></a>
+
+                                            </td>
+                                        </tr>
+                                            i++;
+                                        }
+
+
+                                    </tbody>
+                                </table>
+
+
+
+                            </div>
+
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+</section>
+<div class="modal fade" id="Paymentinformation" aria-modal="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title m-0">Payment Configuration </h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                   
+
+
+                      
+                           
+                                
+                                <div class="col-sm-12">
+                                    <div class="table-responsive" id="viewtable">
+                                        <table id="datatable1" class="table table-sm table-bordere mb-0">
+                                            <thead>
+                                                <tr>
+                                                    @*<th width="30"> Sl#</th>*@
+                                                    <th>Payment Head</th>
+                                                    <th>Applicable</th>
+                                                    <th>Schedule</th>
+                                                    <th>Calculation Type</th>
+                                                    <th>Calculation Rate </th>
+                                                    <th>Make Payment</th>
+
+                                                    <th>Payment Dept</th>
+                                                    <th>Adjustable</th>
+
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+
+                                                @*@{ int j = 1;
+        }
+        @foreach (var b in ViewBag.ConfigDetails)
+        {
+            <tr>
+                <td>@j</td>
+                <td><p class="m-0">@b.PaymentType</p> </td>
+                <td><p class="m-0">@b.Applicable</p> </td>
+                <td><p class="m-0">@b.ScheduleName</p> </td>
+                <td><p class="m-0">@b.CalType</p> </td>
+                <td><p class="m-0">@b.PaymentPercent</p> </td>
+                <td><p class="m-0">@b.MakePayment</p> </td>
+                <td><p class="m-0">@b.PaymentDept</p> </td>
+                <td><p class="m-0">@b.Adjustable</p> </td>
+            </tr>
+            j++;
+        }
+                                                *@
+
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                           
+                       
+
+                   
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+<script>
+    backme="yes"
+    $(document).ready(function () {
+        loadNavigation('ViewList', 'glhelpdesk', 'plraiseticket', 'tl', 'Configuration', 'Dynamic Payment', ' ');
+        $('.searchableselect').searchableselect();
+        $('.shorting-lnk').click(function () {
+            $('.shorting-lnk i').toggleClass('fa-sort-amount-up-alt fa-sort-amount-down-alt ');
+        });
+        $('.filter-dropdown').hide();
+        $('.filter-lnk').click(function () {
+            $(this).toggleClass('active');
+            $(this).siblings('.filter-dropdown').slideToggle();
+        });
+        $('.filter-btn').click(function () {
+            $(this).parent('.shorting-cell .filter-dropdown').slideUp();
+            if ($(this).parent().parent('.shorting-cell').find('.filter-lnk').hasClass('active')) {
+                $(this).parent().siblings('.filter-lnk').removeClass('active');
+            }
+        });
+
+    });
+     if ('@TempData["SuccMessage"]' != '' && '@TempData["SuccMessage"]' != null) {
+
+    swal("",'@TempData["SuccMessage"]',"success");
+    }
+</script>
+<script>
+    function PaymentDetails(PaymentConfigID) {
+        $.ajax({
+                            type: "POST",
+            url: "/Permit/PaymentConfig/DetailsPayment",
+                          //  contentType: "application/json; charset=utf-8",
+            data: { 'id': PaymentConfigID},
+
+                            dataType: "json",
+
+                            success: function (result) {
+
+                                if (result != null) {
+                                    resultdata = result;
+                                    
+                                    $('#datatable1 tbody').empty();
+                                    $.each(result, function (i) {
+                                            
+                                        /*$('table[id="datatable1 tbody"]')*/
+                                        //$("#datatable1 tbody")
+                                        //    .append("<tr>" +
+                                        //    "<td>" + result[i].PaymentType + "</td ><td>" + result[i].Applicable + "</td><td>" + result[i].ScheduleName + "</td><td>" + result[i].CalType + "</td><td>" + result[i].PaymentPercent + "</td><td>" + result[i].MakePayment + "</td><td>" + result[i].PaymentDept + "</td>"
+                                        //    + "<td>" + result[i].Adjustable + "</td>"
+                                        //        + "</tr>");
+                                        var row = "<tr>" +
+                                            "<td>" + result[i].PaymentType + "</td ><td>" + result[i].Applicable + "</td><td>" + result[i].ScheduleName + "</td><td>" + result[i].CalType + "</td><td>" + result[i].PaymentPercent + "</td><td>" + result[i].MakePayment + "</td><td>" + result[i].PaymentDept + "</td>"
+                                            + "<td>" + result[i].Adjustable + "</td>"
+                                            + "</tr>";
+                                        $('table[id="datatable1"]').append(row);
+                                        
+                                    })
+                                }
+                            }
+                        });
+    }
+</script>

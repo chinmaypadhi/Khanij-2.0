@@ -1,0 +1,475 @@
+﻿@*// *********************************************************************************************************
+    //  View Name                : MonthlyCoalProductionPayment
+    //  Desciption               : Payment Page of Monthly coal Production 
+    //  Created By               : Debaraj Swain
+    //  Created On               : 19 April 2021
+    // ********************************************************************************************************
+*@
+@model ReturnEF.DailyProductionModel
+@{
+    ViewData["Title"] = "Monthly Amount (Auction Money) Payment";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@if (ViewBag.msg != null)
+{
+    <script>
+        alert('@ViewBag.msg');
+    </script>
+}
+
+
+<style>
+    .background_border_line {
+        border: 1px solid #583b2c;
+        border-radius: unset;
+        background: white !important;
+    }
+</style>
+
+<style>
+    /*  bhoechie tab */
+    div.bhoechie-tab-container {
+        z-index: 0;
+        background-color: #ffffff;
+        padding: 0 !important;
+        border-radius: 4px;
+        -moz-border-radius: 4px;
+        border: 1px solid #ddd;
+        margin-top: 20px;
+        margin-left: 0px;
+        margin-bottom: 20px;
+        -webkit-box-shadow: 0 6px 12px rgba(0,0,0,.175);
+        box-shadow: 0 6px 12px rgba(0,0,0,.175);
+        -moz-box-shadow: 0 6px 12px rgba(0,0,0,.175);
+        background-clip: padding-box;
+        opacity: 0.97;
+        filter: alpha(opacity=97);
+    }
+
+    div.bhoechie-tab-menu {
+        padding-right: 0;
+        padding-left: 0;
+        padding-bottom: 0;
+    }
+
+        div.bhoechie-tab-menu div.list-group {
+            margin-bottom: 0;
+        }
+
+            div.bhoechie-tab-menu div.list-group > a {
+                margin-bottom: 0;
+            }
+
+                div.bhoechie-tab-menu div.list-group > a .glyphicon,
+                div.bhoechie-tab-menu div.list-group > a .fa {
+                    color: #5A55A3;
+                }
+
+                div.bhoechie-tab-menu div.list-group > a:first-child {
+                    border-top-right-radius: 0;
+                    -moz-border-top-right-radius: 0;
+                }
+
+                div.bhoechie-tab-menu div.list-group > a:last-child {
+                    border-bottom-right-radius: 0;
+                    -moz-border-bottom-right-radius: 0;
+                }
+
+                div.bhoechie-tab-menu div.list-group > a.active,
+                div.bhoechie-tab-menu div.list-group > a.active .glyphicon,
+                div.bhoechie-tab-menu div.list-group > a.active .fa {
+                    background-color: #5A55A3;
+                    background-image: #5A55A3;
+                    color: #ffffff;
+                }
+
+                    div.bhoechie-tab-menu div.list-group > a.active:after {
+                        content: '';
+                        position: absolute;
+                        left: 100%;
+                        top: 50%;
+                        margin-top: -13px;
+                        border-left: 0;
+                        border-bottom: 13px solid transparent;
+                        border-top: 13px solid transparent;
+                        border-left: 10px solid #5A55A3;
+                    }
+
+    div.bhoechie-tab-content {
+        background-color: #ffffff;
+        /* border: 1px solid #eeeeee; */
+        padding-left: 20px;
+        padding-top: 10px;
+    }
+
+    div.bhoechie-tab div.bhoechie-tab-content:not(.active) {
+        display: none;
+    }
+</style>
+
+
+
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        @Html.Partial("_CMSnavigation")
+        <!-- MAIN CONTENT AREA STARTS -->
+
+        <div class="row">
+            <div class="col-12">
+
+
+                <section class="box form-container">
+                    <div class="content-body">
+                        @using (Html.BeginForm("MonthlyCoalProductionPayment", "DailyProduction", FormMethod.Post, new { AUTOCOMPLETE = "Off", id = "form1" }))
+                        {
+                            @(Html.HiddenFor(model => model.PaymentMode))
+                            @(Html.HiddenFor(model => model.PaymentBank))
+                            @(Html.HiddenFor(model => model.P_Mode))
+                            @(Html.HiddenFor(model => model.NetBanking_mode))
+                            @(Html.HiddenFor(model => model.ProductionMonth))
+
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <div class="form-group row">
+                                        <label for="inputLoginId" class="col-sm-4 col-form-label">Mineral Name<span class="text-danger">*</span></label>
+                                        <div class="col-sm-7">
+                                            @Html.TextBoxFor(m => m.MineralName, new { @class = "form-control" })
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <div class="form-group row">
+                                        <label for="inputName" class="col-sm-4 col-form-label">Select Month <span class="text-danger">*</span></label>
+                                        <div class="col-sm-7">
+                                            <div class="py-2">
+                                                @Html.DropDownListFor(model => model.ProductionMonth, ViewBag.ViewMonthList as IEnumerable<SelectListItem>, "--Select--", new { @id = "MONTHS", @class = "form-control", autofocus = "autofocus", required = "required" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <div class="form-group row">
+                                        <label for="inputName" class="col-sm-4 col-form-label">Select Year <span class="text-danger">*</span></label>
+                                        <div class="col-sm-7">
+                                            <div class="py-2">
+                                                @Html.DropDownListFor(model => model.ProductionYear, ViewBag.ViewYearList as IEnumerable<SelectListItem>, "--Select--", new { @id = "YEARS", @class = "form-control", autofocus = "autofocus", required = "required" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <div class="form-group row">
+                                        <label for="inputName" class="col-sm-4 col-form-label">Total Production (in MT)<span class="text-danger">*</span></label>
+                                        <div class="col-sm-7">
+                                            <div class="py-2">
+                                                @Html.TextBoxFor(m => m.TotalProduction, new { @class = "form-control", @readonly = "readonly" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <div class="form-group row">
+                                        <label for="inputName" class="col-sm-4 col-form-label">Monthly Amount(Auction Money)(Rs./MT)<span class="text-danger">*</span></label>
+                                        <div class="col-sm-7">
+                                            <div class="py-2">
+
+                                                @(Html.TextBoxFor(model => model.ProductionMonthlyAmount, new { @class = "form-control", @readonly = "readonly" }))
+                                                &nbsp;&nbsp;
+                                                @Html.Label("", "Please ensure that Auction money showing is updated in your profile as per latest WPI.", new { style = "color: #f00;" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <div class="form-group row">
+                                        <label for="inputName" class="col-sm-4 col-form-label">Total Payable(in Rs.)<span class="text-danger">*</span></label>
+                                        <div class="col-sm-7">
+                                            <div class="py-2">
+
+                                                @(Html.TextBoxFor(model => model.TotalPayableProductionMonthlyAmount, new { @class = "form-control", @readonly = "readonly" }))
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+
+
+
+
+
+                            <div class="row" id="divOnlineOptionDiv" style="display:none;">
+                                <div class="col-md-12">
+                                    <div class="col-lg-11 col-md-4 col-sm-12 col-xs-12 bhoechie-tab-container">
+                                        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 bhoechie-tab-menu">
+                                            <div class="list-group">
+                                                <a href="#" class="list-group-item  active text-center" id="divOnlineOption">
+                                                    Online Payment
+                                                </a>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-9 col-md-9 col-sm-9 col-xs-9 bhoechie-tab">
+                                            <!-- Online payment section -->
+                                            <div class="bhoechie-tab-content active ">
+                                                <div class="row" id="divPaymentOptionOnline">
+                                                    <div class="col-lg-12 col-md-4 col-xs-12">
+                                                        <div id="divOnlineChallanDetails">
+                                                            <div class="col-md-12">
+                                                                <div class="col-md-12 default-form-control-style">
+                                                                    <img src="@Url.Content("/img/SBI.jpg")" alt="SBI" style="width:100px;height:50px;" />
+                                                                    <input name="BankSelection" type="radio" id="chkSBI" value="SBI" checked="checked" />
+                                                                </div>
+                                                                <div class="col-md-12 default-form-control-style" style="text-align: left;">
+                                                                    <img src="@Url.Content("/img/ICICI.png")" alt="ICICI" style="width:100px;height:50px;" />
+                                                                    <input name="BankSelection" type="radio" id="chkICICI" value="ICICI" />
+                                                                </div>
+
+
+
+                                                            </div>
+                                                        </div>
+                                                        <div class="row" id="divPaymentOption" style="display: none">
+                                                            <div class="col-lg-12 col-md-12 col-xs-12">
+                                                                <div id="divOnline">
+                                                                    <div class="col-xs-12">
+                                                                        <div class="col-md-4 default-form-control-style" style="text-align: left;">
+                                                                            @(Html.Label("Net Banking"))
+                                                                            <input name="ModeSelection" type="radio" id="chkICICINetBanking" value="NetBanking" />
+                                                                        </div>
+                                                                        <div class="col-md-4 default-form-control-style">
+                                                                            @(Html.Label("NEFT/RTGS"))
+                                                                            <input name="ModeSelection" type="radio" id="chkNEFT" value="NEFT" checked="checked" />
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="row" id="divNetBankingPayment" style="display: none">
+                                                            <div class="col-lg-12 col-md-12 col-xs-12">
+                                                                <div id="divNet">
+                                                                    <div class="col-xs-12">
+                                                                        <div class="col-md-4 default-form-control-style" style="text-align: left;">
+                                                                            @(Html.Label("Corporate"))
+                                                                            <input name="NetBankingSelection" type="radio" value="Corporate" checked="checked" />
+                                                                        </div>
+                                                                        <div class="col-md-4 default-form-control-style">
+                                                                            @(Html.Label("Retail"))
+                                                                            <input name="NetBankingSelection" type="radio" value="Retail" />
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <!-- Offlineline payment section -->
+
+                                        </div>
+                                    </div>
+                                    <br />
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <input type="submit" id="makePayment" onclick="return onMakePayment();" class="btn-primary btn-sm edit" value="Make Payment" />
+                                    </div>
+                                </div>
+                            </div>
+                             
+                        }
+                    </div>
+                </section>
+            </div>
+
+        </div>
+
+    </div>
+</section>
+
+
+<script>
+    indicateMe = "yes"
+
+    $(document).ready(function () {
+        loadNavigation('AddUser', 'glRoleRes', 'plUser', 'tl', 'Daily Production', 'Monthly Amount (Auction Money) Payment', ' ');
+    });
+</script>
+<script type="text/javascript">
+    @if (TempData["Message"] != null)
+    {
+    <Text>
+    alert('@TempData["Message"]');
+    </Text>
+    }
+</script>
+
+<script type="text/javascript">
+    $("#chkICICI").click(function () {
+        $("#divPaymentOption").show();
+    })
+    $("#chkSBI").click(function () {
+        $("#divPaymentOption").hide();
+    })
+
+    $("#chkICICINetBanking").click(function () {
+        $("#divNetBankingPayment").show();
+    })
+
+    $("#chkNEFT").click(function () {
+        $("#divNetBankingPayment").hide();
+    })
+
+
+
+    function getProductionMonthQty() {
+        try {
+            debugger;
+            var Fyear = $("#YEARS").val();
+            var Month = $("#MONTHS").val();
+            $.ajax({
+                type: "GET",
+
+                url: "/DailyProduction/DailyProduction/GetMonthlyCoalProductionPayment",
+
+                data: {
+                    ProductionYear: Fyear, ProductionMonth: Month
+                },
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                async: false,
+                success: function (result) {
+
+                    if (result != "" && result != null && result != 'undefined') {
+
+                        $("#TotalProduction").val(result.TotalProduction);
+                        $("#ProductionMonthlyAmount").val(result.ProductionMonthlyAmount);
+                        $("#TotalPayableProductionMonthlyAmount").val(result.TotalPayableProductionMonthlyAmount);
+
+                        $("#divOnlineOptionDiv").show();
+                    }
+                    else {
+                        debugger;
+                        $("#TotalProduction").val('').change();
+                        $("#ProductionMonthlyAmount").val('').change();
+                        $("#TotalPayableProductionMonthlyAmount").val('').change();
+                        alert("No Data Available for the selected month. If You want to pay the amount, Please Enter record(s) of all dates of selected month.");
+                        $("#divOnlineOptionDiv").hide();
+                    }
+                }
+            });
+        }
+        catch (e) { }
+    }
+
+    function onMakePayment() {
+        if (confirm('Are you sure to make payment for Monthly Amount (Auction Money) ?')) {
+            debugger;
+            var Fyear1 = $("#YEARS").val();
+            var Month1 = $("#MONTHS").val();
+            $("#ProductionMonth").val(Month1 + ' ' + Fyear1);
+            var isValid = 0;
+            if ($("#divOnlineOption").hasClass("active") == true) {
+                $("#PaymentMode").val(1); // set online payment mode
+                var bank = $("input:radio[name='BankSelection']:checked").val();
+                var mode = $("input:radio[name='ModeSelection']:checked").val();
+                var NetBanking = $("input:radio[name='NetBankingSelection']:checked").val();
+                if (bank == "HDFC") {
+                    $("#PaymentBank").val("HDFC");
+                    $("#__EUAntiForgeryForm").submit();
+                }
+                else if (bank == "ICICI") {
+                    $("#PaymentBank").val("ICICI");
+                    if (mode == "NetBanking") {
+                        $("#P_Mode").val("NetBanking")
+                        if (NetBanking == "Corporate") {
+                            $("#NetBanking_mode").val("Corporate");
+                            $("#__EUAntiForgeryForm").submit();
+                        }
+                        else if (NetBanking == "Retail") {
+                            $("#NetBanking_mode").val("Retail");
+                            $("#__EUAntiForgeryForm").submit();
+                        }
+                    }
+                    else {
+                        $("#P_Mode").val("NEFT")
+                        $("#__EUAntiForgeryForm").submit();
+                    }
+
+
+
+                }
+                else if (bank == "SBI") {
+                    $("#PaymentBank").val("SBI");
+                    // $("#__EUAntiForgeryForm").submit();
+                }
+                else {
+                    alert("Please select bank to make payment !");
+                    return false;
+                }
+            }
+            else {
+
+                $("#PaymentMode").val(0); // set offline mode value
+                if ($("#ChallanNumber").val()) {
+                    if ($("#ChallanDate").val()) {
+                        if ($('input[name="ChallanCopyPath"]').val() != "") {
+                            if (filesize < 2048000) {
+                                if (confirm('Are you sure to make payment ?')) {
+                                    $("#__EUAntiForgeryForm").submit();
+                                }
+                            }
+                            else {
+                                alert("Please make sure your file is less than 2 MB!");
+                                return false;
+                            }
+                        }
+                        else {
+                            alert("Please select file!");
+                        }
+                    }
+                    else {
+                        lert("Please enter Challan Date!");
+                        $("#ChallanDate").focus();
+                    }
+                }
+                else {
+                    alert("Please enter Challan Number!");
+                    $("#ChallanNumber").focus();
+                }
+            }
+        }
+    }
+
+    $(document).ready(function () {
+        $("div.bhoechie-tab-menu>div.list-group>a").click(function (e) {
+            e.preventDefault();
+            $(this).siblings('a.active').removeClass("active");
+            $(this).addClass("active");
+            var index = $(this).index();
+            $("div.bhoechie-tab>div.bhoechie-tab-content").removeClass("active");
+            $("div.bhoechie-tab>div.bhoechie-tab-content").eq(index).addClass("active");
+        });
+
+        getProductionMonthQty();
+
+        if ($("#TotalPayableProductionMonthlyAmount").val() > 0) {
+            $("#divOnlineOptionDiv").show();
+        }
+    });
+
+
+</script>

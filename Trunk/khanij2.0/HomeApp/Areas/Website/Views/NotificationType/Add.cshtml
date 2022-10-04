@@ -1,0 +1,125 @@
+﻿@*// *********************************************************************************************************
+    //  View Name                : Add
+    //  Desciption               : To Save and Update Website Notification Type Details
+    //  Created By               : Lingaraj Dalai
+    //  Created On               : 12 Oct 2021
+    // ********************************************************************************************************
+*@
+@model HomeEF.AddNotificationTypeModel
+@{
+    ViewData["Title"] = "Add";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+@if (TempData["Message"] != null)
+{
+<script>
+        var vv = '@TempData["Message"]';
+        if (vv == 1) {
+            swal("","Notification Type created successfully.","success");
+        }
+        else if (vv == 2) {
+            swal("","Notification Type already exists.","warning");
+        }
+        else if (vv == 3) {
+            swal("", "Something Errror occured. Please Try After Sometime!!", "error");
+        }
+</script>
+}
+<script>
+    indicateMe = "yes"
+    $(document).ready(function () {
+        $('.searchableselect').searchableselect();
+        loadNavigation('Add', 'glhelpdesk', 'plraiseticket', 'tl', 'CMS', 'Notification Type', ' ');
+    });
+    function Validate() {
+        var Iss = false;
+        if (!blankFieldValidation("VCH_NOTIFICATION_NAME", "Notification Type")) {
+            return false;
+        }
+        else if (!blankFieldValidation("VCH_NOTIFICATION_DESC", "Notification Description")) {
+            return false;
+        }
+        Iss = true;
+        return Iss;
+    }
+</script>
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        @Html.Partial("_navigation")
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="javascript:void(0);">
+                                Add
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="~/Website/NotificationType/ViewList">
+                                View
+                            </a>
+                        </li>
+                    </ul>
+                    @Html.Partial("_util")
+                </div>
+                <section class="box form-container">
+                    <div class="content-body">
+                        <h5 class="text-brown font-weight-bold mt-0"> Notification Type Details</h5>
+                        @using (Html.BeginForm("Add", "NotificationType", FormMethod.Post, new { enctype = "multipart/form-data", AUTOCOMPLETE = "Off", id = "form1" }))
+                        {
+                            <div class="row">
+                                <div class="col-lg-6 col-12">
+                                    <div class="form-group row">
+                                        <div class="col-lg-7 col-md-7 col-sm-12">
+                                            <label class="col-form-label">Notification Type <span class="text-danger">*</span></label>
+                                            @Html.TextBoxFor(m => m.VCH_NOTIFICATION_NAME, new { @class = "form-control", @autofocus = "autofocus" })
+                                            @Html.ValidationMessageFor(m => m.VCH_NOTIFICATION_NAME, "", new { @class = "text-danger" })
+                                            @Html.HiddenFor(m => m.INT_NOTIFICATION_TYPE_ID)
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 col-12">
+                                    <div class="form-group row">
+                                        <div class="col-lg-7 col-md-7 col-sm-12">
+                                            <label class="col-form-label">Notification Description <span class="text-danger">*</span></label>
+                                            @Html.TextAreaFor(m => m.VCH_NOTIFICATION_DESC, new { @class = "form-control", @rows = "5", @autofocus = "autofocus" })
+                                            @Html.ValidationMessageFor(m => m.VCH_NOTIFICATION_DESC, "", new { @class = "text-danger" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 col-12">
+                                    <div class="form-group row">
+                                        <div class="col-lg-7 col-md-7 col-sm-12">
+                                            <label class="col-form-label pt-0 font-weight-bolder">Status</label>
+                                            @Html.RadioButtonFor(n => n.BIT_STATUS, true, new { @checked = true, @class = "custom-radio", id = "Rdbtn_Active" })
+                                            <label class="radio-label">Active</label>
+                                            @Html.RadioButtonFor(n => n.BIT_STATUS, false, new { @class = "custom-radio", id = "Rdbtn_Inactive" })
+                                            <label class="radio-label">Inactive</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12 col-sm-12">
+                                    <input type="submit" value='@ViewBag.Button' name="Submit" class="btn btn-success btn-md ml-0 waves-effect waves-light  btnsave" id="Submit" onclick="return Validate()">
+                                    @if (ViewBag.Button == "Update")
+                                    {
+                                        <a href="~/Website/NotificationType/ViewList" class="btn btn-danger btn-md ml-0 waves-effect waves-light btncancel">Cancel</a>
+                                    }
+                                    else
+                                    {
+                                        <a href="~/Website/NotificationType/Add" class="btn btn-danger btn-md ml-0 waves-effect waves-light btncancel">Cancel</a>
+                                    }
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+    <!-- MAIN CONTENT AREA ENDS -->
+</section>
+

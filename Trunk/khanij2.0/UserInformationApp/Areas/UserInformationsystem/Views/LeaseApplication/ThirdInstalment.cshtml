@@ -1,0 +1,397 @@
+﻿@*// *********************************************************************************************************
+    //  View Name                : ThirdInstallment
+    //  Desciption               : To MANAGE Third installment and lease Deed by lesssee
+    //  Created By               : Suroj Kumar Pradhan
+    //  Created On               : 02-may-2021
+    // ********************************************************************************************************
+*@
+@model UserInformationEF.LeaseApplicationModel
+@{
+    ViewData["Title"] = "Add";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<link rel="stylesheet" href="~/css/bootstrap-datetimepicker.min.css" type="text/css" />
+<script src="~/js/moment.min.js"></script>
+<script src="~/js/bootstrap-datetimepicker.min.js"></script>
+
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        <uc1:navigation runat="server" ID="navigation" />
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="javascript:void(0);">
+                                Online Lease Application
+                            </a>
+                        </li>
+                    </ul>
+                    <uc1:util runat="server" ID="util" />
+                </div>
+
+                <section class="box form-container">
+                    @using (Html.BeginForm("Submission", "LeaseApplication", FormMethod.Post, new { id = "__AntiForgeryForm", @enctype = "multipart/form-data", @class = "form-horizontal bordered-row" }))
+                    {
+                        @Html.HiddenFor(x => x.Status)
+                        @Html.HiddenFor(x => x.SpMode)
+                        @Html.Hidden("PaymentMode")
+                        @Html.Hidden("PaymentBank")
+                        @Html.Hidden("PMode")
+                        @Html.Hidden("NetBanking_mode")
+                        @Html.HiddenFor(x => x.LesseeLOI)
+                        @if (Model.Status == 12)
+                        {
+                            <div class="content-body">
+                                <h1 class="text-center"> Pay Third Installment</h1>
+                                <div class="container footer">
+                                    <div class="d-flex justify-content-between">
+                                        <div class="p-1">
+
+                                        </div>
+                                        <div class="p-1">
+                                            <label for="inputPassword" class=" font-weight-bolder">Firm Type</label>
+
+                                        </div>
+                                        <div class="p-1">
+                                            <label for="inputPassword" class=" font-weight-bolder">@Model.CategoryOfLicensee</label>
+                                        </div>
+                                        <div class="p-1">
+
+                                        </div>
+                                    </div>
+                                    <div class="d-flex justify-content-between">
+                                        <div class="p-1">
+
+                                        </div>
+                                        <div class="p-1">
+                                            <label for="inputPassword" class=" font-weight-bolder">Company</label>
+
+                                        </div>
+                                        <div class="p-1">
+                                            <label for="inputPassword" class="font-weight-bolder">@Model.CompanyName</label>
+                                        </div>
+                                        <div class="p-1">
+
+                                        </div>
+                                    </div>
+                                    <div class="d-flex justify-content-between">
+                                        <div class="p-1">
+
+                                        </div>
+                                        <div class="p-1">
+                                            <label for="inputPassword" class="col-sm-13 col-form-label font-weight-bolder">Name of Authorized Person</label>
+
+                                        </div>
+                                        <div class="p-1">
+                                            <label for="inputPassword" class="col-sm-13 col-form-label font-weight-bolder">@Model.NameOfApplicant</label>
+                                        </div>
+                                        <div class="p-1">
+
+                                        </div>
+                                    </div>
+
+
+                                    <div class="d-flex justify-content-between">
+                                        <div class="p-1">
+
+                                        </div>
+                                        <div class="p-1">
+                                            <label for="inputPassword" class="col-sm-13 col-form-labe font-weight-bolder">Amount</label>
+
+                                        </div>
+                                        <div class="p-1">
+                                            <label for="inputPassword" class=" font-weight-bolder">Rs @Model.Third_Installment_Amount</label>
+                                            @Html.Hidden("TransactionalID")
+                                        </div>
+                                        <div class="p-1">
+
+                                        </div>
+                                    </div>
+                                    <div class="d-flex justify-content-between">
+                                        <div class="p-1">
+
+                                        </div>
+                                        <div class="p-1">
+                                            <label for="inputPassword" class=" font-weight-bolder">Due Date</label>
+
+                                        </div>
+                                        <div class="p-1">
+                                            <label for="inputPassword" class=" font-weight-bolder">@Model.Third_Installment_ScheduleDate</label>
+                                        </div>
+                                        <div class="p-1">
+
+                                        </div>
+                                    </div>
+                                    <div class="d-flex justify-content-between">
+                                        <div class="p-1">
+
+                                        </div>
+                                        <div class="p-1">
+                                            <img src=@Url.Content("~/img/b.jpg") alt="SBI" style="width:100px;height:50px;">
+                                            <input name="BankSelection" id="chkSBI" type="radio" value="SBI" checked="checked">
+                                        </div>
+                                        <div class="p-1">
+                                            <img src=@Url.Content("~/img/ICICI.png") alt="SBI" style="width:100px;height:50px;">
+                                            <input name="BankSelection" id="chkICICI" type="radio" value="ICICI">
+                                        </div>
+                                        <div class="p-1">
+
+                                        </div>
+                                    </div>
+                                    <div style="display:none" id="divPaymentOption">
+                                        <div class="d-flex justify-content-between" style="display:none">
+                                            <div class="p-1">
+
+                                            </div>
+                                            <div class="p-1">
+                                                <label for="Net_Banking">Net Banking</label>
+                                                <input name="ModeSelection" type="radio" id="chkICICINetBanking" value="NetBanking" />
+                                            </div>
+                                            <div class="p-1">
+                                                <label for="Net_Banking">NEFT/RTGS</label>
+                                                <input name="ModeSelection" type="radio" id="chkNEFT" value="NEFT" checked="checked" />
+                                            </div>
+                                            <div class="p-1">
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div style="display:none" id="divNetBankingPayment">
+                                        <div class="d-flex justify-content-between">
+                                            <div class="p-1">
+
+                                            </div>
+                                            <div class="p-1">
+                                                <label for="Net_Banking">Corporate</label>
+                                                <input name="NetBankingSelection" type="radio" value="Corporate" checked="checked" />
+                                            </div>
+                                            <div class="p-1">
+                                                <label for="Net_Banking">Retail</label>
+                                                <input name="NetBankingSelection" type="radio" value="Retail" />
+                                            </div>
+                                            <div class="p-1">
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6 offset-sm-6">
+                                        <input type="button" value="Submit" id="btnSubmit" class="btn  btn-primary" onclick="onMakePayment();" style="margin-right: 10px; width: 150px;" />
+
+
+                                    </div>
+                                </div>
+                            </div>
+                        }
+
+                        @if (Model.Status == 13)
+                        {
+                            <div class="content-body">
+                                <h1 class="text-center">Upload Signed details of Mining Lease Deed</h1>
+                                <div class="cotainer">
+                                    <div class="row justify-content-center">
+                                        <div class="col-md-8">
+
+                                            <div class="form-group row">
+                                                <label for="email_address" class="col-md-4 col-form-label text-md-right font-weight-bolder">Firm Type</label>
+                                                <div class="col-md-8">
+                                                    <label for="email_address">@Model.CategoryOfLicensee</label>
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group row">
+                                                <label for="email_address" class="col-md-4 col-form-label text-md-right font-weight-bolder">Comapny</label>
+                                                <div class="col-md-6">
+                                                    <label for="email_address">@Model.CompanyName</label>
+                                                </div>
+                                            </div>
+                                            <div class="form-group row">
+                                                <label for="email_address" class="col-md-4 col-form-label text-md-right font-weight-bolder">Name of Authorized Person</label>
+                                                <div class="col-md-6">
+                                                    <label for="email_address">@Model.NameOfApplicant</label>
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group row">
+                                                <label class="col-sm-4 col-form-label text-md-right font-weight-bolder">Signing Date *</label>
+                                                <div class="col-sm-6">
+                                                    @Html.TextBoxFor(x => x.LeaseDeedUploadedOn, new { @class = "form-control datetime pointer", DataFormatString = "{0:yyyy-MM-dd}", onkeydown = "return false;" })
+
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group row">
+                                                <label for="email_address" class="col-md-4 col-form-label text-md-right font-weight-bolder">Attach Registered Lease Deed *</label>
+                                                <div class="col-md-6">
+                                                    <input type="file" class="custom-file-input" id="filesupport" name="@Html.NameFor(Model => Model.LeaseDeedAgreementFile)">
+                                                    <label class="custom-file-label" for="customFile">Choose Files</label>
+                                                    <label><span class="text-danger text-sm">Only jpg, jpeg, png, pdf, tif file types are allowed.</span></label>
+                                                </div>
+                                            </div>
+                                            <div class="form-group row">
+                                                <label for="email_address" class="col-md-4 col-form-label text-md-right font-weight-bolder">Remarks</label>
+                                                <div class="col-md-6">
+                                                    @Html.TextAreaFor(x => x.Remarks, new { @class = "form-control", @maxlength = 1000, style = "width: 100%;height: 100px;" })
+                                                </div>
+                                            </div>
+                                        </div>
+
+
+                                    </div>
+                                    <div class="col-sm-6 offset-sm-6">
+                                        <input type="button" value="Submit" id="btnSubmit" class="btn  btn-primary" onclick="onMakePayment();" style="margin-right: 10px; width: 200px;" />
+
+                                    </div>
+                                </div>
+
+
+                            </div>
+                        }
+                    }
+                </section>
+            </div>
+        </div>
+    </div>
+    <script>
+        $(document).ready(function () {
+            $('.datetime').datetimepicker({
+                format: 'LT',
+                format: "DD/MM/YYYY",
+
+            }).keydown(false);
+
+
+
+        });
+        function ApplyDsc() {
+            if (confirm("Digital Signature is require for Submitting the Online Application. Are you sure to proceed?")) {
+                $("#__AntiForgeryForm").submit();
+            }
+        }
+        function onMakePayment(chk) {
+            var bank = $("input:radio[name='BankSelection']:checked").val();
+            var mode = $("input:radio[name='ModeSelection']:checked").val();
+            var NetBanking = $("input:radio[name='NetBankingSelection']:checked").val();
+            if ($('#Status').val() == "12") {
+                $('#SpMode').val('ThirdInstallment');
+
+                if (bank == "HDFC") {
+                    $("#PaymentBank").val("HDFC");
+                    if (confirm('Are you sure to make payment ?')) {
+                        $("#__AntiForgeryForm").submit();
+                    }
+                }
+                else if (bank == "ICICI") {
+                    $("#PaymentBank").val("ICICI");
+                    if (mode == "NetBanking") {
+                        $("#PMode").val("NetBanking");
+
+                        if (NetBanking == "Corporate") {
+                            $("#NetBanking_mode").val("Corporate");
+                            if (confirm('Are you sure to make payment ?')) {
+                                $("#__AntiForgeryForm").submit();
+                            }
+                        }
+                        else if (NetBanking == "Retail") {
+                            $("#NetBanking_mode").val("Retail");
+                            if (confirm('Are you sure to make payment ?')) {
+                                $("#__AntiForgeryForm").submit();
+                            }
+                        }
+                    }
+                    else {
+                        $("#PMode").val("NEFT/RTGS");
+                        if (confirm('Are you sure to make payment ?')) {
+                            $("#__AntiForgeryForm").submit();
+                        }
+                    }
+                }
+                else if (bank == "SBI") {
+
+                    $("#PaymentBank").val("SBI");
+                    if (confirm('Are you sure to make payment ?')) {
+                        $("#__AntiForgeryForm").submit();
+                    }
+                }
+                else {
+
+                    alert("Please select bank to make payment !");
+                    return false;
+
+                }
+
+
+
+            }
+
+            else if ($('#Status').val() == "13") {
+                if ($('#LeaseDeedUploadedOn').val() == "") {
+                    alert("Please Enter Signing Date!");
+                    $('input[name="LeaseDeedUploadedOn"]').focus();
+                    return false;
+                }
+
+                else if (LeaseDeedAgreementCopy_FileSize == 0) {
+                    alert("Please Attach/Upload Registered Lease Deed!");
+                    $('input[name="LeaseDeedAgreementCopy"]').focus();
+                    return false;
+                }
+                else if ($("#Remarks").val() == '') {
+                    alert("Please enter remarks.");
+                    $("#Remarks").focus();
+                    return false
+                }
+                else {
+                    $('#SpMode').val('LeaseDeed');
+                    ApplyDsc();
+                    //$("#__AntiForgeryForm").submit();
+                }
+            }
+        }
+        $("#chkICICI").click(function () {
+            $("#divPaymentOption").show();
+        })
+        $("#chkHDFC").click(function () {
+            $("#divPaymentOption").hide();
+        })
+        $("#chkSBI").click(function () {
+            $("#divPaymentOption").hide();
+        })
+
+
+        $("#chkICICINetBanking").click(function () {
+            $("#divNetBankingPayment").show();
+        })
+
+        $("#chkNEFT").click(function () {
+            $("#divNetBankingPayment").hide();
+        })
+
+        $('input[name="LeaseDeedAgreementFile"]').bind('change', function () {
+            debugger;
+            filesize = this.files[0].size;
+            var filess = this.files;
+            var label = $(this).siblings('.custom-file-label');
+            var val = $(this).val().toLowerCase(),
+                regex = new RegExp("(.*?)\.(pdf|jpeg|jpg|png|tif)$");
+            var extension = val.substr((val.lastIndexOf('.') + 1));
+            if (!(regex.test(val))) {
+                debugger;
+                swal("", " " + extension + "  type is not an allowed file type. You can use only jpg, jpeg, png, pdf, tif types of file(s). ", "warning");
+                this.value = '';
+                label.html('');
+                $("#MLA").focus();
+                return false;
+            }
+            else {
+                label.html(filess.length + ' Files Selected');
+            }
+            return false;
+
+        });
+        var LeaseDeedAgreementCopy_FileSize = 0;
+        $('input[name="LeaseDeedAgreementFile"]').bind('change', function () { LeaseDeedAgreementCopy_FileSize = this.files[0].size; return false; });
+    </script>
+</section>
+

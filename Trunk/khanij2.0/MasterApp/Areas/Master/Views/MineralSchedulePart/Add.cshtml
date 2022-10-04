@@ -1,0 +1,203 @@
+﻿@model MasterEF.MineralSchedulePartModel
+@using MasterEF;
+@{
+    ViewData["Title"] = "Add";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+@if (ViewBag.msg != null)
+{
+    <script>
+
+ swal("",'@ViewBag.msg',"success");
+    </script>
+}
+@if (TempData["msg"] != null)
+{
+    <script>
+        swal("",'@TempData["msg"]',"success");
+    </script>
+}
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        @Html.Partial("_CMSnavigation")
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item"><a class="nav-link active" href="/Master/MineralSchedulePart/Add">Add</a></li>
+                        <li class="nav-item"><a class="nav-link" href="/Master/MineralSchedulePart/ViewList">View</a></li>
+                    </ul>
+                    @Html.Partial("_CMSutil")
+                </div>
+                <section class="box form-container">
+                    <div class="content-body">
+                        <form action="Add" method="post" autocomplete="off">
+                            @Html.AntiForgeryToken()
+                            <div class="row">
+                                <div class="col-lg-6 col-12">
+                                    <div class="form-group row">
+                                        <label for="inputLoginId" class="col-sm-4 col-form-label">Mineral Category <span class="text-danger">*</span></label>
+                                        <div class="col-sm-7">
+                                            <select id="MineralTypeId" name="MineralTypeId" title="Mineral Category" class="form-control searchableselect">
+                                                <option value="">Select</option>
+                                                @{
+                                                    List<MineralGradeModel> listMineralType = (List<MineralGradeModel>)ViewData["MineralCategory"];
+                                                    if (listMineralType != null)
+                                                    {
+                                                        foreach (var item in listMineralType)
+                                                        {
+                                                            if (item.MineralTypeId == Model.MineralTypeId)
+                                                            {
+                                                                <option selected="selected" value="@item.MineralTypeId">@item.MineralTypeName</option>
+                                                            }
+                                                            else
+                                                            {
+                                                                <option value="@item.MineralTypeId">@item.MineralTypeName</option>
+                                                            }
+
+                                                        }
+                                                    }
+                                                }
+                                            </select>
+                                            <span class="text-danger">@Html.ValidationMessageFor(m => m.MineralTypeId)</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-6 col-12">
+                                    <div class="form-group row">
+                                        <label for="inputLoginId" class="col-sm-4 col-form-label">Schedule <span class="text-danger">*</span></label>
+                                        <div class="col-sm-7">
+                                            <select id="MineralScheduleID" name="MineralScheduleID" title="Schedule" class="form-control searchableselect">
+                                                <option value="">Select</option>
+                                                @{
+                                                    List<MineralScheduleModel> listMineralScheduleModel = (List<MineralScheduleModel>)ViewData["MineralSchedule"];
+                                                    if (listMineralScheduleModel != null)
+                                                    {
+                                                        foreach (var item in listMineralScheduleModel)
+                                                        {
+                                                            if (item.MineralScheduleID == Model.MineralScheduleId)
+                                                            {
+                                                                <option selected="selected" value="@item.MineralScheduleID">@item.MineralScheduleName</option>
+                                                            }
+                                                            else
+                                                            {
+                                                                <option value="@item.MineralScheduleID">@item.MineralScheduleName</option>
+                                                            }
+
+                                                        }
+                                                    }
+                                                }
+                                            </select>
+                                            <span class="text-danger">@Html.ValidationMessageFor(m => m.MineralScheduleId)</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-6 col-12">
+                                    <div class="form-group row">
+                                        <label for="dropdownDepart" class="col-sm-4 col-form-label">Schedule Part Name <span class="text-danger">*</span></label>
+                                        <div class="col-sm-7">
+                                            <input type="text" id="txtMineralSchedulePartName" name="MineralSchedulePartName" title="Schedule Part Name" value="@Model.MineralSchedulePartName" class="form-control" Onkeypress="return inputLimiter(event,'NameCharactersAndNumbers')" />
+                                            @Html.HiddenFor(m => m.MineralSchedulePartID)
+                                            <span class="text-danger">@Html.ValidationMessageFor(m => m.MineralSchedulePartName)</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-6 col-12">
+                                    <div class="form-group row">
+                                        <label for="inputName" class="col-sm-4 col-form-label">Status <span class="text-danger">*</span></label>
+                                        <div class="col-sm-7">
+                                            <div class="py-2">
+                                                @Html.RadioButtonFor(n => n.IsActive, true, new { @checked = true, @class = "custom-radio", id = "Rdbtn_Active" })
+                                                <label class="radio-label">Active</label>
+                                                @Html.RadioButtonFor(n => n.IsActive, false, new { @class = "custom-radio", id = "Rdbtn_Inactive" })
+                                                <label class="radio-label">Inactive</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6 offset-lg-2 offset-md-4">
+                                    <input type="submit" value='@ViewBag.Button' class="btn btn-primary btn-md ml-0" name="Submit" id="Submit" />
+                                    <a href="/Master/MineralSchedulePart/Add" class="btn btn-danger btn-md">Reset</a>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+    <!-- MAIN CONTENT AREA ENDS -->
+</section>
+<input type="hidden" id="hdnMineralTypeId" value="@Model.MineralTypeId" />
+<input type="hidden" id="hdnMineralScheduleId" value="@Model.MineralScheduleId" />
+<script>
+    indicateMe = "yes"
+    $(document).ready(function () {
+        $('.searchableselect').searchableselect();
+        debugger;
+        loadNavigation('Add', 'glRoleRes', 'plUser', 'tl', 'Master', 'Mineral Schedule Part', ' ');
+        //--------------
+        if ($('#hdnMineralTypeId').val() != "") {
+            $('#MineralTypeId').val($('#hdnMineralTypeId').val());
+        }
+        if ($('#hdnMineralScheduleId').val() != "") {
+            $('#MineralScheduleID').val($('#hdnMineralScheduleId').val());
+        }
+        //---------------
+        $("#Submit").click(function () {
+            debugger;
+            if ($('#MineralTypeId').val() == "") {
+                swal("", "Please Select Mineral Category", "warning");
+                $("#MineralTypeId").focus();
+                return false;
+            }
+            if ($('#MineralScheduleID').val() == "") {
+                swal("", "Please Select Schedule", "warning");
+                $("#MineralScheduleID").focus();
+                return false;
+            }
+
+            if ($('#txtMineralSchedulePartName').val() == "") {
+                swal("", "Please Enter Schedule Part Name", "warning");
+                $("#txtMineralSchedulePartName").focus();
+                return false;
+            }
+
+        });
+        //-----------------------
+        $('#MineralTypeId').change(function () {
+            debugger;
+            if ($('#MineralTypeId').val() != "") {
+                $.ajax({
+                    url: '/Master/MineralSchedulePart/GetMineralScheduleByCategoryId',
+                    data: { 'MineralTypeId': $('#MineralTypeId').val() },
+                    dataType: 'json',
+                    type: 'post',
+                    success: function (data) {
+                        debugger;
+                        $('#MineralScheduleID').html('');
+                        $('#MineralScheduleID').append("<option value=''>Select Schedule</option>");
+                        $.each(data, function (ind, item) {
+                            $('#MineralScheduleID').append("<option value='" + item.mineralScheduleID + "'>" + item.mineralScheduleName + "</option>");
+                        });
+                    },
+                    error: function (err) {
+
+                    }
+                });
+            }
+            else {
+                $('#MineralScheduleID').html('');
+                $('#MineralScheduleID').append("<option value=''>Select Schedule</option>");
+            }
+        });
+        //---------------------------
+
+    });
+
+
+</script>

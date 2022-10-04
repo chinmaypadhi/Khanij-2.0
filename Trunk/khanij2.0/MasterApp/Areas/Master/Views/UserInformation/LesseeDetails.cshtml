@@ -1,0 +1,1474 @@
+﻿@model MasterEF.UserInformationEF
+
+@{
+    ViewData["Title"] = "LesseeDetails";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<script type="text/javascript">
+
+    function onChangeAuction(e) {
+        var auctionwidget = e.sender;
+        if (auctionwidget.value() && auctionwidget.select() === -1) {
+            auctionwidget.value(""); //reset widget
+        }
+        else {
+            if ($("#AuctionTypeId").val() == "1") {
+                // Without Auction
+                $("#MonthlyAmount").hide();
+                $("#PaymentMode").hide();
+                $("#CopyOfPerformanceDiv").hide();
+                $("#WithoutAuctionDiv").show();
+            }
+            else if ($("#AuctionTypeId").val() == "2") {
+                // With Auction
+                $("#WithoutAuctionDiv").hide();
+                $("#MonthlyAmount").show();
+                $("#PaymentMode").show();
+                $("#CopyOfPerformanceDiv").show();
+            }
+            else {
+                // Not Cash
+                $("#MonthlyAmount").hide();
+                $("#PaymentMode").hide();
+                $("#WithoutAuctionDiv").hide();
+                $("#NotCashDiv").show();
+                $("#CopyOfPerformanceDiv").hide();
+            }
+        }
+    }
+
+    $('#MonthlyPeriodicAmt').keypress(function (e) {
+        if (isNaN(this.value + String.fromCharCode(event.keyCode))) return false;
+    });
+
+    $('#ADHAR_CARD').keypress(function (e) {
+        if (isNaN(this.value + String.fromCharCode(event.keyCode))) return false;
+    });
+
+    $('#APPLICATION_FEES').keypress(function (e) {
+        if (isNaN(this.value + String.fromCharCode(event.keyCode))) return false;
+    });
+
+    $('#AmountOfDD').keypress(function (e) {
+        if (isNaN(this.value + String.fromCharCode(event.keyCode))) return false;
+    });
+
+    $('#CHALLAN_DD_AMOUNT').keypress(function (e) {
+        if (isNaN(this.value + String.fromCharCode(event.keyCode))) return false;
+    });
+
+    $('#BANK_GUARRANTEE_AMOUNT').keypress(function (e) {
+        if (isNaN(this.value + String.fromCharCode(event.keyCode))) return false;
+    });
+
+    $('#SURITY_BOND_AMOUNT').keypress(function (e) {
+        if (isNaN(this.value + String.fromCharCode(event.keyCode))) return false;
+    });
+    $('#UpfrontPaymentDeposited').keypress(function (e) {
+        if (isNaN(this.value + String.fromCharCode(event.keyCode))) return false;
+    });
+    $('#TillDateBalanceUpfrontPayment').keypress(function (e) {
+        if (isNaN(this.value + String.fromCharCode(event.keyCode))) return false;
+    });
+
+    $("input[name='lesseeProfile']").css('pointer-events', 'none')
+    //Profile Percentage
+    var gauge1 = loadLiquidFillGauge("fillgauge1", new Number(@ViewBag.completionCount));
+    var config1 = liquidFillGaugeDefaultSettings();
+    //Slide js
+
+    function onRadioChange() {
+        var SelectedRadioVal = $("input[name='AdjustCess']:checked").val()
+
+        if (SelectedRadioVal == 'Yes') {
+            $('.OrderDiv').show();
+        }
+        else {
+            $('.OrderDiv').hide();
+        }
+    }
+
+    jQuery(document).ready(function () {
+        HideshowWbAndLabUpload()
+        //var sessionMineralType = @*@CHiMMS_MVC.Models.Generic.SessionWrapper.MineralTypeName;*@
+        var sessionMineralType ="NON COAL";
+
+        if (sessionMineralType == "Minor Mineral") {
+            var dropdownlist = $("#IsInterNetConnectionAtDistpatch ").data("kendoComboBox");
+            dropdownlist.readonly(true)
+        }
+        else {
+            var dropdownlist = $("#IsInterNetConnectionAtDistpatch ").data("kendoComboBox");
+            dropdownlist.readonly(false);
+        }
+
+
+        $("#MonthlyAmount").hide();
+
+        if ($("#APPLICATION_ID").val() > 0) {
+            if ($("#AuctionTypeId").val() == "1") {
+                // Without Auction
+                $("#MonthlyAmount").hide();
+                $("#PaymentMode").hide();
+                $("#CopyOfPerformanceDiv").hide();
+                $("#WithoutAuctionDiv").show();
+            }
+            else if ($("#AuctionTypeId").val() == "2") {
+                // With Auction
+                $("#WithoutAuctionDiv").hide();
+                $("#MonthlyAmount").show();
+                $("#PaymentMode").show();
+                $("#CopyOfPerformanceDiv").show();
+            }
+            else {
+                // Not Cash
+                $("#MonthlyAmount").hide();
+                $("#PaymentMode").hide();
+                $("#WithoutAuctionDiv").hide();
+                $("#NotCashDiv").show();
+                $("#CopyOfPerformanceDiv").hide();
+            }
+        }
+
+        //var _paymentmodetype = $("input[name=PaymentModeType]").val();
+        //var _paymentmodetype = $("PaymentModeType").val();
+        //if (_paymentmodetype == "BG") {
+        //    $("#BG").attr("checked", "checked");
+        //    $("#BGDiv").show();
+        //    $("#CopyOfPerformanceDiv").show();
+        //}
+        //else if (_paymentmodetype == "DD") {
+        //    $("#DD").attr("checked", "checked");
+        //    $("#BGDiv").hide();
+        //    $("#CopyOfPerformanceDiv").show();
+        //}
+        //else { }
+
+        onRadioChange();
+        if ($("#BG").is(":checked")) {
+            $("#DDDiv").hide();
+            $("#BGDiv").show();
+            $("#CopyofDD").hide();
+            $("#CopyofPerformanceSecurity").show();
+            $("#CopyOfPerformanceDiv").show();
+        }
+        else if ($("#DD").is(":checked")) {
+            $("#BGDiv").hide();
+            $("#CopyofPerformanceSecurity").hide();
+            $("#CopyofDD").show();
+            $("#DDDiv").show();
+            $("#CopyOfPerformanceDiv").show();
+        }
+        else { }
+
+        if ($("#St_Yes").is(":checked")) {
+            $("#CrusherInstalledDiv").show();
+
+            if ($("#Yes").is(":checked")) {
+                $("#LicenseStorageCopy").hide();
+            }
+            else if ($("#No").is(":checked")) {
+                $("#LicenseStorageCopy").show();
+            }
+            else { }
+        }
+        else if ($("#St_No").is(":checked")) {
+            $("#CrusherInstalledDiv").hide();
+            $("#LicenseStorageCopy").hide();
+        }
+        else { }
+
+
+
+        //var _crusher = $("input[name=CrusherInstalled]").val();
+        //if (_crusher == "Yes") {
+        //    $("#Yes").attr("checked", "checked");
+        //}
+        //else if (_crusher == "No") {
+        //    $("#No").attr("checked", "checked");
+        //}
+        //else { }
+
+        @*$.ajax({
+            type: "POST",
+            url: '@Url.Action("GetAppType", "Application", new { Area = "Lessee" })',
+            dataType: "json",
+            success: function (data) {
+
+                $("#AuctionTypeId").data("kendoComboBox").value('');
+                $("#AuctionTypeId").kendoComboBox({
+                    dataSource: data,
+                    dataTextField: "Text",
+                    dataValueField: "Value",
+                    filter: "contains",
+                    minLength: 3,
+                    autoBind: false,
+                    change: function (e) {
+                        onChangeAuction();
+                        var appwidget = e.sender;
+                        if (appwidget.value() && appwidget.select() === -1) {
+                            appwidget.value(""); //reset widget
+                        }
+                    }
+                });
+            }
+        });*@
+
+
+        $(".regular").slick({
+            dots: true,
+            infinite: true,
+            /*autoplay: true,
+            autoplaySpeed: 2000,*/
+            slidesToShow: 5,
+            slidesToScroll: 1
+        });
+
+
+        $(".slick-next").css('display', 'block');
+        $(".slick-next").css('right', '0px');
+        $('.slick-prev').css('display', 'block');
+        $(".slick-prev").css('left', '-2px');
+        $(".slick-prev").css('width', '44px');
+        $(".slick-next").css('width', '58px');
+        $(".slick-next").css('padding-left', '36px');
+
+        $("#reject").click(function () {
+            $("#Remarks").prop('required', true);
+        });
+        $("#approve").click(function () {
+            $('#Remarks').prop('required', false);
+            if ($("#AuctionTypeId").val() == "1") {
+                $("#MonthlyAmount").hide();
+                $('#MonthlyPeriodicAmt').prop('required', false);
+                $('#MonthlyPeriodicAmtRate').prop('required', false);
+            }
+            else {
+                $("#MonthlyAmount").show();
+                $('#MonthlyPeriodicAmt').prop('required', true);
+                $('#MonthlyPeriodicAmtRate').prop('required', true);
+                //if ($('#MonthlyPeriodicAmt').val() == "") {
+                //    alert("Monthly Periodic Amount required !");
+                //    $('#MonthlyPeriodicAmt').focus();
+
+                //}
+                //if ($('#MonthlyPeriodicAmtRate').val() == "") {
+                //    alert("Select Monthly Periodic Amount Rate!");
+                //    $('#MonthlyPeriodicAmtRate').focus();
+                //}
+
+                $("#TR").removeClass("active");
+                $("#LI").addClass("tab-pane fade in active pointer");
+            }
+        });
+    });
+    //MEssage
+    @if (TempData["Message"] != null)
+    {
+                <Text>
+    alert('@TempData["Message"]')
+    </Text>
+    }
+
+@*     @if (Model.PERIOD_OF_RENEWAL_TO_INTIMATION == "Validity Expired")
+     {
+         <Text>
+    $("#PERIOD_OF_RENEWAL_TO").addClass('TodateExpiry')
+    $("#PERIOD_OF_RENEWAL_TO").prop('title', '@Model.PERIOD_OF_RENEWAL_TO_INTIMATION')
+         </Text>
+     }
+
+     else if ((Model.PERIOD_OF_RENEWAL_TO_INTIMATION == "Done"))
+     {
+          <Text>
+    $("#PERIOD_OF_RENEWAL_TO").removeClass('TodateExpiry')
+    $("#PERIOD_OF_RENEWAL_TO").removeClass('TodateIntimation')
+         </Text>
+
+     }
+     else
+     {
+        <Text>
+    $("#PERIOD_OF_RENEWAL_TO").addClass('TodateIntimation')
+    $("#PERIOD_OF_RENEWAL_TO").prop('title', '@Model.PERIOD_OF_RENEWAL_TO_INTIMATION')
+    </Text>
+     }*@
+    @{ string UserType = "Lessee"; }
+    @*@if (CHiMMS_MVC.Models.Generic.SessionWrapper.UserType != "District User")*@
+          @if (UserType != "District User")
+    {
+        //For Disabling all DOM if  is  Forwarded to DD/DMO and Approval is Pending
+        if (Model.STATUS == 1)
+        {
+             <Text>
+
+    $('.pointer').css("pointer-events", "none");
+    $('.btnsave').hide();
+
+             </Text>
+        }
+        else if (Model.STATUS == 2)
+        {
+
+        }
+            <Text>   $('#Remarks').attr('readonly', 'readonly');
+    $('#MonthlyPeriodicAmt').attr('readonly', 'readonly');
+    $('#MonthlyPeriodicAmtRate').attr('readonly', 'readonly');  </Text>
+    }
+    else  // While Approving or Rejectiong By DG/DMO
+    {
+                       <Text>
+    $("#Remarks").removeAttr("readonly");
+    $('#MonthlyPeriodicAmt').removeAttr('readonly');
+    $('#MonthlyPeriodicAmtRate').removeAttr('readonly');
+    $('.slider').css("pointer-events", "none");
+    </Text>
+        if (Model.STATUS == 1)
+        {
+
+        <Text>
+    $('.btnsave').hide();
+    $('.DMO-Button').show();
+    $('.pointer').css("pointer-events", "none");
+    </Text>
+        }
+        else
+        {
+         <Text> $('.pointer').css("pointer-events", "none");
+    $('.btnsave').hide();
+    $('.DMO-Button').hide();   </Text>
+        }
+    }
+
+    $(function () {
+        return { "__RequestVerificationToken": $('input[name=__RequestVerificationToken]').val() }
+    });
+
+    @* $(function () {
+        if ($('#APPLICATION_ID').val() > 0) {
+            var kendoList = $("#MineralCount").data("kendoMultiSelect");
+            kendoList.value(@Model.MINERAL_NAME);
+        }
+    });*@
+</script>
+<script>
+    (function () {
+       
+        @*var lesseeType = "@CHiMMS_MVC.Models.Generic.SessionWrapper.UserRoleInfo";*@
+        var lesseeType = "ML";
+        //console.log(lesseeType);
+
+        switch (lesseeType) {
+            case "RP":
+                $("#LBL_RECONNAISSANCE_LICENSE_NAME").html("Reconnaissance License Name");
+                $("#LBL_APPLICATION_FORM_COPY").html("Application Form(Major)");
+                $("#LBL_RECONNAISSANCE_LICENSE_ADDRESS").html("Reconnaissance License Address");
+                $("#LBL_PROSPECTING_VALIDITY_FROM").html("Prospecting Validity From");
+                $("#LBL_PROSPECTING_VALIDITY_TO").html("Prospecting Validity To");
+                break;
+            case "MAJOR PL":
+                $("#LBL_RECONNAISSANCE_LICENSE_NAME").html("Prospecting License Name");
+                $("#LBL_RECONNAISSANCE_LICENSE_ADDRESS").html("Prospecting License Address");
+                $("#LBL_APPLICATION_FORM_COPY").html("Application Form - PL (Major)");
+                $("#LBL_PROSPECTING_VALIDITY_FROM").html("Prospecting Validity From");
+                $("#LBL_PROSPECTING_VALIDITY_TO").html("Prospecting Validity To");
+                break;
+            case "ML_RML":
+                $("#LBL_RECONNAISSANCE_LICENSE_NAME").html("Lease Name");          //ML_RML
+                $("#LBL_RECONNAISSANCE_LICENSE_ADDRESS").html("Lease Address");
+                $("#LBL_APPLICATION_FORM_COPY").html("Application Form - ML/RML");
+                $("#LBL_PROSPECTING_VALIDITY_FROM").html("Lease  Validity From");
+                $("#LBL_PROSPECTING_VALIDITY_TO").html("Lease Validity To");
+                break;
+            case "MINOR PL":
+                $("#LBL_RECONNAISSANCE_LICENSE_NAME").html("Prospecting License Name");
+                $("#LBL_RECONNAISSANCE_LICENSE_ADDRESS").html("Prospecting LicenseAddress");
+                $("#LBL_APPLICATION_FORM_COPY").html("Application Form - PL Minor");
+                $("#LBL_PROSPECTING_VALIDITY_FROM").html("Prospecting Validity From");
+                $("#LBL_PROSPECTING_VALIDITY_TO").html("Prospecting Validity To");
+                break;
+            case "MINOR-OL&QP":
+                $("#LBL_RECONNAISSANCE_LICENSE_NAME").html("Lease Name");
+                $("#LBL_RECONNAISSANCE_LICENSE_ADDRESS").html("Lease Address");
+                $("#LBL_APPLICATION_FORM_COPY").html("Application Form - QL&QP");
+                $("#LBL_PROSPECTING_VALIDITY_FROM").html("Lease  Validity From");
+                $("#LBL_PROSPECTING_VALIDITY_TO").html("Lease Validity To");
+                break;
+            default: return;
+        }
+    })();
+</script>
+
+<script>
+    function validateWBandLab(btnAction) {
+        if ($("#WBInstalled").val() == null || $("#WBInstalled").val() == "") {
+            alert('Please select WB Installed');
+            $(".WBInstalled").focus();
+            $("#TR").removeClass("active");
+            $("#LI").addClass("tab-pane fade in active");
+            return false;
+        }
+
+        if ($("#WBInstalled").data("kendoComboBox").text().toString().toUpperCase() == "YES") {
+            if ($("#WBStampDate").val() == null || $("#WBStampDate").val() == "") {
+                alert('Please Enter Stamping Date');
+                $("#TR").removeClass("active");
+                $("#LI").addClass("tab-pane fade in active");
+                $(".WBStampDate").focus();
+                return false;
+            }
+            else if ($("#WBValidUpto").val() == null || $("#WBValidUpto").val() == "") {
+                alert('Please Enter WB Valid Upto');
+                $("#TR").removeClass("active");
+                $("#LI").addClass("tab-pane fade in active");
+                $(".WBValidUpto").focus();
+                return false;
+            }
+        }
+        if (btnAction == 'Forward To DD') {
+            if (WBExemptionfilesize == 0 && $('#WBExemption_FILE').val() == "") {
+                alert('Please Upload ' + $("#lblWBUpload").text());
+                $("#TR").removeClass("active");
+                $("#LI").addClass("tab-pane fade in active");
+                $(".WBExemption_Upload").focus();
+                return false;
+            }
+        }
+        else if (btnAction == undefined) {
+            if (WBExemptionfilesize == 0 && $('#WBExemption_FILE').val() == "") {
+                alert('Please Upload ' + $("#lblWBUpload").text());
+                $("#TR").removeClass("active");
+                $("#LI").addClass("tab-pane fade in active");
+                $(".WBExemption_Upload").focus();
+                return false;
+            }
+        }
+
+        if ($("#LabEstablished").val() == null || $("#LabEstablished").val() == "") {
+            alert('Please select Lab Established');
+            $("#TR").removeClass("active");
+            $("#LI").addClass("tab-pane fade in active");
+            $(".LabEstablished").focus();
+            return false;
+        }
+
+        if ($("#LabEstablished").data("kendoComboBox").text().toString().toUpperCase() == "YES" || $("#LabEstablished").data("kendoComboBox").text().toString().toUpperCase() == "NO") {
+            if (btnAction == 'Forward To DD') {
+                if (LabExemptionfilesize == 0 && ($('#LabExemption_FILE').val() == undefined || $('#LabExemption_FILE').val() == "")) {
+                    alert('Please ' + $("#lblLabUpload").text());
+                    $("#TR").removeClass("active");
+                    $("#LI").addClass("tab-pane fade in active");
+                    $(".LabEstablished_Upload").focus();
+                    return false;
+                }
+            }
+            else if (btnAction == undefined) {
+                if (LabExemptionfilesize == 0 && $('#LabExemption_FILE').val() == "") {
+                    alert('Please ' + $("#lblLabUpload").text());
+                    $("#TR").removeClass("active");
+                    $("#LI").addClass("tab-pane fade in active");
+                    $(".LabEstablished_Upload").focus();
+                    return false;
+                }
+            }
+
+        }
+        //else if ($("#LabEstablished").data("kendoComboBox").text().toString().toUpperCase() == "NO") {
+        //    if (btnAction == 'Forward To DD') {
+
+        //    }
+        //    if (LabExemptionfilesize == 0 && $('#LabExemption_FILE').val() == undefined) {
+        //        alert('Please Upload ' + $("#lblLabUpload").text());
+        //        $("#TR").removeClass("active");
+        //        $("#LI").addClass("tab-pane fade in active");
+        //        $(".LabEstablished_Upload").focus();
+        //        return false;
+        //    }
+        //}
+    }
+    function OnSave() {
+        if (validateWBandLab() != false && OnAdjuestCessSelectedAdjuestCessSelected() != false) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+    function ValidateDsc(btnAction) {
+
+        var Type;
+        if (btnAction == 'Forward To DD') {
+            Type = 'forward';
+        }
+        else if (btnAction == 'Approve') {
+            Type = 'Approve';
+            $("#Remarks").prop('required', false);
+        }
+        if (btnAction == 'Reject') {
+            Type = 'Reject';
+            $("#Remarks").prop('required', true);
+
+            if ($("#Remarks").val() == "") {
+                $("#Remarks").focus();
+                alert('Remarks is required!')
+                return;
+            }
+        }
+        if (confirm("Before " + Type + " you need to apply your Digital Signature. Are you confirmed to " + Type + " Profile??")) {
+
+            var Postdata = 'action=signdoc' + "\n" + 'datatosign=Digital Signature Required' + "\n" + 'signaction=sign' + "\n" + 'filepath=' + "\n" + 'panNumberParam=' + "\n" + 'expirycheck=false' + "\n" + 'issuername=' + "\n" + 'certclass=1|2|3' + "\n" + 'certtype=ALL';
+            connection.send(Postdata);
+
+            connection.onerror = function (error) {
+                alert('Please check the server connection: ' + error);
+                alert(error);
+            };
+
+            connection.onmessage = function (e) { // when DSC is success then following function executed.
+                if (e.data.indexOf("subProtocol") == -1) {
+                    //debugger;
+                    //alert(e.data);
+                    $("#DSCResponse").val(e.data).change();
+                    $.ajax(
+                    {
+
+                        url: '@Url.Action("CheckVerifyResponse", "ForwardingNote", new { Area = "Transit" })',
+                        type: "POST",
+                        data: { contentType: "pkcs7", signDataBase64Encoded: e.data, responseType: "plain" },
+                        success: function (msg) {
+                            if (msg == "SUCCESS") {
+                                //  debugger;
+
+                                if (btnAction == "Forward To DD") {
+                                    $("#SubResion").val("Forward To DD");
+                                }
+                                else if (btnAction == "Approve") {
+                                    $("#SubApprove").val("Approve");
+                                }
+                                else if (btnAction == "Reject") {
+                                    $("#SubReject").val("Reject");
+                                }
+                                $("#frmApplicationProfile").submit();
+                            }
+                        }
+                    });
+
+
+
+                }
+                else {
+                    alert(e.data);
+                }
+
+
+            };
+        }
+        else {
+            return false;
+        }
+    }
+    //create By Kavita
+    function OnForwarding(btnAction) {
+        //var checkdata = checkFields();
+        //if (checkdata == 1) {
+        var result1 = OnAdjuestCessSelectedAdjuestCessSelected();
+        var result = validateWBandLab(btnAction);
+
+
+        if (result != false && result1 != false) {
+            if (ValidateDsc(btnAction) != false) {
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
+
+
+        //}
+        //else {
+        //    return false;
+        //}
+    }
+
+    var financialcopyfilesize = 0;
+
+    $('input[name="OrderAttachemtFileCopy"]').bind('change', function () {
+        financialcopyfilesize = this.files[0].size;
+        return false;
+    });
+    function OnAdjuestCessSelectedAdjuestCessSelected() {
+
+        var SelectedRadioVal1 = $("input[name='AdjustCess']:checked").val()
+        if (SelectedRadioVal1 == 'Yes') {
+
+            if ($("#OrderOf").val() == null || $("#OrderOf").val() == "") {
+
+                alert('Please enter Order Of');
+                return false;
+            }
+            if ($("#OrderNo").val() == null || $("#OrderNo").val() == "") {
+
+                alert('Please enter Order No');
+                return false;
+            }
+            if ($("#OrderDate").val() == null || $("#OrderDate").val() == "") {
+
+                alert('Please select Order Date');
+                return false;
+            }
+
+
+            if ($("#OrderAttachment_Path").val() == null) {
+
+                if (financialcopyfilesize = "0") {
+                    alert('Please select Order Attachemt File Copy');
+                    return false;
+                }
+            }
+
+            return true;
+        }
+        else {
+            return true;
+        }
+
+    }
+
+
+    function GetAuctionID() {
+        return {
+            MineralType: '@ViewBag.MineralType'
+        };
+}
+
+function paymentModeChange(e) {
+    if (e.value == "BG") {
+        $("#DDDiv").hide();
+        $("#CopyofDD").hide();
+        $("#BGDiv").show();
+        $("#CopyofPerformanceSecurity").show();
+    }
+    else {
+        $("#BGDiv").hide();
+        $("#CopyofPerformanceSecurity").hide();
+        $("#DDDiv").show();
+        $("#CopyofDD").show();
+    }
+    $("#CopyOfPerformanceDiv").show();
+}
+
+function StorageCrusherChange(e) {
+    if ($("input[name='StorageCrusher']:checked").val() == "Yes") {
+        $("#CrusherInstalledDiv").show();
+        $('input[name="CrusherInstalled"]').trigger("change");
+    }
+    else {
+        $("#CrusherInstalledDiv").hide();
+        $("#LicenseStorageCopy").hide();
+    }
+}
+
+function CrusherInstalledChange(e) {
+    if ($("input[name='CrusherInstalled']:checked").val() == "Yes") {
+        $("#LicenseStorageCopy").hide();
+    }
+    else {
+        $("#LicenseStorageCopy").show();
+    }
+}
+var WBExemptionfilesize = 0, LabExemptionfilesize = 0;
+$('input[name="WBExemption_Upload"]').bind('change', function () {
+    WBExemptionfilesize = this.files[0].size;
+    return false;
+});
+
+$('input[name="LabExemption_Upload"]').bind('change', function () {
+    LabExemptionfilesize = this.files[0].size;
+    return false;
+});
+
+function onChangeWBExemption() {
+
+    //$('#WBExemption_Upload').data('kendoUpload').wrapper.find(".k-file").remove();
+    $('#WBExemption_Upload').data('kendoUpload').wrapper.find(".k-reset").remove();
+    $('#WBExemption_Upload').data('kendoUpload').wrapper.find(".k-upload-status-total").remove();
+
+    WBExemptionfilesize = 0;
+    HideshowWbAndLabUpload();
+    $('#WbFile').hide();
+
+    $('input[name="WBExemption_Upload"]').bind('change', function () {
+        WBExemptionfilesize = this.files[0].size;
+        return false;
+    });
+}
+function onChangeLABExemption() {
+
+    //$('#LabExemption_Upload').data('kendoUpload').wrapper.find(".k-file").remove();
+    $('#LabExemption_Upload').data('kendoUpload').wrapper.find(".k-reset").remove();
+    $('#LabExemption_Upload').data('kendoUpload').wrapper.find(".k-upload-status-total").remove();
+
+    LabExemptionfilesize = 0;
+
+    HideshowWbAndLabUpload()
+    $('#labFile').hide();
+
+    $('input[name="LabExemption_Upload"]').bind('change', function () {
+        LabExemptionfilesize = this.files[0].size;
+        return false;
+    });
+}
+
+function HideshowWbAndLabUpload() {
+    if ($("#WBInstalled").data("kendoComboBox").text().toString().toUpperCase() == "YES") {
+
+        $("#lblWBUpload").text("Upload Stamping Certificate");
+        $("#WBUpload").css("display", "block");
+        $(".DivWBExemption").css("display", "block");
+
+    }
+    else if ($("#WBInstalled").data("kendoComboBox").text().toString().toUpperCase() == "NO") {
+        $("#lblWBUpload").text("Order copy of WB Exemption");
+        $("#WBUpload").css("display", "block");
+        $(".DivWBExemption").css("display", "none");
+    }
+    else {
+
+        $("#WBUpload").css("display", "none");
+    }
+
+    if ($("#LabEstablished").data("kendoComboBox").text().toString().toUpperCase() == "YES") {
+        $("#lblLabUpload").text("Upload copy of  Inspection report by Officials(RH,DGM)");
+        $("#DivLabExemption").css("display", "block");
+    }
+    else if ($("#LabEstablished").data("kendoComboBox").text().toString().toUpperCase() == "NO") {
+        $("#lblLabUpload").text("Upload order copy of exemption by DGM/MRD");
+        $("#DivLabExemption").css("display", "block");
+
+    }
+    else {
+        $("#DivLabExemption").css("display", "none");
+    }
+}
+
+</script>
+@*<div class="page-container row-fluid container-fluid">*@
+<!-- SIDEBAR - START -->
+@*<div class="page-sidebar fixedscroll">
+        <!-- MAIN MENU - START -->
+        <uc1:leftsider runat="server" ID="leftsider" />
+        <!-- MAIN MENU - END -->
+    </div>*@
+<!--  SIDEBAR - END -->
+<!-- START CONTENT -->
+@*<div id="main-content">*@
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        @*<uc1:navigation runat="server" ID="navigation" />*@
+        @Html.Partial("_navigation")
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="javascript:void(0);">
+                                Lesse Details
+                            </a>
+                        </li>
+                    </ul>
+                    @Html.Partial("_util")
+                </div>
+
+                <section class="box form-container">
+                    <div class="content-body">
+                        @using (Html.BeginForm("LesseeDetails", "UserInformation", FormMethod.Post, new { enctype = "multipart/form-data", AUTOCOMPLETE = "Off", id = "form1" }))
+                        {
+                            @Html.HiddenFor(x => x.CREATED_BY)
+                            @Html.AntiForgeryToken()
+                            @Html.HiddenFor(model => model.APPLICATION_ID)
+                            @(Html.HiddenFor(model => model.DSCResponse))
+                            @(Html.HiddenFor(model => model.SubResion))
+                            @(Html.HiddenFor(model => model.SubApprove))
+                            @(Html.HiddenFor(model => model.SubReject))
+                            @(Html.HiddenFor(model => model.LabExemption_FILE))
+                            @(Html.HiddenFor(model => model.WBExemption_FILE))
+                            @(Html.HiddenFor(model => model.OrderAttachment_Path))
+                            <ul class="nav nav-tabs progressbar border-0" id="myTab" role="tablist">
+                                <li class="startstep activestep1">
+                                    <a class="active" id="lease-tab" data-toggle="tab" href="#lease" role="tab" aria-controls="lease" aria-selected="true">Lease Information</a>
+                                </li>
+                                <li>
+                                    <a id="Attachments-tab" data-toggle="tab" href="#Attachments" role="tab" aria-controls="Attachments" aria-selected="false">Attachments</a>
+                                </li>
+                                <li>
+                                    <a id="Fees-tab" data-toggle="tab" href="#Fees" role="tab" aria-controls="Fees" aria-selected="false">Fees Details</a>
+                                </li>
+                                <li>
+                                    <a id="Transfer-tab" data-toggle="tab" href="#Transfer" role="tab" aria-controls="Transfer" aria-selected="false">Transfer</a>
+                                </li>
+                            </ul>
+                            <div class="tab-content" id="myTabContent">
+                                <div class="tab-pane fade show active" id="lease" role="tabpanel" aria-labelledby="lease-tab">
+                                    <h5 class="text-brown font-weight-bold">Lease Information</h5>
+
+                                    <div class="row">
+                                        <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                            <label class="col-form-label font-weight-bolder">Lease Type<span class="text-danger">*</span></label>
+
+
+                                            @Html.DropDownListFor(model => model.APPLICATION_TYPE_ID, ViewBag.ViewUserList as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control", autofocus = "autofocus", required = "required" })
+
+                                        </div>
+                                        <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                            <label class="col-form-label font-weight-bolder">Application Number<span class="text-danger">*</span></label>
+                                            @Html.TextBoxFor(m => m.APPLICATION_NUMBER, new { @class = "form-control" })
+                                        </div>
+                                        <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                            <label class="col-form-label font-weight-bolder">Application Form(Major)<span class="text-danger">*</span></label>
+                                            <div class="custom-file">
+                                                <input type="file" class="custom-file-input" id="flApplForm" name="flApplForm">
+                                                <label class="custom-file-label" for="customFile">Choose Files</label>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                            <label class="col-form-label font-weight-bolder">Mine Code <span class="text-danger">*</span></label>
+                                            @Html.TextBoxFor(m => m.MINE_CODE, new { @class = "form-control" })
+                                        </div>
+                                        <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                            <label for="inputLoginId" class="col-form-label font-weight-bolder">Lease Name  <span class="text-danger">*</span></label>
+                                            @Html.TextBoxFor(m => m.RECONNAISSANCE_LICENSE_NAME, new { @class = "form-control" })
+                                        </div>
+                                        <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                            <label for="inputLoginId" class="col-form-label font-weight-bolder">Lease Address<span class="text-danger">*</span></label>
+                                            @Html.TextBoxFor(m => m.RECONNAISSANCE_LICENSE_ADDRESS, new { @class = "form-control" })
+                                        </div>
+
+                                        <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                            <label class="col-form-label font-weight-bolder">PAN Card Number<span class="text-danger">*</span></label>
+                                            @Html.TextBoxFor(m => m.PAN_CARD_NO, new { @class = "form-control" })
+                                        </div>
+                                        <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                            <label class="col-form-label font-weight-bolder">PAN Card Copy<span class="text-danger">*</span></label>
+                                            <div class="custom-file">
+                                                <input type="file" class="custom-file-input" id="flPanCard" name="flPanCard">
+                                                <label class="custom-file-label" for="customFile">Choose Files</label>
+                                            </div>
+                                            <a href="@Url.Action("Download", "Application", new { name = Model.PAN_CARD_COPY_FILE_NAME, path = Model.PAN_CARD_COPY_FILE_PATH })" target="_blank" class="file-download-licensee">@((Model.PAN_CARD_COPY_FILE_NAME != null) ? Model.PAN_CARD_COPY_FILE_NAME : "")</a>
+                                        </div>
+                                        <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                            <label for="inputLoginId" class="col-form-label font-weight-bolder">Adhar Card Number<span class="text-danger">*</span></label>
+                                            @Html.TextBoxFor(x => x.ADHAR_CARD, new { @maxlength = "12", @class = "form-control" })
+                                        </div>
+
+                                        <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                            <label class="col-form-label font-weight-bolder">Adhar Card Scan Copy<span class="text-danger">*</span></label>
+                                            <div class="custom-file">
+                                                <input type="file" class="custom-file-input" id="flAadhar" name="flAadhar">
+                                                <label class="custom-file-label" for="customFile">Choose Files</label>
+                                            </div>
+                                            <a href="@Url.Action("Download", "UserInformation", new { name = Model.ADHAR_CARD_SCAN_COPY_FILE_NAME, path = Model.ADHAR_CARD_SCAN_COPY_FILE_PATH })" target="_blank" class="file-download-licensee">@((Model.ADHAR_CARD_SCAN_COPY_FILE_NAME != null) ? Model.ADHAR_CARD_SCAN_COPY_FILE_NAME : "")</a>
+                                        </div>
+                                        <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                            <label class="col-form-label font-weight-bolder">Tin Card<span class="text-danger">*</span></label>
+                                            @Html.TextBoxFor(x => x.TIN_CARD, new { @maxlength = "20", @class = "form-control" })
+                                        </div>
+                                        <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                            <label class="col-form-label font-weight-bolder">Tin Card Copy<span class="text-danger">*</span></label>
+                                            <div class="custom-file">
+                                                <input type="file" class="custom-file-input" id="flTinCard" name="flTinCard">
+                                                <label class="custom-file-label" for="customFile">Choose Files</label>
+                                            </div>
+                                            <a href="@Url.Action("Download", "Application", new { name = Model.TIN_CARD_SCAN_COPY_FILE_NAME, path = Model.TIN_CARD_SCAN_COPY_FILE_PATH })" target="_blank" class="file-download-licensee">@((Model.TIN_CARD_SCAN_COPY_FILE_NAME != null) ? Model.TIN_CARD_SCAN_COPY_FILE_NAME : "")</a>
+                                        </div>
+
+                                        <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                            <label class="col-form-label font-weight-bolder">Firm Registration Deed Number<span class="text-danger">*</span></label>
+                                            @Html.TextBoxFor(x => x.FIRMREGISTRATION_DEED_NUMBER, new { @maxlength = "50", @class = "form-control" })
+                                        </div>
+                                        <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                            <label class="col-form-label font-weight-bolder">Firm Registration Deed Document<span class="text-danger">*</span></label>
+                                            <div class="custom-file">
+                                                <input type="file" class="custom-file-input" id="flDeedNo" name="flDeedNo">
+                                                <label class="custom-file-label" for="customFile">Choose Files</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                            <label class="col-form-label font-weight-bolder">Certification Of Incorporation Number<span class="text-danger">*</span></label>
+                                            @Html.TextBoxFor(x => x.CERTIFICATE_OF_INCORPORATION_NUMBER, new { @maxlength = "50", @class = "form-control" })
+                                        </div>
+
+                                        <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                            <label class="col-form-label font-weight-bolder">Certification Of Incorporation Document<span class="text-danger">*</span></label>
+                                            <div class="custom-file">
+                                                <input type="file" class="custom-file-input" id="flIncorporation" name="flIncorporation">
+                                                <label class="custom-file-label" for="customFile">Choose Files</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                            <label class="col-form-label font-weight-bolder">WB Installed<span class="text-danger">*</span></label>
+                                            @Html.DropDownListFor(model => model.WBInstalled, new List<SelectListItem>
+              {
+                                           new SelectListItem{ Text="--Select--", Value = "3",Selected=true },
+                  new SelectListItem{ Text="Yes", Value = "1" },
+                  new SelectListItem{ Text="No", Value = "0" },
+
+               }, new { @class = "form-control", required = "required", autofocus = "autofocus" })
+
+                                        </div>
+                                        <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                            <label class="col-form-label font-weight-bolder">Lab Established<span class="text-danger">*</span></label>
+                                            @Html.DropDownListFor(model => model.LabEstablished, new List<SelectListItem>
+              {
+                  new SelectListItem{ Text="Yes", Value = "1" },
+                  new SelectListItem{ Text="No", Value = "0" },
+                  new SelectListItem{ Text="Not Applicable", Value = "2" ,Selected=true},
+
+               }, new { @class = "form-control", required = "required", autofocus = "autofocus" })
+
+                                        </div>
+
+                                        <div class="col-lg-4 col-md-6 col-sm-12 form-group" style="display: none">
+                                            <label class="col-form-label font-weight-bolder">Stamping Date<span class="text-danger">*</span></label>
+
+                                            <div class="input-group">
+                                                <input type="text" class="form-control datepicker" id="Text1">
+                                                <div class="input-group-prepend">
+                                                    <label class="input-group-text" for="inputDate1"><i class="far fa-calendar"></i></label>
+                                                </div>
+                                            </div>
+
+                                        </div>
+
+                                        <div class="col-lg-4 col-md-6 col-sm-12 form-group" id="DivLabExemption" style="display: none;">
+                                            <label class="col-form-label font-weight-bolder">Order copy of LAB Exemption<span class="text-danger">*</span></label>
+                                            <div class="custom-file">
+                                                <input type="file" class="custom-file-input" id="flInspection" name="flInspection">
+                                                <label class="custom-file-label" for="customFile">Choose Files</label>
+                                            </div>
+                                            <a href="@Model.LabExemption_PATH" target="_blank" class="file-download-licensee">@((Model.LabExemption_PATH != null) ? Model.LabExemption_FILE : "")</a>
+                                        </div>
+                                        <div class="col-lg-4 col-md-6 col-sm-12 form-group DivWBExemption" style="display: none">
+                                            <label class="col-form-label font-weight-bolder">Valid up to<span class="text-danger">*</span></label>
+
+                                            <div class="input-group">
+
+                                                @Html.TextBoxFor(m => m.WBValidUpto, new { @class = "form-control datepicker", id = "WB_ValidityUpto" })
+                                                <div class="input-group-prepend">
+                                                    <label class="input-group-text" for="WB_ValidityUpto"><i class="far fa-calendar"></i></label>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                        <div class="col-lg-4 col-md-6 col-sm-12 form-group" id="WBUpload" style="display: none;">
+                                            <label class="col-form-label font-weight-bolder">Order copy of  WB Exemption<span class="text-danger">*</span></label>
+                                            <div class="custom-file">
+                                                <input type="file" class="custom-file-input" id="flWBExemp" name="flWBExemp">
+                                                <label class="custom-file-label" for="customFile">Choose Files</label>
+                                            </div>
+                                            <a id="WbFile" href="@Model.WBExemption_PATH" target="_blank" class="file-download-licensee">@((Model.WBExemption_PATH != null) ? Model.WBExemption_FILE : "")</a>
+                                        </div>
+                                        <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                            <label class="col-form-label font-weight-bolder">Application Type<span class="text-danger">*</span></label>
+
+                                            @Html.DropDownListFor(model => model.AuctionTypeId, ViewBag.ViewAuctionList as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control", autofocus = "autofocus", required = "required" })
+
+                                        </div>
+                                        <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                            <label class="col-form-label font-weight-bolder">Do you have Storage/Crusher<span class="text-danger">*</span></label>
+                                            <div class="py-2">
+                                                <div class="custom-control custom-radio custom-control-inline">
+                                                    @Html.RadioButtonFor(model => model.StorageCrusher, "Yes", new { id = "St_Yes", onchange = "StorageCrusherChange(this)" }) Yes
+                                                    @Html.RadioButtonFor(model => model.StorageCrusher, "No", new { id = "St_No", onchange = "StorageCrusherChange(this)" }) No
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-4 col-md-6 col-sm-12 form-group" style="display: none;" id="CrusherInstalledDiv">
+                                            <label class="col-form-label font-weight-bolder">Crusher Installed within Lease Hold Area<span class="text-danger">*</span></label>
+                                            @Html.RadioButtonFor(model => model.CrusherInstalled, "Yes", new { id = "Yes", onchange = "CrusherInstalledChange(this)" }) Yes
+                                            @Html.RadioButtonFor(model => model.CrusherInstalled, "No", new { id = "No", onchange = "CrusherInstalledChange(this)" }) No
+                                        </div>
+                                        <div class="col-lg-4 col-md-6 col-sm-12 form-group" id="LicenseStorageCopy" style="display: none;">
+                                            <label class="col-form-label font-weight-bolder">Copy of License of Storage/Crusher<span class="text-danger">*</span></label>
+                                            <div class="custom-file">
+                                                <input type="file" class="custom-file-input" id="flLicenseCursher" name="flLicenseCursher">
+                                                <label class="custom-file-label" for="customFile">Choose Files</label>
+                                            </div>
+                                            <a href="@Url.Action("Download", "Application", new { name = Model.StorageCrusherAttachment_FILE, path = Model.StorageCrusherAttachment_PATH })" target="_blank" class="file-download-licensee">@((Model.StorageCrusherAttachment_FILE != null) ? Model.StorageCrusherAttachment_FILE : "")</a>
+                                        </div>
+
+                                        @{ string ApplicantName = "ACC Jamul- Area : 36.001 (pathariya)", MineralName = "NON COAL";}
+
+                                        @if ((ApplicantName.Contains("Hindalco") || ApplicantName.Contains("Ambuja")) && MineralName.ToUpper() == "COAL")
+                                        {
+
+                                            <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                                <label class="col-form-label font-weight-bolder">Adjust E & I CESS from royalty<span class="text-danger">*</span></label>
+                                                @Html.RadioButtonFor(model => model.AdjustCess, "Yes", new { id = "AdCess_Yes", onchange = "onRadioChange();" }) Yes
+                                                @Html.RadioButtonFor(model => model.AdjustCess, "No", new { id = "AdCess_No", onchange = "onRadioChange();" }) No
+                                            </div>
+
+                                            <div class="row OrderDiv" style="display: none;">
+                                                <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                                    <label class="col-form-label font-weight-bolder">Order Of <span class="text-danger">*</span></label>
+                                                    @Html.TextBoxFor(x => x.OrderOf, new { @maxlength = "200", @class = "form-control" })
+                                                </div>
+                                                <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                                    <label class="col-form-label font-weight-bolder">Order No <span class="text-danger">*</span></label>
+                                                    @Html.TextBoxFor(x => x.OrderNo, new { @maxlength = "200", @class = "form-control" })
+                                                </div>
+                                            </div>
+                                            <div class="row OrderDiv" style="display: none;">
+
+                                                <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                                    <label class="col-form-label font-weight-bolder">Order Date<span class="text-danger">*</span></label>
+                                                    <div class="input-group">
+
+                                                        @Html.TextBoxFor(m => m.OrderDate, new { @class = "form-control datepicker", id = "dtOrderDate" })
+                                                        <div class="input-group-prepend">
+                                                            <label class="input-group-text" for="dtOrderDate"><i class="far fa-calendar"></i></label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                                    <label class="col-form-label font-weight-bolder">Order Attachment<span class="text-danger">*</span></label>
+                                                    <div class="custom-file">
+                                                        <input type="file" class="custom-file-input" id="flOrder" name="flOrder">
+                                                        <label class="custom-file-label" for="customFile">Choose Files</label>
+                                                    </div>
+                                                    <a id="OrderAttachemtFileCopy2" href="@Model.OrderAttachment_Path" target="_blank" class="file-download-licensee">@((Model.OrderAttachment_Path != null) ? Model.OrderAttachment_File : "")</a>
+                                                </div>
+                                            </div>
+
+                                        }
+                                        else if (UserType.ToUpper() == "DISTRICT USER")
+                                        {
+                                            if (Model != null && (Model.RECONNAISSANCE_LICENSE_NAME.Contains("Hindalco") || Model.RECONNAISSANCE_LICENSE_NAME.Contains("Ambuja")) && (Model.AdjustCess.Contains("Yes") || Model.AdjustCess.Contains("No")))
+                                            {
+                                                <div class="row">
+                                                    <div class="col-lg-4 col-md-6 col-sm-12 form-group ">
+                                                        <label class="col-form-label font-weight-bolder">Adjust E & I CESS from royalty<span class="text-danger">*</span></label>
+                                                        @Html.RadioButtonFor(model => model.AdjustCess, "Yes", new { id = "AdCess_Yes", onchange = "onRadioChange();" }) Yes
+                                                        @Html.RadioButtonFor(model => model.AdjustCess, "No", new { id = "AdCess_No", onchange = "onRadioChange();" }) No
+                                                    </div>
+                                                </div>
+                                                <div class="row OrderDiv" style="display: none;">
+                                                    <div class="col-lg-4 col-md-6 col-sm-12 form-group ">
+                                                        <label class="col-form-label font-weight-bolder">Order Of <span class="text-danger">*</span></label>
+                                                        @Html.TextBoxFor(x => x.OrderOf, new { @maxlength = "200", @class = "form-control" })
+                                                    </div>
+                                                    <div class="col-lg-4 col-md-6 col-sm-12 form-group ">
+                                                        <label class="col-form-label font-weight-bolder">Order No <span class="text-danger">*</span></label>
+                                                        @Html.TextBoxFor(x => x.OrderNo, new { @maxlength = "200", @class = "form-control" })
+                                                    </div>
+                                                </div>
+                                                <div class="row OrderDiv" style="display: none;">
+
+                                                    <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+
+                                                        <label class="col-form-label font-weight-bolder">Order Date<span class="text-danger">*</span></label>
+                                                        <div class="input-group">
+
+                                                            @Html.TextBoxFor(m => m.OrderDate, new { @class = "form-control datepicker", id = "dtOrderDate" })
+                                                            <div class="input-group-prepend">
+                                                                <label class="input-group-text" for="dtOrderDate"><i class="far fa-calendar"></i></label>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="col-lg-4 col-md-6 col-sm-12 form-group ">
+                                                        <label class="col-form-label font-weight-bolder">Order Attachment<span class="text-danger">*</span></label>
+                                                        <div class="custom-file">
+                                                            <input type="file" class="custom-file-input" id="flOrder1" name="flOrder1">
+                                                            <label class="custom-file-label" for="customFile">Choose Files</label>
+                                                        </div>
+                                                        <a id="OrderAttachemtFileCopy1" href="@Model.OrderAttachment_Path" target="_blank" class="file-download-licensee">@((Model.OrderAttachment_Path != null) ? Model.OrderAttachment_File : "")</a>
+                                                    </div>
+                                                </div>
+                                            }
+                                        }
+                                    </div>
+
+                                    <div class="row mt-3">
+                                        <div class="col-sm-12 text-center">
+                                            <a class="btn btn-danger btn-md ml-0 waves-effect waves-light">Reset</a>
+                                            <a class="btn btn-primary btn-md ml-0 waves-effect waves-light btnNext">Next</a>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="tab-pane fade" id="Attachments" role="tabpanel" aria-labelledby="Attachments-tab">
+                                    <h5 class="text-brown font-weight-bold">Attachments</h5>
+                                    <div class="row">
+                                        <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                            <label class="col-form-label font-weight-bolder">Power of Atorny<span class="text-danger">*</span></label>
+                                            <div class="custom-file">
+                                                <input type="file" class="custom-file-input" id="flAtorny" name="flAtorny">
+                                                <label class="custom-file-label" for="customFile">Choose Files</label>
+                                            </div>
+                                            <a href="@Url.Action("Download", "Application", new { name = Model.POWER_OF_ATORNY_FILE_NAME, path = Model.POWER_OF_ATORNY_FILE_PATH })" target="_blank" class="file-download-licensee">@((Model.POWER_OF_ATORNY_FILE_NAME != null) ? Model.POWER_OF_ATORNY_FILE_NAME : "")</a>
+                                        </div>
+                                        <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                            <label class="col-form-label font-weight-bolder">Affidavits/Mining Due Certificate<span class="text-danger">*</span></label>
+                                            <div class="custom-file">
+                                                <input type="file" class="custom-file-input" id="flDueCertificate" name="flDueCertificate">
+                                                <label class="custom-file-label" for="customFile">Choose Files</label>
+                                            </div>
+                                            <a href="@Url.Action("Download", "Application", new { name = Model.AFFIDAVITS_MINING_DUE_CERTIFICATE_FILE_NAME, path = Model.AFFIDAVITS_MINING_DUE_CERTIFICATE_FILE_PATH })" target="_blank" class="file-download-licensee">@((Model.AFFIDAVITS_MINING_DUE_CERTIFICATE_FILE_NAME != null) ? Model.AFFIDAVITS_MINING_DUE_CERTIFICATE_FILE_NAME : "")</a>
+                                        </div>
+                                        <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                            <label class="col-form-label font-weight-bolder">Khasara Panchsala<span class="text-danger">*</span></label>
+                                            <div class="custom-file">
+                                                <input type="file" class="custom-file-input" id="flKhasara" name="flKhasara">
+                                                <label class="custom-file-label" for="customFile">Choose Files</label>
+                                            </div>
+                                            <a href="@Url.Action("Download", "Application", new { name = Model.KHASARA_PANCHSALA_FILE_NAME, path = Model.KHASARA_PANCHSALA_FILE_PATH })" target="_blank" class="file-download-licensee">@((Model.KHASARA_PANCHSALA_FILE_NAME != null) ? Model.KHASARA_PANCHSALA_FILE_NAME : "")</a>
+                                        </div>
+
+                                        <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                            <label class="col-form-label font-weight-bolder">Map/Plan of applied area <span class="text-danger">*</span></label>
+                                            <div class="custom-file">
+                                                <input type="file" class="custom-file-input" id="flMap" name="flMap">
+                                                <label class="custom-file-label" for="customFile">Choose Files</label>
+                                            </div>
+                                            <a href="@Url.Action("Download", "Application", new { name = Model.MAP_PLAN_OF_APPLIED_AREA_FILE_NAME, path = Model.MAP_PLAN_OF_APPLIED_AREA_FILE_PATH })" target="_blank" class="file-download-licensee">@((Model.MAP_PLAN_OF_APPLIED_AREA_FILE_NAME != null) ? Model.MAP_PLAN_OF_APPLIED_AREA_FILE_NAME : "")</a>
+                                        </div>
+                                        <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                            <label for="inputLoginId" class="col-form-label font-weight-bolder">Forest Report <span class="text-danger">*</span></label>
+                                            <div class="custom-file">
+                                                <input type="file" class="custom-file-input" id="flForestRpt" name="flForestRpt">
+                                                <label class="custom-file-label" for="customFile">Choose Files</label>
+                                            </div>
+                                            <a href="@Url.Action("Download", "Application", new { name = Model.FOREST_REPORT_FILE_NAME, path = Model.FOREST_REPORT_FILE_PATH })" target="_blank" class="file-download-licensee">@((Model.FOREST_REPORT_FILE_NAME != null) ? Model.FOREST_REPORT_FILE_NAME : "")</a>
+                                        </div>
+                                        <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                            <label for="inputLoginId" class="col-form-label font-weight-bolder">Revenue Officer Report<span class="text-danger">*</span></label>
+                                            <div class="custom-file">
+                                                <input type="file" class="custom-file-input" id="flRevenue" name="flRevenue">
+                                                <label class="custom-file-label" for="customFile">Choose Files</label>
+                                            </div>
+                                            <a href="@Url.Action("Download", "Application", new { name = Model.REVENUE_OFFICER_REPORT_FILE_NAME, path = Model.REVENUE_OFFICER_REPORT_FILE_PATH })" target="_blank" class="file-download-licensee">@((Model.REVENUE_OFFICER_REPORT_FILE_NAME != null) ? Model.REVENUE_OFFICER_REPORT_FILE_NAME : "")</a>
+                                        </div>
+
+                                        <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                            <label class="col-form-label font-weight-bolder">Spot Inspection and Analysis Report<span class="text-danger">*</span></label>
+                                            <div class="custom-file">
+                                                <input type="file" class="custom-file-input" id="flSpot" name="flSpot">
+                                                <label class="custom-file-label" for="customFile">Choose Files</label>
+                                            </div>
+                                            <a href="@Url.Action("Download", "Application", new { name = Model.SPOT_INSPECTION_AND_ANALYSIS_REPORT_FILE_NAME, path = Model.SPOT_INSPECTION_AND_ANALYSIS_REPORT_FILE_PATH })" target="_blank" class="file-download-licensee">@((Model.SPOT_INSPECTION_AND_ANALYSIS_REPORT_FILE_NAME != null) ? Model.SPOT_INSPECTION_AND_ANALYSIS_REPORT_FILE_NAME : "")</a>
+                                        </div>
+                                        <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                            <label class="col-form-label font-weight-bolder">Mining Inspector Report<span class="text-danger">*</span></label>
+                                            <div class="custom-file">
+                                                <input type="file" class="custom-file-input" id="flMI" name="flMI">
+                                                <label class="custom-file-label" for="customFile">Choose Files</label>
+                                            </div>
+                                            <a href="@Url.Action("Download", "Application", new { name = Model.MINING_INSPECTOR_REPORT_FILE_NAME, path = Model.MINING_INSPECTOR_REPORT_FILE_PATH })" target="_blank" class="file-download-licensee">@((Model.MINING_INSPECTOR_REPORT_FILE_NAME != null) ? Model.MINING_INSPECTOR_REPORT_FILE_NAME : "")</a>
+                                        </div>
+                                        <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                            <label for="inputLoginId" class="col-form-label font-weight-bolder">Gram Panchayat Proposal<span class="text-danger">*</span></label>
+                                            <div class="custom-file">
+                                                <input type="file" class="custom-file-input" id="flGramPanchayat" name="flGramPanchayat">
+                                                <label class="custom-file-label" for="customFile">Choose Files</label>
+                                            </div>
+                                            <a href="@Url.Action("Download", "Application", new { name = Model.GRAM_PANCHAYAT_PROPOSAL_FILE_NAME, path = Model.GRAM_PANCHAYAT_PROPOSAL_FILE_PATH })" target="_blank" class="file-download-licensee">@((Model.GRAM_PANCHAYAT_PROPOSAL_FILE_NAME != null) ? Model.GRAM_PANCHAYAT_PROPOSAL_FILE_NAME : "")</a>
+                                        </div>
+                                        @if (Model.MinorMineralFormAttachment_FILE != null)
+                                        {
+                                            <div class="col-lg-4 col-md-6 col-sm-12 form-group" id="minorMineralAttachment">
+                                                <label for="inputLoginId" class="col-form-label font-weight-bolder">Permission to sell mineral as MINOR MINERAL<span class="text-danger">*</span></label>
+                                                <div class="custom-file">
+                                                    <input type="file" class="custom-file-input" id="flMinorMineral" name="flMinorMineral">
+                                                    <label class="custom-file-label" for="customFile">Choose Files</label>
+                                                </div>
+                                                <a href="@Url.Action("Download", "Application", new { name = Model.MinorMineralFormAttachment_FILE, path = Model.MinorMineralFormAttachment_PATH })" target="_blank" class="file-download-licensee">@((Model.MinorMineralFormAttachment_FILE != null) ? Model.MinorMineralFormAttachment_FILE : "")</a>
+                                            </div>
+                                        }
+                                    </div>
+
+                                    <div class="row mt-3">
+                                        <div class="col-sm-12 text-center">
+
+                                            <a class="btn btn-dark btn-md ml-0 waves-effect waves-light btnPrevious">Previous</a>
+                                            <a class="btn btn-danger btn-md ml-0 waves-effect waves-light">Reset</a>
+                                            <a class="btn btn-primary btn-md ml-0 waves-effect waves-light btnNext">Next</a>
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <div class="tab-pane fade" id="Fees" role="tabpanel" aria-labelledby="Fees-tab">
+                                    <h5 class="text-brown font-weight-bold">Fees Details</h5>
+                                    <div class="row pointer" style="display: none;" id="PaymentMode">
+                                        <div class="col-lg-4 col-md-6 col-sm-12">
+
+                                            <label class="col-form-label font-weight-bolder">Payment Mode<span class="text-danger">*</span></label>
+                                            @Html.RadioButtonFor(model => model.PaymentModeType, "BG", new { id = "BG", onChange = "paymentModeChange(this)" }) BG
+                                            @Html.RadioButtonFor(model => model.PaymentModeType, "DD", new { id = "DD", onChange = "paymentModeChange(this)" }) DD
+                                        </div>
+                                        <div class="input-group">
+
+                                            @Html.TextBoxFor(m => m.BG_ValidityUpto, new { @class = "form-control datepicker", id = "BG_ValidityUpto" })
+                                            <div class="input-group-prepend">
+                                                <label class="input-group-text" for="BG_ValidityUpto"><i class="far fa-calendar"></i></label>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-4 col-md-6 col-sm-12" id="DDDiv" style="display: none;">
+                                            <label class="col-form-label font-weight-bolder">Amount of DD<span class="text-danger">*</span></label>
+                                            @Html.TextBoxFor(m => m.AmountOfDD, new { @class = "form-control" })
+                                        </div>
+                                    </div>
+
+                                    <div class=" row">
+                                        <div class="col-lg-4 col-md-6 col-sm-12">
+                                            <label class="col-form-label font-weight-bolder">Application Fees (Rs.)<span class="text-danger">*</span></label>
+                                            @Html.TextBoxFor(m => m.APPLICATION_FEES, new { @maxlength = "50", @class = "form-control" })
+                                        </div>
+                                        <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                            <label class="col-form-label font-weight-bolder">Application Fees Date<span class="text-danger">*</span></label>
+                                            <div class="input-group">
+                                                @Html.TextBoxFor(m => m.APPLICATION_FEES_DATE, new { @class = "form-control datepicker", id = "inputDate1" })
+                                                @*<input type="text" class="form-control datepicker" id="inputDate1">*@
+                                                <div class="input-group-prepend">
+                                                    <label class="input-group-text" for="inputDate1"><i class="far fa-calendar"></i></label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                            <label class="col-form-label font-weight-bolder">Application Fees Copy<span class="text-danger">*</span></label>
+                                            <div class="custom-file">
+                                                <input type="file" class="custom-file-input" id="flApplFee" name="flApplFee">
+                                                <label class="custom-file-label" for="customFile">Choose Files</label>
+                                            </div>
+                                            <a href="@Url.Action("Download", "Application", new { name = Model.APPLICATION_FEES_COPY_FILE_NAME, path = Model.APPLICATION_FEES_COPY_FILE_PATH })" target="_blank" class="file-download-licensee">@((Model.APPLICATION_FEES_COPY_FILE_NAME != null) ? Model.APPLICATION_FEES_COPY_FILE_NAME : "")</a>
+                                        </div>
+
+                                        <div class="col-lg-4 col-md-6 col-sm-12">
+                                            <label class="col-form-label font-weight-bolder">Security Deposit Challan/DD Amount (Rs.) <span class="text-danger">*</span></label>
+                                            @Html.TextBoxFor(m => m.CHALLAN_DD_AMOUNT, new { @maxlength = "50", @class = "form-control" })
+                                        </div>
+                                        <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                            <label for="inputLoginId" class="col-form-label font-weight-bolder">Security Deposit Challan/DD Date <span class="text-danger">*</span></label>
+                                            <div class="input-group">
+                                                @Html.TextBoxFor(m => m.CHALLAN_DD_AMOUNT_DATE, new { @class = "form-control datepicker", id = "dtChallanDD" })
+                                                <div class="input-group-prepend">
+                                                    <label class="input-group-text" for="dtChallanDD"><i class="far fa-calendar"></i></label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                            <label for="inputLoginId" class="col-form-label font-weight-bolder">Security Deposit Challan/DD Copy<span class="text-danger">*</span></label>
+                                            <div class="custom-file">
+                                                <input type="file" class="custom-file-input" id="flSecurityDD" name="flSecurityDD">
+                                                <label class="custom-file-label" for="customFile">Choose Files</label>
+                                            </div>
+                                            <a href="@Url.Action("Download", "Application", new { name = Model.CHALLAN_DD_AMOUNT_COPY_FILE_NAME, path = Model.CHALLAN_DD_AMOUNT_COPY_FILE_PATH })" target="_blank" class="file-download-licensee">@((Model.CHALLAN_DD_AMOUNT_COPY_FILE_NAME != null) ? Model.CHALLAN_DD_AMOUNT_COPY_FILE_NAME : "")</a>
+                                        </div>
+
+                                        <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                            <label class="col-form-label font-weight-bolder">Bank Guarrantee Amount (Rs.)<span class="text-danger">*</span></label>
+                                            @Html.TextBoxFor(m => m.BANK_GUARRANTEE_AMOUNT, new { @maxlength = "50", @class = "form-control" })
+                                        </div>
+                                        <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                            <label class="col-form-label font-weight-bolder">Bank Guarranty Date<span class="text-danger">*</span></label>
+                                            <div class="input-group">
+                                                @Html.TextBoxFor(m => m.BANK_GUARRANTEE_DATE, new { @class = "form-control datepicker", id = "dtBG" })
+                                                <div class="input-group-prepend">
+                                                    <label class="input-group-text" for="dtBG"><i class="far fa-calendar"></i></label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                            <label for="inputLoginId" class="col-form-label font-weight-bolder">Bank Guarranty Copy<span class="text-danger">*</span></label>
+                                            <div class="custom-file">
+                                                <input type="file" class="custom-file-input" id="flBG" name="flBG">
+                                                <label class="custom-file-label" for="customFile">Choose Files</label>
+                                            </div>
+                                            <a href="@Url.Action("Download", "Application", new { name = Model.BANK_GUARRANTEE_COPY_FILE_NAME, path = Model.BANK_GUARRANTEE_COPY_FILE_PATH })" target="_blank" class="file-download-licensee">@((Model.BANK_GUARRANTEE_COPY_FILE_NAME != null) ? Model.BANK_GUARRANTEE_COPY_FILE_NAME : "")</a>
+                                        </div>
+
+                                        <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                            <label class="col-form-label font-weight-bolder">Surety Bond Amount (Rs.)<span class="text-danger">*</span></label>
+                                            @Html.TextBoxFor(m => m.SURITY_BOND_AMOUNT, new { @maxlength = "50", @class = "form-control" })
+                                        </div>
+                                        <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                            <label class="col-form-label font-weight-bolder">Surety Bond Date<span class="text-danger">*</span></label>
+                                            <div class="input-group">
+                                                @Html.TextBoxFor(m => m.SURITY_BOND_DATE, new { @class = "form-control datepicker", id = "dtSecurityBond" })
+                                                <div class="input-group-prepend">
+                                                    <label class="input-group-text" for="dtSecurityBond"><i class="far fa-calendar"></i></label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                            <label for="inputLoginId" class="col-form-label font-weight-bolder">Surety Bond Copy<span class="text-danger">*</span></label>
+                                            <div class="custom-file">
+                                                <input type="file" class="custom-file-input" id="flSecurityBond" name="flSecurityBond">
+                                                <label class="custom-file-label" for="customFile">Choose Files</label>
+                                            </div>
+                                            <a href="@Url.Action("Download", "Application", new { name = Model.SURITY_BOND_COPY_FILE_NAME, path = Model.SURITY_BOND_COPY_FILE_PATH })" target="_blank" class="file-download-licensee">@((Model.SURITY_BOND_COPY_FILE_NAME != null) ? Model.SURITY_BOND_COPY_FILE_NAME : "")</a>
+                                        </div>
+                                        @if (Model != null && Model.AuctionTypeId == 2)
+                                        {
+                                            <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                                <label class="col-form-label font-weight-bolder">Amount of Performance Security<span class="text-danger">*</span></label>
+                                                @Html.TextBoxFor(model => model.UpfrontPaymentDeposited, new { @maxlength = "15", @class = "form-control1", @Readonly = "Readonly" })
+                                                @*@if (CHiMMS_MVC.Models.Generic.SessionWrapper.MineralTypeName == "Major Mineral" || CHiMMS_MVC.Models.Generic.SessionWrapper.MineralTypeName == "")
+                                                    {*@
+                                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                                                    <label class="col-form-label font-weight-bolder">Remaining Upfront Payment<span class="text-danger">*</span></label>
+                                                    @Html.TextBoxFor(model => model.TillDateBalanceUpfrontPayment, new { @maxlength = "15", @class = "form-control1", @Readonly = "Readonly" })
+                                                </div>
+                                                @*}*@
+                                            </div>
+                                        }
+                                        <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                            <label class="col-form-label font-weight-bolder">Fixed Deposits Monthly Income Scheme Certificate<span class="text-danger">*</span></label>
+
+                                            <div class="custom-file">
+                                                <input type="file" class="custom-file-input" id="flFD" name="flFD">
+                                                <label class="custom-file-label" for="customFile">Choose Files</label>
+                                            </div>
+                                            <a href="@Url.Action("Download", "Application", new { name = Model.FIXED_DEPOSITS_MONTHLY_INCOME_SCHEME_CERTIFICATE_FILE_NAME, path = Model.FIXED_DEPOSITS_MONTHLY_INCOME_SCHEME_CERTIFICATE_FILE_PATH })" target="_blank" class="file-download-licensee">@((Model.FIXED_DEPOSITS_MONTHLY_INCOME_SCHEME_CERTIFICATE_FILE_NAME != null) ? Model.FIXED_DEPOSITS_MONTHLY_INCOME_SCHEME_CERTIFICATE_FILE_NAME : "")</a>
+                                        </div>
+                                        <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                            <label class="col-form-label font-weight-bolder">Internet Connection Available distpatch Point<span class="text-danger">*</span></label>
+                                            @Html.DropDownListFor(model => model.IsInterNetConnectionAtDistpatch, new List<SelectListItem>
+             {
+                                          new SelectListItem{ Text="--Select--", Value = "3",Selected=true },
+                 new SelectListItem{ Text="Yes", Value = "1" },
+                 new SelectListItem{ Text="No", Value = "0" },
+
+              }, new { @class = "form-control", required = "required", autofocus = "autofocus" })
+                                        </div>
+                                        <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                            <label for="inputLoginId" class="col-form-label font-weight-bolder">Till Date Dispatch Quantity<span class="text-danger">*</span></label>
+                                            @Html.TextBoxFor(model => model.TillDateDispatchQty, new { @maxlength = "15", @class = "form-control1", @Readonly = "Readonly" })
+                                        </div>
+
+                                        <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                            <label class="col-form-label font-weight-bolder">Amount of Financial Assurance<span class="text-danger">*</span></label>
+                                            @Html.TextBoxFor(model => model.FinancialAmountAssurance, new { @maxlength = "15", @class = "form-control", @Readonly = "Readonly" })
+                                        </div>
+                                        <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                            <label class="col-form-label font-weight-bolder">Financial Assurance Copy<span class="text-danger">*</span></label>
+                                            <div class="custom-file">
+                                                <input type="file" class="custom-file-input" id="flFinancialAssurance" name="flFinancialAssurance">
+                                                <label class="custom-file-label" for="customFile">Choose Files</label>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                    <div class="row mt-3">
+                                        <div class="col-sm-12 text-center">
+
+                                            <a class="btn btn-dark btn-md ml-0 waves-effect waves-light btnPrevious">Previous</a>
+                                            <a class="btn btn-danger btn-md ml-0 waves-effect waves-light">Reset</a>
+                                            <a class="btn btn-primary btn-md ml-0 waves-effect waves-light btnNext">Next</a>
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <div class="tab-pane fade" id="Transfer" role="tabpanel" aria-labelledby="Transfer-tab">
+                                    <h5 class="text-brown font-weight-bold">Transfer</h5>
+                                    <div class="row">
+                                        <div class="col-lg-4 col-md-6 col-sm-12">
+                                            <label class="col-form-label font-weight-bolder">Name Of Transferee<span class="text-danger">*</span></label>
+                                            @Html.TextBoxFor(model => model.NAME_OF_TRANSFEREE, new { @maxlength = "15", @class = "form-control" })
+                                        </div>
+                                        <div class="col-lg-4 col-md-6 col-sm-12">
+                                            <label class="col-form-label font-weight-bolder">Address Of Transferee<span class="text-danger">*</span></label>
+                                            @Html.TextBoxFor(model => model.ADDRESS_OF_TRANSFEREE, new { @maxlength = "100", @class = "form-control" })
+                                        </div>
+                                        <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                            <label class="col-form-label font-weight-bolder">Transfer Grant Order Copy<span class="text-danger">*</span></label>
+                                            <div class="custom-file">
+                                                <input type="file" class="custom-file-input" id="flTRCopy" name="flTRCopy">
+                                                <label class="custom-file-label" for="customFile">Choose Files</label>
+                                            </div>
+                                            <a href="@Url.Action("Download", "Application", new { name = Model.TRANSFER_GRANT_ORDER_COPY_FILE_NAME, path = Model.TRANSFER_GRANT_ORDER_COPY_FILE_PATH })" target="_blank" class="file-download-licensee">@((Model.TRANSFER_GRANT_ORDER_COPY_FILE_NAME != null) ? Model.TRANSFER_GRANT_ORDER_COPY_FILE_NAME : "")</a>
+                                        </div>
+
+                                        <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                            <label class="col-form-label font-weight-bolder">Transfer Lease Deed Copy <span class="text-danger">*</span></label>
+                                            <div class="custom-file">
+                                                <input type="file" class="custom-file-input" id="flTRLeaseDeed" name="flTRLeaseDeed">
+                                                <label class="custom-file-label" for="customFile">Choose Files</label>
+                                            </div>
+                                            <a href="@Url.Action("Download", "Application", new { name = Model.TRANSFER_LEASE_DEED_COPY_FILE_NAME, path = Model.TRANSFER_LEASE_DEED_COPY_FILE_PATH })" target="_blank" class="file-download-licensee">@((Model.TRANSFER_LEASE_DEED_COPY_FILE_NAME != null) ? Model.TRANSFER_LEASE_DEED_COPY_FILE_NAME : "")</a>
+                                        </div>
+                                        <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                            <label for="inputLoginId" class="col-form-label font-weight-bolder">Date Of Transfer<span class="text-danger">*</span></label>
+                                            <div class="input-group">
+
+                                                @Html.TextBoxFor(m => m.DATE_OF_TRANSFER, new { @class = "form-control datepicker", id = "dtTRBond" })
+                                                <div class="input-group-prepend">
+                                                    <label class="input-group-text" for="dtTRBond"><i class="far fa-calendar"></i></label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                            <label for="inputLoginId" class="col-form-label font-weight-bolder">Remarks<span class="text-danger">*</span></label>
+                                            <textarea name="textAddress" rows="1" cols="20" id="textAddress" class="form-control"></textarea>
+                                        </div>
+                                    </div>
+
+
+                                    <div class="row mt-3">
+                                        <div class="col-sm-12 text-center">
+
+                                            @if (@Model.STATUS != 5)
+                                            {
+                                                <div class="row">
+                                                    <div class="col-lg-11 col-md-11 col-sm-11 col-xs-11 text-right margbtn">
+                                                        @if (UserType.ToUpper() == "LESSEE")
+                                                        {
+                                                            <input type="submit" value="Save & Update" class="btn btn-success btn-md ml-0 waves-effect waves-light " onclick="return OnSave();">
+
+                                                            <input type="button" title="Forward to DD" value="Forward To DD" name="cmd" class="btn btn-warning text-dark btn-md waves-effect waves-light" onclick="return OnForwarding('Forward To DD');" />
+                                                        }
+                                                        <input type="button" value="Approve" class="btn btn-dark btn-md ml-0 waves-effect waves-light btnPrevious" id="approve" name="approve" onclick="return OnForwarding('Approve');" style="display: none;">
+                                                        <input type="button" value="Reject" class="btn btn-danger btn-md ml-0 waves-effect waves-light" id="reject" name="reject" onclick="return OnForwarding('Reject');" style="display: none;">
+                                                    </div>
+                                                </div>
+                                            }
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+    <!-- MAIN CONTENT AREA ENDS -->
+</section>
+<uc1:footer runat="server" ID="footer" />
+@*</div>*@
+<!-- END CONTENT -->
+@*</div>*@
+
+<script>
+    indicateMe = "yes"
+    backMe = "yes"
+    $(document).ready(function () {
+        loadNavigation('LesseDetails', 'glRoleRes', 'pllesseprof', 'tl', 'Roles and Responsibity', 'Lessee Profile', ' ');
+    });
+</script>
+
+<script>
+    $(document).ready(function () {
+        $('.datepicker').datetimepicker({
+            format: 'LT',
+            format: 'DD-MM-YYYY',
+            daysOfWeekDisabled: [],
+        });
+    });
+</script>
+

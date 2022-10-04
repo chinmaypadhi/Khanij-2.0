@@ -1,0 +1,907 @@
+﻿@*// *********************************************************************************************************
+    //  View Name                : Grant
+    //  Desciption               : To Save and Update, Forward to DD, Delete Lesee Grant Order Details
+    //  Created By               : Lingaraj Dalai
+    //  Created On               : 16 July 2021
+    // ********************************************************************************************************
+*@
+@model MasterEF.GrantOrderViewModel;
+@using MasterEF;
+@using MasterApp.Web;
+@using Microsoft.AspNetCore.Mvc;
+@using  Microsoft.AspNetCore.Http;
+@inject IHttpContextAccessor HttpContextAccessor
+@{
+    ViewData["Title"] = "Grant";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+    UserLoginSession profile = HttpContextAccessor.HttpContext.Session.Get<UserLoginSession>(KeyHelper.UserKey);
+    //profile.MineralTypeName = "Major Mineral";
+    //profile.MineralName = "NON COAL";
+}
+@if (TempData["Message"] != null)
+{
+    <script>
+        swal("",'@TempData["Message"]',"success");
+    </script>
+}
+<script>
+    indicateMe = "yes"
+    backMe = "yes"
+    $(document).ready(function () {
+        $('.searchableselect').searchableselect();
+        loadNavigation('Grant', 'glUIS', 'pllesseprof', 'tl', 'Lessee Profile', 'Grant Order Details', ' ');
+        $('.datepicker').datetimepicker({
+            format: 'LT',
+            format: 'DD-MMM-YYYY',
+            daysOfWeekDisabled: [],
+            widgetPositioning: {
+                horizontal: 'auto',
+                vertical: 'bottom'
+            }
+        }).keydown(false);
+        onChangeAuction();
+        LeaseExtenderChange();
+        MinesAllotedChange();
+        MinesSectionChange();
+        if ($("#hdnGRANT_ORDER_DATE").val() != "") {
+            $("#inputGrantOrderDate").val($("#hdnGRANT_ORDER_DATE").val());
+        }
+        if ($("#hdnFROM_VALIDITY").val() != "") {
+            $("#inputFromValidity").val($("#hdnFROM_VALIDITY").val());
+        }
+        if ($("#hdnTO_VALIDITY").val() != "") {
+            $("#inputToValidity").val($("#hdnTO_VALIDITY").val());
+        }
+        if ($("#hdnEXECUTION_OF_DEED_DATE").val() != "") {
+            $("#inputExecDeedDate").val($("#hdnEXECUTION_OF_DEED_DATE").val());
+        }
+        if ($("#hdnMDPA_GRANT_ORDER_DATE").val() != "") {
+            $("#inputMDPAOrderDate").val($("#hdnMDPA_GRANT_ORDER_DATE").val());
+        }
+        if ($("#hdnMDPA_GRANT_AGREEMENT_DATE").val() != "") {
+            $("#inputMDPAAgreementDate").val($("#hdnMDPA_GRANT_AGREEMENT_DATE").val());
+        }
+        if ($("#hdnLEASEEXTENSION_FROM_VALIDITY").val() != "") {
+            $("#inputLeaseExtensionFromValidity").val($("#hdnLEASEEXTENSION_FROM_VALIDITY").val());
+        }
+        if ($("#hdnLEASEEXTENSION_TO_VALIDITY").val() != "") {
+            $("#inputLeaseExtensionToValidity").val($("#hdnLEASEEXTENSION_TO_VALIDITY").val());
+        }
+        //For Disabling all DOM if  is  Forwarded to DD/DMO and Approval is Pending
+        if (@Model.STATUS != null && @Model.STATUS != "") {
+            if (@Model.STATUS == 1) {
+                $('.form-control').css("pointer-events", "none");
+                $('.custom-radio').css("pointer-events", "none");
+                $('.btnsave').hide();
+                $('.btnsave1').hide();
+                $('.btnsave3').hide();
+            }
+        }
+        else {
+            $('.btnsave').show();
+            $('.btnsave1').show();
+            $('.btnsave3').show();
+        }
+        /*Show hide controls for Minor/Major-Coal,NonCoal*/
+        var mineraltypename = '@profile.MineralTypeName';
+        var mineralname = '@profile.MineralName';
+        if (mineraltypename == "Minor Mineral") {
+            $("#divMinesSection").hide();/*Field*/
+            $("#divMinesAlloted").hide();/*Field*/
+            $("#divMinesType").hide();/*Field*/
+            $("#divFinalOffer").hide();/*Field*/
+            $("#step2").hide();/*Tab*/
+            $("#step3").hide();/*Tab*/
+            $("#step4").hide();/*Tab*/
+            $("#btnNextMinor").hide();/*Button*/
+            $("#lblGrantOrder").html('Grant Order Copy <small>(with approved map)</small>');
+            $("#lblLeaseDeed").html('Lease Deed Document <small>(with approved map)</small>');
+        }
+        else {
+            $("#divDemarcation").hide();/*Field*/
+            if (mineralname == "COAL") {
+                $('.btnsave1').hide();/*Button*/
+                $('.btnsave3').hide();/*Button*/
+                $("#MDPA-tab").text('CMDPA/CBDPA'); /*Header Text*/
+                $("#hMDPA").text('CMDPA/CBDPA Details');/*Header Text*/
+                $("#btnNextNonCoal").hide();/*Button*/
+                $("#btnBackNonCoal").hide();/*Button*/
+                $("#btnNextCoal").show();/*Button*/
+                $("#btnBackCoal").show();/*Button*/
+            }
+            else {
+                $("#divMinesType").hide();/*Field*/
+                $("#divFinalOffer").hide();/*Field*/
+                $("#step4").hide();/*Tab*/
+                $("#btnNextCoal").hide();/*Button*/
+                $("#btnBackCoal").hide();/*Button*/
+                $("#btnNextNonCoal").show();/*Button*/
+                $("#btnBackNonCoal").show();/*Button*/
+                $('.btnsave1').hide();/*Button*/
+            }
+        }
+        /****************** FILE UPLOAD ********************************/
+            $('input[type="file"]').bind('change', function () {
+                $("input[type='Submit']").attr('disabled', false);
+                $("input[name='cmd']").attr('disabled', false);
+                filesize = this.files[0].size;
+                var val = $(this).val().toLowerCase(),
+                    regex = new RegExp("(.*?)\.(jpeg|jpg|pdf)$");
+                if (!(regex.test(val))) {
+                    swal("", ".docx, tif,xls  type is not an allowed file type. You can use only pdf, jpg, jpeg types of file(s). ", "warning");
+                    this.value = '';
+                    $("input[type='Submit']").attr('disabled', true);
+                    $("input[name='cmd']").attr('disabled', true);
+                    return false;
+                }
+                else if (filesize > 2048000) {
+                    swal("", "File size must be 2 MB !", "warning");
+                    $("input[type='Submit']").attr('disabled', true);
+                    $("input[name='cmd']").attr('disabled', true);
+                    return false;
+                }
+                else {
+                    var fileName = $(this).val().split("\\").pop();
+                    $(this).next('.custom-file-label').html(fileName);
+                }
+                return false;
+            });
+        /***************************************************************/
+
+    });
+    function onChangeAuction() {
+        if ($("#AuctionTypeId").val() == "1")/*NonAuction/Without Auction*/ {
+            $("#divLeaseExtender").show();
+        }
+        else/*Auction*/ {
+            $("#divLeaseExtender").hide();
+        }
+    }
+    function LeaseExtenderChange() {
+        if ($('input[name="LeaseExtender"]:checked').val() == "Yes") {
+            $(".divLeaseExtenderValidity").show();
+        }
+        else {
+            $(".divLeaseExtenderValidity").hide();
+        }
+    }
+    function MinesAllotedChange() {
+        if ($('#MinesAlloted').val() == "MMDR") {
+            $("#divMinesSection").show();
+            MinesSectionChange();
+        }
+        else {
+            $("#divMinesSection").hide();
+            $("#divMinesSectionType").hide();
+        }
+    }
+    function MinesSectionChange() {
+        if ($('input[name="Mines_Section"]:checked').val() == "Yes") {
+            $("#divMinesSectionType").show();
+        }
+        else {
+            $("#divMinesSectionType").hide();
+        }
+    }
+    var YearsList = document.getElementsByName("YEAR")
+    for (var i = 0; i <= YearsList.length; i++) {
+        this.addEventListener("change", function (e) {
+            var CurrentSelectedValue = e.target.value;
+            var Count = 0;
+            for (var i = 0; i < YearsList.length; i++) {
+                if (CurrentSelectedValue == YearsList[i].value) {
+                    Count = Count + 1;
+                }
+                else {
+                    $('.btnsave').show();
+                }
+                if (Count == 2) {
+                    swal("", 'Same mining year ' + YearsList[i].value + ' already existed', "warning");
+                    Count = 1;
+                    YearsList[i].value = '--select--';
+                    $('.btnsave').hide();
+                    break;
+                    e.preventDefault();
+                }
+                else {
+                    $('.btnsave').show();
+                }
+            }
+        });
+        break;
+    }
+    function BindProdData() {
+        var vv = 0;
+        $("#MiningPlanTable").find('tr').each(function (i, el) {
+            if (i == 0) { }
+            else {
+                var $tds = $(this).find('td');
+                var abcd = "YEARS" + vv;
+                var units = "Units" + vv;
+                vv = vv + 1;
+                var data = $tds.eq(3).text().trim();
+                document.getElementById(abcd).value = data;
+            }
+        });
+    }
+    var totalRowsCount = 1;
+    var _flag = 0;
+    function addRow(tableID) {
+        if (totalRowsCount < 10) {
+            var table = document.getElementById(tableID);
+            var rowCount = table.rows.length;
+            var row = table.insertRow(rowCount);
+            var colCount = table.rows[1].cells.length;
+            for (var i = 0; i < colCount; i++) {
+                if (i == colCount - 1) { }
+                else {
+                    var newcell = row.insertCell(i);
+                    if (i == 0) {
+                        newcell.innerHTML = rowCount;
+                    }
+                    else {
+                        newcell.innerHTML = table.rows[1].cells[i].innerHTML;
+                    }
+                    switch (newcell.childNodes[0].type) {
+                        case "text":
+                            newcell.childNodes[0].value = "";
+                            break;
+                        case "checkbox":
+                            newcell.childNodes[0].checked = false;
+                            break;
+                        case "select-one":
+                            newcell.childNodes[0].selectedIndex = 0;
+                            break;
+                    }
+                }
+            }
+            totalRowsCount = totalRowsCount + 1;
+        }
+    }
+    var rws;
+    function RemoveRow(obj) {
+        totalRowsCount = totalRowsCount - 1;
+        var Rowslength = document.getElementById("MiningPlanTable").getElementsByTagName("tr").length;
+
+        if (Rowslength != 2)
+            document.getElementById("MiningPlanTable").deleteRow(Rowslength - 1);
+    }
+    function myFunction() {
+        var table = document.getElementById("MiningPlanTable");
+        var row = table.insertRow(0);
+        var cell1 = row.insertCell(0);
+        var cell2 = row.insertCell(1);
+        cell1.innerHTML = "NEW CELL1";
+        cell2.innerHTML = "NEW CELL2";
+    }
+</script>
+<script>
+    function Validate() {
+         var mineraltypename = '@profile.MineralTypeName';
+        var Iss = false;
+        if (!blankFieldValidation("GRANT_ORDER_NUMBER", "Grant Order Number")) {
+            $("#LeaseDeed-tab").trigger('click');
+            return false;
+        }
+        if (!blankFieldValidation("inputGrantOrderDate", "Grant Order Date")) {
+            $("#LeaseDeed-tab").trigger('click');
+            return false;
+        }
+        if (!blankFieldValidation("LEASE_PERIOD", "Lease Period")) {
+            $("#LeaseDeed-tab").trigger('click');
+            return false;
+        }
+        if (!blankFieldValidation("inputFromValidity", "Lease Validity From")) {
+            $("#LeaseDeed-tab").trigger('click');
+            return false;
+        }
+        if (!blankFieldValidation("inputToValidity", "Lease Validity Upto")) {
+            $("#LeaseDeed-tab").trigger('click');
+            return false;
+        }
+        if (mineraltypename != "Minor Mineral") {
+            if (!blankFieldValidation("MDPA_GRANT_ORDER_NUMBER", "MDPA Grant Order Number")) {
+                $("#MDPA-tab").trigger('click');
+                return false;
+            }
+            if (!blankFieldValidation("inputMDPAOrderDate", "MDPA Grant Order Date")) {
+                $("#MDPA-tab").trigger('click');
+                return false;
+            }
+            if (!blankFieldValidation("inputMDPAAgreementDate", "Agreement Date")) {
+                $("#MDPA-tab").trigger('click');
+                return false;
+            }
+            for (var i = 0; i < document.getElementById('MiningPlanTable').children[1].children.length; i++) {
+                debugger;
+                if (document.getElementById('MiningPlanTable').children[1].children[i].children[1].getElementsByTagName("select")[0].value == "0") {
+                    swal("", "Please Select Year", "warning");
+                    return false;
+                }
+                else if (document.getElementById('MiningPlanTable').children[1].children[i].children[2].getElementsByTagName("input")[0].value == "") {
+                    swal("", "Please Enter Approved Quantity", "warning");
+                    return false;
+                }
+                else if (document.getElementById('MiningPlanTable').children[1].children[i].children[3].getElementsByTagName("select")[0].value == "") {
+                    swal("", "Please Select Unit", "warning");
+                    return false;
+                }
+            }
+        }
+        Iss = true;
+        return Iss;
+    }
+    function OnForwarding(btnAction) {
+        var Type;
+        if (btnAction == 'Forward To DD') {
+            Type = 'forward';
+        }
+        if (confirm("Before " + Type + " you need to apply your Digital Signature. Are you confirmed to " + Type + " Profile??")) {
+                var Postdata = 'action=signdoc' + "\n" + 'datatosign=Digital Signature Required' + "\n" + 'signaction=sign' + "\n" + 'filepath=' + "\n" + 'panNumberParam=' + "\n" + 'expirycheck=false' + "\n" + 'issuername=' + "\n" + 'certclass=1|2|3' + "\n" + 'certtype=ALL';
+                connection.send(Postdata);
+                connection.onerror = function (error) {
+                    swal("",'Please check the server connection: ' + error+'',"warning");
+                    swal("",error,"warning");
+                };
+                connection.onmessage = function (e) { // when DSC is success then following function executed.
+                    if (e.data.indexOf("subProtocol") == -1) {
+                        //alert(e.data);
+                        $("#DSCResponse").val(e.data).change();
+                        $.ajax(
+                            {
+                               url: '@Url.Action("CheckVerifyResponse", "LesseeDetails", new { Area = "LesseeProfile" })',
+                                type: "POST",
+                                data: { contentType: "pkcs7", signDataBase64Encoded: e.data, responseType: "plain" },
+                                success: function (msg) {
+                                    if (msg == "SUCCESS") {
+                                        if (btnAction == "Forward To DD") {
+                                            $("#SubResion").val("Forward To DD");
+                                        }
+                                        $("#form1").submit();
+                                    }
+                                }
+                            });
+                    }
+                    else {
+                        alert(e.data);
+                    }
+                };
+            }
+            else {
+                return false;
+            }
+    }
+    try {
+        var connection = new WebSocket('wss://localhost.emudhra.com:8080');
+        connection.onopen = function () {
+            console.log('Connection Opened');
+        };
+        connection.onerror = function (error) {
+        };
+        connection.onmessage = function (e) {
+            if (e.data.indexOf("subProtocol") == -1) {
+            }
+        };
+    }
+    catch (e) {
+        swal("", "No DSC Connection Found", "warning");
+    }
+    function NextMDPA() {
+        $('#MDPA').trigger('click');
+        $('[href="#MDPA"]').tab('show');
+        $("#MDPA").show();
+        $('#LeaseDeed').hide();
+        $('#LeaseExtension').hide();
+        $('#NonCaptive').hide();
+        $("#LeaseCTOQty").hide();
+        $("#step5").removeClass('active');
+        $("#step2").addClass('active');
+        $("#step1").removeClass('active');
+        $("#step3").removeClass('active');
+        $("#step4").removeClass('active');
+    }
+    function NextLeaseExtension() {
+        $('#LeaseExtension').trigger('click');
+        $('[href="#LeaseExtension"]').tab('show');
+        $("#LeaseExtension").show();
+        $('#MDPA').hide();
+        $('#LeaseDeed').hide();
+        $('#NonCaptive').hide();
+        $("#LeaseCTOQty").hide();
+        $("#step5").removeClass('active');
+        $("#step3").addClass('active');
+        $("#step1").removeClass('active');
+        $("#step2").removeClass('active');
+        $("#step4").removeClass('active');
+    }
+    function NextNonCaptive() {
+        $('#NonCaptive').trigger('click');
+        $('[href="#NonCaptive"]').tab('show');
+        $("#NonCaptive").show();
+        $('#LeaseExtension').hide();
+        $('#MDPA').hide();
+        $('#LeaseDeed').hide();
+        $("#LeaseCTOQty").hide();
+        $("#step5").removeClass('active');
+        $("#step4").addClass('active');
+        $("#step1").removeClass('active');
+        $("#step3").removeClass('active');
+        $("#step2").removeClass('active');
+    }
+    function NextQuantity() {
+        $('#LeaseCTOQty').trigger('click');
+        $('[href="#LeaseCTOQty"]').tab('show');
+        $("#LeaseCTOQty").show();
+        $('#LeaseExtension').hide();
+        $('#MDPA').hide();
+        $('#LeaseDeed').hide();
+        $('#NonCaptive').hide();
+        $("#step5").addClass('active');
+        $("#step1").removeClass('active');
+        $("#step3").removeClass('active');
+        $("#step2").removeClass('active');
+        $("#step4").removeClass('active');
+    }
+    function BackNonCaptive() {
+        $('#NonCaptive').trigger('click');
+        $('[href="#NonCaptive"]').tab('show');
+        $("#NonCaptive").show();
+        $("#LeaseExtension").hide();
+        $('#MDPA').hide();
+        $("#LeaseDeed").hide();
+        $("#LeaseCTOQty").hide();
+        $("#step5").removeClass('active');
+        $("#step4").addClass('active');
+        $("#step1").removeClass('active');
+        $("#step2").removeClass('active');
+        $("#step3").removeClass('active');
+    }
+    function BackLeaseExtension() {
+        $('#LeaseExtension').trigger('click');
+        $('[href="#LeaseExtension"]').tab('show');
+        $("#LeaseExtension").show();
+        $("#NonCaptive").hide();
+        $('#MDPA').hide();
+        $("#LeaseDeed").hide();
+        $("#LeaseCTOQty").hide();
+        $("#step5").removeClass('active');
+        $("#step3").addClass('active');
+        $("#step1").removeClass('active');
+        $("#step2").removeClass('active');
+        $("#step4").removeClass('active');
+    }
+    function BackMDPA() {
+        $('#MDPA').trigger('click');
+        $('[href="#MDPA"]').tab('show');
+        $("#MDPA").show();
+        $("#NonCaptive").hide();
+        $('#LeaseExtension').hide();
+        $("#LeaseDeed").hide();
+        $("#LeaseCTOQty").hide();
+        $("#step5").removeClass('active');
+        $("#step2").addClass('active');
+        $("#step1").removeClass('active');
+        $("#step3").removeClass('active');
+        $("#step4").removeClass('active');
+    }
+    function BackLeaseDeed() {
+        $('#LeaseDeed').trigger('click');
+        $('[href="#LeaseDeed"]').tab('show');
+        $("#LeaseDeed").show();
+        $("#NonCaptive").hide();
+        $('#LeaseExtension').hide();
+        $('#MDPA').hide();
+        $("#LeaseCTOQty").hide();
+        $("#step5").removeClass('active');
+        $("#step1").addClass('active');
+        $("#step2").removeClass('active');
+        $("#step3").removeClass('active');
+        $("#step4").removeClass('active');
+    }
+</script>
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        <!-- MAIN CONTENT AREA STARTS -->
+        @Html.Partial("_CMSnavigation")
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="javascript:void(0);">
+                                Add
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="~/LesseeProfile/LesseeGrantOrderDetails/ViewList">
+                                View
+                            </a>
+                        </li>
+                    </ul>
+                    @Html.Partial("_CMSutil")
+                </div>
+                <section class="box form-container">
+                    <div class="content-body">
+                        @using (Html.BeginForm("Grant", "LesseeGrantOrderDetails", FormMethod.Post, new { AUTOCOMPLETE = "Off", id = "form1", enctype = "multipart/form-data" }))
+                        {
+                            @(Html.HiddenFor(model => model.SubResion))
+                            @(Html.HiddenFor(model => model.SubApprove))
+                            @(Html.HiddenFor(model => model.SubReject))
+                            @Html.AntiForgeryToken()
+                            @Html.HiddenFor(model => model.GRANT_ORDER_ID)
+                            @Html.HiddenFor(x => x.CREATED_BY)
+                            @Html.HiddenFor(model => model.STATUS, new { id = "hdnStatus" })
+                            <ul class="nav nav-tabs progresstab" id="myTab" role="tablist">
+                                <li class="startstep active" id="step1">
+                                    <a id="LeaseDeed-tab" data-toggle="tab" href="#LeaseDeed" role="tab" aria-controls="LeaseDeed" aria-selected="true" onclick="BackLeaseDeed()">Grant Order & Lease Deed Details</a>
+                                </li>
+                                <li id="step2">
+                                    <a id="MDPA-tab" data-toggle="tab" href="#MDPA" role="tab" aria-controls="MDPA" aria-selected="false" onclick="BackMDPA()">MDPA</a>
+                                </li>
+                                <li id="step3">
+                                    <a id="LeaseExtension-tab" data-toggle="tab" href="#LeaseExtension" role="tab" aria-controls="LeaseExtension" aria-selected="false" onclick="BackLeaseExtension()">Lease Extension Details</a>
+                                </li>
+                                <li id="step4">
+                                    <a id="NonCaptive-tab" data-toggle="tab" href="#NonCaptive" role="tab" aria-controls="NonCaptive" aria-selected="false" onclick="BackNonCaptive()">Request For Non-Captive Sale</a>
+                                </li>
+                                <li id="step5">
+                                    <a id="LeaseCTOQty-tab" data-toggle="tab" href="#LeaseCTOQty" role="tab" aria-controls="LeaseCTOQty" aria-selected="false" onclick="NextQuantity()"> Approved Quantity Details</a>
+                                </li>
+                            </ul>
+                            <div class="tab-content" id="myTabContent">
+                                <div href="#LeaseDeed" class="tab-pane fade show active" id="LeaseDeed" role="tabpanel" aria-labelledby="LeaseDeed-tab">
+                                    <h5 class="text-brown font-weight-bold mt-0 mb-4"> Grant Order & Lease Deed Details</h5>
+                                    <div class="row">
+                                        <div class="col-lg-3 col-md-6 col-sm-12 form-group">
+                                            <label class="col-form-label pt-0 font-weight-bolder">Order Number <span class="text-danger">*</span></label>
+                                            @(Html.TextBoxFor(x => x.GRANT_ORDER_NUMBER, new { @maxlength = "50", @class = "form-control", @Onkeypress = "return inputLimiter(event,'NameCharactersAndNumbers')" }))
+                                            @Html.ValidationMessageFor(m => m.GRANT_ORDER_NUMBER, "", new { @class = "text-danger" })
+                                        </div>
+                                        <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                            <label class="col-form-label pt-0 font-weight-bolder">Order Date <span class="text-danger">*</span></label>
+                                            <div class="input-group">
+                                                <input type="text" class="form-control datepicker" id="inputGrantOrderDate" name="GRANT_ORDER_DATE">
+                                                <div class="input-group-prepend">
+                                                    <label class="input-group-text" for="inputGrantOrderDate"><i class="icon-calendar-alt-solid"></i></label>
+                                                </div>
+                                                @Html.HiddenFor(x => x.GRANT_ORDER_DATE, new { @id = "hdnGRANT_ORDER_DATE" })
+                                                @Html.ValidationMessageFor(m => m.GRANT_ORDER_DATE, "", new { @class = "text-danger" })
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-3 col-md-6 col-sm-12 form-group">
+                                            <label class="col-form-label pt-0 font-weight-bolder">Lease Validity From <span class="text-danger">*</span></label>
+                                            <div class="custom-file">
+                                                <div class="input-group">
+                                                    <input type="text" class="form-control datepicker" id="inputFromValidity" name="FROM_VALIDITY">
+                                                    <div class="input-group-prepend">
+                                                        <label class="input-group-text" for="inputFromValidity"><i class="icon-calendar-alt-solid"></i></label>
+                                                    </div>
+                                                    @Html.HiddenFor(x => x.FROM_VALIDITY, new { @id = "hdnFROM_VALIDITY" })
+                                                    @Html.ValidationMessageFor(m => m.FROM_VALIDITY, "", new { @class = "text-danger" })
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-3 col-md-6 col-sm-12 form-group">
+                                            <label class="col-form-label font-weight-bolder">Lease Validity Upto <span class="text-danger">*</span></label>
+                                            <div class="input-group">
+                                                <input type="text" class="form-control datepicker" id="inputToValidity" name="TO_VALIDITY">
+                                                <div class="input-group-prepend">
+                                                    <label class="input-group-text" for="inputToValidity"><i class="icon-calendar-alt-solid"></i></label>
+                                                </div>
+                                                @Html.HiddenFor(x => x.TO_VALIDITY, new { @id = "hdnTO_VALIDITY" })
+                                                @Html.ValidationMessageFor(m => m.TO_VALIDITY, "", new { @class = "text-danger" })
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                            <label for="inputLoginId" class="col-form-label font-weight-bolder" id="lblGrantOrder">Grant Order Copy <small>(with approved lease plan)</small>  </label>
+                                            <div class="custom-file">
+                                                <input type="file" class="custom-file-input" id="File3" name="GRANT_ORDER_COPY">
+                                                <label class="custom-file-label" for="customFile">Choose Files</label>
+                                                <small class="text-danger">Files type <strong>(.jpg , .jpeg , .pdf)</strong> with maximum <strong>2MB</strong></small>
+                                            </div>
+                                            @if (Model.FILE_GRANT_ORDER_COPY != null && Model.FILE_GRANT_ORDER_COPY != "")
+                                            {
+                                                <label class="form-control-plaintext">@(Model.FILE_GRANT_ORDER_COPY) <a href='~/@Model.PATH_GRANT_ORDER_COPY' title="" class="ml-2" data-original-title="Download Grant Order" target="_blank"><i class="icon-file-pdf-solid h5 text-danger"></i></a></label>
+                                            }
+                                        </div>
+                                        <div class="col-lg-3 col-md-6 col-sm-12 form-group">
+                                            <label for="inputLoginId" class="col-form-label font-weight-bolder">Lease Deed No.</label>
+                                            @(Html.TextBoxFor(x => x.EXECUTION_OF_DEED_NUMBER, new { @maxlength = "50", @class = "form-control", @Onkeypress = "return inputLimiter(event,'NameCharactersAndNumbers')" }))
+                                        </div>
+                                        <div class="col-lg-3 col-md-6 col-sm-12 form-group">
+                                            <label class="col-form-label font-weight-bolder">Lease Deed Date</label>
+                                            <div class="input-group">
+                                                <input type="text" class="form-control datepicker" id="inputExecDeedDate" name="EXECUTION_OF_DEED_DATE">
+                                                <div class="input-group-prepend">
+                                                    <label class="input-group-text" for="inputExecDeedDate"><i class="icon-calendar-alt-solid"></i></label>
+                                                </div>
+                                                @Html.HiddenFor(m => m.EXECUTION_OF_DEED_DATE, new { @id = "hdnEXECUTION_OF_DEED_DATE" })
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                            <label class="col-form-label font-weight-bolder" id="lblLeaseDeed">Lease Deed Document <small> (with plan / LOI Letter)</small></label>
+                                            <div class="custom-file">
+                                                <input type="file" class="custom-file-input" id="File1" name="EXECUTION_OF_DEED_COPY">
+                                                <label class="custom-file-label" for="customFile">Choose Files</label>
+                                                <small class="text-danger">Files type <strong>(.jpg , .jpeg , .pdf)</strong> with maximum <strong>2MB</strong></small>
+                                            </div>
+                                            @if (Model.FILE_EXECUTION_OF_DEED_COPY != null && Model.FILE_EXECUTION_OF_DEED_COPY != "")
+                                            {
+                                                <label class="form-control-plaintext">@(Model.FILE_EXECUTION_OF_DEED_COPY) <a href='~/@Model.PATH_EXECUTION_OF_DEED_COPY' title="" class="ml-2" data-original-title="Download Execution Deed" target="_blank"><i class="icon-file-pdf-solid h5 text-danger"></i></a></label>
+                                            }
+                                        </div>
+                                        <div class="col-lg-4 col-md-6 col-sm-12 form-group" id="divDemarcation">
+                                            <label class="col-form-label font-weight-bolder">Upload Demarcation Report</label>
+                                            <div class="custom-file">
+                                                <input type="file" class="custom-file-input" id="File1" name="DEMARCATION_COPY">
+                                                <label class="custom-file-label" for="customFile">Choose Files</label>
+                                                <small class="text-danger">Files type <strong>(.jpg , .jpeg , .pdf)</strong> with maximum <strong>2MB</strong></small>
+                                            </div>
+                                            @if (Model.FILE_DEMARCATION_COPY != null && Model.FILE_DEMARCATION_COPY != "")
+                                            {
+                                                <label class="form-control-plaintext">@(Model.FILE_DEMARCATION_COPY) <a href='~/@Model.PATH_DEMARCATION_COPY' title="" class="ml-2" data-original-title="Download Demarcation Copy" target="_blank"><i class="icon-file-pdf-solid h5 text-danger"></i></a></label>
+                                            }
+                                        </div>
+                                        <div class="col-lg-3 col-md-6 col-sm-12 form-group">
+                                            <label for="inputLoginId" class="col-form-label font-weight-bolder">Lease Period <small>(In Years)</small> <span class="text-danger">*</span></label>
+                                            @(Html.TextBoxFor(x => x.LEASE_PERIOD, new { @class = "form-control", @Onkeypress = "return inputLimiter(event,'Numbers')" }))
+                                            @Html.ValidationMessageFor(m => m.LEASE_PERIOD, "", new { @class = "text-danger" })
+                                        </div>
+                                        <div class="col-lg-3 col-md-6 col-sm-12 form-group" id="divMinesAlloted">
+                                            <label for="inputLoginId" class="col-form-label font-weight-bolder">Mines Allotted As Per Act</label>
+                                            @Html.DropDownListFor(model => model.MinesAlloted,
+                                                           new SelectList(new List<SelectListItem> {
+                                                                          new SelectListItem { Text = "Select", Value = "0"},
+                                                                          new SelectListItem { Text = "MMDR", Value = "MMDR"},
+                                                                          new SelectListItem { Text = "MCR", Value = "MCR"},
+                                                                          new SelectListItem { Text = "CB Act", Value = "CB Act"},
+                                                                          new SelectListItem { Text = "Other", Value = "Other"},
+                                                          }, "Value", "Text"),
+                                                          new { @class = "form-control", @onchange = "MinesAllotedChange()" })
+                                        </div>
+                                        <div class="col-lg-3 col-md-6 col-sm-12 form-group" id="divMinesSection">
+                                            <label for="inputLoginId" class="col-form-label pt-0 font-weight-bolder">Mines Under Section(17A) ?</label>
+                                            <div class="py-2">
+                                                @Html.RadioButtonFor(model => model.Mines_Section, "Yes", new { id = "Yes", @onchange = "MinesSectionChange()", @class = "custom-radio" }) Yes
+                                                @Html.RadioButtonFor(model => model.Mines_Section, "No", new { id = "No", @onchange = "MinesSectionChange()", @class = "custom-radio", @checked = "checked" }) No
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-3 col-md-6 col-sm-12 form-group" id="divMinesSectionType">
+                                            <label for="inputLoginId" class="col-form-label pt-0 font-weight-bolder">Mines Section</label>
+                                            <div class="py-2">
+                                                @Html.RadioButtonFor(model => model.MinesSection, "Reservation", new { id = "Reservation", @class = "custom-radio" }) Reservation
+                                                @Html.RadioButtonFor(model => model.MinesSection, "Non-Reservation", new { id = "Non-Reservation", @class = "custom-radio" }) Non-Reservation
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-3 col-md-6 col-sm-12 form-group" id="divMinesType">
+                                            <label for="inputLoginId" class="col-form-label font-weight-bolder">Type of Mines</label>
+                                            @Html.DropDownListFor(model => model.MinesType,
+                                                           new SelectList(new List<SelectListItem> {
+                                                                          new SelectListItem { Text = "Select", Value = "0"},
+                                                                          new SelectListItem { Text = "Auction for Power Sector", Value = "Auction for Power Sector"},
+                                                                          new SelectListItem { Text = "Allotment Route", Value = "Allotment Route"},
+                                                                          new SelectListItem { Text = "Auction Route", Value = "Auction Route"},
+                                                                          new SelectListItem { Text = "Auction & allotted", Value = "Auction & allotted"},
+                                                          }, "Value", "Text"),
+                                                          new { @class = "form-control" })
+                                        </div>
+                                    </div>
+                                    <div class="row mt-4">
+                                        <div class="col-sm-12 text-center">
+                                            <a class="btn btn-primary btn-md ml-0 waves-effect waves-light btnNext" onclick="NextMDPA()" id="btnNextMinor">Next</a>
+                                            @if (Model.STATUS != 5)
+                                            {
+                                                <input type="submit" id="Submit" value="Save & Update" class="btn btn-success btn-md ml-0 waves-effect waves-light btnsave1" onclick="return Validate()">
+                                                <input type="submit" value="Delete" class="btn btn-danger btn-md ml-0 waves-effect waves-light btndelete" id="Delete" name="delete" onclick="return confirm('Are you sure to delete?')" style="display:none;" />
+                                                <input type="button" title="Forward to DD" value="Forward To DD" name="cmd" class="btn btn-warning text-dark btn-md waves-effect waves-light ml-0 btnsave1" onclick="if (Validate()) { return OnForwarding('Forward To DD'); }" />
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                                <div href="#MDPA" class="tab-pane fade" id="MDPA" role="tabpanel" aria-labelledby="MDPA-tab">
+                                    <h5 class="text-brown font-weight-bold mt-0 mb-4" id="hMDPA"> MDPA Details</h5>
+                                    <div class="row">
+                                        <div class="col-lg-3 col-md-6 col-sm-12 form-group">
+                                            <label class="col-form-label pt-0 font-weight-bolder">Order Number <span class="text-danger">*</span></label>
+                                            @(Html.TextBoxFor(x => x.MDPA_GRANT_ORDER_NUMBER, new { @maxlength = "50", @class = "form-control", @Onkeypress = "return inputLimiter(event,'NameCharactersAndNumbers')" }))
+                                            @Html.ValidationMessageFor(m => m.MDPA_GRANT_ORDER_NUMBER, "", new { @class = "text-danger" })
+                                        </div>
+                                        <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                            <label class="col-form-label pt-0 font-weight-bolder">Order Date <span class="text-danger">*</span></label>
+                                            <div class="input-group">
+                                                <input type="text" class="form-control datepicker" id="inputMDPAOrderDate" name="MDPA_GRANT_ORDER_DATE">
+                                                <div class="input-group-prepend">
+                                                    <label class="input-group-text" for="inputMDPAOrderDate"><i class="icon-calendar-alt-solid"></i></label>
+                                                </div>
+                                                @Html.HiddenFor(x => x.MDPA_GRANT_ORDER_DATE, new { @id = "hdnMDPA_GRANT_ORDER_DATE" })
+                                                @Html.ValidationMessageFor(m => m.MDPA_GRANT_ORDER_DATE, "", new { @class = "text-danger" })
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-3 col-md-6 col-sm-12 form-group">
+                                            <label class="col-form-label pt-0 font-weight-bolder">Agreement Date <span class="text-danger">*</span></label>
+                                            <div class="custom-file">
+                                                <div class="input-group">
+                                                    <input type="text" class="form-control datepicker" id="inputMDPAAgreementDate" name="MDPA_GRANT_AGREEMENT_DATE">
+                                                    <div class="input-group-prepend">
+                                                        <label class="input-group-text" for="inputMDPAAgreementDate"><i class="icon-calendar-alt-solid"></i></label>
+                                                    </div>
+                                                    @Html.HiddenFor(x => x.MDPA_GRANT_AGREEMENT_DATE, new { @id = "hdnMDPA_GRANT_AGREEMENT_DATE" })
+                                                    @Html.ValidationMessageFor(m => m.MDPA_GRANT_AGREEMENT_DATE, "", new { @class = "text-danger" })
+                                                </div>
+                                            </div>
+                                        </div>
+                                        @*<div class="col-lg-8 col-md-6 col-sm-12 form-group">
+                                                <div class="col-sm-10">
+                                                    <div class="table-responsive">
+                                                        @Html.Raw((String)ViewBag.tableLA)
+                                                    </div>
+                                                    <div class="row mt-3">
+                                                        <a class='btn btn-danger btn-md remove m-0 mr-1'><i class='icon-minus-solid' aria-hidden='true' data-toggle='tooltip' data-placement='top' title='Remove Row' onclick="RemoveRow('MiningPlanTable')"></i></a> <a class='btn btn-success btn-md add-btn  m-0 mr-1' data-toggle='tooltip' data-placement='top' title='Add Row' onclick="addRow('MiningPlanTable')"><i class='icon-plus-solid' aria-hidden='true'></i></a>
+                                                    </div>
+                                                </div>
+                                            </div>*@
+                                        <div class="col-lg-3 col-md-6 col-sm-12 form-group" style="display:none;">
+                                            <label for="inputLoginId" class="col-form-label pt-0 font-weight-bolder">Production Quantity</label>
+                                            <div class="py-2">
+                                                @Html.RadioButtonFor(model => model.MDPA_PRODUCTION_QUANTITY, "Per Annum", new { id = "Per Annum", @class = "custom-radio", @Onkeypress = "return inputLimiter(event,'Decimal')" }) Per Annum
+                                                @Html.RadioButtonFor(model => model.MDPA_PRODUCTION_QUANTITY, "MT", new { id = "MT", @class = "custom-radio" }) MT
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-3 col-md-6 col-sm-12 form-group" id="divFinalOffer">
+                                            <label class="col-form-label pt-0 font-weight-bolder">Final Offer <small>(Revenue Sharing in %)</small></label>
+                                            @Html.TextBoxFor(x => x.FINAL_OFFER, new { @maxlength = "10", @class = "form-control", @Onkeypress = "return inputLimiter(event,'Decimal')" })
+                                        </div>
+                                        <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                            <label for="inputLoginId" class="col-form-label font-weight-bolder">Upload MDPA</label>
+                                            <div class="custom-file">
+                                                <input type="file" class="custom-file-input" id="File3" name="GRANT_MDPA_COPY">
+                                                <label class="custom-file-label" for="customFile">Choose Files</label>
+                                                <small class="text-danger">Files type <strong>(.jpg , .jpeg , .pdf)</strong> with maximum <strong>2MB</strong></small>
+                                            </div>
+                                            @if (Model.FILE_MDPA_COPY != null && Model.FILE_MDPA_COPY != "")
+                                            {
+                                                <label class="form-control-plaintext">@(Model.FILE_MDPA_COPY) <a href='~/@Model.PATH_MDPA_COPY' title="" class="ml-2" data-original-title="Download MDPA Order" target="_blank"><i class="icon-file-pdf-solid h5 text-danger"></i></a></label>
+                                            }
+                                        </div>
+                                    </div>
+                                    <div class="row mt-4">
+                                        <div class="col-sm-12 text-center">
+                                            <a class="btn btn-dark btn-md ml-0 waves-effect waves-light btnPrevious" onclick="BackLeaseDeed()">Previous</a>
+                                            <a class="btn btn-primary btn-md ml-0 waves-effect waves-light btnNext" onclick="NextLeaseExtension()">Next</a>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div href="#LeaseExtension" class="tab-pane fade" id="LeaseExtension" role="tabpanel" aria-labelledby="LeaseExtension-tab">
+                                    <h5 class="text-brown font-weight-bold mt-0 mb-4">Lease Extension Details</h5>
+                                    <div class="row">
+                                        <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                            <label class="col-form-label font-weight-bolder">Application Type</label>
+                                            @Html.DropDownListFor(model => model.AuctionTypeId, ViewBag.Auctiontype as IEnumerable<SelectListItem>, "Select", new { @class = "form-control", @onchange = "onChangeAuction()", @autofocus = "autofocus", @style = "pointer-events: none;" })
+                                        </div>
+                                        <div class="col-lg-4 col-md-6 col-sm-12 form-group" id="divLeaseExtender" style="display:none;">
+                                            <label class="col-form-label font-weight-bolder">Lease Extended as per MMDR Amendment 2021 </label>
+                                            <div class="py-2">
+                                                @Html.RadioButtonFor(model => model.LeaseExtender, "Yes", new { id = "Yes", @onchange = "LeaseExtenderChange()", @class = "custom-radio" }) Yes
+                                                @Html.RadioButtonFor(model => model.LeaseExtender, "No", new { id = "No", @onchange = "LeaseExtenderChange()", @class = "custom-radio" }) No
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-3 col-md-6 col-sm-12 form-group divLeaseExtenderValidity" style="display:none;">
+                                            <label class="col-form-label pt-0 font-weight-bolder">Lease Extension Validity From</label>
+                                            <div class="custom-file">
+                                                <div class="input-group">
+                                                    <input type="text" class="form-control datepicker" id="inputLeaseExtensionFromValidity" name="LEASEEXTENSION_FROM_VALIDITY">
+                                                    <div class="input-group-prepend">
+                                                        <label class="input-group-text" for="inputLeaseExtensionFromValidity"><i class="icon-calendar-alt-solid"></i></label>
+                                                    </div>
+                                                    @Html.HiddenFor(x => x.LEASEEXTENSION_FROM_VALIDITY, new { @id = "hdnLEASEEXTENSION_FROM_VALIDITY" })
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-3 col-md-6 col-sm-12 form-group divLeaseExtenderValidity" style="display:none;">
+                                            <label class="col-form-label font-weight-bolder">Lease Extension Validity Upto</label>
+                                            <div class="input-group">
+                                                <input type="text" class="form-control datepicker" id="inputLeaseExtensionToValidity" name="LEASEEXTENSION_TO_VALIDITY">
+                                                <div class="input-group-prepend">
+                                                    <label class="input-group-text" for="inputLeaseExtensionToValidity"><i class="icon-calendar-alt-solid"></i></label>
+                                                </div>
+                                                @Html.HiddenFor(x => x.LEASEEXTENSION_TO_VALIDITY, new { @id = "hdnLEASEEXTENSION_TO_VALIDITY" })
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-4 col-md-6 col-sm-12 form-group divLeaseExtenderValidity" style="display:none;">
+                                            <label for="inputLoginId" class="col-form-label font-weight-bolder">Lease Extension Document Upload</label>
+                                            <div class="custom-file">
+                                                <input type="file" class="custom-file-input" id="File3" name="LEASEEXTENSION_ORDER_COPY">
+                                                <label class="custom-file-label" for="customFile">Choose Files</label>
+                                                <small class="text-danger">Files type <strong>(.jpg , .jpeg , .pdf)</strong> with maximum <strong>2MB</strong></small>
+                                            </div>
+                                            @if (Model.FILE_LEASEEXTENSION != null && Model.FILE_LEASEEXTENSION != "")
+                                            {
+                                                <label class="form-control-plaintext">@(Model.FILE_LEASEEXTENSION) <a href='~/@Model.PATH_LEASEEXTENSION' title="" class="ml-2" data-original-title="Download Lease Order" target="_blank"><i class="icon-file-pdf-solid h5 text-danger"></i></a></label>
+                                            }
+                                        </div>
+                                    </div>
+                                    <div class="row mt-4">
+                                        <div class="col-sm-12 text-center">
+                                            <a class="btn btn-dark btn-md ml-0 waves-effect waves-light btnPrevious" onclick="BackMDPA()">Previous</a>
+                                            <a class="btn btn-primary btn-md ml-0 waves-effect waves-light btnNext" onclick="NextNonCaptive()" id="btnNextCoal">Next</a>
+                                            <a class="btn btn-primary btn-md ml-0 waves-effect waves-light btnNext" onclick="NextQuantity()" id="btnNextNonCoal">Next</a>
+                                            @*@if (Model.STATUS != 5)
+                                                    {
+                                                <input type="submit" id="Submit" value="Save & Update" class="btn btn-success btn-md ml-0 waves-effect waves-light btnsave3" onclick="return Validate()">
+                                                <input type="submit" value="Delete" class="btn btn-danger btn-md ml-0 waves-effect waves-light btndelete" id="Delete" name="delete" onclick="return confirm('Are you sure to delete?')" style="display:none;" />
+                                                <input type="button" title="Forward to DD" value="Forward To DD" name="cmd" class="btn btn-warning text-dark btn-md waves-effect waves-light ml-0 btnsave3" onclick="if (Validate()) { return OnForwarding('Forward To DD'); }" />
+                                                    }*@
+                                        </div>
+                                    </div>
+                                </div>
+                                <div href="#NonCaptive" class="tab-pane fade" id="NonCaptive" role="tabpanel" aria-labelledby="NonCaptive-tab">
+                                    <h5 class="text-brown font-weight-bold mt-0 mb-4">Request For Non Captive Sale</h5>
+                                    <div class="row">
+                                        <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                            <label class="col-form-label font-weight-bolder">Mineral Sale Percentage %</label>
+                                            @Html.DropDownListFor(model => model.MineralSalePercentage,
+                                                           new SelectList(new List<SelectListItem> {
+                                                                          new SelectListItem { Text = "Select", Value = "0"},
+                                                                          new SelectListItem { Text = "Upto 25%", Value = "Upto 25%"},
+                                                                          new SelectListItem { Text = "More than 50%", Value = "More than 50%"},
+                                                          }, "Value", "Text"),
+                                                          new { @class = "form-control" })
+                                        </div>
+                                        <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                            <label for="inputLoginId" class="col-form-label font-weight-bolder">Upload Tender/Allottment Document</label>
+                                            <div class="custom-file">
+                                                <input type="file" class="custom-file-input" id="File3" name="ALLOTTMENT_ORDER_COPY">
+                                                <label class="custom-file-label" for="customFile">Choose Files</label>
+                                                <small class="text-danger">Files type <strong>(.jpg , .jpeg , .pdf)</strong> with maximum <strong>2MB</strong></small>
+                                            </div>
+                                            @if (Model.FILE_ALLOTTMENT != null && Model.FILE_ALLOTTMENT != "")
+                                            {
+                                                <label class="form-control-plaintext">@(Model.FILE_ALLOTTMENT) <a href='~/@Model.PATH_ALLOTTMENT' title="" class="ml-2" data-original-title="Download MDPA Order" target="_blank"><i class="icon-file-pdf-solid h5 text-danger"></i></a></label>
+                                            }
+                                        </div>
+                                        <div class="col-lg-3 col-md-6 col-sm-12 form-group">
+                                            <label for="inputLoginId" class="col-form-label font-weight-bolder">Amount/Percentage</label>
+                                            @(Html.TextBoxFor(x => x.AllotmentAmount, new { @class = "form-control", @Onkeypress = "return inputLimiter(event,'Numbers')" }))
+                                        </div>
+                                    </div>
+                                    <div class="row mt-4">
+                                        <div class="col-sm-12 text-center">
+                                            <a class="btn btn-dark btn-md ml-0 waves-effect waves-light btnPrevious" onclick="BackLeaseExtension()">Previous</a>
+                                            <a class="btn btn-primary btn-md ml-0 waves-effect waves-light btnNext" onclick="NextQuantity()">Next</a>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div href="#LeaseCTOQty" class="tab-pane fade" id="LeaseCTOQty" role="tabpanel" aria-labelledby="LeaseCTOQty-tab">
+                                    <h5 class="text-brown font-weight-bold mt-0 mb-4">Financial Year wise Approved Mineral Quantity</h5>
+                                    <div class="form-group row pt-3">
+                                        <div class="col-sm-7">
+                                            <div class="table-responsive">
+                                                @Html.Raw((String)ViewBag.tableLA)
+                                            </div>
+                                            <div class="row mt-4">
+                                                <a class='btn btn-danger btn-md remove m-0 mr-1'><i class='icon-minus-solid' aria-hidden='true' data-toggle='tooltip' data-placement='top' title='Remove Row' onclick="RemoveRow('MiningPlanTable')"></i></a> <a class='btn btn-success btn-md add-btn  m-0 mr-1' data-toggle='tooltip' data-placement='top' title='Add Row' onclick="addRow('MiningPlanTable')"><i class='icon-plus-solid' aria-hidden='true'></i></a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row mt-4">
+                                        <div class="col-sm-12 text-center">
+                                            <a class="btn btn-dark btn-md ml-0 waves-effect waves-light btnPrevious" onclick="BackNonCaptive()" id="btnBackCoal">Previous</a>
+                                            <a class="btn btn-dark btn-md ml-0 waves-effect waves-light btnPrevious" onclick="BackLeaseExtension()" id="btnBackNonCoal">Previous</a>
+                                            @if (Model.STATUS != 5)
+                                            {
+                                                <input type="submit" id="Submit" value="Save & Update" class="btn btn-success btn-md ml-0 waves-effect waves-light btnsave" onclick="return Validate()">
+                                                <input type="submit" value="Delete" class="btn btn-danger btn-md ml-0 waves-effect waves-light btndelete" id="Delete" name="delete" onclick="return confirm('Are you sure to delete?')" style="display:none;" />
+                                                <input type="button" title="Forward to DD" value="Forward To DD" name="cmd" class="btn btn-warning text-dark btn-md waves-effect waves-light ml-0 btnsave" onclick="if (Validate()) { return OnForwarding('Forward To DD'); }" />
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+</section>
+

@@ -1,0 +1,136 @@
+﻿@*// *********************************************************************************************************
+    //  View Name                : ViewList
+    //  Desciption               : To View and Delete Website Testimonial Details
+    //  Created By               : Lingaraj Dalai
+    //  Created On               : 27 Oct 2021
+    // ********************************************************************************************************
+*@
+@model IEnumerable<HomeEF.ViewTestimonialModel>
+@using HomeApp.Web;
+@{
+    ViewData["Title"] = "ViewList";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+@if (TempData["Message"] != null)
+{
+    <script>
+        var vv = '@TempData["Message"]';
+        if (vv == 1) {
+            swal("", "Testimonial updated successfully.", "success");
+        }
+        else if (vv == 2) {
+            swal("","Testimonial already exists.","warning");
+        }
+        else if (vv == 3){
+            swal("", "Something Errror occured. Please Try After Sometime!!", "error");
+        }
+        else if (vv == 4) {
+            swal("", "Testimonial Deleted Sucessfully!!", "success");
+        }
+    </script>
+}
+<script>
+    $(document).ready(function () {
+        loadNavigation('ViewList', 'glhelpdesk', 'plraiseticket', 'tl', 'CMS', 'Testimonial', ' ');
+        $('.searchableselect').searchableselect();
+        $('#datatable').DataTable();
+        $('.shorting-lnk').click(function () {
+            $('.shorting-lnk i').toggleClass('fa-sort-amount-up-alt fa-sort-amount-down-alt ');
+        });
+    });
+</script>
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        @Html.Partial("_navigation")
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link" href="~/Website/Testimonial/Add">
+                                Add
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="javascript:void(0);">
+                                View
+                            </a>
+                        </li>
+                    </ul>
+                    @Html.Partial("_util")
+                </div>
+                <section class="box form-container">
+                    <div class="content-body">
+                        <h5 class="text-brown font-weight-bold mt-0"> Testimonial Details</h5>
+                        <div class="content-body pt-0">
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="table-responsive" id="viewtable">
+                                        <table id="datatable" class="table table-sm table-bordered">
+                                            <thead>
+                                                <tr>
+                                                    <th width="20px">Sl#</th>
+                                                    <th>Photo</th>
+                                                    <th>Name</th>
+                                                    <th>Designation</th>
+                                                    <th>Location</th>
+                                                    <th>Message</th>
+                                                    <th width="50px" class="noprint text-center">Edit</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @{
+                                                    var count = 0;
+                                                    foreach (var item in Model)
+                                                    {
+                                                        count++;
+                                                        var dyclass = @item.BIT_STATUS == "Active" ? "active-row" : "inactive-row";
+                                                        <tr class="@dyclass">
+                                                            <td>@count</td>
+                                                            @if (item.VCH_IMG_PATH != null && item.VCH_IMG_PATH != "")
+                                                            {
+                                                                <td>
+                                                                    <a href="~/Website/Testimonial/DownloadFiles?filename=@item.VCH_IMG_NAME" title="" class="ml-2" data-original-title="Download Photo Copy">
+                                                                        <img src="~/@item.VCH_IMG_PATH" width="50" height="50" />
+                                                                    </a>
+                                                                </td>
+                                                            }
+                                                            else
+                                                            {
+                                                                <td>NA</td>
+                                                            }
+                                                            <td>@item.VCH_TESTIMONIAL_NAME</td>
+                                                            <td>@item.VCH_TESTIMONIAL_DESG</td>
+                                                            <td>@item.VCH_TESTIMONIAL_LOCATION</td>
+                                                            <td>@item.VCH_TESTIMONIAL_MSG</td>
+                                                            <td class="text-center noprint">
+                                                                @*<a href="@CustomQueryStringHelper.EncryptString("Website","Add","Testimonial",new {id=item.INT_TESTIMONIAL_ID })" class="text-success btn-sm" title="Edit">
+            <i class="icon-pencil-alt-solid"></i>
+        </a>
+        <a href="@CustomQueryStringHelper.EncryptString("Website","Delete","Testimonial",new {id=item.INT_TESTIMONIAL_ID })" class="text-danger btn-sm" title="Delete" onclick="return confirm('Are you sure to delete?')">
+            <i class="icon-trash-alt-solid"></i>
+        </a>*@
+                                                                <a href="/Website/Testimonial/Add/@item.INT_TESTIMONIAL_ID" class="text-success btn-sm">
+                                                                    <i class="icon-pencil-alt-solid"></i>
+                                                                </a>
+                                                                <a href="/Website/Testimonial/Add/@item.INT_TESTIMONIAL_ID" class="text-danger btn-sm" title="Delete" onclick="return confirm('Are you sure to delete?')">
+                                                                    <i class="icon-trash-alt-solid"></i>
+                                                                </a>
+                                                            </td>
+                                                        </tr>
+                                                    }
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+    <!-- MAIN CONTENT AREA ENDS -->
+</section>

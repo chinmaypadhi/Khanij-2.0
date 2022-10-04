@@ -1,0 +1,284 @@
+﻿@*// ************************************************************************************************************
+    //  View Name                : CTODetails
+    //  Desciption               : To Save and Update, Forward, Approve and Reject Liecensee CTO Details
+    //  Created By               : Prakash Chandra Biswal
+    //  Created On               : 25 June 2021
+    // **********************************************************************************************************
+*@
+
+@model MasterEF.CTODetails
+@{
+    ViewData["Title"] = "CTODetails";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+@if (TempData["Message"] != null)
+{
+    <script>
+        swal("", '@TempData["Message"]', "success");
+    </script>
+}
+<script>
+    indicateMe = "yes"
+    backMe = "yes"
+    $(document).ready(function () {
+        loadNavigation('CTODetails', 'glRoleRes', 'pllesseprof', 'tl', 'Licensee Profile', 'CTO Details', ' ');
+
+        $('.datepicker').datetimepicker({
+            format: 'LT',
+            format: 'DD-MMM-YYYY',
+            //daysOfWeekDisabled: [0, 6],
+            daysOfWeekDisabled: [],
+            widgetPositioning: {
+                horizontal: 'auto',
+                vertical: 'bottom'
+            }
+        }).keydown(false);
+
+        
+
+        if ($("#hdnCTO_Order_Date").val() != "") {
+            $("#dt_CTO_ORDER_DATE").val($("#hdnCTO_Order_Date").val());
+        }
+        if ($("#hdnCTO_VALID_FROM").val() != "") {
+            $("#dt_CTO_VALID_FROM").val($("#hdnCTO_VALID_FROM").val());
+        }
+        if ($("#hdnCTO_VALID_TO").val() != "") {
+            $("#dt_CTO_VALID_TO").val($("#hdnCTO_VALID_TO").val());
+        }
+
+        $('input[type="file"]').bind('change', function () {
+            $("input[name='Submit']").attr('disabled', false);
+            filesize = this.files[0].size;
+            var val = $(this).val().toLowerCase(),
+                //regex = new RegExp("(.*?)\.(jpeg|jpg|png)$");
+                regex = new RegExp("(.*?)\.(pdf)$");
+            if (!(regex.test(val))) {
+                swal("", "only pdf file type are allowed. ", "warning");
+                this.value = '';
+                $("input[name='Submit']").attr('disabled', true);
+                return false;
+            }
+            else if (filesize > 2048000) {
+                swal("", "File size must be 2 MB !", "warning");
+                $("input[name='Submit']").attr('disabled', true);
+                return false;
+            }
+            else {
+                var fileName = $(this).val().split("\\").pop();
+                $(this).next('.custom-file-label').html(fileName);
+            }
+            return false;
+        });
+        if (@Model.STATUS == 1) {
+            $('.form-control').css("pointer-events", "none");
+            $('#cmd').hide();
+            $('#cmd1').hide();
+        }
+
+        
+    });
+</script>
+<script>
+    function Validate() {
+        var Iss = false;
+        if (!blankFieldValidation("CTO_ORDER_NO", "CTO ORDER NO")) {
+            return false;
+        }
+        if (!blankFieldValidation("CTO_ORDER_DATE", "CTO ORDER DATE")) {
+            return false;
+        }
+        if (!blankFieldValidation("CTO_VALID_FROM", "CTO VALID FROM DATE")) {
+            return false;
+        }
+        if (!blankFieldValidation("CTO_VALID_TO", "CTO VALID TO DATE")) {
+            return false;
+        }
+        Iss = true;
+        return Iss;
+    }
+</script>
+<script>
+    function OnForwarding(btnAction) {
+        var Type;
+        if (btnAction == 'Forward To DD') {
+            Type = 'forward';
+        }
+        if (confirm("Before " + Type + " you need to apply your Digital Signature. Are you confirmed to " + Type + " Profile??")) {
+                var Postdata = 'action=signdoc' + "\n" + 'datatosign=Digital Signature Required' + "\n" + 'signaction=sign' + "\n" + 'filepath=' + "\n" + 'panNumberParam=' + "\n" + 'expirycheck=false' + "\n" + 'issuername=' + "\n" + 'certclass=1|2|3' + "\n" + 'certtype=ALL';
+                connection.send(Postdata);
+                connection.onerror = function (error) {
+                    swal("",'Please check the server connection: ' + error+'',"warning");
+                    swal("",error,"warning");
+                };
+                connection.onmessage = function (e) { // when DSC is success then following function executed.
+                    if (e.data.indexOf("subProtocol") == -1) {
+                        //alert(e.data);
+                        $("#DSCResponse").val(e.data).change();
+                        $.ajax(
+                            {
+                               url: '@Url.Action("CheckVerifyResponse", "UserInformationLiensee", new { Area = "Licensee" })',
+                                type: "POST",
+                                data: { contentType: "pkcs7", signDataBase64Encoded: e.data, responseType: "plain" },
+                                success: function (msg) {
+                                    if (msg == "SUCCESS") {
+                                        if (btnAction == "Forward To DD") {
+                                            $("#SubResion").val("Forward To DD");
+                                        }
+                                        $("#form1").submit();
+                                    }
+                                }
+                            });
+                    }
+                    else {
+                        //alert(e.data);
+                    }
+                };
+            }
+            else {
+                return false;
+            }
+    }
+    try {
+        var connection = new WebSocket('wss://localhost.emudhra.com:8080');
+        connection.onopen = function () {
+            console.log('Connection Opened');
+        };
+        connection.onerror = function (error) {
+        };
+        connection.onmessage = function (e) {
+            if (e.data.indexOf("subProtocol") == -1) {
+            }
+        };
+    }
+    catch (e) {
+        swal("", "No DSC Connection Found", "warning");
+    }
+
+    function ForwordToDdWithoutDS(btnAction) {
+
+        if (btnAction == "Forward To DD") {
+            $("#SubResion").val("Forward To DD");
+        }
+
+        $("#form1").submit();
+
+    }
+</script>
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+
+        @Html.Partial("_CMSnavigation")
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="javascript:void(0);">
+                                Add
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="~/Licensee/CTODetail/ViewList">
+                                View
+                            </a>
+                        </li>
+                    </ul>
+                    @Html.Partial("_CMSutil")
+                </div>
+
+                <section class="box form-container">
+                    <div class="content-body">
+                        <h5 class="text-brown font-weight-bold mt-0"> CTO Details</h5>
+
+                        @Html.HiddenFor(m => m.CTO_ORDER_DATE, new { @id = "hdnCTO_Order_Date" })
+                        @Html.HiddenFor(m => m.CTO_VALID_FROM, new { @id = "hdnCTO_VALID_FROM" })
+                        @Html.HiddenFor(m => m.CTO_VALID_TO, new { @id = "hdnCTO_VALID_TO" })
+
+                        @using (Html.BeginForm("Create", "CTODetail", FormMethod.Post, new { enctype = "multipart/form-data", AUTOCOMPLETE = "Off", id = "form1" }))
+                        {
+                            @Html.AntiForgeryToken()
+                            @Html.HiddenFor(m=>m.CREATED_BY)
+                            @Html.HiddenFor(model => model.SubResion)
+                            <input type="hidden" name="CTO_ID" value="@Model.CTO_ID" />
+
+                            <div class="row">
+                                <div class="col-lg-6 col-md-6 col-sm-12 form-group">
+                                    <label class="col-form-label pt-0 font-weight-bolder">Consent To Operate Letter Number <span class="text-danger">*</span></label>
+                                    @Html.TextBoxFor(x => x.CTO_ORDER_NO, new { @maxlength = "50", @class = "form-control", Onkeypress = "return inputLimiter(event,'NameCharactersAndNumbers')" })
+                                    @Html.ValidationMessageFor(x => x.CTO_ORDER_NO, "", new { @class = "text-danger", @maxlength = 50 })
+                                </div>
+                                <div class="col-lg-6 col-md-6 col-sm-12 form-group">
+                                    <label class="col-form-label pt-0 font-weight-bolder">Consent To Operate Order Date<span class="text-danger">*</span></label>
+                                    <div class="input-group">
+                                        @Html.TextBoxFor(m => m.CTO_ORDER_DATE, new { @class = "form-control datepicker", id = "dt_CTO_ORDER_DATE" })
+                                        <div class="input-group-prepend">
+                                            <label class="input-group-text" for="dt_CTO_ORDER_DATE"><i class="icon-calendar-alt-solid"></i></label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 col-md-6 col-sm-12 form-group">
+                                    <label class="col-form-label pt-0 font-weight-bolder">Consent To Operate Valid From<span class="text-danger">*</span></label>
+                                    <div class="input-group">
+                                        @Html.TextBoxFor(m => m.CTO_VALID_FROM, new { @class = "form-control datepicker", id = "dt_CTO_VALID_FROM" })
+                                        <div class="input-group-prepend">
+                                            <label class="input-group-text" for="dt_CTO_VALID_FROM"><i class="icon-calendar-alt-solid"></i></label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-6 col-md-6 col-sm-12 form-group">
+                                    <label class="col-form-label font-weight-bolder">Consent To Operate Valid To<span class="text-danger">*</span></label>
+                                    <div class="input-group">
+                                        @if (Model.CTOValidityStatus == "Validity Expired")
+                                        {
+                                            @Html.TextBoxFor(m => m.CTO_VALID_TO, new { @class = "form-control datepicker border-danger", id = "dt_CTO_VALID_TO" })
+                                        }
+                                        else
+                                        {
+                                            @Html.TextBoxFor(m => m.CTO_VALID_TO, new { @class = "form-control datepicker", id = "dt_CTO_VALID_TO" })
+                                        }
+
+                                        <div class="input-group-prepend">
+                                            <label class="input-group-text" for="dt_CTO_VALID_TO"><i class="icon-calendar-alt-solid"></i></label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-6 col-md-6 col-sm-12 form-group">
+                                    <label class="col-form-label pt-0 font-weight-bolder"> Consent To Operate Letter<span class="text-danger">*</span></label>
+                                    <div class="custom-file">
+                                        <input type="file" class="custom-file-input" id="selectedFile" name="selectedFile">
+                                        <label class="custom-file-label" for="customFile">Choose Files</label>
+                                    </div>
+
+                                    @if (Model.CTO_LETTER_PATH != null)
+                                    {
+                                        <label class="form-control-plaintext">@(Model.FILE_CTO_LETTER) <a href='~/@Model.CTO_LETTER_PATH' title="" class="ml-2" data-original-title="Download" target="_blank"><i class="icon-file-pdf-solid h5 text-danger"></i></a></label>
+                                    }
+                                </div>
+                            </div>
+                            <div class="row mt-4">
+                                <div class="col-sm-12 text-center">
+                                    @if (@Model.STATUS != 5)
+                                    {
+                                        <input type="submit" value="Save & Update" name="cmd" formaction="" class="btn btn-success btn-md ml-0 waves-effect waves-light  btnsave" id="cmd" onclick="return Validate()">
+                                        <input type="submit" value="Delete" name="cmd" class="btn btn-danger btn-md ml-0 waves-effect waves-light btnsave" id="cmd2" onclick="return confirm('Are you sure to delete?')" style="display:none">
+                                        <input type="button" value="Forward To DD" name="cmd" class="btn btn-warning text-dark btn-md waves-effect waves-light btnsave" id="cmd1" onclick="if (Validate()) { return OnForwarding('Forward To DD'); }">
+                                        @*<input type="button" value="Forward To DD" name="cmd" class="btn btn-warning text-dark btn-md waves-effect waves-light btnsave" id="cmd1" onclick="if (Validate()) { return ForwordToDdWithoutDS('Forward To DD'); }">*@
+                                    }
+                                </div>
+                            </div>
+                        }
+
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+    <!-- MAIN CONTENT AREA ENDS -->
+</section>
+
+
+
+

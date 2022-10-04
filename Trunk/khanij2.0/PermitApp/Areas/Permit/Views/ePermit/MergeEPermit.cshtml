@@ -1,0 +1,1043 @@
+﻿@model PermitEF.ePermitModel
+@{
+    ViewData["Title"] = "ePermitApplication";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+
+
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        @Html.Partial("_CMSnavigation")
+
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="javascript:void(0);">
+                                Apply e-permit
+                            </a>
+                        </li>
+
+                    </ul>
+                    @Html.Partial("_CMSutil")
+                </div>
+
+                <section class="box form-container">
+                    <div class="content-body">
+                        @using (Html.BeginForm("AddBulkPermitData", "MergePermit", FormMethod.Post, new { enctype = "multipart/form-data", AUTOCOMPLETE = "Off", id = "__EUAntiForgeryForm", @Area = "Permit" }))
+                        {
+                            @Html.AntiForgeryToken()
+
+                            @(Html.HiddenFor(model => model.BulkPermitIdList))
+                            @(Html.HiddenFor(model => model.BulkPermitId))
+                            @(Html.HiddenFor(model => model.TransactionalID))
+                            @(Html.HiddenFor(model => model.EmailId))
+                            @(Html.HiddenFor(model => model.MobileNo))
+                            @(Html.HiddenFor(model => model.PayableRoyalty))
+                            @(Html.HiddenFor(model => model.NMET))
+                            @(Html.HiddenFor(model => model.TCS))
+                            @(Html.HiddenFor(model => model.DMF))
+                            @(Html.HiddenFor(model => model.Cess))
+                            @(Html.HiddenFor(model => model.eCess))
+                            @(Html.HiddenFor(model => model.NMETPer))
+                            @(Html.HiddenFor(model => model.TCSPer))
+                            @(Html.HiddenFor(model => model.DMFPer))
+                            @(Html.HiddenFor(model => model.CessPer))
+                            @(Html.HiddenFor(model => model.eCessPer))
+                            @(Html.HiddenFor(model => model.PayableRoyaltyBase))
+                            @(Html.HiddenFor(model => model.Production))
+                            @(Html.HiddenFor(model => model.RemainingProduction))
+                            @(Html.HiddenFor(model => model.RoyaltyRateID))
+                            @(Html.HiddenFor(model => model.isForwarded))
+                            @(Html.HiddenFor(model => model.MineralGradeName))
+                            @(Html.HiddenFor(model => model.MineralNature))
+                            @(Html.HiddenFor(model => model.GeneratedBy))
+                            @(Html.HiddenFor(model => model.GeneratedDesignation))
+                            @(Html.HiddenFor(model => model.IsWalletAdjusted))
+                            @(Html.HiddenFor(model => model.MergePermitAmount))
+                            @(Html.HiddenFor(model => model.MineralName))
+                            @(Html.HiddenFor(model => model.ISAdjustmentCess))
+                            @(Html.HiddenFor(model => model.OrderNo))
+                            @(Html.HiddenFor(model => model.OrderDate))
+                            @(Html.HiddenFor(model => model.OrderOf))
+                            <div class="row">
+                                <div class="col-lg-6 col-md-12 col-sm-12">
+                                    <h5 class="text-brown font-weight-bold mt-0">New Application</h5>
+                                    <div class="row">
+                                        @if (Model != null && string.IsNullOrEmpty(Model.MineralName) == false && Model.MineralName.Contains("Coal"))
+                                        {
+                                            <div class="col-lg-12 col-md-12 col-sm-12" id="Coal_SchemeofCoal">
+                                                <label class="col-form-label font-weight-bolder">Scheme of Coal Sale</label>
+                                                @Html.DropDownListFor(model => model.TypeOfCoalDispatched, ViewBag.ViewCoalTypeList as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control form-group", autofocus = "autofocus", required = "required" })
+                                            </div>
+                                        }
+                                        <div class="col-lg-12 col-md-12 col-sm-12">
+                                            <label class="col-form-label font-weight-bolder">Name of Lessee </label>
+                                            @(Html.TextBoxFor(model => model.LesseeName, new { @class = "form-control form-group", @readonly = "readonly" }))
+                                        </div>
+                                        <div class="col-lg-12 col-md-12 col-sm-12">
+                                            <label class="col-form-label font-weight-bolder">Address</label>
+                                            @(Html.TextBoxFor(model => model.LesseeAddress, new { @class = "form-control form-group", @readonly = "readonly" }))
+
+                                        </div>
+                                        <div class="col-lg-6 col-md-6 col-sm-12">
+                                            <label class="col-form-label font-weight-bolder">Grant Order No.</label>
+                                            @(Html.TextBoxFor(model => model.GrantOrderNo, new { @class = "form-control form-group", @readonly = "readonly" }))
+                                        </div>
+                                        <div class="col-lg-6 col-md-6 col-sm-12">
+                                            <label class="col-form-label font-weight-bolder">Grant Order Date </label>
+                                            @(Html.TextBoxFor(model => model.DateOfGrant, new { @class = "form-control form-group", @readonly = "readonly" }))
+                                        </div>
+
+
+                                        <div class="col-lg-6 col-md-6 col-sm-12">
+                                            <label class="col-form-label font-weight-bolder">Period of Lease</label>
+                                            @(Html.TextBoxFor(model => model.PeriodOfLease, new { @class = "form-control form-group", @readonly = "readonly" }))
+                                        </div>
+                                        <div class="col-lg-6 col-md-6 col-sm-12">
+                                            <label class="col-form-label font-weight-bolder">Village</label>
+                                            @(Html.TextBoxFor(model => model.Village, new { @class = "form-control form-group", @readonly = "readonly" }))
+                                            @(Html.HiddenFor(model => model.VillageId))
+                                        </div>
+                                        <div class="col-lg-6 col-md-6 col-sm-12">
+                                            <label class="col-form-label font-weight-bolder">Panchayat</label>
+                                            @(Html.TextBoxFor(model => model.Panchayat, new { @class = "form-control form-group", @readonly = "readonly" }))
+                                        </div>
+                                        <div class="col-lg-6 col-md-6 col-sm-12">
+                                            <label class="col-form-label font-weight-bolder">Tehsil</label>
+                                            @(Html.TextBoxFor(model => model.Tehsil, new { @class = "form-control form-group", @readonly = "readonly" }))
+                                            @(Html.HiddenFor(model => model.TehsilId))
+                                        </div>
+
+
+                                        <div class="col-lg-6 col-md-6 col-sm-12">
+                                            <label class="col-form-label font-weight-bolder">Police Station</label>
+                                            @(Html.TextBoxFor(model => model.PoliceStation, new { @class = "form-control form-group", @readonly = "readonly" }))
+                                        </div>
+
+                                        <div class="col-lg-6 col-md-6 col-sm-12">
+                                            <label class="col-form-label font-weight-bolder">District</label>
+                                            @(Html.TextBoxFor(model => model.District, new { @class = "form-control form-group", @readonly = "readonly" }))
+                                            @(Html.HiddenFor(model => model.DistrictId))
+                                        </div>
+                                        @if (Model != null && Model.MineralName != null && Model.MineralName.Contains("Coal"))
+                                        {
+
+                                            <div class="col-lg-12 col-md-12 col-sm-12 form-group">
+                                                <label class="col-form-label font-weight-bolder">Delivery Order</label>
+                                                <div class="col-lg-12 col-md-12 col-sm-12 pl-0">
+                                                    <input name="DOSelection" type="radio" id="YESDO" value="1" checked="checked" class="custom-radio" />
+                                                    <label class="radio-label">
+                                                        YES
+                                                    </label>
+                                                    <input name="DOSelection" type="radio" id="NODO" value="0" class="custom-radio" />
+                                                    <label class="radio-label"> NO</label>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-lg-4 col-md-6 col-sm-12" id="doRequired">
+                                                <label class="col-form-label font-weight-bolder">Delivery Order No.</label>
+                                                @(Html.TextBoxFor(model => model.DONumber, new { @class = "form-control form-group", @readonly = "readonly" }))
+                                            </div>
+                                            <div class="col-lg-4 col-md-6 col-sm-12" id="Coal_DeliveryOrder">
+                                                <label class="col-form-label font-weight-bolder">Delivery Order Date</label>
+                                                @(Html.TextBoxFor(model => model.DODate, new { @class = "form-control form-group", @readonly = "readonly" }))
+                                            </div>
+
+                                        }
+
+                                        <div class="col-lg-6 col-md-6 col-sm-12">
+                                            <label class="col-form-label font-weight-bolder">Mineral Name</label>
+                                            @(Html.TextBoxFor(model => model.MineralName, new { @class = "form-control form-group", @readonly = "readonly" }))
+                                            @(Html.HiddenFor(model => model.MineralId))
+                                        </div>
+                                        <div class="col-lg-6 col-md-6 col-sm-12 form-group">
+                                            <label class="col-form-label font-weight-bolder">Mineral Form</label>
+                                            @(Html.TextBoxFor(model => model.MineralNature, new { @class = "form-control", @readonly = "readonly" }))
+                                            @(Html.HiddenFor(model => model.MineralNatureId))
+
+                                        </div>
+
+                                        <div class="col-lg-6 col-md-6 col-sm-12 form-group">
+                                            <label class="col-form-label font-weight-bolder">Mineral Grade</label>
+                                            @(Html.TextBoxFor(model => model.MineralGradeName, new { @class = "form-control", @readonly = "readonly" }))
+                                            @(Html.HiddenFor(model => model.MineralGradeId))
+                                        </div>
+                                        <div class="col-lg-6 col-md-6 col-sm-12 form-group">
+                                            <label class="col-form-label font-weight-bolder">Remaining Dispatch</label>
+                                            @(Html.TextBoxFor(model => model.RemainingProduction, new { @class = "form-control", @readonly = "readonly" }))
+                                        </div>
+                                        <div class="col-lg-6 col-md-6 col-sm-12 form-group bauxite">
+                                            <label class="col-form-label font-weight-bolder">Alumina Content </label>
+                                            @(Html.TextBoxFor(model => model.AluminaContent, new { @class = "form-control form-group", onkeypress = "return isNumberKey(event,this)", @maxlength = "10", @onblur = "txtQuantityChange();" }))
+                                        </div>
+                                        <div class="col-lg-6 col-md-6 col-sm-12 form-group tin">
+                                            <label class="col-form-label font-weight-bolder">Tin Content</label>
+                                            @(Html.TextBoxFor(model => model.TinContent, new { @class = "form-control form-group", onkeypress = "return isNumberKey(event,this)", @maxlength = "10", @onblur = "txtQuantityChange();" }))
+                                        </div>
+                                        <div class="col-lg-6 col-md-6 col-sm-12">
+                                            <label class="col-form-label font-weight-bolder">Quantity<small><i class="fas fa-rupee-sign ml-1"></i></small></label>
+                                            @(Html.TextBoxFor(model => model.ProposedQty, new { @class = "form-control form-group", @onblur = "txtQuantityChange();" }))
+                                        </div>
+                                        <div class="col-lg-6 col-md-6 col-sm-12">
+                                            <label class="col-form-label font-weight-bolder">Unit</label>
+                                            @(Html.TextBoxFor(model => model.UnitName, new { @class = "form-control form-group", @readonly = "readonly" }))
+                                            @(Html.HiddenFor(model => model.UnitId))
+                                        </div>
+                                        @if (Model != null && Model.MineralName != null && Model.MineralName.Contains("Coal"))
+                                        {
+                                            if (ViewBag.read != null)
+                                            {
+                                                <div class="col-lg-6 col-md-6 col-sm-12">
+                                                    <label class="col-form-label font-weight-bolder">Basic Price / Royalty Rate</label>
+                                                    @(Html.TextBoxFor(model => model.BasicRate, new { @class = "form-control form-group",@readonly= @ViewBag.read }))
+                                                </div>
+                                            }
+                                            else
+                                            {
+                                                <div class="col-lg-6 col-md-6 col-sm-12">
+                                                    <label class="col-form-label font-weight-bolder">Basic Price / Royalty Rate</label>
+                                                    @(Html.TextBoxFor(model => model.BasicRate, new { @class = "form-control form-group" }))
+                                                </div>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <div class="col-lg-6 col-md-6 col-sm-12">
+                                                <label class="col-form-label font-weight-bolder">Royalty Rate</label>
+                                                @(Html.TextBoxFor(model => model.RoyaltyRate, new { @class = "form-control form-group", @readonly = "readonly" }))
+                                            </div>
+                                        }
+
+                                        <input type="hidden" id="che" name="che" value="@ViewBag.read" />
+                                        <div class="col-lg-6 col-md-6 col-sm-12">
+                                            <label class="col-form-label font-weight-bolder">Total Payable Amount<small><i class="icon-rupee-sign-solid ml-1"></i></small></label>
+                                            @(Html.TextBoxFor(model => model.TotalPayableAmount, new { @class = "form-control form-group", @readonly = "readonly" }))
+                                        </div>
+                                    </div>
+                                    <div class="row mt-3">
+                                        <div class="col-sm-12">
+                                            <a class="btn btn-dark btn-md ml-0 waves-effect waves-light " data-toggle="modal" data-target="#viewcalculation">View Calculation</a>
+                                            @if (Model == null || Model.BulkPermitId == null || Model.BulkPermitId < 1)
+                                            {
+                                                <input type="button" onclick="return onSubmit();" id="btnSave" value="Save" class="btn btn-success btn-md ml-0 waves-effect waves-light" />
+                                                @*<input type="button" title="Make Payment" data-target="#mi-modal" data-toggle="modal" value="Make Payment" id="btnPayment" class="btn btn-primary btn-md ml-0 waves-effect waves-light" />*@
+                                                <input type="button" title="Make Payment" onclick="return OnPayment();" value="Make Payment" id="btnPayment" class="btn btn-primary btn-md ml-0 waves-effect waves-light" />
+
+                                            }
+                                            else
+                                            {
+
+                                                <input type="button" id="btnEdit" value="Update" onclick="return onSubmit();" class="btn btn-primary" />
+                                                @*<input type="button" title="Make Payment" value="Make Payment" id="btnPayment1" class="btn btn-primary" />*@
+                                                <input type="button" title="Make Payment" onclick="return OnPayment();" value="Make Payment" id="btnPayment" class="btn btn-primary btn-md ml-0 waves-effect waves-light" />
+                                                <input type="submit" onclick="return onPrivewDownload();" id="btnForwardToDDDMO1" value="Download Draft Application" name="cmdPreview" class="btn btn-primary" />
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 col-md-12 col-sm-12">
+                                    <h5 class="text-brown font-weight-bold mt-0">Details</h5>
+                                    <div class="bg-light p-2 shadow-sm">
+                                        <div class="row">
+                                            <div class="col-lg-12 col-md-12 col-sm-12">
+                                                <div class="row">
+                                                    <label class="col-sm-7 col-form-label font-weight-bolder">EC Approved Qty + Opening Stock</label>
+                                                    <div class="col-sm-5">
+                                                        <span class="colon">:</span>
+                                                        @(Html.LabelFor(x => x.TotalECApprovedQty, @Model.TotalECApprovedQty))
+                                                        @*<label class="form-control-plaintext"><span class="colon">:</span>2000000.000</label>*@
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-12 col-md-12 col-sm-12">
+                                                <div class="row">
+                                                    <label class="col-sm-7 col-form-label font-weight-bolder">Mining Plan Qty</label>
+                                                    <div class="col-sm-5">
+                                                        <span class="colon">:</span>
+                                                        @Html.LabelFor(x => x.TotalMiningProductionQty, @Model.TotalMiningProductionQty.ToString())
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-12 col-md-12 col-sm-12">
+                                                <div class="row">
+                                                    <label class="col-sm-7 col-form-label font-weight-bolder">Lease Validity</label>
+                                                    <div class="col-sm-5">
+                                                        <span class="colon">:</span>
+                                                        @(Html.Label(@Model.MPValidity))
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-12 col-md-12 col-sm-12">
+                                                <div class="row">
+                                                    <label class="col-sm-7 col-form-label font-weight-bolder">By Road</label>
+                                                    <div class="col-sm-5">
+                                                        <span class="colon">:</span>
+                                                        @(Html.LabelFor(x => x.RoadDispatch, @Model.RoadDispatch))
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-12 col-md-12 col-sm-12">
+                                                <div class="row">
+                                                    <label class="col-sm-7 col-form-label font-weight-bolder">By Road-Rail</label>
+                                                    <div class="col-sm-5">
+                                                        <span class="colon">:</span>
+                                                        @(Html.LabelFor(x => x.RoadRailDispatch, @Model.RoadRailDispatch))
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-12 col-md-12 col-sm-12">
+                                                <div class="row">
+                                                    <label class="col-sm-7 col-form-label font-weight-bolder">By Inside Railway Siding</label>
+                                                    <div class="col-sm-5">
+                                                        <span class="colon">:</span>
+                                                        @(Html.LabelFor(x => x.InsideRailwaySidingDispatch, @Model.InsideRailwaySidingDispatch))
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-12 col-md-12 col-sm-12">
+                                                <div class="row">
+                                                    <label class="col-sm-7 col-form-label font-weight-bolder">By Conveyor Belt</label>
+                                                    <div class="col-sm-5">
+                                                        <span class="colon">:</span>
+                                                        @(Html.LabelFor(x => x.ConveyorBeltDispatch, @Model.ConveyorBeltDispatch))
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-12 col-md-12 col-sm-12">
+                                                <div class="row">
+                                                    <label class="col-sm-7 col-form-label font-weight-bolder">By MGR/Own Wagon</label>
+                                                    <div class="col-sm-5">
+                                                        <span class="colon">:</span>
+                                                        @(Html.LabelFor(x => x.MGROWNWagonDispatch, @Model.MGROWNWagonDispatch))
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-12 col-md-12 col-sm-12">
+                                                <div class="row">
+                                                    <label class="col-sm-7 col-form-label font-weight-bolder">By End use plant inside the lease area</label>
+                                                    <div class="col-sm-5">
+                                                        <span class="colon">:</span>
+                                                        @(Html.LabelFor(x => x.EndUsePlantinsIdetheLeaseAreaDispatch, @Model.EndUsePlantinsIdetheLeaseAreaDispatch))
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-12 col-md-12 col-sm-12">
+                                                <div class="row">
+                                                    <label class="col-sm-7 col-form-label font-weight-bolder">By Ropeway</label>
+                                                    <div class="col-sm-5">
+                                                        <span class="colon">:</span>
+                                                        @(Html.LabelFor(x => x.RopewayDispatch, @Model.RopewayDispatch))
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-12 col-md-12 col-sm-12">
+                                                <div class="row">
+                                                    <label class="col-sm-7 col-form-label font-weight-bolder">Total Dispatched (e-Pass)</label>
+                                                    <div class="col-sm-5">
+                                                        <span class="colon">:</span>
+                                                        @(Html.LabelFor(x => x.UserTotalDispatch, @Model.UserTotalDispatch))
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-12 col-md-12 col-sm-12">
+                                                <div class="row">
+                                                    <label class="col-sm-7 col-form-label font-weight-bolder">Total Dispatched</label>
+                                                    <div class="col-sm-5">
+                                                        <span class="colon">:</span>
+                                                        @(Html.LabelFor(x => x.TillDateDispatched, @Model.TillDateDispatched))
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+    <!-- MAIN CONTENT AREA ENDS -->
+</section>
+@*<uc1:footer runat="server" ID="footer" />*@
+
+<div class="modal fade" id="viewcalculation">
+    <div class="modal-dialog modal-dialog-centered modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title m-0">View Calculation</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+            <div class="modal-body">
+                <div class="row col-md-12">
+                    <h6 class="w-100">Mines Details</h6>
+
+                    <div class="mb-3">
+                        <span class="font-weight-bold">Auction Type : </span><small>@ViewBag.Auct =></small>
+                        <span class="font-weight-bold">Lease Extend : </span><small>@ViewBag.Leaseext =></small>
+                        <span class="font-weight-bold">Captive : </span><small>@ViewBag.capt =></small>
+                        <span class="font-weight-bold">Grant Date : </span><small>@ViewBag.Mlgrd</small>
+                    </div>
+                    <table id="PaymentTable" class="table table-bordered"></table>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+@(Html.HiddenFor(model => model.PaymentDetails))
+<div class="modal fade" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true" id="mi-modal">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel">Do you want to adjust your e-wallet amount with this e-permit payment ?</h4>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" id="modal-btn-si">Yes</button>
+                <button type="button" class="btn btn-primary" id="modal-btn-no">No</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    indicateMe = "yes"
+    backMe = "yes"
+    $(document).ready(function () {
+        loadNavigation('NewE-permit', 'glhelpdesk', 'plraiseticket', 'tl', 'E-Permit', 'Apply e-permit', ' ');
+        $('.datetime').datetimepicker({
+            format: "DD/MM/YYYY"
+        }).keydown(false);
+    });
+</script>
+
+<script>
+
+    function GetMineralGradeId() {
+        return {
+            MineralNatureId: $("#MineralNatureId").val()
+        };
+    }
+
+
+
+    function CheckQuantityChange_BulkPermitId() {
+
+        var TotalQuantity = parseFloat($("#ProposedQty").val());
+        debugger;
+        if ($("#BasicRate").val() == "" || $("#ProposedQty").val() == "") {
+            $('#PaymentTable').empty();
+            $("#TotalPayableAmount").val(0);
+            return false;
+        }
+
+        var MineralGrade = $('#MineralGradeId').val();
+        var TotalQty = 0;
+        var ProductionCap = 0;
+        $.ajax({
+            url: '@Url.Action("GradeWiseCheckECQTY", "Lessee", new { Area = "Permit" })',
+            type: "GET",
+            //data: '{MineralGradeId : "' + MineralGrade + '" }',
+            data: { MineralGradeId: MineralGrade },
+            success: function (data) {
+                if (data != "" && data != 0) {
+                    $("#ProductionCap").val(parseFloat(data));
+                }
+
+                var TotalQty = parseFloat($("#ProposedQty").val()) + parseFloat($("#RemainingProduction").val());
+                var ProductionCap = parseFloat($("#ProductionCap").val());
+
+                if (TotalQty > ProductionCap) {
+
+                    $("#ProposedQty").val(0).change();
+                    $("#PayableRoyalty").val(0).change();
+                    // alert("Your Production Capacity Balance is : " + $("#RemainingProduction").val());
+                   /* alert("Your Production Capacity Balance is : " + ProductionCap);*/
+                    swal("", "Your Production Capacity Balance is : " + ProductionCap,"success")
+                    return false;
+                }
+                else {
+
+
+                    var RoyaltyRate = 0;
+                    var TotalQuantity = parseFloat($("#ProposedQty").val()) + parseFloat($("#RemainingProduction").val());
+                    var MiningProduction = parseFloat($("#ProductionCap").val());
+
+                    //var MineralNatureId = $('#MineralNatureId').val();
+                    //var Mineral = $('#MineralId').val();
+                    var UnitType = $('#UnitId').val();
+                    //var MineralGrade = $('#MineralGradeId').val();
+                    //var RoyaltyRate = parseFloat($("#BasicRate").val());
+                    //var AluminaContent = $("#AluminaContent").val();
+                    //var TinContent = $("#TinContent").val();
+
+                    if ($('#MineralName').val().indexOf("Coal") >= 0) {
+                        RoyaltyRate = $("#BasicRate").val();
+                    }
+                    else {
+                        RoyaltyRate = $("#RoyaltyRate").val();
+                    }
+                    var LeaseTypeId = '@TempData["LeaseTypeId"]';
+                    var AppQuantity = $("#ProposedQty").val();
+                    //var BulkPermitId = $('#BulkPermitId').val();
+
+                    var P_BulkPermitId = $('#BulkPermitId').val();
+                    var P_MineralNatureId = $('#MineralNatureId').val();
+                    var P_Mineral = $('#MineralId').val();
+                    var P_MineralGrade = $('#MineralGradeId').val();
+                    var P_RoyaltyRate = parseFloat($("#BasicRate").val());
+
+                    var P_AluminaContent = $("#AluminaContent").val();
+                    var P_TinContent = $("#TinContent").val();
+
+                    if (AppQuantity == "" || AppQuantity == null) { AppQuantity = "0" }
+                    $.ajax({
+                        type: "POST",
+                        url: "/Permit/Lessee/RevisedCalculation",
+                        //url: '@Url.Action("RevisedCalculation", "Lessee", new { Area = "Permit" })',
+                        data: { 'MineralNatureId': P_MineralNatureId, 'MineralGradeId': P_MineralGrade, MineralId: P_Mineral, Quantity: TotalQuantity, RoyaltyRate: P_RoyaltyRate, BulkPermitId: P_BulkPermitId, AluminaContent: P_AluminaContent, TinContent: P_TinContent },
+                        //data: '{MineralNatureId: "' + MineralNatureId + '",MineralGradeId: "' + MineralGrade + '",MineralId: "' + Mineral + '",Quantity: "' + TotalQuantity + '",RoyaltyRate: "' + RoyaltyRate + '",BulkPermitId: "' + BulkPermitId + '",AluminaContent: "' + AluminaContent + '",TinContent: "' + TinContent + '"}',
+                        //contentType: "application/json; charset=utf-8",
+                        dataType: "json",
+                        success: function (result) {
+                            if (result != null) {
+                                $('#isNegativeRoyalty').val(0).change();
+                                resultdata = result;
+                                var isOffline = false;
+                                $('#PaymentTable').empty();
+                                if ($("#MineralName").val() == "Coal" && $("#LesseeName").val().indexOf('Hindalco') >= 0 && $("#ISAdjustmentCess").val() == "1") {
+                                    $('#PaymentTable').append('<tr><td colspan="4" ><label style="color: red;font-size: 14px;">Note : This adjustment in Royalty is w.r.t to <b style="color: black">' + $("#OrderOf").val() + ' </b> with order no <b style="color: black"> ' + $("#OrderNo").val() + ' </b> on dated : <b style="color: black">' + $("#OrderDate").val() + '<b>.</label><br /><label style="color: red;font-size: 14px;">Total Payable Royalty = Payable Royalty - (Infrastructure Development  Cess + Environmental Cess) </label></td></tr>');
+                                }
+                                $('#PaymentTable').append('<tr><th width="160px"><label style="color: red;font-size: 16px;margin-bottom: 0px;">Payable</label></th><th ><label style="margin-bottom: 0px;">Payment Amount <small><i class="icon-rupee-sign-solid ml-1"></i></small></label></th><th><label style="margin-bottom: 0px;">Calculation</label></th><th ><label style="margin-bottom: 0px;">Head of Account</label></th></tr>');
+                                $.each(result, function (i) {
+
+                                    if (result[i].MappingValue <= 0 && $('#isNegativeRoyalty').val() == 0 && $("#LesseeName").val().indexOf('Hindalco') >= 0 && $("#ISAdjustmentCess").val() == "1") {
+                                        $('#isNegativeRoyalty').val(1).change();
+                                    }
+
+                                    if (result[i].IsApplicable == false) {
+                                        if (isOffline == false) {
+                                            $('#PaymentTable').append('<tr><td style="width:100%;" colspan="4"><label style="color: red;font-size: 16px;font-weight: 700;margin-bottom: 0px;">Shall be paid separately</label></td></tr>');
+                                            isOffline = true;
+                                        }
+                                    }
+                                    if (i == 0) {
+                                        $("#RoyaltyRateID").val(result[0].PaymentTypeID);
+                                        $("#RoyaltyRate").val(result[0].CalValue);
+                                        $("#TotalPayableAmount").val(result[0].TotalPayableAmount);
+                                        $("#PayableRoyalty").val(result[0].MappingValue);
+                                        var vvRoyalty = result[i].PaymentType;
+
+                                        if (vvRoyalty == "Payable Royalty" && $("#ISAdjustmentCess").val() == "1") {
+                                            vvRoyalty = "Total Payable Royalty";
+                                        }
+                                        else {
+                                            vvRoyalty = "Royalty";
+                                        }
+
+                                        if (result[i].CalType == "Rs / Unit") {
+                                            $('#PaymentTable').append('<tr><td><label>' + vvRoyalty + '</label></td><td ><input class="form-control" readonly="readonly" type="text" value="' + result[i].MappingValue + '"></td><td ><input class="form-control" readonly="readonly" type="text" value="' + result[i].RoyaltyRate + ' ' + result[i].CalType + '"></td><td ><input class="form-control" readonly="readonly" type="text" value="' + result[i].HeadAccount + '"></td></tr>');
+                                        }
+                                        else if (result[i].CalType == "Fixed") {
+                                            $('#PaymentTable').append('<tr><td ><label>' + vvRoyalty + '</label></td><td ><input class="form-control" readonly="readonly" type="text" value="' + result[i].MappingValue + '"></td><td ><input class="form-control" readonly="readonly" type="text" value="' + result[i].RoyaltyRate + ' ' + result[i].CalType + '"></td><td ><input class="form-control" readonly="readonly" type="text" value="' + result[i].HeadAccount + '"></td></tr>');
+                                        }
+                                        else {
+                                            $('#PaymentTable').append('<tr><td ><label>' + vvRoyalty + '</label></td><td ><input class="form-control" readonly="readonly" type="text" value="' + result[i].MappingValue + '"></td><td ><input class="form-control" readonly="readonly" type="text" value="' + result[i].RoyaltyRate + ' ' + result[i].CalType + ' of ' + result[i].BasisRate + '"></td><td ><input class="form-control" readonly="readonly" type="text" value="' + result[i].HeadAccount + '"></td></tr>');
+                                        }
+                                    }
+                                    else {
+                                        $('#PaymentTable').append('<tr><td ><label>' + result[i].PaymentType + '</label></td><td ><input class="form-control" readonly="readonly" type="text" value="' + result[i].MappingValue + '"></td><td ><input class="form-control" readonly="readonly" type="text" value="' + result[i].CalValue + ' ' + result[i].CalType + '"></td><td ><input class="form-control" readonly="readonly" type="text" value="' + result[i].HeadAccount + '"></td></tr>');
+                                    }
+
+                                })
+                            }
+                        }
+                    });
+                }
+            },
+            error: function (data) {
+            }
+        });
+
+
+    }
+
+    $(document).ready(function () {
+        if ($("#BulkPermitId").val() > 0) {
+            CheckQuantityChange_BulkPermitId();
+
+            //QuantityChange_BulkPermitId();
+            //$("#ProposedQty").val((Math.abs($("#ProposedQty").val()) - Math.abs($("#RemainingProduction").val())))
+        }
+        var Mineral = $('#MineralName').val();
+
+        if (Mineral == 'Bauxite') {
+            $(".bauxite").show();
+            $(".tin").hide()
+
+        }
+        else if (Mineral == 'Tin Ore') {
+            $(".tin").show();
+            $(".bauxite").hide();
+        }
+        else {
+            $(".bauxite").hide();
+            $(".tin").hide();
+        }
+        if (parseInt($("#BulkPermitId").val()) > 0 && $("#DONumber").val() != "") {
+            // var DOApplicable = $("input:radio[name='DOSelection']:checked").val();
+            $(":radio[name='DOSelection'][value='1']").attr('checked', 'checked');
+            $("#doRequired").show();
+            $("#Coal_DeliveryOrder").show();
+        }
+        else {
+            $(":radio[name='DOSelection'][value='0']").attr('checked', 'checked');
+            $("#doRequired").hide();
+            $("#Coal_DeliveryOrder").hide();
+        }
+    });
+
+    if ($("#BulkPermitId").val() > 0) {
+        $("#btnSave").attr("disabled", "disabled");
+    }
+    else {
+        $("#btnEdit").attr("disabled", "disabled");
+    }
+
+    function txtQuantityChange() {
+        CheckQuantityChange_BulkPermitId();
+    }
+
+    $('#BasicRate').change(function () {
+        var vv = CheckQuantityChange_BulkPermitId();
+    })
+
+    var myWindow = $("#window"), undo = $("#Calculation");
+    var resultdata;
+    var win;
+    myWindow.hide();
+
+    undo.click(function () {
+        try {
+            CheckQuantityChange_BulkPermitId();
+        }
+        catch (e) {
+
+        }
+
+        if (!win) {
+            win.center().open();
+        } else {
+            win.open();
+        }
+    });
+
+    function onClose() {
+    }
+
+
+
+    function openPopUp() {
+        if (!win) {
+            win.center().open();
+        } else {
+            win.open();
+        }
+
+        if (resultdata != null) {
+            $("#PayableRoyalty1").val(resultdata.PayableRoyalty);
+            $("#TCS1").val(resultdata.TCS);
+            $("#Cess1").val(resultdata.Cess);
+            $("#DMF1").val(resultdata.DMF);
+            $("#NMET1").val(resultdata.NMET);
+            $("#TotalPayableAmount1").val(resultdata.TotalPayableAmount);
+            $("#eCess1").val(resultdata.eCess);
+            //$("#TotalPayableAmount_popup").val(resultdata.TotalPayableAmount);
+            $("#TCSPer1").val(resultdata.TCSPer);
+            $("#CessPer1").val(resultdata.CessPer);
+            $("#eCessPer1").val(resultdata.eCessPer);
+            $("#DMFPer1").val(resultdata.DMFPer);
+            $("#NMETPer1").val(resultdata.NMETPer);
+            $("#PayableRoyaltyBase1").val(resultdata.PayableRoyaltyBase).change();
+        }
+        else {
+            $("#PayableRoyalty1").val($("#PayableRoyalty").val());
+            $("#TCS1").val($("#TCS").val());
+            $("#Cess1").val($("#Cess").val());
+            $("#DMF1").val($("#DMF").val());
+            $("#NMET1").val($("#NMET").val());
+            $("#TotalPayableAmount1").val($("#TotalPayableAmount").val());
+            $("#eCess1").val($("#eCess").val());
+            $("#TCSPer1").val($("#TCSPer").val());
+            $("#CessPer1").val($("#CessPer").val());
+            $("#eCessPer1").val($("#eCessPer").val());
+            $("#DMFPer1").val($("#DMFPer").val());
+            $("#NMETPer1").val($("#NMETPer").val());
+            $("#PayableRoyaltyBase1").val($("#PayableRoyaltyBase").val());
+        }
+    }
+
+    $('#ProposedQty').keypress(function (e) {
+        if (isNaN(this.value + String.fromCharCode(event.keyCode))) return false;
+    });
+
+    $('#BasicRate').keypress(function (e) {
+        if (isNaN(this.value + String.fromCharCode(event.keyCode))) return false;
+    });
+
+    var modalConfirm = function (callback) {
+        //$("#btnPayment").on("click", function () {
+        //    $("#mi-modal").modal('show');
+
+        //});
+        //$("#btnPayment1").on("click", function () {
+        //    $("#mi-modal").modal('show');
+
+        //});
+        $("#modal-btn-si").on("click", function () {
+            callback(true);
+            $("#mi-modal").modal('hide');
+        });
+        $("#modal-btn-no").on("click", function () {
+            callback(false);
+            $("#mi-modal").modal('hide');
+        });
+    };
+
+    modalConfirm(function (confirm) {
+        if (confirm) {
+            //Acciones si el usuario confirma
+            $("#IsWalletAdjusted").val(1).change();
+            OnPayment();
+        } else {
+            $("#IsWalletAdjusted").val(0).change();
+            OnPayment();
+            //Acciones si el usuario no confirma
+        }
+    });
+
+    function checkFields() {
+        var totalAmountAdjust = parseFloat($("#MergePermitAmount").val());
+        var TotalQty = parseFloat($("#ProposedQty").val());
+        var ProductionCap = parseFloat($("#ProductionCap").val());
+        if (TotalQty > ProductionCap) {
+            $("#ProposedQty").val(0).change();
+            $("#PayableRoyalty").val(0).change();
+            swal("", "Your Production Capacity Balance is : " + ProductionCap, "success")
+       /*     alert("Your Production Capacity Balance is : " + ProductionCap);*/
+            return false;
+        }
+
+        txtQuantityChange();
+
+        var vv = $("#ProposedQty").val();
+        var TotalQuantity = parseFloat($("#ProposedQty").val());
+        var MiningProduction = parseFloat($("#RemainingProduction").val());
+        var vvPP = $("#TotalPayableAmount").val();
+
+        var DOApplicable = $("input:radio[name='DOSelection']:checked").val();
+        var DODate = $('#DODate').val();
+
+        var vvroyalty = $("#RoyaltyRate").val();
+
+        var MF = $("#MineralNatureId").val();
+        var MG = $("#MineralGradeId").val();
+        var DONo = $("#DONumber").val();
+        var Scheme = $("#TypeOfCoalDispatched").val();
+        var basicPrice = $("#BasicRate").val();
+
+        var AluminaContent = $("#AluminaContent").val();
+        var TinContent = $("#TinContent").val();
+        var MineralName = $("#MineralName").val();
+        var MFName = $("#MineralNature").val();
+
+        if (MF == "" || MF == 0) {
+            swal("", "Select Mineral Form", "warning")
+           /* alert("Select Mineral Form");*/
+            return;
+        }
+        else if (MG == "" || MG == 0) {
+            swal("", "Select Mineral Grade", "warning")
+            /*alert("Select Mineral Grade");*/
+            return;
+        }
+
+        if ($('#MineralName').val().indexOf("Coal") >= 0) {
+            if (parseInt(DOApplicable) == 1) {
+                if (DONumber == null || DONo == "" || DONo == 0) {
+                    swal("", "Enter Delivery Order No.", "warning")
+                    /*alert("Enter Delivery Order No.");*/
+                    return false;
+                }
+                else if (DODate == null || DODate == "") {
+                    swal("", "Enter Delivery order date.", "warning")
+                    /*alert("Enter Delivery order date.");*/
+                    return false;
+                }
+                else if (Scheme == "" || Scheme == 0) {
+                    swal("", "Select Scheme of Coal Sale", "warning")
+                   /* alert("Select Scheme of Coal Sale");*/
+                    return false;
+                }
+                else if (basicPrice == "" || basicPrice == 0) {
+                    swal("", "Basic Price is not defined", "warning")
+                    /*alert("Basic Price is not defined");*/
+                    return false;
+                }
+            }
+        }
+        if (vv == "" || TotalQuantity == 0) {
+            swal("", "Enter Qty.", "warning")
+            /*alert("Enter Qty.");*/
+            return false;
+        }
+        else if (MineralName == 'Tin Ore') {
+            if (TinContent == "" || TinContent == 0) {
+                swal("", "Enter Tin Content.", "warning")
+             /*   alert("Enter Tin Content.");*/
+                $("#TinContent").focus();
+                return false;
+            }
+        }
+        else if (MineralName == 'Bauxite') {
+            if (MFName == "For use in alumina and aluminium metal extraction") {
+                if (AluminaContent == "" || AluminaContent == 0) {
+                    swal("", "Enter Alumina Content.", "warning")
+                    /*alert("Enter Alumina Content.");*/
+                    $("#AluminaContent").focus();
+                    return false;
+                }
+            }
+        }
+        else if (vvPP == "" || parseFloat(vvPP) == 0) {
+            swal("", "Royalty Rate is not defined for this Mineral Grade", "warning")
+            /*alert("Royalty Rate is not defined for this Mineral Grade");*/
+            return false;
+        }
+        else if (vvroyalty == "" || parseFloat(vvroyalty) == 0) {
+            swal("", "Royalty Rate is not defined for this Mineral Grade", "warning")
+           /* alert("Royalty Rate is not defined for this Mineral Grade");*/
+            return false;
+        }
+        //else if (totalAmountAdjust == "" || parseFloat(totalAmountAdjust) == 0) {
+        //    alert("The e-Permit don't have enough balance payment for new application");
+        //    return false;
+        //}
+        //else if (parseFloat(totalAmountAdjust) > parseFloat(vvPP)) {
+        //    alert("The e-Permit don't have enough balance payment for new application");
+        //    return false;
+        //}
+        return true;
+    }
+
+    function onSubmit() {
+        if ($("#isNegativeRoyalty").val() == 1) {
+/*            alert("Payable Amount is coming less than 0. Kindly re-check the values entered for Basic Price/ Royalty Rate & Quantity.");*/
+            swal("", "Payable Amount is coming less than 0. Kindly re-check the values entered for Basic Price/ Royalty Rate & Quantity.", "warning")
+            return false;
+        }
+        else {
+            var vv = checkFields();
+            if (vv == true) {
+
+                swal({
+                    title: "Are you sure to save this application ?",
+                    icon: "warning",
+                    buttons: ["No", "Yes"],
+                })
+                    .then((submit) => {
+                        if (submit) {
+                            $("#__EUAntiForgeryForm").submit();
+                        }
+                    });
+
+                //if (confirm("Are you sure to save this application ?")) {
+                //    $("#__EUAntiForgeryForm").submit();
+                //}
+            }
+            else {
+                return false;
+            }
+        }
+    }
+
+    function onPrivewDownload() {
+        if ($("#isNegativeRoyalty").val() == 1) {
+/*            alert("Payable Amount is coming less than 0. Kindly re-check the values entered for Basic Price/ Royalty Rate & Quantity.");*/
+            swal("", "Payable Amount is coming less than 0. Kindly re-check the values entered for Basic Price/ Royalty Rate & Quantity.", "warning")
+            return false;
+        }
+        else {
+            var vv = checkFields();
+            if (vv == true) {
+                $("#__EUAntiForgeryForm").submit();
+            }
+        }
+    }
+
+    function OnPayment() {
+        if ($("#isNegativeRoyalty").val() == 1) {
+/*            alert("Payable Amount is coming less than 0. Kindly re-check the values entered for Basic Price/ Royalty Rate & Quantity.");*/
+            swal("", "Payable Amount is coming less than 0. Kindly re-check the values entered for Basic Price/ Royalty Rate & Quantity.", "warning")
+            return false;
+        }
+        else {
+            var vv = checkFields();
+            if (vv == true) {
+
+                swal({
+                    title: "Are you sure to make payment??",
+                    icon: "warning",
+                    buttons: ["No", "Yes"],
+                })
+                    .then((submit) => {
+                        if (submit) {
+                            if ($("#BulkPermitId").val() == null || $("#BulkPermitId").val() != "") {
+                                $("#isForwarded").val(1).change();
+                            }
+                            $("#__EUAntiForgeryForm").submit();
+                        }
+                    });
+
+                //if (confirm("Are you sure to make payment??")) {
+                //    if ($("#BulkPermitId").val() == null || $("#BulkPermitId").val() != "") {
+                //        $("#isForwarded").val(1).change();
+                //    }
+                //    $("#__EUAntiForgeryForm").submit();
+                //}
+            }
+            else {
+                return false;
+            }
+        }
+    }
+
+
+
+    function ForwardRequest(e) {
+        if ($("#isNegativeRoyalty").val() == 1) {
+            alert("Payable Amount is coming less than 0. Kindly re-check the values entered for Basic Price/ Royalty Rate & Quantity.");
+            return false;
+        }
+        else {
+            var iss = true
+            if (iss == true) {
+                swal({
+                    title: "Are you sure you to forward this application to DD/DMO",
+                    icon: "warning",
+                    buttons: ["No", "Yes"],
+                })
+                    .then((submit) => {
+                        if (submit) {
+                            var id = $("#BulkPermitId").val();
+                            var transactionalid = $("#TransactionalID").val();
+                            var emailid = $("#EmailId").val();
+                            var mobileno = $("#MobileNo").val();
+
+                            $.ajax({
+                                url: '@Url.Action("Forward_Request", "MergeEPermit")',
+                                type: "POST",
+                                //send current record ID to the server
+                                data: { bulkPermitId: id, TransactionalId: transactionalid, EmailID: emailid, MobileNO: mobileno },
+                                success: function (data) {
+                                    if (data == 1) {
+                                        alert("Application has been forwarded successfully.");
+                                    }
+                                    else {
+                                        alert("Request can't forwarded");
+                                    }
+                                    // OnRefreshGrid();
+                                },
+                                error: function (data) {
+                                    alert("Request can't forwarded");
+                                }
+
+                            });
+                        }
+                    });
+            }
+            else {
+                return false;
+            }
+    }
+}
+
+function EditApplicationDetails() {
+    var PayableRoyalty = $("#PayableRoyalty").val();
+    var TCS = $("#TCS").val();
+    var Cess = $("#Cess").val();
+    var eCess = $("#eCess").val();
+    var DMF = $("#DMF").val();
+    var NMET = $("#NMET").val();
+    var TotalPayableAmount = $("#TotalPayableAmount").val();
+    var ProposedQty = $("#ProposedQty").val();
+    var BulkPermitId = $("#BulkPermitId").val();
+    var MineralId = $("#MineralId").val();
+    $.ajax({
+        url: '@Url.Action("UpdateBulkPermitData", "MergeEPermit")',
+                type: "POST",
+                //send current record ID to the server
+                data: { bulkpermitid: BulkPermitId, mineralid: MineralId, ProposedQty: ProposedQty, payableroyalty: PayableRoyalty, tcs: TCS, cess: Cess, eCess: eCess, dmf: DMF, nmet: NMET, totalpayableamount: TotalPayableAmount },
+                success: function (data) {
+                    if (data.Data[0] == "1") {
+                        swal("", "Application Updated Successfully", "success")
+                     /*   alert("Application Updated Successfully");*/
+                    }
+                    else {
+                       /* alert("Application Not Updated Successfully !");*/
+                        swal("", "Application Not Updated Successfully !", "success")
+                    }
+                }
+            });
+
+        }
+
+        function isNumberKey(evt, obj) {
+
+            var charCode = (evt.which) ? evt.which : event.keyCode
+            var value = obj.value;
+            var dotcontains = value.indexOf(".") != -1;
+            if (dotcontains)
+                if (charCode == 46) return false;
+            if (charCode == 46) return true;
+            if (charCode > 31 && (charCode < 48 || charCode > 57))
+                return false;
+            return true;
+        }
+</script>
+<script>
+    $(document).on("change", "input[type=radio]", function () {
+        var DOApplicable = $("input:radio[name='DOSelection']:checked").val();
+        if (DOApplicable == "1") {
+            $("#doRequired").show();
+            $("#Coal_DeliveryOrder").show();
+            if (parseInt($("#BulkPermitId").val()) > 0) {
+
+            }
+            else {
+                $('#DONumber').val('');
+            }
+        }
+        else {
+            $("#doRequired").hide();
+            $("#Coal_DeliveryOrder").hide();
+            if (parseInt($("#BulkPermitId").val()) > 0) {
+
+            }
+            else {
+                $('#DONumber').val('');
+            }
+        }
+
+    });
+</script>

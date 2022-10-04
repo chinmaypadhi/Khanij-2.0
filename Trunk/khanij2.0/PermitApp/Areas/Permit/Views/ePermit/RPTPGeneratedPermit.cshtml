@@ -1,0 +1,242 @@
+﻿@model PermitEF.LicenseInfoRPTP
+
+@{
+    ViewData["Title"] = "RPTPFinal";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+<script src=" https://cdn.datatables.net/1.10.24/js/jquery.dataTables.min.js"></script>
+
+
+<section class="wrapper main-wrapper row">
+    <div class="col-12" id="mainDiv">
+        @Html.Partial("_CMSnavigation")
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link " href="@Url.Content("~/Permit/ePermit/RPTPPermitList")">
+                                New e-permit
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="@Url.Content("~/Permit/ePermit/RPTPSavedPermit")">
+                                Saved RPTP Application
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link  active" href="#">
+                                Generated RPTP e-Permit
+                            </a>
+                        </li>
+
+
+                    </ul>
+
+                    @Html.Partial("_CMSutil")
+                </div>
+                <div class="searchform">
+                    <div class="row">
+                        <div class="col-sm-4">
+                            <div class="form-group row">
+                                <label for="inputText" class="col-sm-4 col-form-label">
+                                    From Date
+                                </label>
+                                <div class="col-sm-8">
+                                    <div class="input-group">
+                                        <div class="input-group-addon">
+                                            <i class="fa fa-calendar"></i>
+                                        </div>
+                                        @Html.TextBoxFor(model => model.FromDate, "", new { @class = "form-control datepicker", placeholder = "DD/MMM/YYYY", autofocus = "autofocus", @maxlength = "20", @id = "FromDate", @autocomplete = "off" })
+                                        @(Html.HiddenFor(model => model.permittype))
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <div class="col-sm-4">
+                            <div class="form-group row">
+                                <label for="inputText" class="col-sm-3 col-form-label">
+                                    To Date
+                                </label>
+                                <div class="col-sm-8">
+                                    <div class="input-group">
+                                        <div class="input-group-addon">
+                                            <i class="fa fa-calendar"></i>
+                                        </div>
+                                        @Html.TextBoxFor(model => model.ToDate, "", new { @class = "form-control datepicker", placeholder = "DD/MMM/YYYY", autofocus = "autofocus", @maxlength = "20", @id = "ToDate", @autocomplete = "off" })
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+
+
+                        <div class="col-md-2 mt-md-0 mt-3">
+                            <input type="button" id="btnSearch" onclick="Search();" value="Search" class="btn btn-sm btn-success m-0 waves-effect waves-light" />
+                        </div>
+
+                    </div>
+
+                </div>
+                <section class="box form-container">
+
+                    @using (Html.BeginForm("RPTFFinal", "ePermit", FormMethod.Post, new { AUTOCOMPLETE = "Off", id = "form1" }))
+                    {
+
+
+                        <div class="content-body">
+
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <table id="table-landscape" class="table table-sm table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th>Sr.No.</th>
+                                                <th>User Code</th>
+                                                <th>Application ID</th>
+                                                @if (ViewBag.ePermitType == "GeneratedPermit")
+                                                {
+                                                    <th>e-Permit No</th>
+                                                }
+                                                <th>Date of Application</th>
+                                                <th>Available Quantity in Stock</th>
+
+                                                <th>Mineral Name</th>
+                                                <th>Mineral Grade</th>
+                                                <th>Quantity</th>
+                                                <th>Date of Approved Application</th>
+                                                <th>e-Permit</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach (var b in ViewBag.ViewList)
+                                            {
+
+                                                <tr>
+                                                    <td><p class="m-0" id="MineralName">@b.SrNo</p> </td>
+                                                    <td><p class="m-0" id="MineralName">@b.LicenseeCode</p> </td>
+                                                    <td><p class="m-0" id="MineralName">@b.ApplicationNo</p> </td>
+                                                    @if (ViewBag.ePermitType == "GeneratedPermit")
+                                                    {
+                                                        <td><p class="m-0" id="MineralName">@b.BulkPermitNo</p> </td>
+                                                    }
+                                                    <td><p class="m-0" id="MineralName">@b.ApplicationDate</p> </td>
+                                                    <td><p class="m-0" id="MineralName">@b.AvailableQty</p> </td>
+                                                    <td><p class="m-0" id="MineralName">@b.MineralName</p> </td>
+                                                    <td><p class="m-0" id="MineralGradeName">@b.MineralGrade</p> </td>
+                                                    <td><p class="m-0" id="MineralNature">@b.ApprovedQty</p> </td>
+
+                                                    <td><p class="m-0">@b.ApprovedOn</p> </td>
+                                                    @if (ViewBag.ePermitType == "GeneratedPermit")
+                                                    {
+                                                        if (b.DSCLesseeFilePath == "")
+                                                        {
+                                                            <td><p class="m-0">--</p> </td>
+                                                        }
+                                                        else
+                                                        {
+                                                            <td>
+                                                                <a class="btn-floating btn-outline-primary btn-sm waves-effect waves-light" href=@b.DSCLesseeFilePath target='_blank'> Download e - Permit </a>
+                                                            </td>
+                                                        }
+                                                    }
+                                                    else
+                                                    {
+                                                        if (b.DSCLesseeFilePath == "")
+                                                        {
+                                                            <td>
+                                                                <p class="m-0">
+                                                                    <a class="btn-floating btn-outline-primary btn-sm waves-effect waves-light" href="@Url.Content("~/Permit/ePermit/RPTPPreview?BulkPermitId="+@b.RPTPBulkPermitId+"")">Generate e-Permit</a>
+                                                                </p>
+                                                            </td>
+                                                        }
+                                                        else
+                                                        {
+                                                            <td>
+                                                                <a class="btn-floating btn-outline-primary btn-sm waves-effect waves-light" href='@b.DSCLesseeFilePath' target='_blank'> Download e - Permit </a>
+                                                            </td>
+                                                        }
+                                                    }
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+
+
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </section>
+            </div>
+        </div>
+    </div>
+    <!-- MAIN CONTENT AREA ENDS -->
+</section>
+@*<uc1:footer runat="server" ID="footer" />*@
+<script>
+
+    $(document).ready(function () {
+        loadNavigation('ViewList', 'glhelpdesk', 'plraiseticket', 'tl', 'E-Permit', 'RPTP Application', ' ');
+        $('.searchableselect').searchableselect();
+        $('.shorting-lnk').click(function () {
+            $('.shorting-lnk i').toggleClass('fa-sort-amount-up-alt fa-sort-amount-down-alt ');
+        });
+        $('.filter-dropdown').hide();
+        $('.filter-lnk').click(function () {
+            $(this).toggleClass('active');
+            $(this).siblings('.filter-dropdown').slideToggle();
+        });
+        $('.filter-btn').click(function () {
+            $(this).parent('.shorting-cell .filter-dropdown').slideUp();
+            if ($(this).parent().parent('.shorting-cell').find('.filter-lnk').hasClass('active')) {
+                $(this).parent().siblings('.filter-lnk').removeClass('active');
+            }
+        });
+
+    });
+</script>
+
+<script>
+    $(document).ready(function () {
+        $('.datepicker').datetimepicker({
+            format: 'LT',
+            format: 'DD-MM-YYYY',
+
+        });
+    });
+    function Search() {
+
+        if ($("#FromDate").val() != "" && $("#ToDate").val() != "") {
+            debugger;
+            var permittype = $("#permittype").val();
+            var dt_FromDate = $("#FromDate").val();
+            var dt_ToDate = $("#ToDate").val();
+            $.ajax({
+                type: "GET",
+                url: "/Permit/ePermit/RPTFFinal",
+                data: { 'id': permittype, FromDate: dt_FromDate, ToDate: dt_ToDate},
+                cache: false,
+                //contentType: "application/json",
+                datatype: "JSON",
+                success: function (data) {
+
+
+                }
+            });
+
+
+        }
+        else {
+
+            alert("please enter from and to date for search.")
+            return false;
+        }
+    }
+</script>
+<script>
+
+</script>

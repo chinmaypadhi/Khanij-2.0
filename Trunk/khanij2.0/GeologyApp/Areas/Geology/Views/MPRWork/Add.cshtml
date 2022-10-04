@@ -1,0 +1,1757 @@
+﻿@*// *********************************************************************************************************
+    //  View Name                : Add
+    //  Desciption               : To Add,Edit,Update Monthly Progress Report Work Details
+    //  Created By               : Lingaraj Dalai
+    //  Created On               : 02 March 2021
+    // ********************************************************************************************************
+*@
+@model GeologyEF.MPRWorkmaster
+@{
+    ViewData["Title"] = "Add";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+@if (TempData["msg"] != null)
+{
+    <script>
+         var vv = '@TempData["msg"]';
+        if (vv == 1) {
+            swal("","Monthly Progress Report work created successfully.","success");
+        }
+        else if (vv == 4) {
+            swal("", "Monthly Progress Report work updated successfully.", "success");
+        }
+        else if (vv == 2) {
+            swal("","Monthly Progress Report work already exists.","warning");
+        }
+        else {
+            swal("","Monthly Progress Report work not Saved Sucessfully!!","error");
+        }
+    </script>
+}
+<script>
+    indicateMe = "yes"
+    backMe="yes"
+    $(document).ready(function () {
+        debugger;
+        loadNavigation('Add', 'glgeology', 'plmonprorep', 'tl', 'Geology', 'Monthly Progress Report', ' ');
+        $('.datetime').datetimepicker({
+            format: "DD/MM/YYYY",
+        }).keydown(false);
+        $('.datepicker').datetimepicker({
+            format: 'LT',
+            format: 'DD/MM/YYYY',
+            daysOfWeekDisabled: [],
+        }).keydown(false);
+        $('.searchableselect').searchableselect();
+        if ($("#hfWorkId").val() !== "") { getMultipleEntriesTable(); }
+        $(".only-numeric").bind("keypress", function (e) {
+            var keyCode = e.which ? e.which : e.keyCode
+
+            if (!(keyCode >= 48 && keyCode <= 57)) {
+                $(".error").css("display", "inline");
+                return false;
+            } else {
+                $(".error").css("display", "none");
+            }
+        });
+        $(".only-alphabets").bind("keypress", function (evt) {
+            var charCode = (evt.which) ? evt.which : window.event.keyCode;
+            if (charCode <= 13) {
+                return true;
+            }
+            else {
+                var keyChar = String.fromCharCode(charCode);
+                var re = /^[a-zA-Z ]+$/;
+                return re.test(keyChar);
+            }
+        });
+        $(".only-numeric-decimal").bind("keypress", function (e) {
+            var charCode = (evt.which) ? evt.which : event.keyCode
+            var value = obj.value;
+            var dotcontains = value.indexOf(".") != -1;
+            if (dotcontains)
+                if (charCode == 46) return false;
+            if (charCode == 46) return true;
+            if (charCode > 31 && (charCode < 48 || charCode > 57))
+                return false;
+            return true;
+        });
+        var filesize = 0;
+        $('input[type="file"]').bind('change', function () {
+            $("input[name='Submit']").attr('disabled', false);
+            filesize = this.files[0].size;
+            var val = $(this).val().toLowerCase(),
+                regex = new RegExp("(.*?)\.(pdf|jpeg|jpg|png|xls|tif)$");
+            if (!(regex.test(val))) {
+                swal("", ".docx  type is not an allowed file type. You can use only jpg, jpeg, png, pdf, tif types of file(s). ", "warning");
+                this.value = '';
+                $("input[name='Submit']").attr('disabled', true);
+                return false;
+            }
+            else if (filesize > 1048000) {
+                swal("", "File size must be 1 MB !", "warning");
+                $("input[name='Submit']").attr('disabled', true);
+                return false;
+            }
+            else {
+                var fileName = $(this).val().split("\\").pop();
+                $(this).next('.custom-file-label').html(fileName);
+            }
+            return false;
+        });
+    });
+    function showFirst() {
+        debugger;
+        $("#first").addClass("show active");
+        $("#step1").addClass("active");
+        $("#second").removeClass("active");
+        $("#step2").removeClass("active");
+        $("#third").removeClass("active");
+        $("#step3").removeClass("active");
+        $("#four").removeClass("active");
+        $("#step4").removeClass("active");
+    }
+    function showSecond() {
+        debugger;
+        //if ($('#Up_To_The_Last_Month').val() == "") {
+        //    swal("", "Please Enter Up to the last month", "warning");
+        //    $('#Up_To_The_Last_Month').focus();
+        //    return false;
+        //}
+        //else if ($('#During_The_Month').val() == "") {
+        //    swal("", "Please Enter During the month", "warning");
+        //    $('#During_The_Month').focus();
+        //    return false;
+        //}
+        //else if ($('#Labor').val() == "") {
+        //    swal("", "Please Enter Labor", "warning");
+        //    $('#Labor').focus();
+        //    return false;
+        //}
+        //else if ($('#POL').val() == "") {
+        //    swal("", "Please Enter POL", "warning");
+        //    $('#POL').focus();
+        //    return false;
+        //}
+        //else if ($('#Repair_And_Maintenance').val() == "") {
+        //    swal("", "Please Enter Repairs & maintenance", "warning");
+        //    $('#Repair_And_Maintenance').focus();
+        //    return false;
+        //}
+        //else if ($('#others').val() == "") {
+        //    swal("", "Please Enter During the month", "warning");
+        //    $('#others').focus();
+        //    return false;
+        //}
+        //else if ($('#Total').val() == "") {
+        //    swal("", "Please Enter Total", "warning");
+        //    $('#Total').focus();
+        //    return false;
+        //}
+        $("#second").addClass("show active");
+        $("#step2").addClass("active");
+        $("#first").removeClass("active");
+        $("#third").removeClass("active");
+        $("#four").removeClass("active");
+        $("#step1").removeClass("active");
+        $("#step3").removeClass("active");
+        $("#step4").removeClass("active");
+    }
+    function showThird() {
+        //if ($('#Reconn_Area_Target').val() == "") {
+        //    swal("", "Please Enter Target", "warning");
+        //    $('#Reconn_Area_Target').focus();
+        //    return false;
+        //}
+        //else if ($('.value1').val() == "") {
+        //    swal("", "Please enter work done up to the last month", "warning");
+        //    $('.value1').focus();
+        //    return false;
+        //}
+        //else if ($('.value2').val() == "") {
+        //    swal("", "Please Enter Work done during the month", "warning");
+        //    $('value2').focus();
+        //    return false;
+        //}
+        //if ($('#Detailed_Area_Target').val() == "") {
+        //    swal("", "Please Enter Target", "warning");
+        //    $('#Detailed_Area_Target').focus();
+        //    return false;
+        //}
+        //else if ($('.value4').val() == "") {
+        //    swal("", "Please enter work done up to the last month", "warning");
+        //    $('.value4').focus();
+        //    return false;
+        //}
+        //else if ($('.value5').val() == "") {
+        //    swal("", "Please Enter Work done during the month", "warning");
+        //    $('value5').focus();
+        //    return false;
+        //}
+        //if ($('#Pitting_Nos_Target').val() == "") {
+        //    swal("", "Please Enter Target", "warning");
+        //    $('#Pitting_Nos_Target').focus();
+        //    return false;
+        //}
+        //else if ($('.value7').val() == "") {
+        //    swal("", "Please enter work done up to the last month", "warning");
+        //    $('.value7').focus();
+        //    return false;
+        //}
+        //else if ($('.value8').val() == "") {
+        //    swal("", "Please Enter Work done during the month", "warning");
+        //    $('value8').focus();
+        //    return false;
+        //}
+        //if ($('#Pitting_Volume_Target').val() == "") {
+        //    swal("", "Please Enter Target", "warning");
+        //    $('#Pitting_Volume_Target').focus();
+        //    return false;
+        //}
+        //else if ($('.value10').val() == "") {
+        //    swal("", "Please enter work done up to the last month", "warning");
+        //    $('.value10').focus();
+        //    return false;
+        //}
+        //else if ($('.value11').val() == "") {
+        //    swal("", "Please Enter Work done during the month", "warning");
+        //    $('value11').focus();
+        //    return false;
+        //}
+        //if ($('#Trenching_Nos_Target').val() == "") {
+        //    swal("", "Please Enter Target", "warning");
+        //    $('#Trenching_Nos_Target').focus();
+        //    return false;
+        //}
+        //else if ($('.value13').val() == "") {
+        //    swal("", "Please enter work done up to the last month", "warning");
+        //    $('.value13').focus();
+        //    return false;
+        //}
+        //else if ($('.value14').val() == "") {
+        //    swal("", "Please Enter Work done during the month", "warning");
+        //    $('value14').focus();
+        //    return false;
+        //}
+        //if ($('#Trenching_Volume_Target').val() == "") {
+        //    swal("", "Please Enter Target", "warning");
+        //    $('#Trenching_Volume_Target').focus();
+        //    return false;
+        //}
+        //else if ($('.value16').val() == "") {
+        //    swal("", "Please enter work done up to the last month", "warning");
+        //    $('.value16').focus();
+        //    return false;
+        //}
+        //else if ($('.value17').val() == "") {
+        //    swal("", "Please Enter Work done during the month", "warning");
+        //    $('value17').focus();
+        //    return false;
+        //}
+        //if ($('#B_H_Cpmpleted_Target').val() == "") {
+        //    swal("", "Please Enter Target", "warning");
+        //    $('#B_H_Cpmpleted_Target').focus();
+        //    return false;
+        //}
+        //else if ($('.value19').val() == "") {
+        //    swal("", "Please enter work done up to the last month", "warning");
+        //    $('.value19').focus();
+        //    return false;
+        //}
+        //else if ($('.value20').val() == "") {
+        //    swal("", "Please Enter Work done during the month", "warning");
+        //    $('value20').focus();
+        //    return false;
+        //}
+        //if ($('#Metrage_Target').val() == "") {
+        //    swal("", "Please Enter Target", "warning");
+        //    $('#Metrage_Target').focus();
+        //    return false;
+        //}
+        //else if ($('.value22').val() == "") {
+        //    swal("", "Please enter work done up to the last month", "warning");
+        //    $('.value22').focus();
+        //    return false;
+        //}
+        //else if ($('.value23').val() == "") {
+        //    swal("", "Please Enter Work done during the month", "warning");
+        //    $('value23').focus();
+        //    return false;
+        //}
+        //if ($('#B_H_Under_Progress_Target').val() == "") {
+        //    swal("", "Please Enter Target", "warning");
+        //    $('#B_H_Under_Progress_Target').focus();
+        //    return false;
+        //}
+        //else if ($('.value25').val() == "") {
+        //    swal("", "Please enter work done up to the last month", "warning");
+        //    $('.value25').focus();
+        //    return false;
+        //}
+        //else if ($('.value26').val() == "") {
+        //    swal("", "Please Enter Work done during the month", "warning");
+        //    $('value26').focus();
+        //    return false;
+        //}
+        //if ($('#Metrage_2_Target').val() == "") {
+        //    swal("", "Please Enter Target", "warning");
+        //    $('#Metrage_2_Target').focus();
+        //    return false;
+        //}
+        //else if ($('.value28').val() == "") {
+        //    swal("", "Please enter work done up to the last month", "warning");
+        //    $('.value28').focus();
+        //    return false;
+        //}
+        //else if ($('.value29').val() == "") {
+        //    swal("", "Please Enter Work done during the month", "warning");
+        //    $('value29').focus();
+        //    return false;
+        //}
+        //if ($('#Total_Metrage_Target').val() == "") {
+        //    swal("", "Please Enter Target", "warning");
+        //    $('#Total_Metrage_Target').focus();
+        //    return false;
+        //}
+        //else if ($('.value31').val() == "") {
+        //    swal("", "Please enter work done up to the last month", "warning");
+        //    $('.value31').focus();
+        //    return false;
+        //}
+        //else if ($('.value32').val() == "") {
+        //    swal("", "Please Enter Work done during the month", "warning");
+        //    $('value32').focus();
+        //    return false;
+        //}
+        $("#third").addClass("show active");
+        $("#step3").addClass("show active");
+        $("#first").removeClass("active");
+        $("#second").removeClass("active");
+        $("#four").removeClass("active");
+        $("#step1").removeClass("active");
+        $("#step2").removeClass("active");
+        $("#step4").removeClass("active");
+    }
+    function showFourth() {
+        $("#four").addClass("show active");
+        $("#step4").addClass("show active");
+        $("#third").removeClass("active");
+        $("#step3").removeClass("active");
+        $("#first").removeClass("active");
+        $("#second").removeClass("active");
+        $("#step1").removeClass("active");
+        $("#step2").removeClass("active");
+    }
+    /*Validation*/
+    function Validate() {
+       if ($('#Up_To_The_Last_Month').val() == "") {
+            swal("", "Please Enter Up to the last month", "warning");
+            $('#Up_To_The_Last_Month').focus();
+            $('#first-tab').trigger('click');
+            return false;
+        }
+        else if ($('#During_The_Month').val() == "") {
+            swal("", "Please Enter During the month", "warning");
+            $('#During_The_Month').focus();
+            $('#first-tab').trigger('click');
+            return false;
+        }
+        else if ($('#Labor').val() == "") {
+            swal("", "Please Enter Labor", "warning");
+            $('#Labor').focus();
+            $('#first-tab').trigger('click');
+            return false;
+        }
+        else if ($('#POL').val() == "") {
+            swal("", "Please Enter POL", "warning");
+            $('#POL').focus();
+            $('#first-tab').trigger('click');
+            return false;
+        }
+        else if ($('#Repair_And_Maintenance').val() == "") {
+            swal("", "Please Enter Repairs & maintenance", "warning");
+            $('#Repair_And_Maintenance').focus();
+            $('#first-tab').trigger('click');
+            return false;
+        }
+        else if ($('#others').val() == "") {
+            swal("", "Please Enter During the month", "warning");
+            $('#others').focus();
+            $('#first-tab').trigger('click');
+            return false;
+        }
+        else if ($('#Reconn_Area_Target').val() == "") {
+            swal("", "Please Enter Target", "warning");
+            $('#Reconn_Area_Target').focus();
+            $('#second-tab').trigger('click');
+            return false;
+        }
+        else if ($('.value1').val() == "") {
+            swal("", "Please enter work done up to the last month", "warning");
+            $('.value1').focus();
+            $('#second-tab').trigger('click');
+            return false;
+        }
+        else if ($('.value2').val() == "") {
+            swal("", "Please Enter Work done during the month", "warning");
+            $('value2').focus();
+            $('#second-tab').trigger('click');
+            return false;
+        }
+        else if ($('#Detailed_Area_Target').val() == "") {
+            swal("", "Please Enter Target", "warning");
+            $('#Detailed_Area_Target').focus();
+            $('#second-tab').trigger('click');
+            return false;
+        }
+        else if ($('.value4').val() == "") {
+            swal("", "Please enter work done up to the last month", "warning");
+            $('.value4').focus();
+            $('#second-tab').trigger('click');
+            return false;
+        }
+        else if ($('.value5').val() == "") {
+            swal("", "Please Enter Work done during the month", "warning");
+            $('value5').focus();
+            $('#second-tab').trigger('click');
+            return false;
+        }
+        else if ($('#Pitting_Nos_Target').val() == "") {
+            swal("", "Please Enter Target", "warning");
+            $('#Pitting_Nos_Target').focus();
+            $('#second-tab').trigger('click');
+            return false;
+        }
+        else if ($('.value7').val() == "") {
+            swal("", "Please enter work done up to the last month", "warning");
+            $('.value7').focus();
+            $('#second-tab').trigger('click');
+            return false;
+        }
+        else if ($('.value8').val() == "") {
+            swal("", "Please Enter Work done during the month", "warning");
+            $('value8').focus();
+            $('#second-tab').trigger('click');
+            return false;
+        }
+        else if ($('#Pitting_Volume_Target').val() == "") {
+            swal("", "Please Enter Target", "warning");
+            $('#Pitting_Volume_Target').focus();
+            $('#second-tab').trigger('click');
+            return false;
+        }
+        else if ($('.value10').val() == "") {
+            swal("", "Please enter work done up to the last month", "warning");
+            $('.value10').focus();
+            $('#second-tab').trigger('click');
+            return false;
+        }
+        else if ($('.value11').val() == "") {
+            swal("", "Please Enter Work done during the month", "warning");
+            $('value11').focus();
+            $('#second-tab').trigger('click');
+            return false;
+        }
+        else if ($('#Trenching_Nos_Target').val() == "") {
+            swal("", "Please Enter Target", "warning");
+            $('#Trenching_Nos_Target').focus();
+            $('#second-tab').trigger('click');
+            return false;
+        }
+        else if ($('.value13').val() == "") {
+            swal("", "Please enter work done up to the last month", "warning");
+            $('.value13').focus();
+            $('#second-tab').trigger('click');
+            return false;
+        }
+        else if ($('.value14').val() == "") {
+            swal("", "Please Enter Work done during the month", "warning");
+            $('value14').focus();
+            $('#second-tab').trigger('click');
+            return false;
+        }
+        else if ($('#Trenching_Volume_Target').val() == "") {
+            swal("", "Please Enter Target", "warning");
+            $('#Trenching_Volume_Target').focus();
+            $('#second-tab').trigger('click');
+            return false;
+        }
+        else if ($('.value16').val() == "") {
+            swal("", "Please enter work done up to the last month", "warning");
+            $('.value16').focus();
+            $('#second-tab').trigger('click');
+            return false;
+        }
+        else if ($('.value17').val() == "") {
+            swal("", "Please Enter Work done during the month", "warning");
+            $('value17').focus();
+            $('#second-tab').trigger('click');
+            return false;
+        }
+        else if ($('#B_H_Cpmpleted_Target').val() == "") {
+            swal("", "Please Enter Target", "warning");
+            $('#B_H_Cpmpleted_Target').focus();
+            $('#second-tab').trigger('click');
+            return false;
+        }
+        else if ($('.value19').val() == "") {
+            swal("", "Please enter work done up to the last month", "warning");
+            $('.value19').focus();
+            $('#second-tab').trigger('click');
+            return false;
+        }
+        else if ($('.value20').val() == "") {
+            swal("", "Please Enter Work done during the month", "warning");
+            $('value20').focus();
+            $('#second-tab').trigger('click');
+            return false;
+        }
+        else if ($('#Metrage_Target').val() == "") {
+            swal("", "Please Enter Target", "warning");
+            $('#Metrage_Target').focus();
+            $('#second-tab').trigger('click');
+            return false;
+        }
+        else if ($('.value22').val() == "") {
+            swal("", "Please enter work done up to the last month", "warning");
+            $('.value22').focus();
+            $('#second-tab').trigger('click');
+            return false;
+        }
+        else if ($('.value23').val() == "") {
+            swal("", "Please Enter Work done during the month", "warning");
+            $('value23').focus();
+            $('#second-tab').trigger('click');
+            return false;
+        }
+        else if ($('#B_H_Under_Progress_Target').val() == "") {
+            swal("", "Please Enter Target", "warning");
+            $('#B_H_Under_Progress_Target').focus();
+            $('#second-tab').trigger('click');
+            return false;
+        }
+        else if ($('.value25').val() == "") {
+            swal("", "Please enter work done up to the last month", "warning");
+            $('.value25').focus();
+            $('#second-tab').trigger('click');
+            return false;
+        }
+        else if ($('.value26').val() == "") {
+            swal("", "Please Enter Work done during the month", "warning");
+            $('value26').focus();
+            $('#second-tab').trigger('click');
+            return false;
+        }
+        else if ($('#Metrage_2_Target').val() == "") {
+            swal("", "Please Enter Target", "warning");
+            $('#Metrage_2_Target').focus();
+            $('#second-tab').trigger('click');
+            return false;
+        }
+        else if ($('.value28').val() == "") {
+            swal("", "Please enter work done up to the last month", "warning");
+            $('.value28').focus();
+            $('#second-tab').trigger('click');
+            return false;
+        }
+        else if ($('.value29').val() == "") {
+            swal("", "Please Enter Work done during the month", "warning");
+            $('value29').focus();
+            $('#second-tab').trigger('click');
+            return false;
+        }
+        else if ($('#Total_Metrage_Target').val() == "") {
+            swal("", "Please Enter Target", "warning");
+            $('#Total_Metrage_Target').focus();
+            $('#second-tab').trigger('click');
+            return false;
+        }
+        else if ($('.value31').val() == "") {
+            swal("", "Please enter work done up to the last month", "warning");
+            $('.value31').focus();
+            $('#second-tab').trigger('click');
+            return false;
+        }
+        else if ($('.value32').val() == "") {
+            swal("", "Please Enter Work done during the month", "warning");
+            $('value32').focus();
+            $('#second-tab').trigger('click');
+            return false;
+        }
+        else if ($('#Resources').val() == "") {
+            swal("", "Please Enter Other Information", "warning");
+            $('#Resources').focus();
+            $('#second-tab').trigger('click');
+            return false;
+        }
+        for (var i = 0; i < document.getElementById('CampsDetails').children[1].children.length; i++) {
+            var date = /^(0?[1-9]|1[0-9]|2[0-9]|3[0-1])\/(0?[1-9]|1[0-2])\/([0-9]{4})$/;
+            if (document.getElementById('CampsDetails').children[1].children[i].children[1].getElementsByTagName("input")[0].value == "") {
+                swal("", "Please Enter Camp Name", "warning");
+                $('#Camps_Name').focus();
+                $('#third-tab').trigger('click');
+                return false;
+            }
+            else if (document.getElementById('CampsDetails').children[1].children[i].children[2].getElementsByTagName("input")[0].value == "") {
+                swal("", "Please Enter Camp Designation", "warning");
+                $('#Camps_Designation').focus();
+                $('#third-tab').trigger('click');
+                return false;
+            }
+            else if (document.getElementById('CampsDetails').children[1].children[i].children[3].getElementsByTagName("input")[0].value == "") {
+                swal("", "Please Enter From Date", "warning");
+                $('#third-tab').trigger('click');
+                $('#third-tab').trigger('click');
+                $('#Camps_From').focus();
+                return false;
+            }
+            else if (!date.test(document.getElementById('CampsDetails').children[1].children[i].children[3].getElementsByTagName("input")[0].value)) {
+                swal("", "Enter Valid Camps From Date", "warning");
+                $('#third-tab').trigger('click');
+                $('#Camps_From').focus();
+                return false;
+            }
+            else if (document.getElementById('CampsDetails').children[1].children[i].children[4].getElementsByTagName("input")[0].value == "") {
+                swal("", "Please Enter To Date", "warning");
+                $('#third-tab').trigger('click');
+                $('#Camps_To').focus();
+                return false;
+            }
+            else if (!date.test(document.getElementById('CampsDetails').children[1].children[i].children[4].getElementsByTagName("input")[0].value)) {
+                swal("", "Enter Valid Camps To Date", "warning");
+                $('#third-tab').trigger('click');
+                $('#Camps_To').focus();
+                return false;
+            }
+            else if (document.getElementById('CampsDetails').children[1].children[i].children[5].getElementsByTagName("input")[0].value == "") {
+                swal("", "Please Enter No of days", "warning");
+                $('#Camps_No_Of_Days').focus();
+                $('#third-tab').trigger('click');
+                return false;
+            }
+        }
+        GetData();
+    }
+    var totalRowsCount = 1;
+    function addRow() {
+        debugger;
+        var date = /^(0?[1-9]|1[0-9]|2[0-9]|3[0-1])\/(0?[1-9]|1[0-2])\/([0-9]{4})$/;
+        if (!blankFieldValidation("Camps_Name", "Camp Name")) {
+            return false;
+        }
+        else if (!blankFieldValidation("Camps_Designation", "Camp Designation")) {
+            return false;
+        }
+        else if (!blankFieldValidation("Camps_From", "Camps From Date")) {
+            return false;
+        }
+        else if (!date.test($('#Camps_From').val())) {
+            swal("", "Enter Valid Camps From Date", "warning");
+            $('#Camps_From').focus();
+            return false;
+        }
+        else if (!blankFieldValidation("Camps_To", "Camps To Date")) {
+            return false;
+        }
+        else if (!date.test($('#Camps_To').val())) {
+            swal("", "Enter Valid Camps To Date", "warning");
+            $('#Camps_To').focus();
+            return false;
+        }
+        else if (!blankFieldValidation("Camps_No_Of_Days", "No Of days")) {
+            return false;
+        }
+        $('#CampsDetails tbody').append('<tr><td>' + Number($('#CampsDetails tbody tr').length + 1) + '</td>' +
+            '<td><input type="text" id="Camps_Name" class="form-control only-alphabets" name="Camps_Name" onkeypress="return ValidateAlphabets(event);"/></td>' +
+            '<td><input type="text" id="Camps_Designation" class="form-control only-alphabets" name="Camps_Designation" onkeypress="return ValidateAlphabets(event);"/></td>' +
+            '</td><td><input type="text" id="Camps_From" class="form-control datepicker" name="Camps_From" onkeypress="return IsValidDate(event);" maxlength="10"/></td>' +
+            '<td><input type="text" id="Camps_To" class="form-control datepicker" name="Camps_To" onkeypress="return IsValidDate(event);" maxlength="10"/></td>' +
+            '</td><td><input type="text" id="Camps_No_Of_Days" class="form-control" name="Camps_No_Of_Days" /></td>' +
+            '</td><td><input type="text" id="Camps_Remarks" class="form-control" name="Camps_Remarks" /></td>' +
+            '<td><a class="btn btn-danger btn-md waves-effect waves-light" data-toggle="tooltip" data-placement="top" title="Remove Row" onclick="RemoveRow();"><i class="icon-minus-solid" aria-hidden="true"></i></a></td>'+
+            '<td><a class="btn btn-success btn-md waves-effect waves-light" data-toggle="tooltip" data-placement="top" title="Add Row" onclick="addRow()"><i class="icon-plus-solid" aria-hidden="true"></i></a></td></tr>');
+        GetData();
+    }
+    function RemoveRow() {
+        debugger;
+        if ($('#CampsDetails tbody tr').length > 1)
+            $('#CampsDetails tbody tr:last').remove();
+        GetData();
+    }
+    function ValidateTextBox(e) {
+        //var regex = new RegExp("^[a-zA-Z0-9]+$");
+        var regex = new RegExp("^[^,]+$");
+        var str = String.fromCharCode(!e.keyCode ? e.which : e.keyCode);
+        if (regex.test(str)) {
+            return true;
+        }
+        return false;
+    }
+    function ValidateAlphabets(evt) {
+        var charCode = (evt.which) ? evt.which : window.event.keyCode;
+        if (charCode <= 13) {
+            return true;
+        }
+        else {
+            var keyChar = String.fromCharCode(charCode);
+            var re = /^[a-zA-Z ]+$/;
+            return re.test(keyChar);
+        }
+    }
+    function GetData() {
+        //debugger;
+        var CampsName = "";
+        var CampsDesg = "";
+        var CampsFrom = "";
+        var CampsTo = "";
+        var CampsNo_Of_days=""
+        var CampsRemarks = "";
+        if ($('#CampsDetails tbody tr').length > 0) {
+            $('#CampsDetails tbody tr').each(function () {
+                CampsName += $(this).find('input:eq(0)').val() + ",";
+                CampsDesg += $(this).find('input:eq(1)').val() + ",";
+                CampsFrom += $(this).find('input:eq(2)').val() + ",";
+                CampsTo += $(this).find('input:eq(3)').val() + ",";
+                CampsNo_Of_days += $(this).find('input:eq(4)').val() + ",";
+                CampsRemarks += $(this).find('input:eq(5)').val() + ",";
+            });
+        }
+        $('#hfCampsName').val(CampsName.toString().replace(/,([^,]*)$/, ''));
+        $('#hfcampsDesg').val(CampsDesg.toString().replace(/,([^,]*)$/, ''));
+        $('#hfcampsFrom').val(CampsFrom.toString().replace(/,([^,]*)$/, ''));
+        $('#hfcampsTo').val(CampsTo.toString().replace(/,([^,]*)$/, ''));
+        $('#hfcampsNodays').val(CampsNo_Of_days.toString().replace(/,([^,]*)$/, ''));
+        $('#hfcampsRemarks').val(CampsRemarks.toString().replace(/,([^,]*)$/, ''));
+    }
+    function getMultipleEntriesTable() {
+        debugger;
+        $.ajax({
+            url: '@Url.Action("getMultipleMPRCampWorkData", "MPRWork",new { Area="Geology"})',
+            type: "GET",
+            data: { MPR_Id: $("#hfMPRId").val(), Work_Id: $("#hfWorkId").val() },
+            dataType: 'json',
+            success: function (data) {
+                debugger;
+                $('#tr_CampsDetails').remove();
+                for (i = 0; i < data.camps_Designation.split(",").length; i++) {
+                    var iNum = parseInt(i) + parseInt(1);
+                    if (iNum == 1) {
+                        $('#CampsDetails tbody').append('<tr><td>' + iNum + '</td>' +
+                            '<td> <input type="text" id="Camps_Name" class="form-control only-alphabets" name="Camps_Name" value="' + data.camps_Name.split(",")[i] + '" onkeypress="return ValidateAlphabets(event);"/></td>' +
+                            '<td><input type="text" id="Camps_Designation" class="form-control only-alphabets" name="Camps_Designation" value="' + data.camps_Designation.split(",")[i] + '" onkeypress="return ValidateAlphabets(event);"/></td>' +
+                            '</td><td><input type="text" id="Camps_From" class="form-control datepicker" name="Camps_From" value="' + data.camps_From.split(",")[i] + '" onkeypress="return IsValidDate(event);" maxlength="10"/></td>' +
+                            '<td><input type="text" id="Camps_To" class="form-control datepicker" name="Camps_To" value="' + data.camps_To.split(",")[i] + '" onkeypress="return IsValidDate(event);" maxlength="10"/></td>' +
+                            '</td><td><input type="text" id="Camps_No_Of_Days" class="form-control" name="Camps_No_Of_Days" value="' + data.camps_No_Of_Days.split(",")[i] + '" /></td>' +
+                            '</td><td><input type="text" id="Camps_Remarks" class="form-control" name="Camps_Remarks" value="' + data.camps_Remarks.split(",")[i] + '" /></td>' +
+                            '<td><a class="btn btn-success btn-md waves-effect waves-light" data-toggle="tooltip" data-placement="top" title="Add Row" onclick="addRow()"><i class="icon-plus-solid" aria-hidden="true"></i></a></td></tr>');
+                    }
+                    else {
+                        $('#CampsDetails tbody').append('<tr><td>' + iNum + '</td>' +
+                            '<td> <input type="text" id="Camps_Name" class="form-control only-alphabets" name="Camps_Name" value="' + data.camps_Name.split(",")[i] + '" onkeypress="return ValidateAlphabets(event);"/></td>' +
+                            '<td><input type="text" id="Camps_Designation" class="form-control only-alphabets" name="Camps_Designation" value="' + data.camps_Designation.split(",")[i] + '" onkeypress="return ValidateAlphabets(event);"/></td>' +
+                            '</td><td><input type="text" id="Camps_From" class="form-control datepicker" name="Camps_From" value="' + data.camps_From.split(",")[i] + '" onkeypress="return IsValidDate(event);" maxlength="10"/></td>' +
+                            '<td><input type="text" id="Camps_To" class="form-control datepicker" name="Camps_To" value="' + data.camps_To.split(",")[i] + '" onkeypress="return IsValidDate(event);" maxlength="10"/></td>' +
+                            '</td><td><input type="text" id="Camps_No_Of_Days" class="form-control" name="Camps_No_Of_Days" value="' + data.camps_No_Of_Days.split(",")[i] + '" /></td>' +
+                            '</td><td><input type="text" id="Camps_Remarks" class="form-control" name="Camps_Remarks" value="' + data.camps_Remarks.split(",")[i] + '" /></td>' +
+                            '<td><a class="btn btn-danger btn-md waves-effect waves-light" data-toggle="tooltip" data-placement="top" title="Remove Row" onclick="RemoveRow();"><i class="icon-minus-solid" aria-hidden="true"></i></a></td>' +
+                            '<td><a class="btn btn-success btn-md waves-effect waves-light" data-toggle="tooltip" data-placement="top" title="Add Row" onclick="addRow()"><i class="icon-plus-solid" aria-hidden="true"></i></a></td></tr>');
+                    }
+                }
+            },
+            error: function (err) {
+            }
+        })
+    }
+    function CalcuateVal() {
+        debugger;
+        $(".value3").val(+$(".value1").val() + +$(".value2").val());
+        $(".value6").val(+$(".value4").val() + +$(".value5").val());
+        $(".value9").val(+$(".value7").val() + +$(".value8").val());
+        $(".value12").val(+$(".value10").val() + +$(".value11").val());
+        $(".value15").val(+$(".value13").val() + +$(".value14").val());
+        $(".value18").val(+$(".value16").val() + +$(".value17").val());
+        $(".value21").val(+$(".value19").val() + +$(".value20").val());
+        $(".value24").val(+$(".value22").val() + +$(".value23").val());
+        $(".value27").val(+$(".value25").val() + +$(".value26").val());
+        $(".value30").val(+$(".value28").val() + +$(".value29").val());
+        $(".value33").val(+$(".value31").val() + +$(".value32").val());
+        $(".value36").val(+$(".value34").val() + +$(".value35").val());
+        $(".value39").val(+$(".value37").val() + +$(".value38").val());
+        $(".value42").val(+$(".value40").val() + +$(".value41").val());
+        $(".value45").val(+$(".value43").val() + +$(".value44").val());
+        $(".value48").val(+$(".value46").val() + +$(".value47").val());
+        $(".value51").val(+$(".value49").val() + +$(".value50").val());
+        $(".value54").val(+$(".value52").val() + +$(".value53").val());
+        $(".value57").val(+$(".value55").val() + +$(".value56").val());
+        $(".value60").val(+$(".value58").val() + +$(".value59").val());
+        $(".value63").val(+$(".value61").val() + +$(".value62").val());
+        $(".value66").val(+$(".value64").val() + +$(".value65").val());
+        $(".value69").val(+$(".value67").val() + +$(".value68").val());
+        $(".value72").val(+$(".value70").val() + +$(".value71").val());
+        $(".value75").val(+$(".value73").val() + +$(".value74").val());
+        $(".value78").val(+$(".value76").val() + +$(".value77").val());
+        $(".value81").val(+$(".value79").val() + +$(".value80").val());
+        $(".value84").val(+$(".value82").val() + +$(".value83").val());
+        $(".value87").val(+$(".value85").val() + +$(".value86").val());
+        $(".value90").val(+$(".value88").val() + +$(".value89").val());
+    }
+    function CalcuateDetailsOfBTotal() {
+        var Labor = $('#Labor').val();
+        var POL = $('#POL').val();
+        var Repair = $('#Repair_And_Maintenance').val();
+        var Other = $('#others').val();
+        Labor = Labor || 0
+        POL = POL || 0
+        Repair = Repair || 0
+        Other = Other || 0
+        var Total = parseFloat(Labor) + parseFloat(POL) + parseFloat(Repair) + parseFloat(Other)
+        $('#Total').val(Total);
+        $('#During_The_Month').val(Total);
+    }
+    function IsValidDate(e) {
+        var specialKeys = new Array();
+        specialKeys.push(8); //Backspace
+        specialKeys.push(9); //Tab
+        specialKeys.push(46); //Delete
+        specialKeys.push(36); //Home
+        specialKeys.push(35); //End
+        specialKeys.push(37); //Left
+        specialKeys.push(39); //Right
+        var keyCode = e.keyCode == 0 ? e.charCode : e.keyCode;
+        var ret = ((keyCode >= 48 && keyCode <= 57) || (keyCode == 43) || (keyCode == 47) || (specialKeys.indexOf(e.keyCode) != -1 && e.charCode != e.keyCode));
+        $(".error").css.display = ret ? "none" : "inline";
+        return ret;
+    }
+</script>
+<style>
+    @@media(max-width: 1366px) {
+        .bg-light .row label {
+            height: 62px;
+        }
+    }
+
+    @@media(max-width: 768px) {
+        .bg-light .row label {
+            height: auto;
+        }
+    }
+</style>
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        <!-- MAIN CONTENT AREA STARTS -->
+        @Html.Partial("_CMSnavigation")
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="javascript:void(0);">
+                                Add
+                            </a>
+                        </li>
+                    </ul>
+                    @Html.Partial("_CMSutil")
+                </div>
+
+                <section class="box form-container">
+                    <div class="content-body">
+                        @using (Html.BeginForm("Add", "MPRWork", FormMethod.Post, new { AUTOCOMPLETE = "Off", id = "form1", enctype = "multipart/form-data" }))
+                        {
+                            @Html.AntiForgeryToken()
+                            <ul class="nav nav-tabs progresstab" id="myTab" role="tablist">
+                                <li class="startstep active" id="step1">
+                                    <a id="first-tab" data-toggle="tab" href="#first" role="tab" aria-controls="first" aria-selected="false" onclick="showFirst()">Expenditure Incurred</a>
+                                </li>
+                                <li id="step2">
+                                    <a id="second-tab" data-toggle="tab" href="#second" role="tab" aria-controls="second" aria-selected="false" onclick="showSecond()">Exploration Data</a>
+                                </li>
+                                <li id="step3">
+                                    <a id="third-tab" data-toggle="tab" href="#third" role="tab" aria-controls="third" aria-selected="false" onclick="showThird()">Hault at camps for officers</a>
+                                </li>
+                                <li id="step4">
+                                    <a id="four-tab" data-toggle="tab" href="#four" role="tab" aria-controls="four" aria-selected="true" onclick="showFourth()">Enclosers</a>
+                                </li>
+                            </ul>
+                            <div class="tab-content" id="myTabContent">
+                                <div class="tab-pane fade show active" id="first" role="tabpanel" aria-labelledby="first-tab">
+                                    <div class="row">
+                                        <div class="col-xl-12">
+                                            <h5 class="text-brown font-weight-bold mt-0">Expenditure Incurred</h5>
+                                        </div>
+                                        <div class="col-lg-12">
+                                            <div class="row">
+                                                <div class="col-xl-4 form-group">
+                                                    <label class="col-form-label">Up to the last month in ₹ <span class="text-danger">*</span></label>
+                                                    <input type="text" class="form-control mb-lg-0 mb-3 only-numeric" value="@Model.Up_To_The_Last_Month" name="Up_To_The_Last_Month" id="Up_To_The_Last_Month">
+                                                    @Html.ValidationMessageFor(m => m.Up_To_The_Last_Month, "", new { @class = "text-danger" })
+                                                </div>
+                                                <div class="col-xl-4 form-group d-none">
+                                                    <label class="col-form-label">During the month </label>
+                                                    <input type="text" class="form-control mb-lg-0 mb-3 only-numeric" value="@Model.During_The_Month" name="During_The_Month" id="During_The_Month" readonly>
+                                                </div>
+                                            </div>
+                                            <label class="col-form-label"> During the month</label>
+                                            <div class="row">
+                                                <div class="col-lg-2 col-md-12 col-sm-12">
+                                                    <label class="col-form-label">Labor in ₹ <span class="text-danger">*</span></label>
+                                                    <input type="text" class="form-control mb-lg-0 mb-3 only-numeric" value="@Model.Labor" name="Labor" id="Labor" onfocusout="CalcuateDetailsOfBTotal()">
+                                                    @Html.ValidationMessageFor(m => m.Labor, "", new { @class = "text-danger" })
+                                                </div>
+                                                <div class="col-lg-2 col-md-12 col-sm-12">
+                                                    <label class="col-form-label">P.O.L in ₹ <span class="text-danger">*</span></label>
+                                                    <input type="text" class="form-control mb-lg-0 mb-3 only-numeric" value="@Model.POL" name="POL" id="POL" onfocusout="CalcuateDetailsOfBTotal()">
+                                                    @Html.ValidationMessageFor(m => m.POL, "", new { @class = "text-danger" })
+                                                </div>
+                                                <div class="col-lg-4 col-md-12 col-sm-12">
+                                                    <label class="col-form-label">Repairs and maintenance in ₹ <span class="text-danger">*</span></label>
+                                                    <input class="form-control mb-lg-0 mb-3 only-numeric" type="text" value="@Model.Repair_And_Maintenance" name="Repair_And_Maintenance" id="Repair_And_Maintenance" onfocusout="CalcuateDetailsOfBTotal()">
+                                                    @Html.ValidationMessageFor(m => m.Repair_And_Maintenance, "", new { @class = "text-danger" })
+                                                </div>
+                                                <div class="col-lg-2 col-md-12 col-sm-12">
+                                                    <label class="col-form-label">Others in ₹ <span class="text-danger">*</span></label>
+                                                    <input class="form-control mb-lg-0 mb-3 only-numeric" type="text" value="@Model.others" name="others" id="others" onfocusout="CalcuateDetailsOfBTotal()">
+                                                    @Html.ValidationMessageFor(m => m.others, "", new { @class = "text-danger" })
+                                                </div>
+                                                <div class="col-lg-2 col-md-12 col-sm-12">
+                                                    <label class="col-form-label">Total in ₹</label>
+                                                    <input class="form-control mb-lg-0 mb-0 only-numeric" type="text" value="@Model.Total" name="Total" id="Total" readonly>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="text-center mt-4">
+                                        <a href="@Url.Content("~/Geology/MPRWork/Add")" class="btn btn-danger btn-md ml-0 waves-effect waves-light">Reset</a>
+                                        <a class="btn btn-primary btn-md ml-0 waves-effect waves-light btnNext" onclick="showSecond()">Next</a>
+                                    </div>
+                                </div>
+                                <div class="tab-pane fade" id="second" role="tabpanel" aria-labelledby="second-tab">
+                                    <div class="row">
+                                        <div class="col-xl-12">
+                                            <h5 class="text-brown font-weight-bold mt-0 mb-3">Exploration Data <small>(Mt)</small></h5>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-lg-6 col-md-6 col-sm-12">
+                                            <div class="bg-light p-2 mb-4 border">
+                                                <label class="col-form-label font-weight-bolder pt-0 text-brown">(A) Reconn. Geological Survey (Scale - 1:50,000)</label>
+                                                <br />
+                                                <label class="col-form-label font-weight-bolder pt-0 text-warning">Area (sq. km.)</label>
+                                                <div class="row">
+                                                    <div class="col-lg-6 col-md-12 col-sm-12">
+                                                        <label class="col-form-label">Target</label>
+                                                        <input type="text" class="form-control mb-lg-3 mb-3 only-numeric" value="@Model.Reconn_Area_Target" name="Reconn_Area_Target" id="Reconn_Area_Target">
+                                                        @Html.ValidationMessageFor(m => m.Reconn_Area_Target, "", new { @class = "text-danger" })
+                                                    </div>
+                                                    <div class="col-lg-6 col-md-12 col-sm-12">
+                                                        <label class="col-form-label">Work done up to the last month</label>
+                                                        <input type="text" class="form-control mb-lg-3 mb-3 value1 only-numeric" value="@Model.Reconn_Area_Last_Month" name="Reconn_Area_Last_Month" onfocusout="CalcuateVal()">
+                                                        @Html.ValidationMessageFor(m => m.Reconn_Area_Last_Month, "", new { @class = "text-danger" })
+                                                    </div>
+                                                    <div class="col-lg-6 col-md-12 col-sm-12">
+                                                        <label class="col-form-label">Work done during the month</label>
+                                                        <input type="text" class="form-control mb-lg-0 mb-3 value2 only-numeric" value="@Model.Reconn_Area_During_Month" name="Reconn_Area_During_Month" onfocusout="CalcuateVal()">
+                                                        @Html.ValidationMessageFor(m => m.Reconn_Area_During_Month, "", new { @class = "text-danger" })
+                                                    </div>
+                                                    <div class="col-lg-6 col-md-12 col-sm-12">
+                                                        <label class="col-form-label">Total work done end of current month</label>
+                                                        <input type="text" class="form-control value3" value="@Model.Reconn_Area_Current_Month" name="Reconn_Area_Current_Month" readonly>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-6 col-md-6 col-sm-12">
+                                            <div class="bg-light p-2 mb-4 border">
+                                                <label class="col-form-label font-weight-bolder pt-0 text-brown">(B) Detailed Geological Mapping (Scale - 1:4,000)</label>
+                                                <br />
+                                                <label class="col-form-label font-weight-bolder  pt-0 text-warning">Area (sq. km.)</label>
+                                                <div class="row">
+                                                    <div class="col-lg-6 col-md-12 col-sm-12">
+                                                        <label class="col-form-label">Target</label>
+                                                        <input type="text" class="form-control mb-lg-3 mb-3 only-numeric" value="@Model.Detailed_Area_Target" name="Detailed_Area_Target" id="Detailed_Area_Target">
+                                                    </div>
+                                                    <div class="col-lg-6 col-md-12 col-sm-12">
+                                                        <label class="col-form-label">Work done up to the last month</label>
+                                                        <input type="text" class="form-control mb-lg-3 mb-3 value4 only-numeric" value="@Model.Detailed_Area_Last_Month" name="Detailed_Area_Last_Month" onfocusout="CalcuateVal()">
+                                                    </div>
+                                                    <div class="col-lg-6 col-md-12 col-sm-12">
+                                                        <label class="col-form-label">Work done during the month</label>
+                                                        <input type="text" class="form-control mb-lg-0 mb-3 value5 only-numeric" value="@Model.Detailed_Area_During_Month" name="Detailed_Area_During_Month" onfocusout="CalcuateVal()">
+                                                    </div>
+                                                    <div class="col-lg-6 col-md-12 col-sm-12">
+                                                        <label class="col-form-label">Total work done end of current month</label>
+                                                        <input type="text" class="form-control value6" value="@Model.Detailed_Area_Current_Month" name="Detailed_Area_Current_Month" readonly>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-lg-6 col-md-6 col-sm-12">
+                                            <div class="bg-light p-2 mb-4 border">
+                                                <label class="col-form-label font-weight-bolder pt-0 text-brown">(C) Pitting</label>
+                                                <br />
+                                                <label class="col-form-label font-weight-bolder  pt-0 text-warning"> Nos.</label>
+                                                <div class="row">
+                                                    <div class="col-lg-6 col-md-12 col-sm-12">
+                                                        <label class="col-form-label">Target</label>
+                                                        <input type="text" class="form-control mb-lg-3 mb-3 only-numeric" value="@Model.Pitting_Nos_Target" name="Pitting_Nos_Target" id="Pitting_Nos_Target">
+                                                        @Html.ValidationMessageFor(m => m.Pitting_Nos_Target, "", new { @class = "text-danger" })
+                                                    </div>
+                                                    <div class="col-lg-6 col-md-12 col-sm-12">
+                                                        <label class="col-form-label">Work done up to the last month</label>
+                                                        <input type="text" class="form-control mb-lg-3 mb-3 value7 only-numeric" value="@Model.Pitting_Nos_Last_Month" name="Pitting_Nos_Last_Month" onfocusout="CalcuateVal()">
+                                                        @Html.ValidationMessageFor(m => m.Pitting_Nos_Last_Month, "", new { @class = "text-danger" })
+                                                    </div>
+                                                    <div class="col-lg-6 col-md-12 col-sm-12">
+                                                        <label class="col-form-label">Work done during the month</label>
+                                                        <input type="text" class="form-control mb-lg-3 mb-3 value8 only-numeric" value="@Model.Pitting_Nos_During_Month" name="Pitting_Nos_During_Month" onfocusout="CalcuateVal()">
+                                                        @Html.ValidationMessageFor(m => m.Pitting_Nos_During_Month, "", new { @class = "text-danger" })
+                                                    </div>
+                                                    <div class="col-lg-6 col-md-12 col-sm-12">
+                                                        <label class="col-form-label">Total work done end of current month</label>
+                                                        <input type="number" class="form-control mb-lg-3 mb-3 value9" value="@Model.Pitting_Nos_Current_Month" name="Pitting_Nos_Current_Month" readonly>
+                                                    </div>
+                                                </div>
+                                                <label class="col-form-label font-weight-bolder  pt-0 text-warning"> Volume (cu. m.).</label>
+                                                <div class="row">
+                                                    <div class="col-lg-6 col-md-12 col-sm-12">
+                                                        <label class="col-form-label">Target</label>
+                                                        <input type="text" class="form-control mb-lg-3 mb-3 only-numeric" value="@Model.Pitting_Volume_Target" name="Pitting_Volume_Target" id="Pitting_Volume_Target">
+                                                    </div>
+                                                    <div class="col-lg-6 col-md-12 col-sm-12">
+                                                        <label class="col-form-label">Work done up to the last month</label>
+                                                        <input type="text" class="form-control mb-lg-3 mb-3 value10 only-numeric" value="@Model.Pitting_Volume_Last_Month" name="Pitting_Volume_Last_Month" onfocusout="CalcuateVal()">
+                                                    </div>
+                                                    <div class="col-lg-6 col-md-12 col-sm-12">
+                                                        <label class="col-form-label">Work done during the month</label>
+                                                        <input type="text" class="form-control mb-lg-3 mb-3 value11 only-numeric" value="@Model.Pitting_Volume_During_Month" name="Pitting_Volume_During_Month" onfocusout="CalcuateVal()">
+                                                    </div>
+                                                    <div class="col-lg-6 col-md-12 col-sm-12">
+                                                        <label class="col-form-label">Total work done end of current month</label>
+                                                        <input type="text" class="form-control value12" value="@Model.Pitting_Volume_Current_Month" name="Pitting_Volume_Current_Month" readonly>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-6 col-md-6 col-sm-12">
+                                            <div class="bg-light p-2 mb-4 border">
+                                                <label class="col-form-label font-weight-bolder pt-0 text-brown">(D) Trenching</label>
+                                                <br />
+                                                <label class="col-form-label font-weight-bolder  pt-0 text-warning"> Nos.</label>
+                                                <div class="row">
+                                                    <div class="col-lg-6 col-md-12 col-sm-12">
+                                                        <label class="col-form-label">Target</label>
+                                                        <input type="text" class="form-control mb-lg-3 mb-3 only-numeric" value="@Model.Trenching_Nos_Target" name="Trenching_Nos_Target" id="Trenching_Nos_Target">
+                                                    </div>
+                                                    <div class="col-lg-6 col-md-12 col-sm-12">
+                                                        <label class="col-form-label">Work done up to the last month</label>
+                                                        <input type="text" class="form-control mb-lg-3 mb-3 value13 only-numeric" value="@Model.Trenching_Nos_Last_Month" name="Trenching_Nos_Last_Month" onfocusout="CalcuateVal()">
+                                                    </div>
+                                                    <div class="col-lg-6 col-md-12 col-sm-12">
+                                                        <label class="col-form-label">Work done during the month</label>
+                                                        <input type="text" class="form-control mb-lg-3 mb-3 value14 only-numeric" value="@Model.Trenching_Nos_During_Month" name="Trenching_Nos_During_Month" onfocusout="CalcuateVal()">
+                                                    </div>
+                                                    <div class="col-lg-6 col-md-12 col-sm-12">
+                                                        <label class="col-form-label">Total work done end of current month</label>
+                                                        <input type="text" class="form-control mb-lg-3 mb-3 value15" value="@Model.Trenching_Nos_During_Month" name="Trenching_Nos_During_Month" readonly>
+                                                    </div>
+                                                </div>
+                                                <label class="col-form-label font-weight-bolder  pt-0 text-warning"> Volume (cu. m.).</label>
+                                                <div class="row">
+                                                    <div class="col-lg-6 col-md-12 col-sm-12">
+                                                        <label class="col-form-label">Target</label>
+                                                        <input type="text" class="form-control mb-lg-3 mb-3 only-numeric" value="@Model.Trenching_Volume_Target" name="Trenching_Volume_Target" id="Trenching_Volume_Target">
+                                                    </div>
+                                                    <div class="col-lg-6 col-md-12 col-sm-12">
+                                                        <label class="col-form-label">Work done up to the last month</label>
+                                                        <input type="text" class="form-control mb-lg-3 mb-3 value16 only-numeric" value="@Model.Trenching_Volume_Last_Month" name="Trenching_Volume_Last_Month" onfocusout="CalcuateVal()">
+                                                    </div>
+                                                    <div class="col-lg-6 col-md-12 col-sm-12">
+                                                        <label class="col-form-label">Work done during the month</label>
+                                                        <input type="text" class="form-control mb-lg-3 mb-3 value17 only-numeric" value="@Model.Trenching_Volume_During_Month" name="Trenching_Volume_During_Month" onfocusout="CalcuateVal()">
+                                                    </div>
+                                                    <div class="col-lg-6 col-md-12 col-sm-12">
+                                                        <label class="col-form-label">Total work done end of current month</label>
+                                                        <input type="text" class="form-control value18" value="@Model.Trenching_Volume_Current_Month" name="Trenching_Volume_Current_Month" readonly>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-xl-12">
+                                            <div class="bg-light p-2 mb-4 border">
+                                                <label class="col-form-label font-weight-bolder pt-0 text-brown">(E) Drilling</label>
+                                                <br />
+                                                <label class="col-form-label font-weight-bolder  pt-0 text-warning">B.h. Completed</label>
+                                                <div class="row">
+                                                    <div class="col-lg-3 col-md-12 col-sm-12">
+                                                        <label class="col-form-label">Target</label>
+                                                        <input type="text" class="form-control mb-lg-3 mb-3 only-numeric" value="@Model.B_H_Cpmpleted_Target" name="B_H_Cpmpleted_Target" id="B_H_Cpmpleted_Target">
+                                                    </div>
+                                                    <div class="col-lg-3 col-md-12 col-sm-12">
+                                                        <label class="col-form-label">Work done up to the last month</label>
+                                                        <input type="text" class="form-control mb-lg-3 mb-3 value19 only-numeric" value="@Model.B_H_Cpmpleted_Last_Month" name="B_H_Cpmpleted_Last_Month" onfocusout="CalcuateVal()">
+                                                    </div>
+                                                    <div class="col-lg-3 col-md-12 col-sm-12">
+                                                        <label class="col-form-label">Work done during the month</label>
+                                                        <input type="text" class="form-control mb-lg-0 mb-3 value20 only-numeric" value="@Model.B_H_Cpmpleted_During_Month" name="B_H_Cpmpleted_During_Month" onfocusout="CalcuateVal()">
+                                                    </div>
+                                                    <div class="col-lg-3 col-md-12 col-sm-12">
+                                                        <label class="col-form-label">Total work done end of current month</label>
+                                                        <input type="text" class="form-control mb-lg-0 mb-3 value21" value="@Model.B_H_Cpmpleted_Current_Month" name="B_H_Cpmpleted_Current_Month" readonly>
+                                                    </div>
+
+                                                </div>
+                                                <label class="col-form-label font-weight-bolder  pt-0 text-warning">Metrage</label>
+                                                <div class="row">
+
+                                                    <div class="col-lg-3 col-md-12 col-sm-12">
+                                                        <label class="col-form-label">Target</label>
+                                                        <input type="text" class="form-control mb-lg-3 mb-3 only-numeric" value="@Model.Metrage_Target" name="Metrage_Target" id="Metrage_Target">
+                                                    </div>
+                                                    <div class="col-lg-3 col-md-12 col-sm-12">
+                                                        <label class="col-form-label">Work done up to the last month</label>
+                                                        <input type="text" class="form-control mb-lg-3 mb-3 value22 only-numeric" value="@Model.Metrage_Last_Month" name="Metrage_Last_Month" onfocusout="CalcuateVal()">
+                                                    </div>
+                                                    <div class="col-lg-3 col-md-12 col-sm-12">
+                                                        <label class="col-form-label">Work done during the month</label>
+                                                        <input type="text" class="form-control mb-lg-0 mb-3 value23 only-numeric" value="@Model.Metrage_During_Month" name="Metrage_During_Month" onfocusout="CalcuateVal()">
+                                                    </div>
+                                                    <div class="col-lg-3 col-md-12 col-sm-12">
+                                                        <label class="col-form-label">Total work done end of current month</label>
+                                                        <input type="text" class="form-control mb-lg-0 mb-3 value24" value="@Model.Metrage_Current_Month" name="Metrage_Current_Month" readonly>
+                                                    </div>
+
+                                                </div>
+                                                <label class="col-form-label font-weight-bolder  pt-0 text-warning">B.H. Under Progress</label>
+                                                <div class="row">
+                                                    <div class="col-lg-3 col-md-12 col-sm-12">
+                                                        <label class="col-form-label">Target</label>
+                                                        <input type="text" class="form-control mb-lg-3 mb-3 only-numeric" value="@Model.B_H_Under_Progress_Target" name="B_H_Under_Progress_Target" id="B_H_Under_Progress_Target">
+                                                    </div>
+                                                    <div class="col-lg-3 col-md-12 col-sm-12">
+                                                        <label class="col-form-label">Work done up to the last month</label>
+                                                        <input type="text" class="form-control mb-lg-3 mb-3 value25 only-numeric" value="@Model.B_H_Under_Progress_Last_Month" name="B_H_Under_Progress_Last_Month" onfocusout="CalcuateVal()">
+                                                    </div>
+                                                    <div class="col-lg-3 col-md-12 col-sm-12">
+                                                        <label class="col-form-label">Work done during the month</label>
+                                                        <input type="text" class="form-control mb-lg-0 mb-3 value26 only-numeric" value="@Model.B_H_Under_Progress_During_Month" name="B_H_Under_Progress_During_Month" onfocusout="CalcuateVal()">
+                                                    </div>
+                                                    <div class="col-lg-3 col-md-12 col-sm-12">
+                                                        <label class="col-form-label">Total work done end of current month</label>
+                                                        <input type="text" class="form-control mb-lg-0 mb-3 value27" value="@Model.B_H_Under_Progress_Current_Month" name="B_H_Under_Progress_Current_Month" readonly>
+                                                    </div>
+                                                </div>
+                                                <label class="col-form-label font-weight-bolder  pt-0 text-warning">Metrage</label>
+                                                <div class="row">
+                                                    <div class="col-lg-3 col-md-12 col-sm-12">
+                                                        <label class="col-form-label">Target</label>
+                                                        <input type="text" class="form-control mb-lg-3 mb-3 only-numeric" value="@Model.Metrage_2_Target" name="Metrage_2_Target" id="Metrage_2_Target">
+                                                    </div>
+                                                    <div class="col-lg-3 col-md-12 col-sm-12">
+                                                        <label class="col-form-label">Work done up to the last month</label>
+                                                        <input type="text" class="form-control mb-lg-3 mb-3 value28 only-numeric" value="@Model.Metrage_2_Last_Month" name="Metrage_2_Last_Month" onfocusout="CalcuateVal()">
+                                                    </div>
+                                                    <div class="col-lg-3 col-md-12 col-sm-12">
+                                                        <label class="col-form-label">Work done during the month</label>
+                                                        <input type="text" class="form-control mb-lg-0 mb-3 value29 only-numeric" value="@Model.Metrage_2_During_Month" name="Metrage_2_During_Month" onfocusout="CalcuateVal()">
+                                                    </div>
+                                                    <div class="col-lg-3 col-md-12 col-sm-12">
+                                                        <label class="col-form-label">Total work done end of current month</label>
+                                                        <input type="text" class="form-control mb-lg-0 mb-3 value30" value="@Model.Metrage_2_Current_Month" name="Metrage_2_Current_Month" readonly>
+                                                    </div>
+                                                </div>
+                                                <label class="col-form-label font-weight-bolder  pt-0 text-warning">Total Metrage</label>
+                                                <div class="row">
+                                                    <div class="col-lg-3 col-md-12 col-sm-12">
+                                                        <label class="col-form-label">Target</label>
+                                                        <input type="text" class="form-control mb-lg-3 mb-3 only-numeric" value="@Model.Total_Metrage_Target" name="Total_Metrage_Target" id="Total_Metrage_Target">
+                                                    </div>
+                                                    <div class="col-lg-3 col-md-12 col-sm-12">
+                                                        <label class="col-form-label">Work done up to the last month</label>
+                                                        <input type="text" class="form-control mb-lg-3 mb-3 value31 only-numeric" value="@Model.Total_Metrage_Last_Month" name="Total_Metrage_Last_Month" onfocusout="CalcuateVal()">
+                                                    </div>
+                                                    <div class="col-lg-3 col-md-12 col-sm-12">
+                                                        <label class="col-form-label">Work done during the month</label>
+                                                        <input type="text" class="form-control mb-lg-0 mb-3 value32 only-numeric" value="@Model.Total_Metrage_During_Month" name="Total_Metrage_During_Month" onfocusout="CalcuateVal()">
+                                                    </div>
+                                                    <div class="col-lg-3 col-md-12 col-sm-12">
+                                                        <label class="col-form-label">Total work done end of current month</label>
+                                                        <input type="text" class="form-control value33" value="@Model.Total_Metrage_Current_Month" name="Total_Metrage_Current_Month" readonly>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-xl-6">
+                                            <div class="bg-light p-2 mb-4 border">
+                                                <label class="col-form-label font-weight-bolder pt-0 text-brown">(F) Geochemical Sampling</label>
+                                                <div class="row">
+                                                    <div class="col-lg-6 col-md-12 col-sm-12">
+                                                        <label class="col-form-label">Target</label>
+                                                        <input type="text" class="form-control mb-lg-3 mb-3 only-numeric" value="@Model.Geochemical_Sampling_Target" name="Geochemical_Sampling_Target">
+                                                    </div>
+                                                    <div class="col-lg-6 col-md-12 col-sm-12">
+                                                        <label class="col-form-label">Work done up to the last month</label>
+                                                        <input type="text" class="form-control mb-lg-3 mb-3 value34 only-numeric" value="@Model.Geochemical_Sampling_Last_Month" name="Geochemical_Sampling_Last_Month" onfocusout="CalcuateVal()">
+                                                    </div>
+                                                    <div class="col-lg-6 col-md-12 col-sm-12">
+                                                        <label class="col-form-label">Work done during the month</label>
+                                                        <input type="text" class="form-control mb-lg-0 mb-3 value35 only-numeric" value="@Model.Geochemical_Samplinge_During_Month" name="Geochemical_Samplinge_During_Month" onfocusout="CalcuateVal()">
+                                                    </div>
+                                                    <div class="col-lg-6 col-md-12 col-sm-12">
+                                                        <label class="col-form-label">Total work done end of current month</label>
+                                                        <input type="text" class="form-control value36" value="@Model.Geochemical_Sampling_Current_Month" name="Geochemical_Sampling_Current_Month" readonly>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-xl-6">
+                                            <div class="bg-light p-2 mb-4 border">
+                                                <label class="col-form-label font-weight-bolder pt-0 text-brown">(G) Geophysical Survey</label>
+                                                <div class="row">
+                                                    <div class="col-lg-6 col-md-12 col-sm-12">
+                                                        <label class="col-form-label">Target</label>
+                                                        <input type="text" class="form-control mb-lg-3 mb-3 only-numeric" value="@Model.Geophysical_Survey_Target" name="Geophysical_Survey_Target">
+                                                    </div>
+                                                    <div class="col-lg-6 col-md-12 col-sm-12">
+                                                        <label class="col-form-label">Work done up to the last month</label>
+                                                        <input type="text" class="form-control mb-lg-3 mb-3 value37 only-numeric" value="@Model.Geophysical_Survey_Last_Month" name="Geophysical_Survey_Last_Month" onfocusout="CalcuateVal()">
+                                                    </div>
+                                                    <div class="col-lg-6 col-md-12 col-sm-12">
+                                                        <label class="col-form-label">Work done during the month</label>
+                                                        <input type="text" class="form-control mb-lg-0 mb-3 value38 only-numeric" value="@Model.Geophysical_Survey_During_Month" name="Geophysical_Survey_During_Month" onfocusout="CalcuateVal()">
+                                                    </div>
+                                                    <div class="col-lg-6 col-md-12 col-sm-12">
+                                                        <label class="col-form-label">Total work done end of current month</label>
+                                                        <input type="text" class="form-control value39" value="@Model.Geophysical_Survey_Current_Month" name="Geophysical_Survey_Current_Month" readonly>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-xl-12">
+                                            <div class="bg-light p-2 mb-4 border">
+                                                <label class="col-form-label font-weight-bolder pt-0 text-brown">(H) Photogeological Survey</label>
+                                                <br>
+                                                <label class="col-form-label font-weight-bolder  pt-0 text-warning"> Prefield Interpretation (sq. km. on scale)</label>
+                                                <div class="row">
+                                                    <div class="col-lg-3 col-md-12 col-sm-12">
+                                                        <label class="col-form-label">Target</label>
+                                                        <input type="text" class="form-control mb-lg-3 mb-3 only-numeric" value="@Model.Prefield_Interpretation_Target" name="Prefield_Interpretation_Target">
+                                                    </div>
+                                                    <div class="col-lg-3 col-md-12 col-sm-12">
+                                                        <label class="col-form-label">Work done up to the last month</label>
+                                                        <input type="text" class="form-control mb-lg-3 mb-3 value40 only-numeric" value="@Model.Prefield_Interpretation_Last_Month" name="Prefield_Interpretation_Last_Month" onfocusout="CalcuateVal()">
+                                                    </div>
+                                                    <div class="col-lg-3 col-md-12 col-sm-12">
+                                                        <label class="col-form-label">Work done during the month</label>
+                                                        <input type="text" class="form-control mb-lg-0 mb-3 value41 only-numeric" value="@Model.Prefield_Interpretation_During_Month" name="Prefield_Interpretation_During_Month" onfocusout="CalcuateVal()">
+                                                    </div>
+                                                    <div class="col-lg-3 col-md-12 col-sm-12">
+                                                        <label class="col-form-label">Total work done end of current month</label>
+                                                        <input type="text" class="form-control mb-lg-0 mb-3 value42" value="@Model.Prefield_Interpretation_Current_Month" name="Prefield_Interpretation_Current_Month" readonly>
+                                                    </div>
+                                                </div>
+                                                <label class="col-form-label font-weight-bolder  pt-0 text-warning"> Post field Interpretation (sq. km. on scale)</label>
+                                                <div class="row">
+                                                    <div class="col-lg-3 col-md-12 col-sm-12">
+                                                        <label class="col-form-label">Target</label>
+                                                        <input type="text" class="form-control mb-lg-3 mb-3 only-numeric" value="@Model.Postfield_Interpretation_Target" name="Postfield_Interpretation_Target">
+                                                    </div>
+                                                    <div class="col-lg-3 col-md-12 col-sm-12">
+                                                        <label class="col-form-label">Work done up to the last month</label>
+                                                        <input type="text" class="form-control mb-lg-3 mb-3 value43 only-numeric" value="@Model.Postfield_Interpretation_Last_Month" name="Postfield_Interpretation_Last_Month" onfocusout="CalcuateVal()">
+                                                    </div>
+                                                    <div class="col-lg-3 col-md-12 col-sm-12">
+                                                        <label class="col-form-label">Work done during the month</label>
+                                                        <input type="text" class="form-control mb-lg-0 mb-3 value44 only-numeric" value="@Model.Postfield_Interpretation_During_Month" name="Postfield_Interpretation_During_Month" onfocusout="CalcuateVal()">
+                                                    </div>
+                                                    <div class="col-lg-3 col-md-12 col-sm-12">
+                                                        <label class="col-form-label">Total work done end of current month</label>
+                                                        <input type="text" class="form-control mb-lg-0 mb-3 value45" value="@Model.Postfield_Interpretation_Current_Month" readonly>
+                                                    </div>
+                                                </div>
+                                                <label class="col-form-label font-weight-bolder  pt-0 text-warning"> Field Check (sq. km. on scale)</label>
+                                                <div class="row">
+                                                    <div class="col-lg-3 col-md-12 col-sm-12">
+                                                        <label class="col-form-label">Target</label>
+                                                        <input type="text" class="form-control mb-lg-3 mb-3 only-numeric" value="@Model.Field_Check_Target" name="Field_Check_Target">
+                                                    </div>
+                                                    <div class="col-lg-3 col-md-12 col-sm-12">
+                                                        <label class="col-form-label">Work done up to the last month</label>
+                                                        <input type="text" class="form-control mb-lg-3 mb-3 value46 only-numeric" value="@Model.Field_Check_Last_Month" name="Field_Check_Last_Month" onfocusout="CalcuateVal()">
+                                                    </div>
+                                                    <div class="col-lg-3 col-md-12 col-sm-12">
+                                                        <label class="col-form-label">Work done during the month</label>
+                                                        <input type="text" class="form-control mb-lg-0 mb-3 value47 only-numeric" value="@Model.Field_Check_During_Month" name="Field_Check_During_Month" onfocusout="CalcuateVal()">
+                                                    </div>
+                                                    <div class="col-lg-3 col-md-12 col-sm-12">
+                                                        <label class="col-form-label">Total work done end of current month</label>
+                                                        <input type="text" class="form-control value48" value="@Model.Field_Check_Current_Month" name="Field_Check_Current_Month" readonly>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-xl-12">
+                                            <div class="bg-light p-2 mb-4 border">
+                                                <label class="col-form-label font-weight-bolder pt-0 text-brown">(I) Sampling (Surface/Core Sample)</label>
+                                                <br>
+                                                <label class="col-form-label font-weight-bolder  pt-0 text-warning"> Samples Drawn</label>
+                                                <div class="row">
+                                                    <div class="col-lg-3 col-md-12 col-sm-12">
+                                                        <label class="col-form-label">Target</label>
+                                                        <input type="text" class="form-control mb-lg-3 mb-3 only-numeric" value="@Model.Sample_Drawn_Target" name="Sample_Drawn_Target">
+                                                    </div>
+                                                    <div class="col-lg-3 col-md-12 col-sm-12">
+                                                        <label class="col-form-label">Work done up to the last month</label>
+                                                        <input type="text" class="form-control mb-lg-3 mb-3 value49 only-numeric" value="@Model.Sample_Drawn_Last_Month" name="Sample_Drawn_Last_Month" onfocusout="CalcuateVal()">
+                                                    </div>
+                                                    <div class="col-lg-3 col-md-12 col-sm-12">
+                                                        <label class="col-form-label">Work done during the month</label>
+                                                        <input type="text" class="form-control mb-lg-0 mb-3 value50 only-numeric" value="@Model.Sample_Drawn_During_Month" name="Sample_Drawn_During_Month" onfocusout="CalcuateVal()">
+                                                    </div>
+                                                    <div class="col-lg-3 col-md-12 col-sm-12">
+                                                        <label class="col-form-label">Total work done end of current month</label>
+                                                        <input type="text" class="form-control mb-lg-0 mb-3 value51" value="@Model.Sample_Drawn_Current_Month" name="Sample_Drawn_Current_Month" readonly>
+                                                    </div>
+                                                </div>
+                                                <label class="col-form-label font-weight-bolder  pt-0 text-warning">  Samples Prepared</label>
+                                                <div class="row">
+                                                    <div class="col-lg-3 col-md-12 col-sm-12">
+                                                        <label class="col-form-label">Target</label>
+                                                        <input type="text" class="form-control mb-lg-3 mb-3 only-numeric" value="@Model.Sample_Prepared_Target" name="Sample_Prepared_Target">
+                                                    </div>
+                                                    <div class="col-lg-3 col-md-12 col-sm-12">
+                                                        <label class="col-form-label">Work done up to the last month</label>
+                                                        <input type="text" class="form-control mb-lg-3 mb-3 value52 only-numeric" value="@Model.Sample_Prepared_Last_Month" name="Sample_Prepared_Last_Month" onfocusout="CalcuateVal()">
+                                                    </div>
+                                                    <div class="col-lg-3 col-md-12 col-sm-12">
+                                                        <label class="col-form-label">Work done during the month</label>
+                                                        <input type="text" class="form-control mb-lg-0 mb-3 value53 only-numeric" value="@Model.Sample_Prepared_During_Month" name="Sample_Prepared_During_Month" onfocusout="CalcuateVal()">
+                                                    </div>
+                                                    <div class="col-lg-3 col-md-12 col-sm-12">
+                                                        <label class="col-form-label">Total work done end of current month</label>
+                                                        <input type="number" class="form-control mb-lg-0 mb-3 value54" value="@Model.Sample_Prepared_Current_Month" name="Sample_Prepared_Current_Month" readonly>
+                                                    </div>
+                                                </div>
+                                                <label class="col-form-label font-weight-bolder  pt-0 text-warning"> Samples Sent For Chemical Analysis</label>
+                                                <div class="row">
+                                                    <div class="col-lg-3 col-md-12 col-sm-12">
+                                                        <label class="col-form-label">Target</label>
+                                                        <input type="text" class="form-control mb-lg-3 mb-3 only-numeric" value="@Model.Sample_Sent_For_Chemical_Analysis_Target" name="Sample_Sent_For_Chemical_Analysis_Target">
+                                                    </div>
+                                                    <div class="col-lg-3 col-md-12 col-sm-12">
+                                                        <label class="col-form-label">Work done up to the last month</label>
+                                                        <input type="text" class="form-control mb-lg-3 mb-3 value55 only-numeric" value="@Model.Sample_Sent_For_Chemical_Analysis_Last_Month" name="Sample_Sent_For_Chemical_Analysis_Last_Month" onfocusout="CalcuateVal()">
+                                                    </div>
+                                                    <div class="col-lg-3 col-md-12 col-sm-12">
+                                                        <label class="col-form-label">Work done during the month</label>
+                                                        <input type="text" class="form-control mb-lg-0 mb-3 value56 only-numeric" value="@Model.Sample_Sent_For_Chemical_Analysis_During_Month" name="Sample_Sent_For_Chemical_Analysis_During_Month" onfocusout="CalcuateVal()">
+                                                    </div>
+                                                    <div class="col-lg-3 col-md-12 col-sm-12">
+                                                        <label class="col-form-label">Total work done end of current month</label>
+                                                        <input type="number" class="form-control mb-lg-0 mb-3 value57" value="@Model.Sample_Sent_For_Chemical_Analysis_Current_Month" name="Sample_Sent_For_Chemical_Analysis_Current_Month" readonly>
+                                                    </div>
+                                                </div>
+                                                <label class="col-form-label font-weight-bolder  pt-0 text-warning"> Samples Sent For Petrography</label>
+                                                <div class="row">
+                                                    <div class="col-lg-3 col-md-12 col-sm-12">
+                                                        <label class="col-form-label">Target</label>
+                                                        <input type="text" class="form-control mb-lg-3 mb-3 only-numeric" value="@Model.Sample_Sent_For_Petrography_Target" name="Sample_Sent_For_Petrography_Target">
+                                                    </div>
+                                                    <div class="col-lg-3 col-md-12 col-sm-12">
+                                                        <label class="col-form-label">Work done up to the last month</label>
+                                                        <input type="text" class="form-control mb-lg-3 mb-3 value58 only-numeric" value="@Model.Sample_Sent_For_Petrography_Last_Month" name="Sample_Sent_For_Petrography_Last_Month" onfocusout="CalcuateVal()">
+                                                    </div>
+                                                    <div class="col-lg-3 col-md-12 col-sm-12">
+                                                        <label class="col-form-label">Work done during the month</label>
+                                                        <input type="text" class="form-control mb-lg-0 mb-3 value59 only-numeric" value="@Model.Sample_Sent_For_Petrography_During_Month" name="Sample_Sent_For_Petrography_During_Month" onfocusout="CalcuateVal()">
+                                                    </div>
+                                                    <div class="col-lg-3 col-md-12 col-sm-12">
+                                                        <label class="col-form-label">Total work done end of current month</label>
+                                                        <input type="number" class="form-control value60" value="@Model.Sample_Sent_For_Petrography_Current_Month" name="Sample_Sent_For_Petrography_Current_Month" readonly>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-xl-12">
+                                            <div class="bg-light p-2 mb-4 border">
+                                                <label class="col-form-label font-weight-bolder pt-0 text-brown">(J) Reserves</label>
+                                                <br>
+                                                <label class="col-form-label font-weight-bolder  pt-0 text-warning"> Inferred (Million Tonnes)</label>
+                                                <div class="row">
+                                                    <div class="col-lg-3 col-md-12 col-sm-12">
+                                                        <label class="col-form-label">Target</label>
+                                                        <input type="text" class="form-control mb-lg-3 mb-3 only-numeric" value="@Model.Inferred_Target" name="Inferred_Target">
+                                                    </div>
+                                                    <div class="col-lg-3 col-md-12 col-sm-12">
+                                                        <label class="col-form-label">Work done up to the last month</label>
+                                                        <input type="text" class="form-control mb-lg-3 mb-3 value61 only-numeric" value="@Model.Inferred_Last_Month" name="Inferred_Last_Month" onfocusout="CalcuateVal()">
+                                                    </div>
+                                                    <div class="col-lg-3 col-md-12 col-sm-12">
+                                                        <label class="col-form-label">Work done during the month</label>
+                                                        <input type="text" class="form-control mb-lg-0 mb-3 value62 only-numeric" value="@Model.Inferred_During_Month" name="Inferred_During_Month" onfocusout="CalcuateVal()">
+                                                    </div>
+                                                    <div class="col-lg-3 col-md-12 col-sm-12">
+                                                        <label class="col-form-label">Total work done end of current month</label>
+                                                        <input type="number" class="form-control mb-lg-0 mb-3 value63" value="@Model.Inferred_Current_Month" name="Inferred_Current_Month" readonly>
+                                                    </div>
+                                                </div>
+                                                <label class="col-form-label font-weight-bolder  pt-0 text-warning">Estimated (Million Tonnes)</label>
+                                                <div class="row">
+                                                    <div class="col-lg-3 col-md-12 col-sm-12">
+                                                        <label class="col-form-label">Target</label>
+                                                        <input type="text" class="form-control mb-lg-3 mb-3 only-numeric" value="@Model.Estimated_Target" name="Estimated_Target">
+                                                    </div>
+                                                    <div class="col-lg-3 col-md-12 col-sm-12">
+                                                        <label class="col-form-label">Work done up to the last month</label>
+                                                        <input type="text" class="form-control mb-lg-3 mb-3 value64 only-numeric" value="@Model.Estimated_Last_Month" name="Estimated_Last_Month" onfocusout="CalcuateVal()">
+                                                    </div>
+                                                    <div class="col-lg-3 col-md-12 col-sm-12">
+                                                        <label class="col-form-label">Work done during the month</label>
+                                                        <input type="text" class="form-control mb-lg-0 mb-3 value65 only-numeric" value="@Model.Estimated_During_Month" name="Estimated_During_Month" onfocusout="CalcuateVal()">
+                                                    </div>
+                                                    <div class="col-lg-3 col-md-12 col-sm-12">
+                                                        <label class="col-form-label">Total work done end of current month</label>
+                                                        <input type="number" class="form-control mb-lg-0 mb-3 value66" value="@Model.Estimated_Current_Month" name="Estimated_Current_Month" readonly>
+                                                    </div>
+                                                </div>
+                                                <label class="col-form-label font-weight-bolder  pt-0 text-warning"> Proved (Million Tonnes)</label>
+                                                <div class="row">
+                                                    <div class="col-lg-3 col-md-12 col-sm-12">
+                                                        <label class="col-form-label">Target</label>
+                                                        <input type="text" class="form-control mb-lg-3 mb-3 only-numeric" value="@Model.Proved_Target" name="Proved_Target">
+                                                    </div>
+                                                    <div class="col-lg-3 col-md-12 col-sm-12">
+                                                        <label class="col-form-label">Work done up to the last month</label>
+                                                        <input type="text" class="form-control mb-lg-3 mb-3 value67 only-numeric" value="@Model.Proved_Last_Month" name="Proved_Last_Month" onfocusout="CalcuateVal()">
+                                                    </div>
+                                                    <div class="col-lg-3 col-md-12 col-sm-12">
+                                                        <label class="col-form-label">Work done during the month</label>
+                                                        <input type="text" class="form-control mb-lg-0 mb-3 value68 only-numeric" value="@Model.Proved_During_Month" name="Proved_During_Month" onfocusout="CalcuateVal()">
+                                                    </div>
+                                                    <div class="col-lg-3 col-md-12 col-sm-12">
+                                                        <label class="col-form-label">Total work done end of current month</label>
+                                                        <input type="number" class="form-control value69" value="@Model.Proved_Current_Month" name="Proved_Current_Month" readonly>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-xl-12">
+                                            <div class="bg-light p-2 mb-4 border">
+                                                <label class="col-form-label font-weight-bolder pt-0 text-brown">(K) Topographical Survey</label>
+                                                <br>
+                                                <label class="col-form-label font-weight-bolder  pt-0 text-warning"> Laying Of Base Line (km.) 1:10000</label>
+                                                <div class="row">
+
+                                                    <div class="col-lg-3 col-md-12 col-sm-12">
+                                                        <label class="col-form-label">Target</label>
+                                                        <input type="text" class="form-control mb-lg-3 mb-3 only-numeric" value="@Model.Laying_Of_Base_Line_Target" name="Laying_Of_Base_Line_Target">
+                                                    </div>
+                                                    <div class="col-lg-3 col-md-12 col-sm-12">
+                                                        <label class="col-form-label">Work done up to the last month</label>
+                                                        <input type="text" class="form-control mb-lg-3 mb-3 value70 only-numeric" value="@Model.Laying_Of_Base_Line_Last_Month" name="Laying_Of_Base_Line_Last_Month" onfocusout="CalcuateVal()">
+                                                    </div>
+                                                    <div class="col-lg-3 col-md-12 col-sm-12">
+                                                        <label class="col-form-label">Work done during the month</label>
+                                                        <input type="text" class="form-control mb-lg-0 mb-3 value71 only-numeric" value="@Model.Laying_Of_Base_Line_During_Month" name="Laying_Of_Base_Line_During_Month" onfocusout="CalcuateVal()">
+                                                    </div>
+                                                    <div class="col-lg-3 col-md-12 col-sm-12">
+                                                        <label class="col-form-label">Total work done end of current month</label>
+                                                        <input type="number" class="form-control mb-lg-0 mb-3 value72" value="@Model.Laying_Of_Base_Line_Current_Month" name="Laying_Of_Base_Line_Current_Month" readonly>
+                                                    </div>
+
+                                                </div>
+                                                <label class="col-form-label font-weight-bolder  pt-0 text-warning"> Laying Of Grids (sq. km.)</label>
+                                                <div class="row">
+
+                                                    <div class="col-lg-3 col-md-12 col-sm-12">
+                                                        <label class="col-form-label">Target</label>
+                                                        <input type="text" class="form-control mb-lg-3 mb-3 only-numeric" value="@Model.Laying_Of_Grids_Target" name="Laying_Of_Grids_Target">
+                                                    </div>
+                                                    <div class="col-lg-3 col-md-12 col-sm-12">
+                                                        <label class="col-form-label">Work done up to the last month</label>
+                                                        <input type="text" class="form-control mb-lg-3 mb-3 value73 only-numeric" value="@Model.Laying_Of_Grids_Last_Month" name="Laying_Of_Grids_Last_Month" onfocusout="CalcuateVal()">
+                                                    </div>
+                                                    <div class="col-lg-3 col-md-12 col-sm-12">
+                                                        <label class="col-form-label">Work done during the month</label>
+                                                        <input type="text" class="form-control mb-lg-0 mb-3 value74 only-numeric" value="@Model.Laying_Of_Grids_During_Month" name="Laying_Of_Grids_During_Month" onfocusout="CalcuateVal()">
+                                                    </div>
+                                                    <div class="col-lg-3 col-md-12 col-sm-12">
+                                                        <label class="col-form-label">Total work done end of current month</label>
+                                                        <input type="number" class="form-control mb-lg-0 mb-3 value75" value="@Model.Laying_Of_Grids_Current_Month" name="Laying_Of_Grids_Current_Month" readonly>
+                                                    </div>
+
+                                                </div>
+                                                <label class="col-form-label font-weight-bolder  pt-0 text-warning"> No. Of Pits/B.H. Point Located</label>
+                                                <div class="row">
+                                                    <div class="col-lg-3 col-md-12 col-sm-12">
+                                                        <label class="col-form-label">Target</label>
+                                                        <input type="text" class="form-control mb-lg-3 mb-3 only-numeric" value="@Model.No_of_Pits_Target" name="No_of_Pits_Target">
+                                                    </div>
+                                                    <div class="col-lg-3 col-md-12 col-sm-12">
+                                                        <label class="col-form-label">Work done up to the last month</label>
+                                                        <input type="text" class="form-control mb-lg-3 mb-3 value76 only-numeric" value="@Model.No_of_Pits_Last_Month" name="No_of_Pits_Last_Month" onfocusout="CalcuateVal()">
+                                                    </div>
+                                                    <div class="col-lg-3 col-md-12 col-sm-12">
+                                                        <label class="col-form-label">Work done during the month</label>
+                                                        <input type="text" class="form-control mb-lg-0 mb-3 value77 only-numeric" value="@Model.No_of_Pits_During_Month" name="No_of_Pits_During_Month" onfocusout="CalcuateVal()">
+                                                    </div>
+                                                    <div class="col-lg-3 col-md-12 col-sm-12">
+                                                        <label class="col-form-label">Total work done end of current month</label>
+                                                        <input type="number" class="form-control mb-lg-0 mb-3 value78" value="@Model.No_of_Pits_Current_Month" name="No_of_Pits_Current_Month" readonly>
+                                                    </div>
+                                                </div>
+                                                <label class="col-form-label font-weight-bolder  pt-0 text-warning">  R.L./Co-ordinates Of Pits/B.H.</label>
+                                                <div class="row">
+                                                    <div class="col-lg-3 col-md-12 col-sm-12">
+                                                        <label class="col-form-label">Target</label>
+                                                        <input type="text" class="form-control mb-lg-3 mb-3 only-numeric" value="@Model.Co_ordinates_Of_Pits_Target" name="Co_ordinates_Of_Pits_Target">
+                                                    </div>
+                                                    <div class="col-lg-3 col-md-12 col-sm-12">
+                                                        <label class="col-form-label">Work done up to the last month</label>
+                                                        <input type="text" class="form-control mb-lg-3 mb-3 value79 only-numeric" value="@Model.Co_ordinates_Of_Pits_Last_Month" name="Co_ordinates_Of_Pits_Last_Month" onfocusout="CalcuateVal()">
+                                                    </div>
+                                                    <div class="col-lg-3 col-md-12 col-sm-12">
+                                                        <label class="col-form-label">Work done during the month</label>
+                                                        <input type="text" class="form-control mb-lg-0 mb-3 value80 only-numeric" value="@Model.Co_ordinates_Of_Pits_During_Month" name="Co_ordinates_Of_Pits_During_Month" onfocusout="CalcuateVal()">
+                                                    </div>
+                                                    <div class="col-lg-3 col-md-12 col-sm-12">
+                                                        <label class="col-form-label">Total work done end of current month</label>
+                                                        <input type="number" class="form-control mb-lg-0 mb-3 value81" value="@Model.Co_ordinates_Of_Pits_Current_Month" name="Co_ordinates_Of_Pits_Current_Month" readonly>
+                                                    </div>
+                                                </div>
+                                                <label class="col-form-label font-weight-bolder  pt-0 text-warning">  Contouring (sq. km.)</label>
+                                                <div class="row">
+                                                    <div class="col-lg-3 col-md-12 col-sm-12">
+                                                        <label class="col-form-label">Target</label>
+                                                        <input type="text" class="form-control mb-lg-3 mb-3 only-numeric" value="@Model.Contouring_Target" name="Contouring_Target">
+                                                    </div>
+                                                    <div class="col-lg-3 col-md-12 col-sm-12">
+                                                        <label class="col-form-label">Work done up to the last month</label>
+                                                        <input type="text" class="form-control mb-lg-3 mb-3 value82 only-numeric" value="@Model.Contouring_Last_Month" name="Contouring_Last_Month" onfocusout="CalcuateVal()">
+                                                    </div>
+                                                    <div class="col-lg-3 col-md-12 col-sm-12">
+                                                        <label class="col-form-label">Work done during the month</label>
+                                                        <input type="text" class="form-control mb-lg-0 mb-3 value83 only-numeric" value="@Model.Contouring_During_Month" name="Contouring_During_Month" onfocusout="CalcuateVal()">
+                                                    </div>
+                                                    <div class="col-lg-3 col-md-12 col-sm-12">
+                                                        <label class="col-form-label">Total work done end of current month</label>
+                                                        <input type="number" class="form-control mb-lg-0 mb-3 value84" value="@Model.Contouring_Current_Month" name="Contouring_Current_Month" readonly>
+                                                    </div>
+                                                </div>
+                                                <label class="col-form-label font-weight-bolder  pt-0 text-warning">  Plotting Of Permanent Features</label>
+                                                <div class="row">
+                                                    <div class="col-lg-3 col-md-12 col-sm-12">
+                                                        <label class="col-form-label">Target</label>
+                                                        <input type="text" class="form-control mb-lg-3 mb-3 only-numeric" value="@Model.Plotting_Of_Permanent_Features_Target" name="Plotting_Of_Permanent_Features_Target">
+                                                    </div>
+                                                    <div class="col-lg-3 col-md-12 col-sm-12">
+                                                        <label class="col-form-label">Work done up to the last month</label>
+                                                        <input type="text" class="form-control mb-lg-3 mb-3 value85 only-numeric" value="@Model.Plotting_Of_Permanent_Features_Last_Month" name="Plotting_Of_Permanent_Features_Last_Month" onfocusout="CalcuateVal()">
+                                                    </div>
+                                                    <div class="col-lg-3 col-md-12 col-sm-12">
+                                                        <label class="col-form-label">Work done during the month</label>
+                                                        <input type="text" class="form-control mb-lg-0 mb-3 value86 only-numeric" value="@Model.Plotting_Of_Permanent_Features_During_Month" name="Plotting_Of_Permanent_Features_During_Month" onfocusout="CalcuateVal()">
+                                                    </div>
+                                                    <div class="col-lg-3 col-md-12 col-sm-12">
+                                                        <label class="col-form-label">Total work done end of current month</label>
+                                                        <input type="number" class="form-control mb-lg-0 mb-3 value87" value="@Model.Plotting_Of_Permanent_Features_Current_Month" name="Plotting_Of_Permanent_Features_Current_Month" readonly>
+                                                    </div>
+                                                </div>
+                                                <label class="col-form-label font-weight-bolder  pt-0 text-warning"> Plotting Of Road/Nala (k.m.)</label>
+                                                <div class="row">
+                                                    <div class="col-lg-3 col-md-12 col-sm-12">
+                                                        <label class="col-form-label">Target</label>
+                                                        <input type="text" class="form-control mb-lg-3 mb-3 only-numeric" value="@Model.Plotting_Of_Road_Nala_Target" name="Plotting_Of_Road_Nala_Target">
+                                                    </div>
+                                                    <div class="col-lg-3 col-md-12 col-sm-12">
+                                                        <label class="col-form-label">Work done up to the last month</label>
+                                                        <input type="text" class="form-control mb-lg-3 mb-3 value88 only-numeric" value="@Model.Plotting_Of_Road_Nala_Last_Month" name="Plotting_Of_Road_Nala_Last_Month" onfocusout="CalcuateVal()">
+                                                    </div>
+                                                    <div class="col-lg-3 col-md-12 col-sm-12">
+                                                        <label class="col-form-label">Work done during the month</label>
+                                                        <input type="text" class="form-control mb-lg-0 mb-3 value89 only-numeric" value="@Model.Plotting_Of_Road_Nala_During_Month" name="Plotting_Of_Road_Nala_During_Month" onfocusout="CalcuateVal()">
+                                                    </div>
+                                                    <div class="col-lg-3 col-md-12 col-sm-12">
+                                                        <label class="col-form-label">Total work done end of current month</label>
+                                                        <input type="number" class="form-control value90" value="@Model.Plotting_Of_Road_Nala_Current_Month" name="Plotting_Of_Road_Nala_Current_Month" readonly>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-sm-12">
+                                            <div class="form-group row">
+                                                <label for="dropdownDist" class="col-lg-3 col-md-6 col-sm-12 col-form-label font-weight-bolder">Other Information, If Any <span class="text-danger">*</span></label>
+                                                <div class="col-lg-3 col-md-6 col-sm-12">
+                                                    <input type="text" class="form-control" value="@Model.Resources" name="Resources" id="Resources">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row mt-3">
+                                        <div class="col-sm-12 text-center">
+                                            <a class="btn btn-dark btn-md ml-0 waves-effect waves-light btnPrevious" onclick="showFirst()">Previous</a>
+                                            <a href="@Url.Content("~/Geology/MPRWork/Add")" class="btn btn-danger btn-md ml-0 waves-effect waves-light">Reset</a>
+                                            <a class="btn btn-primary btn-md ml-0 waves-effect waves-light btnNext" onclick="showThird()">Next</a>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="tab-pane fade" id="third" role="tabpanel" aria-labelledby="third-tab">
+                                    <div class="row">
+                                        <div class="col-xl-12">
+                                            <h5 class="text-brown font-weight-bold mt-4 mb-3">Hault at camps for officers <small>(for staffs attach separate leaf)</small></h5>
+                                        </div>
+                                        <div class="col-lg-12 col-md-12 col-sm-12">
+                                            <div class="table-responsive">
+                                                <table class="table table-sm border" id="CampsDetails">
+                                                    <thead>
+                                                        <tr>
+                                                            <th width="30px">Sl#</th>
+                                                            <th>Name</th>
+                                                            <th>Designation</th>
+                                                            <th>From (dd/MM/yyyy)</th>
+                                                            <th>To (dd/MM/yyyy)</th>
+                                                            <th>No. of Days at Camps</th>
+                                                            <th>Remarks, If Any</th>
+                                                            <th width="100px" colspan="2" class="text-center">Actions</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr id="tr_CampsDetails">
+                                                            <td>1</td>
+                                                            <td>
+                                                                <input type="text" class="form-control only-alphabets" id="Camps_Name" name="Camps_Name">
+                                                            </td>
+                                                            <td>
+                                                                <input type="text" class="form-control only-alphabets" id="Camps_Designation" name="Camps_Designation">
+                                                            </td>
+                                                            <td>
+                                                                <div class="input-group">
+                                                                    <input type="text" class="form-control" id="Camps_From" name="Camps_From" onkeypress="return IsValidDate(event);" maxlength="10">
+                                                                </div>
+                                                            </td>
+                                                            <td>
+                                                                <div class="input-group">
+                                                                    <input type="text" class="form-control" id="Camps_To" name="Camps_To" onkeypress="return IsValidDate(event);" maxlength="10">
+                                                                </div>
+                                                            </td>
+                                                            <td>
+                                                                <input type="text" class="form-control only-numeric" id="Camps_No_Of_Days" name="Camps_No_Of_Days">
+                                                            </td>
+                                                            <td>
+                                                                <textarea class="form-control" rows="1" id="Camps_Remarks" name="Camps_Remarks"></textarea>
+                                                            </td>
+                                                            <td>
+                                                                <a class="btn btn-success btn-md waves-effect waves-light" data-toggle="tooltip" data-placement="top" title="Add Row" onclick="addRow()"><i class="icon-plus-solid" aria-hidden="true"></i></a>
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row mt-3">
+                                        <div class="col-sm-12 text-center">
+                                            <a class="btn btn-dark btn-md ml-0 waves-effect waves-light btnPrevious" onclick="showSecond()">Previous</a>
+                                            <a href="@Url.Content("~/Geology/MPRWork/Add")" class="btn btn-danger btn-md ml-0 waves-effect waves-light">Reset</a>
+                                            <a class="btn btn-primary btn-md ml-0 waves-effect waves-light btnNext" onclick="showFourth()">Next</a>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="tab-pane fade" id="four" role="tabpanel" aria-labelledby="four-tab">
+                                    <div class="row">
+                                        <div class="col-xl-12">
+                                            <h5 class="text-brown font-weight-bold mt-0 mb-3">Enclosers</h5>
+                                        </div>
+                                        <div class="col-xl-12 mb-3 ">
+                                            <small class="text-danger float-right ">* Only <strong> jpg, jpeg, png, pdf, tif</strong> file types with size less than <strong>1 MB </strong> are allowed.</small>
+                                        </div>
+                                        <div class="col-xl-12">
+                                            <div class="row">
+                                                <div class="col-lg-3 col-md-6 col-sm-12 form-group">
+                                                    <label class="col-form-label font-weight-bolder pt-0">Maps</label>
+                                                    <div class="custom-file">
+                                                        <input type="file" class="custom-file-input" id="MapAttachment" name="MapAttachment">
+                                                        <label class="custom-file-label" for="customFile">Choose Files</label>
+                                                    </div>
+                                                    @if (Model.Map != null && Model.Map != "")
+                                                    {
+                                                        <label class="form-control-plaintext">@(Model.MapName) <a href='~/@Model.Map' title="" class="ml-2" data-original-title="Download Borehole Attachment" target="_blank"><i class="icon-file-pdf-solid h5 text-danger"></i></a></label>
+                                                    }
+                                                </div>
+                                                <div class="col-lg-3 col-md-6 col-sm-12 form-group">
+                                                    <label class="col-form-label font-weight-bolder pt-0">Borehole Logs</label>
+                                                    <div class="custom-file">
+                                                        <input type="file" class="custom-file-input" id="BoreholeAttachment" name="BoreholeAttachment">
+                                                        <label class="custom-file-label" for="customFile">Choose Files</label>
+                                                    </div>
+                                                    @if (Model.BoreholeLogs != null && Model.BoreholeLogs != "")
+                                                    {
+                                                        <label class="form-control-plaintext">@(Model.LogName) <a href='~/@Model.BoreholeLogs' title="" class="ml-2" data-original-title="Download Map Attachment" target="_blank"><i class="icon-file-pdf-solid h5 text-danger"></i></a></label>
+                                                    }
+                                                </div>
+                                                <div class="col-lg-3 col-md-6 col-sm-12 form-group">
+                                                    <label class="col-form-label font-weight-bolder pt-0">Geological Description</label>
+                                                    <div class="custom-file">
+                                                        <input type="file" class="custom-file-input" id="SynopsisAttachment" name="SynopsisAttachment">
+                                                        <label class="custom-file-label" for="customFile">Choose Files</label>
+                                                    </div>
+                                                    @if (Model.Synopsis != null && Model.Synopsis != "")
+                                                    {
+                                                        <label class="form-control-plaintext">@(Model.SynopsisName) <a href='~/@Model.Synopsis' title="" class="ml-2" data-original-title="Download Synopsis Attachment" target="_blank"><i class="icon-file-pdf-solid h5 text-danger"></i></a></label>
+                                                    }
+                                                </div>
+                                                <div class="col-lg-3 col-md-6 col-sm-12 form-group">
+                                                    <label class="col-form-label font-weight-bolder pt-0">Any Other Information</label>
+                                                    <div class="custom-file">
+                                                        <input type="file" class="custom-file-input" id="Other_InfoAttachment" name="Other_InfoAttachment">
+                                                        <label class="custom-file-label" for="customFile">Choose Files</label>
+                                                    </div>
+                                                    @if (Model.Other_Info != null && Model.Other_Info != "")
+                                                    {
+                                                        <label class="form-control-plaintext">@(Model.OtherName) <a href='~/@Model.Other_Info' title="" class="ml-2" data-original-title="Download Other Attachment" target="_blank"><i class="icon-file-pdf-solid h5 text-danger"></i></a></label>
+                                                    }
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row mt-3">
+                                        <div class="col-sm-12 text-center">
+                                            <a class="btn btn-dark btn-md ml-0 waves-effect waves-light btnPrevious" onclick="showThird()">Previous</a>
+                                            <a href="@Url.Content("~/Geology/MPRWork/Add")" class="btn btn-danger btn-md ml-0 waves-effect waves-light">Reset</a>
+                                            <input type="submit" value='@ViewBag.Button' class="btn btn-primary btn-md ml-0 waves-effect waves-light" name="Submit" id="Submit" onclick="return Validate()" />
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                            @Html.HiddenFor(m => m.MPR_Id, new { @id = "hfMPRId" });
+                            @Html.HiddenFor(m => m.Camps_Namedetails, new { @id = "hfCampsName" })
+                            @Html.HiddenFor(m => m.Camps_Designationdetails, new { @id = "hfcampsDesg" })
+                            @Html.HiddenFor(m => m.Camps_Fromdetails, new { @id = "hfcampsFrom" })
+                            @Html.HiddenFor(m => m.Camps_Todetails, new { @id = "hfcampsTo" })
+                            @Html.HiddenFor(m => m.Camps_No_Of_Daysdetails, new { @id = "hfcampsNodays" })
+                            @Html.HiddenFor(m => m.Camps_Remarksdetails, new { @id = "hfcampsRemarks" })
+                            @Html.HiddenFor(m => m.Work_Id, new { @id = "hfWorkId" })
+                        }
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+</section>
+
+

@@ -1,0 +1,140 @@
+﻿@*// *********************************************************************************************************
+    //  View Name                : View WorkFlow
+    //  Desciption               : To View LeaveAssignClassWise
+    //  Created By               : Suresh kumar behera
+    //  Created On               : 13-july-2021
+    // ********************************************************************************************************
+*@
+@model IEnumerable<EstablishmentEf.WorkFlowEFQuery>
+@{
+    ViewData["Title"] = "ViewWorkFlow";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+
+@inject EstablishmentApp.KhanijSecurity.KhanijIDataProtection protector;
+
+@if (TempData["msg"] != null)
+{
+    <script>
+        var vv = '@TempData["msg"]';
+        if (vv == 1) {
+            swal("", "WorkFlow saved successfully.", "success");
+        }
+        else if (vv == 2) {
+            swal("", "WorkFlow allready exists.", "warning");
+        }
+        else if (vv == 3) {
+            swal("", "WorkFlow updated sucessfully", "success");
+        }
+        else if (vv == 4) {
+            swal("", "WorkFlow  deleted sucessfully", "success");
+        }
+        else {
+            swal("", "Something Errror occured. Please Try After Sometime!!", "error");
+        }
+    </script>
+
+    TempData["msg"] = null;
+
+}
+
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link" href="@Url.Content("~/WorkFlow/WorkFlow/AddWorkFlow")">
+                                Add WorkFlow
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="javascript:void(0);">
+                                View WorkFlow
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                <section class="box form-container">
+                    <div class="content-body pt-0">
+                        <div class="legend-box">
+                            <ul class="d-flex mb-1 justify-content-end list-unstyled">
+                                <li><span class="bg-success"></span> Active</li>
+                                <li><span class="bg-warning"></span> Inactive</li>
+                            </ul>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-12">
+
+                                <table id="table-exports" class="table table-sm table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th width="30px">Sl#</th>
+                                            <th>Module Name</th>
+                                            <th>SubModule Name</th>
+                                            <th>Activity Name</th>
+                                            <th>Step</th>
+                                            <th>Authority Type</th>
+
+                                            <th>Escalation</th>
+                                            <th>Escalation in Day</th>
+                                            <th>Required Notification</th>
+                                            <th>Notification Type</th>
+                                            <th width="60px" class="noprint">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @{
+                                            var count = 0;
+                                            foreach (var item in Model)
+                                            {
+                                                count++;
+
+                                                                                <tr class="active-row">
+                                                                                    <td>@count</td>
+                                                                                    <td>@item.ModuleName</td>
+                                                                                    <td>@item.SubModuleName</td>
+                                                                                    <td>@item.ActivityName</td>
+                                                                                    <td>@item.intStep</td>
+                                                                                    <td>@item.AuthorityType</td>
+
+                                                                                    <td>@item.Escalation</td>
+                                                                                    <td>@item.intEscalationinDays</td>
+                                                                                    <td>@item.Notification</td>
+                                                                                    <td>@item.NotificationType</td>
+
+                                                                                    <td class="noprint">
+                                                                                        <a href="@Url.Content("~/WorkFlow/WorkFlow/AddWorkFlow/")@protector.Decode(Convert.ToString(@item.intWorkFlowId))" class="btn-outline-primary btn-sm"><i class="icon-pencil-alt-solid"></i></a>
+                                                                                        <a href="@Url.Content("~/WorkFlow/WorkFlow/DeleteWorkFlow/")@protector.Decode(Convert.ToString(@item.intWorkFlowId))" class="btn-outline-danger btn-sm" onclick="return confirm('Are you sure to Delete?')"><i class="icon-trash-alt-solid"></i></a>
+                                                                                    </td>
+                                                                                </tr>
+                                                }
+                                            }
+                                    </tbody>
+                                </table>
+
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+    <!-- MAIN CONTENT AREA ENDS -->
+</section>
+
+<script>
+
+    $(document).ready(function () {
+        loadNavigation('ViewWorkFlow', 'glempprofile', 'plofficetype', 'tl', 'Configuration', 'ViewWorkFlow', ' ');
+
+        $('.searchableselect').searchableselect();
+
+        $('.shorting-lnk').click(function () {
+            $('.shorting-lnk i').toggleClass('fa-sort-amount-up-alt fa-sort-amount-down-alt ');
+        });
+
+    });
+</script>

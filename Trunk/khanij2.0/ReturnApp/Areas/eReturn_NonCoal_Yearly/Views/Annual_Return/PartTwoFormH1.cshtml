@@ -1,0 +1,2171 @@
+﻿@*// *********************************************************************************************************
+    //  View Name                : PartTwoFormH1
+    //  Desciption               : Add Part2 of Yearly Return G1
+    //  Created By               : Debaraj Swain
+    //  Created On               : 12 July 2021
+    // ********************************************************************************************************
+*@
+@model ReturnEF.AnnualReturnH1PartTwoModel
+@{
+    ViewData["Title"] = "Part Two Form G1";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+}
+@*<link rel="stylesheet" href="~/css/bootstrap-datetimepicker.min.css" type="text/css" />
+<script src="~/js/moment.min.js"></script>
+<script src="~/js/bootstrap-datetimepicker.min.js"></script>
+<script src='@Url.Content("~/js/sweetalert.min.js")'></script>
+<script src="~/js/specialChar.js"></script>
+<script src="~/js/CSMValidation.js"></script>*@
+@if (TempData["msg"] != null)
+{
+    <script>
+             swal("", "@TempData["msg"]", "success");
+    </script>
+}
+@if (TempData["result"] != null)
+{
+    <script>
+             swal("", "@TempData["result"]", "success");
+    </script>
+}
+@if (ViewBag.msg != null)
+{
+    <script>
+                      swal("",@ViewBag.msg, "success");
+    </script>
+}
+<script type="text/javascript">
+
+    $(document).ready(function () {
+
+        $('.datetime').datetimepicker({
+            format: 'LT',
+            format: "DD/MM/YYYY",
+            daysOfWeekDisabled: [],
+        });
+        $('#Dateof_Transfer').val("");
+    })
+</script>
+<style>
+    div {
+        padding: 0;
+        margin: 0;
+    }
+
+    .label-nav {
+        display: inline-block;
+        text-decoration: none;
+        color: #FCB53A;
+    }
+
+    ul {
+        padding: 0;
+        margin: 0;
+    }
+
+    .element {
+        width: 150px;
+        height: 150px;
+        background: #FCB53A;
+        -moz-border-radius: 50%;
+        -webkit-border-radius: 50%;
+        border-radius: 50%;
+        text-align: center;
+        padding-top: 50px;
+    }
+
+    .circle-text {
+        font-family: inherit;
+        line-height: 20px;
+        color: #fff;
+        text-rendering: optimizelegibility;
+    }
+
+    .btn-circle {
+        border: 2px solid #FCB53A;
+        border-radius: 50%;
+        background-color: #fff;
+    }
+
+        .btn-circle:focus {
+            border: 2px solid #FCB53A;
+            border-radius: 50%;
+            background-color: #fff;
+        }
+
+    .btn-circle-filled {
+        border: 2px solid #FCB53A;
+        border-radius: 50%;
+        background-color: #FCB53A;
+    }
+
+        .btn-circle-filled:focus {
+            border: 2px solid #FCB53A;
+            border-radius: 50%;
+            background-color: #FCB53A;
+        }
+
+    .detail-card {
+        border: 1px solid #FCB53A;
+        margin-bottom: 10px;
+    }
+
+    .details-section {
+        margin-top: 10px;
+    }
+
+    .details {
+        padding-left: 2px;
+    }
+
+    .card-section-header-text {
+        color: #FCB53A;
+    }
+
+    .liquidFillGaugeText {
+        font-family: Helvetica;
+        font-weight: bold;
+    }
+
+    p {
+        padding: 0;
+        margin: 0;
+    }
+
+    .profile-dash {
+        background-color: #d4d4d4;
+    }
+
+    .wh {
+        background-color: #fff;
+    }
+</style>
+<style>
+    .panel {
+        border: 0.5px solid #000000;
+        border-radius: 0;
+    }
+
+    .bg-gold {
+        background-color: #FCB53A;
+    }
+
+    .form-control1 {
+        border-radius: 0;
+        border-style: solid;
+        border-width: 1px;
+        font-size: 13px;
+        margin: 0 0 8px;
+        padding: 5px 3%;
+        width: 100%;
+    }
+
+    .btn.btnsave {
+        background-color: #fbb53b;
+        color: #ffffff;
+    }
+
+        .btn.btnsave:hover {
+            background-color: #fdca71;
+            color: #ffffff;
+        }
+
+    .lnk-btn {
+        color: #fff;
+        font: bold;
+        font-size: 1em;
+    }
+
+        .lnk-btn:after {
+            margin-left: 2px;
+            content: '|';
+            color: #000000;
+        }
+
+        .lnk-btn:focus {
+            color: #000000;
+        }
+
+    .slider {
+        width: 100%;
+        margin: 15px 0 30px 0;
+    }
+
+    hr {
+        display: block;
+        margin-top: 5px;
+        border-style: inset;
+        border-width: 1px;
+    }
+
+    .a1 {
+        padding: 10px 39px 8px 42px;
+        margin-left: 20px;
+        margin-right: 20px;
+    }
+</style>
+<style>
+    table, th, td {
+        border: 1px solid black;
+        border-collapse: collapse;
+    }
+
+    th, td {
+        padding: 5px;
+        text-align: left;
+    }
+</style>
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        <!-- MAIN CONTENT AREA STARTS -->
+        @Html.Partial("_CMSnavigation")
+        <div class="row">
+            <div class="col-12">
+
+
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link" href="@Url.Action("PartOneFormH1", "Annual_Return",new { Financial_Year = @TempData["F_Y"] })">
+                                Part 1
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" id="partTwo" href="@Url.Action("PartTwoFormH1", "Annual_Return",new { Financial_Year = @TempData["F_Y"] })">
+
+                                Part 2
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="partTwo">
+
+                                Part 3
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="partTwo">
+
+                                Part 4
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="partTwo">
+
+                                Part 5
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="partTwo">
+
+                                Part 6
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="partTwo">
+
+                                Part 7
+                            </a>
+                        </li>
+
+
+
+
+                    </ul>
+                    @Html.Partial("_CMSutil")
+                </div>
+
+
+                <section class="box form-container">
+                    <div class="content-body">
+                        @using (Html.BeginForm("PartTwoFormH1", "ANNUAL_RETURN", FormMethod.Post, new { @id = "G1_Source", @enctype = "multipart/form-data" }))
+                        {
+                            <div class="text-center text-dark">
+                                <h6 class="font-weight-bold"> </h6>
+                                <h6 class="font-weight-bold">ANNUAL Return <small>FORM G-1</small></h6>
+                                <p class="font-weight-normal mb-0">
+                                    [To be used for minerals other than Copper, Gold, Lead, Pyrites, Tin, Tungsten, Zinc and precious and semi-precious stones]
+                                </p>
+                                <h6 class="font-weight-bold">General <small>(Part – I)</small></h6>
+
+                            </div>
+
+
+
+                            <ul class="nav nav-tabs progressbar border-0" id="myTab" role="tablist">
+                                <li class="startstep activestep1">
+                                    <a class="active" id="first-tab" data-toggle="tab" href="#MD" role="tab" aria-controls="first" aria-selected="true">Staff Details</a>
+                                </li>
+                                <li>
+                                    <a id="second-tab" data-toggle="tab" href="#WD" role="tab" aria-controls="second" aria-selected="false">Work Deatils</a>
+                                </li>
+                                <li>
+                                    <a id="third-tab" data-toggle="tab" href="#LAD" role="tab" aria-controls="third" aria-selected="false"> Salary/Wages Paid</a>
+                                </li>
+                                <li>
+                                    <a id="four-tab" data-toggle="tab" href="#RRP" role="tab" aria-controls="four" aria-selected="false">PART-II A (Capital Structure)</a>
+                                </li>
+                                <li>
+                                    <a id="four-tab" data-toggle="tab" href="#DWM" role="tab" aria-controls="four" aria-selected="false">PART-II A (Source of Finance/Interest and Rent)</a>
+                                </li>
+
+                            </ul>
+                            <div class="tab-content" id="myTabContent">
+                                <input type="hidden" value="@ViewBag.Year" name="Year" id="Year" />
+                                <div class="tab-pane fade show active" id="MD" role="tabpanel" aria-labelledby="first-tab">
+                                    <input type="hidden" value="@ViewBag.Year" name="objStaffWork.Year" id="objStaffWorkYear" />
+                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" style="margin: 15px 0;">
+
+                                        <div class="">
+                                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                                @Html.HiddenFor(m => m.objStaffWork.Flag1)
+                                                @Html.HiddenFor(m => m.objStaffWork.WorkDetails_Id)
+                                                @Html.Label("1 Number of supervisory staff employed at the mine")
+                                            </div>
+
+                                            <br />
+                                        </div>
+
+                                        <hr />
+                                        <table style="width: 100%">
+                                            <tr>
+                                                <td>@Html.Label("Description")</td>
+                                                <td>@Html.Label("Wholly employed")</td>
+                                                <td>@Html.Label("Partly employed")</td>
+                                            </tr>
+                                            <tr>
+                                                <td>@Html.Label("(i) Graduate Mining Engineer")</td>
+                                                <td>@Html.TextBoxFor(m => m.objStaffWork.Whollyemployed1, new { @type = "number", @class = "StaffDetails form-control", @onchange = "TextChangeWhollyemployed()" })</td>
+                                                <td>@Html.TextBoxFor(m => m.objStaffWork.Partlyemployed1, new { @type = "number", @class = "StaffDetails form-control", @onchange = "TextChangePartlyemployed()" })</td>
+                                            </tr>
+                                            <tr>
+                                                <td>@Html.Label("(ii) Diploma Mining Engineer")</td>
+                                                <td>@Html.TextBoxFor(m => m.objStaffWork.Whollyemployed2, new { @type = "number", @class = "StaffDetails form-control", @onchange = "TextChangeWhollyemployed()" })</td>
+                                                <td>@Html.TextBoxFor(m => m.objStaffWork.Partlyemployed2, new { @type = "number", @class = "StaffDetails form-control", @onchange = "TextChangePartlyemployed()" })</td>
+                                            </tr>
+                                            <tr>
+                                                <td>@Html.Label("(iii) Geologist")</td>
+                                                <td>@Html.TextBoxFor(m => m.objStaffWork.Whollyemployed3, new { @type = "number", @class = "StaffDetails form-control", @onchange = "TextChangeWhollyemployed()" })</td>
+                                                <td>@Html.TextBoxFor(m => m.objStaffWork.Partlyemployed3, new { @type = "number", @class = "StaffDetails form-control", @onchange = "TextChangePartlyemployed()" })</td>
+                                            </tr>
+                                            <tr>
+                                                <td>@Html.Label("(iv) Surveyor")</td>
+                                                <td>@Html.TextBoxFor(m => m.objStaffWork.Whollyemployed4, new { @type = "number", @class = "StaffDetails form-control", @onchange = "TextChangeWhollyemployed()" })</td>
+                                                <td>@Html.TextBoxFor(m => m.objStaffWork.Partlyemployed4, new { @type = "number", @class = "StaffDetails form-control", @onchange = "TextChangePartlyemployed()" })</td>
+                                            </tr>
+                                            <tr>
+                                                <td>@Html.Label("(v) Other administrative and technical supervisory staff")</td>
+                                                <td>@Html.TextBoxFor(m => m.objStaffWork.Whollyemployed5, new { @type = "number", @class = "StaffDetails form-control", @onchange = "TextChangeWhollyemployed()" })</td>
+                                                <td>@Html.TextBoxFor(m => m.objStaffWork.Partlyemployed5, new { @type = "number", @class = "StaffDetails form-control", @onchange = "TextChangePartlyemployed()" })</td>
+                                            </tr>
+                                            <tr>
+                                                <td style="margin-left: 10px">@Html.Label("Total:")</td>
+                                                <td>@Html.TextBoxFor(m => m.objStaffWork.Whollyemployed_Total, new { @class = "StaffDetails form-control", @readonly = "readonly" })</td>
+                                                <td>@Html.TextBoxFor(m => m.objStaffWork.Partlyemployed_Total, new { @class = "StaffDetails form-control", @readonly = "readonly" })</td>
+                                            </tr>
+                                        </table>
+                                        <br />
+                                        <div class="">
+                                            <div class="col-sm-9">
+                                            </div>
+                                            <div class="col-sm-3">
+                                                
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mt-3">
+                                        <div class="col-sm-12 text-center">
+
+                                            <a id="second-tab" data-toggle="tab" href="#WD" class="btn btn-primary btn-md ml-0 waves-effect waves-light btnNext" role="tab" aria-controls="second" aria-selected="false">Next</a>
+                                        </div>
+                                    </div>
+
+
+
+                                </div>
+                                <div class="tab-pane fade" id="WD" role="tabpanel" aria-labelledby="second-tab">
+                                    <input type="hidden" value="@ViewBag.Year" name="objWork.Year" id="objWork" />
+
+                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" style="margin: 15px 0;">
+                                        @Html.HiddenFor(m => m.objWork.Flag)
+                                        <table style="width: 100%">
+                                            <tr>
+                                                <td>@Html.Label("2 (i) Number of days the mine worked:")</td>
+                                                <td>
+                                                    @Html.TextBoxFor(m => m.objWork.NoOfDaysMineWorked, new { @type = "number", @class = "form-control" })
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>@Html.Label("(ii) No of shifts per day:")</td>
+                                                <td>
+                                                    @Html.TextBoxFor(m => m.objWork.NoOfShiftPerDay, new { @type = "number", @class = "form-control" })
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="2">
+                                                    <p>
+                                                        (iii) Indicate reasons for work stoppage in the mine during the year
+                                                        (due to strike, lockout, heavy rain, non-availability of labour, transport bottleneck,
+                                                        lack of demand, uneconomic operations,etc)and the number of days of work stoppage for each of the factors separately.
+                                                    </p>
+                                                </td>
+                                            </tr>
+
+
+                                        </table>
+                                        <input type="button" value="Add Row" onclick="addRow('tbl_MineWork')" />
+                                        <input type="button" name="" value="Remove Row" onclick="RemoveRow('tbl_MineWork');">
+
+                                        <table border="1" id="tbl_MineWork" class="table" style="margin-top: 15px; width: 100%">
+                                            <thead>
+                                                <tr>
+                                                    <th>Reasons</th>
+                                                    <th>No Of days Work Stop</th>
+                                                </tr>
+                                            </thead>
+                                            <tr id="tr_MineWork">
+                                                <td>
+                                                    <input type="hidden" name="Work_Id" />
+                                                    <input type="text" class="form-control" name="Reason">
+                                                </td>
+                                                <td>
+                                                    <input type="number" class="form-control" name="NoOfDaysMineStop">
+                                                </td>
+
+                                            </tr>
+
+                                        </table>
+
+                                        <br />
+                                        <div class="">
+                                            <div class="col-sm-9">
+                                            </div>
+                                            <div class="col-sm-3">
+                                               
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row mt-3">
+                                        <div class="col-sm-12 text-center">
+
+                                          
+                                            <a id="second-tab" data-toggle="tab" href="#MD" class="btn btn-dark btn-md ml-0 waves-effect waves-light btnPrevious" role="tab" aria-controls="second" aria-selected="false">Previous</a>
+
+                                          
+                                            <a id="third-tab" data-toggle="tab" href="#LAD" class="btn btn-primary btn-md ml-0 waves-effect waves-light btnNext" role="tab" aria-controls="third" aria-selected="false"> Next</a>
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <div class="tab-pane fade" id="LAD" role="tabpanel" aria-labelledby="third-tab">
+                                    <input type="hidden" value="@ViewBag.Year" name="objSalaryWages.Year" id="objSalaryWagesYear" />
+
+                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" style="margin: 15px 0;">
+
+                                        <div class="">
+                                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                                @Html.HiddenFor(m => m.objSalaryWages.SalaryWages_Id)
+                                                @Html.HiddenFor(m => m.objSalaryWages.Flag2)
+                                                @Html.Label("3 Employment and salary/wages paid #:")
+                                            </div>
+
+                                            <br />
+                                        </div>
+                                        <hr />
+
+
+                                        <table style="width: 100%">
+                                            <tr>
+                                                <td colspan="9">
+
+                                                    @Html.Label("Maximum number of persons employed on any one day during the year")
+                                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                                        <div class="">
+                                                            <div class="col-lg-4 col-md-6 col-sm-12 col-xs-12">
+                                                                @Html.Label("(i) In workings below ground on (date)")
+
+                                                             
+                                                                <div class="input-group-prepend">
+                                                                    <input type="text" class="form-control datetime" id="objSalaryWages.WorkingBelowGrounddate_str" name="objSalaryWages.WorkingBelowGrounddate_str" />
+                                                                    <label class="input-group-text" for="inputDate"><i class="icon-calendar-alt-solid"></i></label>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-lg-4 col-md-6 col-sm-12 col-xs-12">
+                                                            </div>
+                                                            <div class="col-lg-4 col-md-6 col-sm-12 col-xs-12">
+                                                                @Html.Label("(a)(number)")
+                                                                @Html.TextBoxFor(m => m.objSalaryWages.WorkingBelowNo, new { @type = "number", @class = "form-control" })
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                                        <div class="">
+                                                            <div class="col-lg-4 col-md-6 col-sm-12 col-xs-12">
+                                                                @Html.Label("(ii) In all in the mine on (date)")
+                                                               
+                                                                <div class="input-group-prepend">
+                                                                    <input type="text" class="form-control datetime" id="objSalaryWages.WorkingOnMinedate_str" name="objSalaryWages.WorkingOnMinedate_str" />
+                                                                    <label class="input-group-text" for="inputDate"><i class="icon-calendar-alt-solid"></i></label>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-lg-4 col-md-6 col-sm-12 col-xs-12">
+                                                            </div>
+                                                            <div class="col-lg-4 col-md-6 col-sm-12 col-xs-12">
+                                                                @Html.Label("(a)(number)")
+                                                                @Html.TextBoxFor(m => m.objSalaryWages.WorkingOnMineNo, new { @type = "number", @class = "form-control" })
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td rowspan="2">@Html.Label("Classification")</td>
+                                                <td colspan="3">@Html.Label("Total number of man days worked during the year")</td>
+                                                <td rowspan="2">@Html.Label("No of days worked during the year")</td>
+                                                <td colspan="3">@Html.Label("Average daily number of persons employed")</td>
+                                                <td rowspan="2">@Html.Label("Total Wages/Salary for the year (Rs)")</td>
+                                            </tr>
+                                            <tr>
+                                                <td>@Html.Label("Direct")</td>
+                                                <td>@Html.Label("Contract")</td>
+                                                <td>@Html.Label("Total")</td>
+                                                <td>@Html.Label("Male")</td>
+                                                <td>@Html.Label("Female")</td>
+                                                <td>@Html.Label("Total")</td>
+                                            </tr>
+                                            <tr>
+                                                <td style="width: 20%">(1)</td>
+                                                <td style="width: 10%">2(A)</td>
+                                                <td style="width: 10%">2(B)</td>
+                                                <td style="width: 10%">2(C)</td>
+                                                <td style="width: 10%">(3)</td>
+                                                <td style="width: 10%">4(A)</td>
+                                                <td style="width: 10%">4(B)</td>
+                                                <td style="width: 10%">4(C)</td>
+                                                <td style="width: 10%">(5)</td>
+                                            </tr>
+                                            <tr>
+                                                <td>@Html.Label("Below Ground")</td>
+                                                <td>
+                                                    @Html.TextBoxFor(m => m.objSalaryWages.BG_Direct, new { @type = "number", @class = "BG form-control" })
+                                                </td>
+                                                <td>
+                                                    @Html.TextBoxFor(m => m.objSalaryWages.BG_Contract, new { @type = "number", @class = "BG form-control" })
+                                                </td>
+                                                <td>
+                                                    @Html.TextBoxFor(m => m.objSalaryWages.BG_Total, new { @type = "number", @class = "BG form-control", @readonly = "readonly" })
+                                                </td>
+                                                <td>
+                                                    @Html.TextBoxFor(m => m.objSalaryWages.BG_NoOFDaysWork, new { @type = "number", @class = "BG form-control" })
+                                                </td>
+                                                <td>
+                                                    @Html.TextBoxFor(m => m.objSalaryWages.BG_Male, new { @type = "number", @class = "BG form-control" })
+                                                </td>
+                                                <td>
+                                                    @Html.TextBoxFor(m => m.objSalaryWages.BG_Female, new { @type = "number", @class = "BG form-control" })
+                                                </td>
+                                                <td>
+                                                    @Html.TextBoxFor(m => m.objSalaryWages.BG_Average_Total, new { @type = "number", @class = "BG form-control", @readonly = "readonly" })
+                                                </td>
+                                                <td>
+                                                    @Html.TextBoxFor(m => m.objSalaryWages.BG_TotalWages, new { @type = "number", @class = "BG form-control" })
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>@Html.Label("Opencast")</td>
+                                                <td>@Html.TextBoxFor(m => m.objSalaryWages.OC_Direct, new { @type = "number", @class = "OC form-control" })</td>
+                                                <td>@Html.TextBoxFor(m => m.objSalaryWages.OC_Contract, new { @type = "number", @class = "OC form-control" })</td>
+                                                <td>@Html.TextBoxFor(m => m.objSalaryWages.OC_Total, new { @type = "number", @class = "OC form-control", @readonly = "readonly" })</td>
+                                                <td>@Html.TextBoxFor(m => m.objSalaryWages.OC_NoOFDaysWork, new { @type = "number", @class = "OC form-control" })</td>
+                                                <td>@Html.TextBoxFor(m => m.objSalaryWages.OC_Male, new { @type = "number", @class = "OC form-control" })</td>
+                                                <td>@Html.TextBoxFor(m => m.objSalaryWages.OC_Female, new { @type = "number", @class = "OC form-control" })</td>
+                                                <td>@Html.TextBoxFor(m => m.objSalaryWages.OC_Average_Total, new { @type = "number", @class = "OC form-control", @readonly = "readonly" })</td>
+                                                <td>@Html.TextBoxFor(m => m.objSalaryWages.OC_TotalWages, new { @type = "number", @class = "OC form-control" })</td>
+                                            </tr>
+                                            <tr>
+                                                <td>@Html.Label("Above Ground")</td>
+                                                <td>@Html.TextBoxFor(m => m.objSalaryWages.AG_Direct, new { @type = "number", @class = "AG form-control" })</td>
+                                                <td>@Html.TextBoxFor(m => m.objSalaryWages.AG_Contract, new { @type = "number", @class = "AG form-control" })</td>
+                                                <td>@Html.TextBoxFor(m => m.objSalaryWages.AG_Total, new { @type = "number", @class = "AG form-control", @readonly = "readonly" })</td>
+                                                <td>@Html.TextBoxFor(m => m.objSalaryWages.AG_NoOFDaysWork, new { @type = "number", @class = "AG form-control" })</td>
+                                                <td>@Html.TextBoxFor(m => m.objSalaryWages.AG_Male, new { @type = "number", @class = "AG form-control" })</td>
+                                                <td>@Html.TextBoxFor(m => m.objSalaryWages.AG_Female, new { @type = "number", @class = "AG form-control" })</td>
+                                                <td>@Html.TextBoxFor(m => m.objSalaryWages.AG_Average_Total, new { @type = "number", @class = "AG form-control", @readonly = "readonly" })</td>
+                                                <td>@Html.TextBoxFor(m => m.objSalaryWages.AG_TotalWages, new { @type = "number", @class = "AG form-control" })</td>
+                                            </tr>
+                                            <tr>
+                                                <td>@Html.Label("Total:")</td>
+                                                <td>@Html.TextBoxFor(m => m.objSalaryWages.Total_Direct, new { @class = "form-control", @readonly = "readonly" })</td>
+                                                <td>@Html.TextBoxFor(m => m.objSalaryWages.Total_Contract, new { @class = "form-control", @readonly = "readonly" })</td>
+                                                <td>@Html.TextBoxFor(m => m.objSalaryWages.Total_Total, new { @class = "form-control", @readonly = "readonly" })</td>
+                                                <td>@Html.TextBoxFor(m => m.objSalaryWages.Total_NoOFDaysWork, new { @class = "form-control", @readonly = "readonly" })</td>
+                                                <td>@Html.TextBoxFor(m => m.objSalaryWages.Total_Male, new { @class = "form-control", @readonly = "readonly" })</td>
+                                                <td>@Html.TextBoxFor(m => m.objSalaryWages.Total_Female, new { @class = "form-control", @readonly = "readonly" })</td>
+                                                <td>@Html.TextBoxFor(m => m.objSalaryWages.Total_Average_Total, new { @class = "form-control", @readonly = "readonly" })</td>
+                                                <td>@Html.TextBoxFor(m => m.objSalaryWages.Total_TotalWages, new { @class = "form-control", @readonly = "readonly" })</td>
+                                            </tr>
+                                        </table>
+                                        <br />
+                                        <div class="">
+                                            <div class="col-sm-9">
+                                            </div>
+                                            <div class="col-sm-3">
+                                                
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mt-3">
+                                        <div class="col-sm-12 text-center">
+                                           
+                                            <a id="third-tab" data-toggle="tab" href="#WD" class="btn btn-dark btn-md ml-0 waves-effect waves-light btnPrevious" role="tab" aria-controls="third" aria-selected="false"> Previous</a>
+            
+                                            <a id="third-tab" data-toggle="tab" href="#RRP" class="btn btn-primary btn-md ml-0 waves-effect waves-light btnNext" role="tab" aria-controls="third" aria-selected="false"> Next</a>
+
+                                        </div>
+                                    </div>
+
+
+                                </div>
+                                <div class="tab-pane fade" id="RRP" role="tabpanel" aria-labelledby="four-tab">
+                                    <input type="hidden" value="@ViewBag.Year" name="objCapitalStructure.Year" id="objCapitalStructureYear" />
+                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" style="margin: 15px 0;">
+                                        <div class="">
+                                            <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                                                @Html.HiddenFor(m => m.objCapitalStructure.CapitalStructure_Id)
+                                                @Html.HiddenFor(m => m.objCapitalStructure.Flag3)
+
+                                            </div>
+                                            <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                                            </div>
+                                            <br />
+                                        </div>
+                                        @Html.Label("1 Value of Fixed Assets* (Rs)")
+                                        @Html.Label("(in respect of the mine, beneficiation plant, mine work-shop, power and water installation)")
+                                        <div class="">
+                                            <div class="col-lg-4 col-md-6 col-sm-12 col-xs-12">
+                                                @Html.TextBoxFor(m => m.objCapitalStructure.ValueofFixedAssets, new { @type = "number", @class = "form-control" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                        @Html.Label("In case this information is furnished as combined information in another mine's return please specify Mine Code/Mine Name:")
+                                        <div class="">
+                                            <div class="col-lg-4 col-md-6 col-sm-12 col-xs-12">
+                                                @Html.TextBoxFor(m => m.objCapitalStructure.OtherMineCode, new { @class = "form-control" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <table>
+                                        <tr>
+                                            <td>@Html.Label("Description")</td>
+                                            <td>@Html.Label("At the beginning of the year(Rs)")</td>
+                                            <td>@Html.Label("Additions during the Year(Rs)")</td>
+                                            <td>@Html.Label("Sold or discarded during the year(Rs)")</td>
+                                            <td>@Html.Label("Depreciation during the year(Rs)")</td>
+                                            <td>@Html.Label("Net closing Balance (Rs) (2+3)-(4+5)")</td>
+                                            <td>@Html.Label("Estimated market value**(Rs)")</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-center">1</td>
+                                            <td class="text-center">2</td>
+                                            <td class="text-center">3</td>
+                                            <td class="text-center">4</td>
+                                            <td class="text-center">5</td>
+                                            <td class="text-center">6</td>
+                                            <td class="text-center">7</td>
+                                        </tr>
+                                        <tr>
+                                            <td>@Html.Label("(i) Land***")</td>
+                                            <td>@Html.TextBoxFor(m => m.objCapitalStructure.Land_AtBeginning, new { @type = "number", @class = "CapitalStructure form-control", @onchange = "Text_Beginning();" })</td>
+                                            <td>@Html.TextBoxFor(m => m.objCapitalStructure.Land_Additions, new { @type = "number", @class = "CapitalStructure form-control", @onchange = "Text_Additions();" })</td>
+                                            <td>@Html.TextBoxFor(m => m.objCapitalStructure.Land_Sold_Discarded, new { @type = "number", @class = "CapitalStructure form-control", @onchange = "Text_Discarded();" })</td>
+                                            <td>@Html.TextBoxFor(m => m.objCapitalStructure.Land_Depreciation, new { @type = "number", @class = "CapitalStructure form-control", @onchange = "Text_Depreciation();" })</td>
+                                            <td>@Html.TextBoxFor(m => m.objCapitalStructure.Land_Net_closing_Balance, new { @type = "number", @class = "form-control", @readonly = "readonly" })</td>
+                                            <td>@Html.TextBoxFor(m => m.objCapitalStructure.Land_Estimated_Market, new { @type = "number", @class = "CapitalStructure form-control", @onchange = "Text_Estimated();" })</td>
+
+                                        </tr>
+                                        <tr>
+                                            <td colspan="7">@Html.Label("(ii) Building:")</td>
+                                        </tr>
+                                        <tr>
+                                            <td>@Html.Label("Industrial")</td>
+                                            <td>@Html.TextBoxFor(m => m.objCapitalStructure.Industrial_AtBeginning, new { @type = "number", @class = "CapitalStructure form-control", @onchange = "Text_Beginning();" })</td>
+                                            <td>@Html.TextBoxFor(m => m.objCapitalStructure.Industrial_Additions, new { @type = "number", @class = "CapitalStructure form-control", @onchange = "Text_Additions();" })</td>
+                                            <td>@Html.TextBoxFor(m => m.objCapitalStructure.Industrial_Sold_Discarded, new { @type = "number", @class = "CapitalStructure form-control", @onchange = "Text_Discarded();" })</td>
+                                            <td>@Html.TextBoxFor(m => m.objCapitalStructure.Industrial_Depreciation, new { @type = "number", @class = "CapitalStructure form-control", @onchange = "Text_Depreciation();" })</td>
+                                            <td>@Html.TextBoxFor(m => m.objCapitalStructure.Industrial_Net_closing_Balance, new { @type = "number", @class = "form-control", @readonly = "readonly" })</td>
+                                            <td>@Html.TextBoxFor(m => m.objCapitalStructure.Industrial_Estimated_Market, new { @type = "number", @class = "CapitalStructure form-control", @onchange = "Text_Estimated();" })</td>
+                                        </tr>
+                                        <tr>
+                                            <td>@Html.Label("Residential")</td>
+                                            <td>@Html.TextBoxFor(m => m.objCapitalStructure.Residential_AtBeginning, new { @type = "number", @class = "CapitalStructure form-control", @onchange = "Text_Beginning();" })</td>
+                                            <td>@Html.TextBoxFor(m => m.objCapitalStructure.Residential_Additions, new { @type = "number", @class = "CapitalStructure form-control", @onchange = "Text_Additions();" })</td>
+                                            <td>@Html.TextBoxFor(m => m.objCapitalStructure.Residential_Sold_Discarded, new { @type = "number", @class = "CapitalStructure form-control", @onchange = "Text_Discarded();" })</td>
+                                            <td>@Html.TextBoxFor(m => m.objCapitalStructure.Residential_Depreciation, new { @type = "number", @class = "CapitalStructure form-control", @onchange = "Text_Depreciation();" })</td>
+                                            <td>@Html.TextBoxFor(m => m.objCapitalStructure.Residential_Net_closing_Balance, new { @type = "number", @class = "form-control", @readonly = "readonly" })</td>
+                                            <td>@Html.TextBoxFor(m => m.objCapitalStructure.Residential_Estimated_Market, new { @type = "number", @class = "CapitalStructure form-control", @onchange = "Text_Estimated();" })</td>
+                                        </tr>
+                                        <tr>
+                                            <td>@Html.Label("(iii) Plant and Machinery including transport equipment")</td>
+                                            <td>@Html.TextBoxFor(m => m.objCapitalStructure.P_M_T_AtBeginning, new { @type = "number", @class = "CapitalStructure form-control", @onchange = "Text_Beginning();" })</td>
+                                            <td>@Html.TextBoxFor(m => m.objCapitalStructure.P_M_T_Additions, new { @type = "number", @class = "CapitalStructure form-control", @onchange = "Text_Additions();" })</td>
+                                            <td>@Html.TextBoxFor(m => m.objCapitalStructure.P_M_T_Sold_Discarded, new { @type = "number", @class = "CapitalStructure form-control", @onchange = "Text_Discarded();" })</td>
+                                            <td>@Html.TextBoxFor(m => m.objCapitalStructure.P_M_T_Depreciation, new { @type = "number", @class = "CapitalStructure form-control", @onchange = "Text_Depreciation();" })</td>
+                                            <td>@Html.TextBoxFor(m => m.objCapitalStructure.P_M_T_Net_closing_Balance, new { @type = "number", @class = "form-control", @readonly = "readonly" })</td>
+                                            <td>@Html.TextBoxFor(m => m.objCapitalStructure.P_M_T_Estimated_Market, new { @type = "number", @class = "CapitalStructure form-control", @onchange = "Text_Estimated();" })</td>
+                                        </tr>
+                                        <tr>
+                                            <td style="width: 20%">@Html.Label("iv) Capitalised Expenditure such as pre-production exploration, development,major overhaul and repair to machinery etc (As prescribed under Income Tax Act)")</td>
+                                            <td>@Html.TextBoxFor(m => m.objCapitalStructure.Exp_AtBeginning, new { @type = "number", @class = "CapitalStructure form-control", @onchange = "Text_Beginning();" })</td>
+                                            <td>@Html.TextBoxFor(m => m.objCapitalStructure.Exp_Additions, new { @type = "number", @class = "CapitalStructure form-control", @onchange = "Text_Additions();" })</td>
+                                            <td>@Html.TextBoxFor(m => m.objCapitalStructure.Exp_Sold_Discarded, new { @type = "number", @class = "CapitalStructure form-control", @onchange = "Text_Discarded();" })</td>
+                                            <td>@Html.TextBoxFor(m => m.objCapitalStructure.Exp_Depreciation, new { @type = "number", @class = "CapitalStructure form-control", @onchange = "Text_Depreciation();" })</td>
+                                            <td>@Html.TextBoxFor(m => m.objCapitalStructure.Exp_Net_closing_Balance, new { @type = "number", @class = "form-control", @readonly = "readonly" })</td>
+                                            <td>@Html.TextBoxFor(m => m.objCapitalStructure.Exp_Estimated_Market, new { @type = "number", @class = "CapitalStructure form-control", @onchange = "Text_Estimated();" })</td>
+                                        </tr>
+                                        <tr>
+                                            <td>@Html.Label("Total:")</td>
+                                            <td>@Html.TextBoxFor(m => m.objCapitalStructure.Total_AtBeginning, new { @class = "form-control", @readonly = "readonly" })</td>
+                                            <td>@Html.TextBoxFor(m => m.objCapitalStructure.Total_Additions, new { @class = "form-control", @readonly = "readonly" })</td>
+                                            <td>@Html.TextBoxFor(m => m.objCapitalStructure.Total_Sold_Discarded, new { @class = "form-control", @readonly = "readonly" })</td>
+                                            <td>@Html.TextBoxFor(m => m.objCapitalStructure.Total_Depreciation, new { @class = "form-control", @readonly = "readonly" })</td>
+                                            <td>@Html.TextBoxFor(m => m.objCapitalStructure.Total_Net_closing_Balance, new { @class = "form-control", @readonly = "readonly" })</td>
+                                            <td>@Html.TextBoxFor(m => m.objCapitalStructure.Total_Estimated_Market, new { @class = "form-control", @readonly = "readonly" })</td>
+                                        </tr>
+                                    </table>
+                                    <br />
+                                    <div class="">
+                                        <div class="col-sm-9">
+                                        </div>
+                                        <div class="col-sm-3">
+                                         
+                                        </div>
+                                    </div>
+                                    <p>
+                                        * In case the fixed assets are common to more than one mine, furnish combined information for all such mines together in any one of the mine’s return. In the returns for other mines,
+                                        give only a cross reference to the particular mine's return where-in the information is included.<br />
+                                        ** Optional and may be furnished in respect of items (i), (ii) and (iii) if the mine owner desires<br />
+                                        *** Including any non-recurring expenditure incurred on the acquisition of land
+                                    </p>
+
+                                    <div class="row mt-3">
+                                        <div class="col-sm-12 text-center">
+
+                                            <a id="third-tab" data-toggle="tab" href="#LAD" class="btn btn-dark btn-md ml-0 waves-effect waves-light btnPrevious" role="tab" aria-controls="third" aria-selected="false"> Previous</a>
+                                            <a id="third-tab" data-toggle="tab" href="#DWM" class="btn btn-primary btn-md ml-0 waves-effect waves-light btnNext" role="tab" aria-controls="third" aria-selected="false"> Next</a>
+
+
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <div class="tab-pane fade" id="DWM" role="tabpanel" aria-labelledby="third-tab">
+                                    <input type="hidden" value="@ViewBag.Year" name="objSource.Year" id="objSourceYear" />
+                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" style="margin: 15px 0;">
+
+                                        <br />
+
+                                        <div class="">
+                                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                                @Html.HiddenFor(m => m.objSource.Flag4)
+                                                @Html.HiddenFor(m => m.objSource.SourceOfFinance_Id)
+                                                @Html.Label("2 Source of Finance ( at the end of the year) :")
+                                            </div>
+
+                                            <br />
+                                        </div>
+                                        <hr />
+                                        <div class="">
+                                            <div class="col-lg-4 col-md-6 col-sm-12 col-xs-12">
+                                                @Html.Label("(i) Paid up Share Capital (Rs)")
+                                                @Html.TextBoxFor(m => m.objSource.ShareCapital, new { @type = "number", @class = "Source form-control" })
+                                            </div>
+                                            <div class="col-lg-4 col-md-6 col-sm-12 col-xs-12">
+                                                @Html.Label("(ii)Own Capital (Rs)")
+                                                @Html.TextBoxFor(m => m.objSource.OwnCapital, new { @type = "number", @class = "Source form-control" })
+                                            </div>
+                                            <div class="col-lg-4 col-md-6 col-sm-12 col-xs-12">
+                                                @Html.Label("(iii)Reserve & Surplus (All Types)( Rs)")
+                                                @Html.TextBoxFor(m => m.objSource.Reserve, new { @type = "number", @class = "Source form-control" })
+                                            </div>
+                                        </div>
+                                        @Html.Label("(iv)Long Term loans outstanding (#)(Rs)")
+                                        <div>
+                                            <div class="col-lg-4 col-md-6 col-sm-12 col-xs-12">
+                                                @Html.Label("Name of the Institution/Source")
+                                                @Html.TextBoxFor(m => m.objSource.Institution, new { @type = "number", @class = "Source form-control" })
+                                            </div>
+                                            <div class="col-lg-4 col-md-6 col-sm-12 col-xs-12">
+                                                @Html.Label("Amount of Loan (Rs)")
+                                                @Html.TextBoxFor(m => m.objSource.AmountofLoan, new { @type = "number", @class = "Source form-control" })
+                                            </div>
+                                            <div class="col-lg-4 col-md-6 col-sm-12 col-xs-12">
+                                                @Html.Label("Rate of Interest")
+                                                @Html.TextBoxFor(m => m.objSource.RateofInterest, new { @type = "number", @class = "Source form-control" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" style="margin: 15px 0;">
+
+                                        <p>
+                                            (#) Indicate the names of the lending institutions such as State Finance Corporation, Industrial Development and other
+                                            Public Corporations, Co-operative Banks, Nationalised Banks and other sources along with the amount of loan from
+                                            each source and the rate of interest at which loan has been taken.
+                                        </p>
+                                        @Html.Label("3 Interest and Rent (Rs)")
+                                        <hr />
+                                        <div class="">
+                                            <div class="col-lg-4 col-md-6 col-sm-12 col-xs-12">
+                                                @Html.Label("(i) Interest paid during the year")
+                                                @Html.TextBoxFor(m => m.objSource.Interestpaid, new { @type = "number", @class = "Source form-control" })
+                                            </div>
+                                            <div class="col-lg-5 col-md-6 col-sm-12 col-xs-12">
+                                                @Html.Label("(ii) Rents (excluding surface rent) paid during the year")
+                                                @Html.TextBoxFor(m => m.objSource.Rentspaid, new { @type = "number", @class = "Source form-control" })
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mt-3">
+                                        <div class="col-sm-12 text-center">
+
+                                            <a id="third-tab" data-toggle="tab" href="#RRP" class="btn btn-dark btn-md ml-0 waves-effect waves-light btnPrevious" role="tab" aria-controls="third" aria-selected="false"> Previous</a>
+                                            <input type="button" id="btnSaveSourceOfFinance" value="Save" class="btn btn-success btn-md ml-0 waves-effect waves-light btnsave" onclick="return OnSaveSourceOfFinance();">
+                                            <input type="button" value="Update" id="btnUpdateSourceOfFinance" style="display: none" class="btn btn-secondary btn-md ml-0 waves-effect waves-light btnsave" onclick="return OnUpdateSourceOfFinance();">
+
+                                        </div>
+                                    </div>
+
+
+                                </div>
+
+                            </div>
+                        }
+                    </div>
+                </section>
+
+            </div>
+
+            <div>
+
+            </div>
+        </div>
+
+
+
+    </div>
+</section>
+<script>
+
+
+    var totalRowsCount = 1;
+    function addRow(tableID) {
+
+        if (parseInt(totalRowsCount) < parseInt(5)) {
+            var table = document.getElementById(tableID);
+
+            var rowCount = table.rows.length;
+            var row = table.insertRow(rowCount);
+
+            var colCount = table.rows[1].cells.length;
+
+            for (var i = 0; i < colCount; i++) {
+
+                if (i == colCount) // old was if (i == colCount - 1)
+                { }
+                else
+                {
+                    var newcell = row.insertCell(i);
+                    //var newcell2 = row.insertCell(i + 1);
+                    if (i == 0) {
+                        newcell.innerHTML = table.rows[1].cells[i].innerHTML; //rowCount;
+                        //newcell2.innerHTML = table.rows[1].cells[i + 1].innerHTML;
+                    }
+                    else {
+                        newcell.innerHTML = table.rows[1].cells[i].innerHTML;
+                    }
+
+                    switch (newcell.childNodes[0].type) {
+                        case "text":
+                            newcell.childNodes[0].value = "";
+                            break;
+                            //case "checkbox":
+                            //    newcell.childNodes[0].checked = false;
+                            //    break;
+                            //case "select-one":
+                            //    newcell.childNodes[0].selectedIndex = 0;
+                            //    break;
+                    }
+                }
+            }
+            totalRowsCount = totalRowsCount + 1;
+        }
+    }
+
+    var rws;
+    function RemoveRow(obj) {
+        totalRowsCount = totalRowsCount - 1;
+
+        var Rowslength = document.getElementById("tbl_MineWork").getElementsByTagName("tr").length;
+
+        if (Rowslength != 2)
+            document.getElementById("tbl_MineWork").deleteRow(Rowslength - 1);
+    }
+
+    $('tbl_MineWork').on('click', 'input[type="button"]', function (e) {
+        $(this).closest('tr').remove()
+    })
+
+
+
+
+    $(document).ready(function () {
+        GetStaffWorkDetails();
+        GetSalaryWagesDetails();
+        GetCapitalStructureDetails();
+        GetSourceOfFinanceDetails();
+        GetWorkDetails();
+    })
+
+    function GetStaffWorkDetails() {
+        var selectedYear = $("#Year").val();
+
+        $.ajax({
+            type: "GET",
+            url: '@Url.Action("GetStaffandWork", "ANNUAL_RETURN")',
+            data: { Year: selectedYear },
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            beforeSend: function () {
+                var varValue = 1;
+            },
+            success: function (data) {
+
+                debugger;
+                if (data.workDetails_Id != null && data.workDetails_Id != "") {
+                    $("#btnUpdateStaffandWork").show();
+                    $("#btnSaveStaffandWork").hide();
+                    $('#objStaffWork_WorkDetails_Id').val(data.workDetails_Id);
+                    $('#objStaffWork_Whollyemployed1').val(data.whollyemployed1);
+                    $('#objStaffWork_Whollyemployed2').val(data.whollyemployed2);
+                    $('#objStaffWork_Whollyemployed3').val(data.whollyemployed3);
+                    $('#objStaffWork_Whollyemployed4').val(data.whollyemployed4);
+                    $('#objStaffWork_Whollyemployed5').val(data.whollyemployed5);
+                    $('#objStaffWork_Whollyemployed_Total').val(data.whollyemployed_Total);
+
+                    $('#objStaffWork_Partlyemployed1').val(data.partlyemployed1);
+                    $('#objStaffWork_Partlyemployed2').val(data.partlyemployed2);
+                    $('#objStaffWork_Partlyemployed3').val(data.partlyemployed3);
+                    $('#objStaffWork_Partlyemployed4').val(data.partlyemployed4);
+                    $('#objStaffWork_Partlyemployed5').val(data.partlyemployed5);
+                    $('#objStaffWork_Partlyemployed_Total').val(data.partlyemployed_Total);
+
+                  
+                }
+                else { $("#btnUpdateStaffandWork").hide(); $("#btnSaveStaffandWork").show(); }
+            }
+
+        });
+    }
+
+
+    function GetWorkDetails() {
+        var selectedYear = $("#Year").val();
+        debugger;
+        $.ajax({
+            type: "GET",
+            url: '@Url.Action("GetWorkDetails", "ANNUAL_RETURN")',
+            data: { Year: selectedYear },
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            beforeSend: function () {
+                var varValue = 1;
+            },
+            success: function (data) {
+                $("#btnUpdateWork").show();
+                $("#btnSaveWork").hide();
+                $('#tr_MineWork').remove();
+
+                if (data.noOfDaysMineStop.length > 0) {
+                    for (var i = 0; i < data.noOfDaysMineStop.length; i++) {
+
+                        $('#tbl_MineWork').append('<tr><td><input type="hidden" id="Work_Id" name="Work_Id" value="'
+                            + data.work_Id[i] + '" /><input type="text"  class="form-control1" id="Reason" name="Reason" class="k-textbox" value="'
+                            + data.reason[i] + '"  onkeypress= "return ValidateTextBox(event);" /></td><td><input type="number"  class="form-control1" id="NoOfDaysMineStop" name="NoOfDaysMineStop" value="'
+                            + data.noOfDaysMineStop[i] + '" class="k-textbox" onkeypress= "return ValidateTextBox(event);" /></td></tr>');
+
+                    }
+                }
+                else {
+
+                    $('#tbl_MineWork').append('<tr><td><input type="hidden" id="Work_Id" name="Work_Id" value="' + data.work_Id[i] + '" /><input type="text"  class="form-control1" id="Reason" name="Reason" class="k-textbox" value=""  onkeypress= "return ValidateTextBox(event);" /></td><td><input type="number"  class="form-control1" id="NoOfDaysMineStop" name="NoOfDaysMineStop" value="'
+                        + data.noOfDaysMineStop[i] + '" class="k-textbox" onkeypress= "return ValidateTextBox(event);" /></td></tr>');
+
+                }
+
+
+
+                $('#objWork_NoOfDaysMineWorked').val(data.noOfDaysMineWorked);
+                $('#objWork_NoOfShiftPerDay').val(data.noOfShiftPerDay);
+
+
+                //}
+
+            }
+
+        });
+    }
+
+    function GetSalaryWagesDetails() {
+        var selectedYear = $("#Year").val();
+        $.ajax({
+            type: "GET",
+            url: '@Url.Action("GetSalaryWagesPaid", "ANNUAL_RETURN")',
+            data: { Year: selectedYear },
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            beforeSend: function () {
+                var varValue = 1;
+            },
+            success: function (data) {
+                if (data.salaryWages_Id != null && data.salaryWages_Id != "") {
+                    $("#btnUpdateSalaryWagesPaid").show();
+                    $("#btnSaveSalaryWagesPaid").hide();
+                    $('#objSalaryWages_SalaryWages_Id').val(data.salaryWages_Id);
+                    $('#objSalaryWages_WorkingBelowGrounddate_str').val(data.workingBelowGrounddate_str);
+                    $('#objSalaryWages_WorkingBelowNo').val(data.workingBelowNo);
+                    $('#objSalaryWages_WorkingOnMinedate_str').val(data.workingOnMinedate_str);
+                    $('#objSalaryWages_WorkingOnMineNo').val(data.workingOnMineNo);
+                    $('#objSalaryWages_BG_Direct').val(data.bG_Direct);
+                    $('#objSalaryWages_BG_Contract').val(data.bG_Contract);
+
+                    $('#objSalaryWages_BG_Total').val(data.bG_Total);
+                    $('#objSalaryWages_BG_NoOFDaysWork').val(data.bG_NoOFDaysWork);
+                    $('#objSalaryWages_BG_Male').val(data.bG_Male);
+                    $('#objSalaryWages_BG_Female').val(data.bG_Female);
+                    $('#objSalaryWages_BG_Average_Total').val(data.bG_Average_Total);
+                    $('#objSalaryWages_BG_TotalWages').val(data.bG_TotalWages);
+
+                    $('#objSalaryWages_OC_Direct').val(data.oC_Direct);
+                    $('#objSalaryWages_OC_Contract').val(data.oC_Contract);
+                    $('#objSalaryWages_OC_Total').val(data.oC_Total);
+                    $('#objSalaryWages_OC_NoOFDaysWork').val(data.oC_NoOFDaysWork);
+
+                    $('#objSalaryWages_OC_Male').val(data.oC_Male);
+                    $('#objSalaryWages_OC_Female').val(data.oC_Female);
+                    $('#objSalaryWages_OC_Average_Total').val(data.oC_Average_Total);
+                    $('#objSalaryWages_OC_TotalWages').val(data.oC_TotalWages);
+
+                    $('#objSalaryWages_AG_Direct').val(data.aG_Direct);
+                    $('#objSalaryWages_AG_Contract').val(data.aG_Contract);
+                    $('#objSalaryWages_AG_Total').val(data.aG_Total);
+                    $('#objSalaryWages_AG_NoOFDaysWork').val(data.aG_NoOFDaysWork);
+
+                    $('#objSalaryWages_AG_Male').val(data.aG_Male);
+                    $('#objSalaryWages_AG_Female').val(data.aG_Female);
+                    $('#objSalaryWages_AG_Average_Total').val(data.aG_Average_Total);
+                    $('#objSalaryWages_AG_TotalWages').val(data.aG_TotalWages);
+
+                    $('#objSalaryWages_Total_Direct').val(data.total_Direct);
+                    $('#objSalaryWages_Total_Contract').val(data.total_Contract);
+                    $('#objSalaryWages_Total_Total').val(data.total_Total);
+                    $('#objSalaryWages_Total_NoOFDaysWork').val(data.total_NoOFDaysWork);
+
+                    $('#objSalaryWages_Total_Male').val(data.total_Male);
+                    $('#objSalaryWages_Total_Female').val(data.total_Female);
+                    $('#objSalaryWages_Total_Average_Total').val(data.total_Average_Total);
+                    $('#objSalaryWages_Total_TotalWages').val(data.total_TotalWages);
+
+                }
+                else { $("#btnUpdateSalaryWagesPaid").hide(); $("#btnSaveSalaryWagesPaid").show(); }
+            }
+
+        });
+    }
+
+    function GetCapitalStructureDetails() {
+        var selectedYear = $("#Year").val();
+        $.ajax({
+            type: "GET",
+            url: '@Url.Action("GetCapitalStructure", "ANNUAL_RETURN")',
+            data: { Year: selectedYear },
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            beforeSend: function () {
+                var varValue = 1;
+            },
+            success: function (data) {
+                if (data.capitalStructure_Id != null && data.capitalStructure_Id != "") {
+                    $("#btnUpdateCapitalStructure").show();
+                    $("#btnSaveCapitalStructure").hide();
+                    $('#objCapitalStructure_CapitalStructure_Id').val(data.capitalStructure_Id);
+                    $('#objCapitalStructure_ValueofFixedAssets').val(data.valueofFixedAssets);
+                    $('#objCapitalStructure_OtherMineCode').val(data.otherMineCode);
+                    $('#objCapitalStructure_Land_AtBeginning').val(data.land_AtBeginning);
+                    $('#objCapitalStructure_Land_Additions').val(data.land_Additions);
+                    $('#objCapitalStructure_Land_Sold_Discarded').val(data.land_Sold_Discarded);
+                    $('#objCapitalStructure_Land_Depreciation').val(data.land_Depreciation);
+
+                    $('#objCapitalStructure_Land_Net_closing_Balance').val(data.land_Net_closing_Balance);
+                    $('#objCapitalStructure_Land_Estimated_Market').val(data.land_Estimated_Market);
+                    $('#objCapitalStructure_Industrial_AtBeginning').val(data.industrial_AtBeginning);
+                    $('#objCapitalStructure_Industrial_Additions').val(data.industrial_Additions);
+                    $('#objCapitalStructure_Industrial_Sold_Discarded').val(data.industrial_Sold_Discarded);
+                    $('#objCapitalStructure_Industrial_Depreciation').val(data.industrial_Depreciation);
+
+                    $('#objCapitalStructure_Industrial_Net_closing_Balance').val(data.industrial_Net_closing_Balance);
+                    $('#objCapitalStructure_Industrial_Estimated_Market').val(data.industrial_Estimated_Market);
+                    $('#objCapitalStructure_Residential_AtBeginning').val(data.residential_AtBeginning);
+                    $('#objCapitalStructure_Residential_Additions').val(data.residential_Additions);
+
+                    $('#objCapitalStructure_Residential_Sold_Discarded').val(data.residential_Sold_Discarded);
+                    $('#objCapitalStructure_Residential_Depreciation').val(data.residential_Depreciation);
+                    $('#objCapitalStructure_Residential_Net_closing_Balance').val(data.residential_Net_closing_Balance);
+                    $('#objCapitalStructure_Residential_Estimated_Market').val(data.residential_Estimated_Market);
+
+                    $('#objCapitalStructure_P_M_T_AtBeginning').val(data.p_M_T_AtBeginning);
+                    $('#objCapitalStructure_P_M_T_Additions').val(data.p_M_T_Additions);
+                    $('#objCapitalStructure_P_M_T_Additions').val(data.p_M_T_Additions);
+                    $('#objCapitalStructure_P_M_T_Sold_Discarded').val(data.p_M_T_Sold_Discarded);
+
+                    $('#objCapitalStructure_P_M_T_Depreciation').val(data.p_M_T_Depreciation);
+                    $('#objCapitalStructure_P_M_T_Net_closing_Balance').val(data.p_M_T_Net_closing_Balance);
+                    $('#objCapitalStructure_P_M_T_Estimated_Market').val(data.p_M_T_Estimated_Market);
+                    $('#objCapitalStructure_Exp_AtBeginning').val(data.exp_AtBeginning);
+
+                    $('#objCapitalStructure_Exp_Additions').val(data.exp_Additions);
+                    $('#objCapitalStructure_Exp_Sold_Discarded').val(data.exp_Sold_Discarded);
+                    $('#objCapitalStructure_Exp_Depreciation').val(data.exp_Depreciation);
+                    $('#objCapitalStructure_Exp_Net_closing_Balance').val(data.exp_Net_closing_Balance);
+
+                    $('#objCapitalStructure_Exp_Estimated_Market').val(data.exp_Estimated_Market);
+                    $('#objCapitalStructure_Total_AtBeginning').val(data.total_AtBeginning);
+                    $('#objCapitalStructure_Total_Additions').val(data.total_Additions);
+                    $('#objCapitalStructure_Total_Sold_Discarded').val(data.total_Sold_Discarded);
+                    $('#objCapitalStructure_Total_Depreciation').val(data.total_Depreciation);
+                    $('#objCapitalStructure_Total_Net_closing_Balance').val(data.total_Net_closing_Balance);
+                    $('#objCapitalStructure_Total_Estimated_Market').val(data.total_Estimated_Market);
+
+                }
+                else { $("#btnUpdateCapitalStructure").hide(); $("#btnSaveCapitalStructure").show(); }
+            }
+
+        });
+    }
+
+    function GetSourceOfFinanceDetails() {
+        var selectedYear = $("#Year").val();
+
+        $.ajax({
+            type: "GET",
+            url: '@Url.Action("GetSourceOfFinance", "ANNUAL_RETURN")',
+            data: { Year: selectedYear },
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            beforeSend: function () {
+                var varValue = 1;
+            },
+            success: function (data) {
+
+                if (data.sourceOfFinance_Id != null && data.sourceOfFinance_Id != "") {
+                    $("#btnUpdateSourceOfFinance").show();
+                    $("#btnSaveSourceOfFinance").hide();
+                    $('#objSource_SourceOfFinance_Id').val(data.sourceOfFinance_Id);
+                    $('#objSource_ShareCapital').val(data.shareCapital);
+                    $('#objSource_OwnCapital').val(data.ownCapital);
+                    $('#objSource_Reserve').val(data.reserve);
+                    $('#objSource_Institution').val(data.institution);
+                    $('#objSource_AmountofLoan').val(data.amountofLoan);
+                    $('#objSource_RateofInterest').val(data.rateofInterest);
+                    $('#objSource_Interestpaid').val(data.interestpaid);
+                    $('#objSource_Rentspaid').val(data.rentspaid);
+                }
+                else { $("#btnUpdateSourceOfFinance").hide(); $("#btnSaveSourceOfFinance").show(); }
+            }
+
+        });
+    }
+
+
+    function OnSaveStaffandWork() {
+        if ($("#objStaffWork_Year").val() == "") {
+            $("#objStaffWork_Year").focus();
+            swal("", "Please Select Financial Year !", "warning");
+            return false;
+        }
+        else {
+            if (ValidateStaffDetails() != false) {
+                $("#objStaffWork_Flag1").val(2);
+                $("#G1_StaffWork").submit();
+            }
+        }
+    }
+
+    function OnUpdateStaffandWork() {
+        if (ValidateStaffDetails() != false) {
+            $("#objStaffWork_Flag1").val(1);
+            $("#G1_StaffWork").submit();
+        }
+    }
+
+
+    function OnSaveWork() {
+
+        if ($("#objWork_Year").val() == "") {
+            $("#objWork_Year").focus();
+            swal("", "Please Select Financial Year !", "warning");
+            return false;
+        }
+        else {
+
+            $("#objWork_Flag").val(2);
+            $("#G1_objWork").submit();
+        }
+    }
+
+    function OnUpdateWork() {
+        $("#objWork_Flag").val(1);
+        $("#G1_objWork").submit();
+    }
+
+    function OnSaveSalaryWagesPaid() {
+        var isflag = 0;
+        if (ValidateSalaryWages() != false) {
+            $("#objSalaryWages_Flag2").val(2);
+            $("#G1_objSalaryWages").submit();
+        }
+    }
+
+    function OnUpdateSalaryWagesPaid() {
+        if (ValidateSalaryWages() != false) {
+            $("#objSalaryWages_Flag2").val(1);
+            $("#G1_objSalaryWages").submit();
+        }
+    }
+
+    function OnSaveCapitalStructure() {
+        if ($("#objCapitalStructure_Year").val() == "") {
+            $("#objCapitalStructure_Year").focus();
+            swal("", "Please Select Financial Year !", "warning");
+            return false;
+        }
+        else {
+            if (ValidateCapitalStructure() != false) {
+                $("#objCapitalStructure_Flag3").val(2);
+                $("#G1_CapitalStructure").submit();
+            }
+        }
+    }
+
+    function OnUpdateCapitalStructure() {
+        if (ValidateCapitalStructure() != false) {
+            $("#objCapitalStructure_Flag3").val(1);
+            $("#G1_CapitalStructure").submit();
+        }
+    }
+
+    function OnSaveSourceOfFinance() {
+        if ($("#objSource_Year").val() == "") {
+            $("#objSource_Year").focus();
+            swal("", "Please Select Financial Year !", "warning");
+            return false;
+        }
+        else {
+            if (ValidatePartII() != false) {
+                $("#objWork_Flag").val(2);
+
+                $("#objStaffWork_Flag1").val(2);
+
+                $("#objSalaryWages_Flag2").val(2);
+
+                $("#objCapitalStructure_Flag3").val(2);
+
+                $("#objSource_Flag4").val(2);
+
+                $("#G1_Source").submit();
+            }
+        }
+    }
+
+    function OnUpdateSourceOfFinance() {
+        if (ValidatePartII() != false) {
+            $("#objWork_Flag").val(1);
+
+            $("#objStaffWork_Flag1").val(1);
+
+            $("#objSalaryWages_Flag2").val(1);
+
+            $("#objCapitalStructure_Flag3").val(1);
+
+            $("#objSource_Flag4").val(1);
+            $("#G1_Source").submit();
+        }
+    }
+    function TextChangeWhollyemployed() {
+        var Whollyemployed1 = $("#objStaffWork_Whollyemployed1").val();
+        if (Whollyemployed1 == "") {
+            Whollyemployed1 = 0;
+        }
+        var Whollyemployed2 = $("#objStaffWork_Whollyemployed2").val();
+        if (Whollyemployed2 == "") {
+            Whollyemployed2 = 0;
+        }
+        var Whollyemployed3 = $("#objStaffWork_Whollyemployed3").val();
+        if (Whollyemployed3 == "") {
+            Whollyemployed3 = 0;
+        }
+        var Whollyemployed4 = $("#objStaffWork_Whollyemployed4").val();
+        if (Whollyemployed4 == "") {
+            Whollyemployed4 = 0;
+        }
+        var Whollyemployed5 = $("#objStaffWork_Whollyemployed5").val();
+        if (Whollyemployed5 == "") {
+            Whollyemployed5 = 0;
+        }
+        var SUM = Number(Whollyemployed1) + Number(Whollyemployed2) + Number(Whollyemployed3) + Number(Whollyemployed4) + Number(Whollyemployed5)
+        $("#objStaffWork_Whollyemployed_Total").val(SUM);
+    }
+    function TextChangePartlyemployed() {
+        var Partlyemployed1 = $("#objStaffWork_Partlyemployed1").val();
+        if (Partlyemployed1 == "") {
+            Partlyemployed1 = 0;
+        }
+        var Partlyemployed2 = $("#objStaffWork_Partlyemployed2").val();
+        if (Partlyemployed2 == "") {
+            Partlyemployed2 = 0;
+        }
+        var Partlyemployed3 = $("#objStaffWork_Partlyemployed3").val();
+        if (Partlyemployed3 == "") {
+            Partlyemployed3 = 0;
+        }
+        var Partlyemployed4 = $("#objStaffWork_Partlyemployed4").val();
+        if (Partlyemployed4 == "") {
+            Partlyemployed4 = 0;
+        }
+        var Partlyemployed5 = $("#objStaffWork_Partlyemployed5").val();
+        if (Partlyemployed5 == "") {
+            Partlyemployed5 = 0;
+        }
+        var SUM = Number(Partlyemployed1) + Number(Partlyemployed2) + Number(Partlyemployed3) + Number(Partlyemployed4) + Number(Partlyemployed5)
+        $("#objStaffWork_Partlyemployed_Total").val(SUM);
+    }
+    //for Salary and Wages
+    function TextBelowGround() {
+        var BG_Direct = $("#objSalaryWages_BG_Direct").val();
+        if (BG_Direct == "") {
+            BG_Direct = 0;
+        }
+        var BG_Contract = $("#objSalaryWages_BG_Contract").val();
+        if (BG_Contract == "") {
+            BG_Contract = 0;
+        }
+        var SUM = Number(BG_Direct) + Number(BG_Contract);
+        $("#objSalaryWages_BG_Total").val(SUM);
+    }
+    function TextOpenCast() {
+        var BG_Direct = $("#objSalaryWages_OC_Direct").val();
+        if (BG_Direct == "") {
+            BG_Direct = 0;
+        }
+        var BG_Contract = $("#objSalaryWages_OC_Contract").val();
+        if (BG_Contract == "") {
+            BG_Contract = 0;
+        }
+        var SUM = Number(BG_Direct) + Number(BG_Contract);
+        $("#objSalaryWages_OC_Total").val(SUM);
+    }
+    function TextAboveGround() {
+        var BG_Direct = $("#objSalaryWages_AG_Direct").val();
+        if (BG_Direct == "") {
+            BG_Direct = 0;
+        }
+        var BG_Contract = $("#objSalaryWages_AG_Contract").val();
+        if (BG_Contract == "") {
+            BG_Contract = 0;
+        }
+        var SUM = Number(BG_Direct) + Number(BG_Contract);
+        $("#objSalaryWages_AG_Total").val(SUM);
+    }
+    function TextDirect() {
+        var BG_Direct = $("#objSalaryWages_BG_Direct").val();
+        if (BG_Direct == "") {
+            BG_Direct = 0;
+        }
+        var OC_Direct = $("#objSalaryWages_OC_Direct").val();
+        if (OC_Direct == "") {
+            OC_Direct = 0;
+        }
+        var AG_Direct = $("#objSalaryWages_AG_Direct").val();
+        if (AG_Direct == "") {
+            AG_Direct = 0;
+        }
+        var SUM = Number(BG_Direct) + Number(OC_Direct) + Number(AG_Direct);
+        $("#objSalaryWages_Total_Direct").val(SUM);
+    }
+    function TextContract() {
+        var BG_Direct = $("#objSalaryWages_BG_Contract").val();
+        if (BG_Direct == "") {
+            BG_Direct = 0;
+        }
+        var OC_Direct = $("#objSalaryWages_OC_Contract").val();
+        if (OC_Direct == "") {
+            OC_Direct = 0;
+        }
+        var AG_Direct = $("#objSalaryWages_AG_Contract").val();
+        if (AG_Direct == "") {
+            AG_Direct = 0;
+        }
+        var SUM = Number(BG_Direct) + Number(OC_Direct) + Number(AG_Direct);
+        $("#objSalaryWages_Total_Contract").val(SUM);
+    }
+    function TextTotal() {
+        var BG_Total = $("#objSalaryWages_BG_Total").val();
+        if (BG_Total == "") {
+            BG_Total = 0;
+        }
+        var OC_Total = $("#objSalaryWages_OC_Total").val();
+        if (OC_Total == "") {
+            OC_Total = 0;
+        }
+        var AG_Total = $("#objSalaryWages_AG_Total").val();
+        if (AG_Total == "") {
+            AG_Total = 0;
+        }
+        var SUM = Number(BG_Total) + Number(OC_Total) + Number(AG_Total);
+        $("#objSalaryWages_Total_Total").val(SUM);
+    }
+    //-----------------------------------
+    function TextBG_persons() {
+        var BG_Direct = $("#objSalaryWages_BG_Male").val();
+        if (BG_Direct == "") {
+            BG_Direct = 0;
+        }
+        var BG_Contract = $("#objSalaryWages_BG_Female").val();
+        if (BG_Contract == "") {
+            BG_Contract = 0;
+        }
+        var SUM = Number(BG_Direct) + Number(BG_Contract);
+        $("#objSalaryWages_BG_Average_Total").val(SUM);
+    }
+    function TextOC_persons() {
+        var OC_Male = $("#objSalaryWages_OC_Male").val();
+        if (OC_Male == "") {
+            OC_Male = 0;
+        }
+        var OC_Female = $("#objSalaryWages_OC_Female").val();
+        if (OC_Female == "") {
+            OC_Female = 0;
+        }
+        var SUM = Number(OC_Male) + Number(OC_Female);
+        $("#objSalaryWages_OC_Average_Total").val(SUM);
+    }
+    function TextAG_persons() {
+        var AG_Male = $("#objSalaryWages_AG_Male").val();
+        if (AG_Male == "") {
+            AG_Male = 0;
+        }
+        var AG_Female = $("#objSalaryWages_AG_Female").val();
+        if (AG_Female == "") {
+            AG_Female = 0;
+        }
+        var SUM = Number(AG_Male) + Number(AG_Female);
+        $("#objSalaryWages_AG_Average_Total").val(SUM);
+    }
+    function TextMaleTotal() {
+        var BG_Male = $("#objSalaryWages_BG_Male").val();
+        if (BG_Male == "") {
+            BG_Male = 0;
+        }
+        var OC_Male = $("#objSalaryWages_OC_Male").val();
+        if (OC_Male == "") {
+            OC_Male = 0;
+        }
+        var AG_Male = $("#objSalaryWages_AG_Male").val();
+        if (AG_Male == "") {
+            AG_Male = 0;
+        }
+        var SUM = Number(BG_Male) + Number(OC_Male) + Number(AG_Male);
+        $("#objSalaryWages_Total_Male").val(SUM);
+    }
+    function TextFemaleTotal() {
+        var BG_Female = $("#objSalaryWages_BG_Female").val();
+        if (BG_Female == "") {
+            BG_Female = 0;
+        }
+        var OC_Female = $("#objSalaryWages_OC_Female").val();
+        if (OC_Female == "") {
+            OC_Female = 0;
+        }
+        var AG_Female = $("#objSalaryWages_AG_Female").val();
+        if (AG_Female == "") {
+            AG_Female = 0;
+        }
+        var SUM = Number(BG_Female) + Number(OC_Female) + Number(AG_Female);
+        $("#objSalaryWages_Total_Female").val(SUM);
+    }
+    function Text_personsTotal() {
+        var BG_Average_Total = $("#objSalaryWages_BG_Average_Total").val();
+        if (BG_Average_Total == "") {
+            BG_Average_Total = 0;
+        }
+        var OC_Average_Total = $("#objSalaryWages_OC_Average_Total").val();
+        if (OC_Average_Total == "") {
+            OC_Average_Total = 0;
+        }
+        var AG_Average_Total = $("#objSalaryWages_AG_Average_Total").val();
+        if (AG_Average_Total == "") {
+            AG_Average_Total = 0;
+        }
+        var SUM = Number(BG_Average_Total) + Number(OC_Average_Total) + Number(AG_Average_Total);
+        $("#objSalaryWages_Total_Average_Total").val(SUM);
+
+    }
+    function Text_TotalWages_Salary() {
+        var BG_TotalWages = $("#objSalaryWages_BG_TotalWages").val();
+        if (BG_TotalWages == "") {
+            BG_TotalWages = 0;
+        }
+        var OC_TotalWages = $("#objSalaryWages_OC_TotalWages").val();
+        if (OC_TotalWages == "") {
+            OC_TotalWages = 0;
+        }
+        var AG_TotalWages = $("#objSalaryWages_AG_TotalWages").val();
+        if (AG_TotalWages == "") {
+            AG_TotalWages = 0;
+        }
+        var SUM = Number(BG_TotalWages) + Number(OC_TotalWages) + Number(AG_TotalWages);
+        $("#objSalaryWages_Total_TotalWages").val(SUM);
+
+    }
+    function Text_Noofdaysworked() {
+        var BG_NoOFDaysWork = $("#objSalaryWages_BG_NoOFDaysWork").val();
+        if (BG_NoOFDaysWork == "") {
+            BG_NoOFDaysWork = 0;
+        }
+        var OC_NoOFDaysWork = $("#objSalaryWages_OC_NoOFDaysWork").val();
+        if (OC_NoOFDaysWork == "") {
+            OC_NoOFDaysWork = 0;
+        }
+        var AG_NoOFDaysWork = $("#objSalaryWages_AG_NoOFDaysWork").val();
+        if (AG_NoOFDaysWork == "") {
+            AG_NoOFDaysWork = 0;
+        }
+        var SUM = Number(BG_NoOFDaysWork) + Number(OC_NoOFDaysWork) + Number(AG_NoOFDaysWork);
+        $("#objSalaryWages_Total_NoOFDaysWork").val(SUM);
+
+    }
+
+
+</script>
+<script>
+
+    $("#objSalaryWages_BG_Direct").on("change", function () {
+        TextBelowGround();
+        TextDirect();
+        TextTotal();
+    });
+    $("#objSalaryWages_BG_Contract").on("change", function () {
+        TextBelowGround();
+        TextContract();
+        TextTotal();
+    });
+
+    $("#objSalaryWages_OC_Direct").on("change", function () {
+        TextOpenCast();
+        TextDirect();
+        TextTotal();
+    });
+
+    $("#objSalaryWages_AG_Direct").on("change", function () {
+        TextDirect();
+        TextAboveGround();
+        TextTotal();
+    });
+
+    $("#objSalaryWages_OC_Contract").on("change", function () {
+        TextContract();
+        TextOpenCast();
+        TextTotal();
+    });
+
+    $("#objSalaryWages_AG_Contract").on("change", function () {
+        TextContract();
+        TextAboveGround();
+        TextTotal();
+    });
+
+    //-----------------------------------------------------------------
+
+
+    $("#objSalaryWages_BG_Male").on("change", function () {
+        TextBG_persons();
+        TextMaleTotal();
+        Text_personsTotal();
+    });
+
+    $("#objSalaryWages_OC_Male").on("change", function () {
+        TextOC_persons();
+        TextMaleTotal();
+        Text_personsTotal();
+    });
+
+    $("#objSalaryWages_AG_Male").on("change", function () {
+        TextAG_persons();
+        TextMaleTotal();
+        Text_personsTotal();
+    });
+
+    $("#objSalaryWages_BG_Female").on("change", function () {
+        TextBG_persons();
+        TextFemaleTotal();
+        Text_personsTotal();
+    });
+
+    $("#objSalaryWages_OC_Female").on("change", function () {
+        TextOC_persons();
+        TextFemaleTotal();
+        Text_personsTotal();
+    });
+
+    $("#objSalaryWages_AG_Female").on("change", function () {
+        TextAG_persons();
+        TextFemaleTotal();
+        Text_personsTotal();
+    });
+    $("#objSalaryWages_BG_TotalWages").on("change", function () {
+        Text_TotalWages_Salary();
+    });
+    $("#objSalaryWages_OC_TotalWages").on("change", function () {
+        Text_TotalWages_Salary();
+    });
+    $("#objSalaryWages_AG_TotalWages").on("change", function () {
+        Text_TotalWages_Salary();
+    });
+
+    $("#objSalaryWages_BG_NoOFDaysWork").on("change", function () {
+        Text_Noofdaysworked();
+    });
+    $("#objSalaryWages_OC_NoOFDaysWork").on("change", function () {
+        Text_Noofdaysworked();
+    });
+    $("#objSalaryWages_AG_NoOFDaysWork").on("change", function () {
+        Text_Noofdaysworked();
+    });
+
+</script>
+
+<script>
+    function Text_Beginning() {
+        var Land_AtBeginning = $("#objCapitalStructure_Land_AtBeginning").val();
+        if (Land_AtBeginning == "") {
+            Land_AtBeginning = 0;
+        }
+        var Industrial_AtBeginning = $("#objCapitalStructure_Industrial_AtBeginning").val();
+        if (Industrial_AtBeginning == "") {
+            Industrial_AtBeginning = 0;
+        }
+        var Residential_AtBeginning = $("#objCapitalStructure_Residential_AtBeginning").val();
+        if (Residential_AtBeginning == "") {
+            Residential_AtBeginning = 0;
+        }
+        var P_M_T_AtBeginning = $("#objCapitalStructure_P_M_T_AtBeginning").val();
+        if (P_M_T_AtBeginning == "") {
+            P_M_T_AtBeginning = 0;
+        }
+        var Exp_AtBeginning = $("#objCapitalStructure_Exp_AtBeginning").val();
+        if (Exp_AtBeginning == "") {
+            Exp_AtBeginning = 0;
+        }
+        var SUM = Number(Land_AtBeginning) + Number(Industrial_AtBeginning) + Number(Residential_AtBeginning) + Number(P_M_T_AtBeginning) + Number(Exp_AtBeginning);
+        $("#objCapitalStructure_Total_AtBeginning").val(SUM);
+
+    }
+
+    function Text_Additions() {
+        var Land_AtBeginning = $("#objCapitalStructure_Land_Additions").val();
+        if (Land_AtBeginning == "") {
+            Land_AtBeginning = 0;
+        }
+        var Industrial_AtBeginning = $("#objCapitalStructure_Industrial_Additions").val();
+        if (Industrial_AtBeginning == "") {
+            Industrial_AtBeginning = 0;
+        }
+        var Residential_AtBeginning = $("#objCapitalStructure_Residential_Additions").val();
+        if (Residential_AtBeginning == "") {
+            Residential_AtBeginning = 0;
+        }
+        var P_M_T_AtBeginning = $("#objCapitalStructure_P_M_T_Additions").val();
+        if (P_M_T_AtBeginning == "") {
+            P_M_T_AtBeginning = 0;
+        }
+        var Exp_AtBeginning = $("#objCapitalStructure_Exp_Additions").val();
+        if (Exp_AtBeginning == "") {
+            Exp_AtBeginning = 0;
+        }
+        var SUM = Number(Land_AtBeginning) + Number(Industrial_AtBeginning) + Number(Residential_AtBeginning) + Number(P_M_T_AtBeginning) + Number(Exp_AtBeginning);
+        $("#objCapitalStructure_Total_Additions").val(SUM);
+
+    }
+
+    function Text_Discarded() {
+        var Land_AtBeginning = $("#objCapitalStructure_Land_Sold_Discarded").val();
+        if (Land_AtBeginning == "") {
+            Land_AtBeginning = 0;
+        }
+        var Industrial_AtBeginning = $("#objCapitalStructure_Industrial_Sold_Discarded").val();
+        if (Industrial_AtBeginning == "") {
+            Industrial_AtBeginning = 0;
+        }
+        var Residential_AtBeginning = $("#objCapitalStructure_Residential_Sold_Discarded").val();
+        if (Residential_AtBeginning == "") {
+            Residential_AtBeginning = 0;
+        }
+        var P_M_T_AtBeginning = $("#objCapitalStructure_P_M_T_Sold_Discarded").val();
+        if (P_M_T_AtBeginning == "") {
+            P_M_T_AtBeginning = 0;
+        }
+        var Exp_AtBeginning = $("#objCapitalStructure_Exp_Sold_Discarded").val();
+        if (Exp_AtBeginning == "") {
+            Exp_AtBeginning = 0;
+        }
+        var SUM = Number(Land_AtBeginning) + Number(Industrial_AtBeginning) + Number(Residential_AtBeginning) + Number(P_M_T_AtBeginning) + Number(Exp_AtBeginning);
+        $("#objCapitalStructure_Total_Sold_Discarded").val(SUM);
+
+    }
+
+    function Text_Depreciation() {
+        var Land_AtBeginning = $("#objCapitalStructure_Land_Depreciation").val();
+        if (Land_AtBeginning == "") {
+            Land_AtBeginning = 0;
+        }
+        var Industrial_AtBeginning = $("#objCapitalStructure_Industrial_Depreciation").val();
+        if (Industrial_AtBeginning == "") {
+            Industrial_AtBeginning = 0;
+        }
+        var Residential_AtBeginning = $("#objCapitalStructure_Residential_Depreciation").val();
+        if (Residential_AtBeginning == "") {
+            Residential_AtBeginning = 0;
+        }
+        var P_M_T_AtBeginning = $("#objCapitalStructure_P_M_T_Depreciation").val();
+        if (P_M_T_AtBeginning == "") {
+            P_M_T_AtBeginning = 0;
+        }
+        var Exp_AtBeginning = $("#objCapitalStructure_Exp_Depreciation").val();
+        if (Exp_AtBeginning == "") {
+            Exp_AtBeginning = 0;
+        }
+        var SUM = Number(Land_AtBeginning) + Number(Industrial_AtBeginning) + Number(Residential_AtBeginning) + Number(P_M_T_AtBeginning) + Number(Exp_AtBeginning);
+        $("#objCapitalStructure_Total_Depreciation").val(SUM);
+
+    }
+
+    function Text_Estimated() {
+        var Land_AtBeginning = $("#objCapitalStructure_Land_Estimated_Market").val();
+        if (Land_AtBeginning == "") {
+            Land_AtBeginning = 0;
+        }
+        var Industrial_AtBeginning = $("#objCapitalStructure_Industrial_Estimated_Market").val();
+        if (Industrial_AtBeginning == "") {
+            Industrial_AtBeginning = 0;
+        }
+        var Residential_AtBeginning = $("#objCapitalStructure_Residential_Estimated_Market").val();
+        if (Residential_AtBeginning == "") {
+            Residential_AtBeginning = 0;
+        }
+        var P_M_T_AtBeginning = $("#objCapitalStructure_P_M_T_Estimated_Market").val();
+        if (P_M_T_AtBeginning == "") {
+            P_M_T_AtBeginning = 0;
+        }
+        var Exp_AtBeginning = $("#objCapitalStructure_Exp_Estimated_Market").val();
+        if (Exp_AtBeginning == "") {
+            Exp_AtBeginning = 0;
+        }
+        var SUM = Number(Land_AtBeginning) + Number(Industrial_AtBeginning) + Number(Residential_AtBeginning) + Number(P_M_T_AtBeginning) + Number(Exp_AtBeginning);
+        $("#objCapitalStructure_Total_Estimated_Market").val(SUM);
+
+    }
+    function Text_NetClosingBalance1() {
+        var Land_AtBeginning = $("#objCapitalStructure_Land_AtBeginning").val();
+        if (Land_AtBeginning == "") {
+            Land_AtBeginning = 0;
+        }
+        var Land_Additions = $("#objCapitalStructure_Land_Additions").val();
+        if (Land_Additions == "") {
+            Land_Additions = 0;
+        }
+        var Land_Sold_Discarded = $("#objCapitalStructure_Land_Sold_Discarded").val();
+        if (Land_Sold_Discarded == "") {
+            Land_Sold_Discarded = 0;
+        }
+        var Land_Depreciation = $("#objCapitalStructure_Land_Depreciation").val();
+        if (Land_Depreciation == "") {
+            Land_Depreciation = 0;
+        }
+
+        var SUM = (Number(Land_AtBeginning) + Number(Land_Additions)) - (Number(Land_Sold_Discarded) + Number(Land_Depreciation));
+        $("#objCapitalStructure_Land_Net_closing_Balance").val(SUM);
+    }
+    function Text_NetClosingBalance2() {
+        var AtBeginning = $("#objCapitalStructure_Industrial_AtBeginning").val();
+        if (AtBeginning == "") {
+            AtBeginning = 0;
+        }
+        var Additions = $("#objCapitalStructure_Industrial_Additions").val();
+        if (Additions == "") {
+            Additions = 0;
+        }
+        var Sold_Discarded = $("#objCapitalStructure_Industrial_Sold_Discarded").val();
+        if (Sold_Discarded == "") {
+            Sold_Discarded = 0;
+        }
+        var Depreciation = $("#objCapitalStructure_Industrial_Depreciation").val();
+        if (Depreciation == "") {
+            Depreciation = 0;
+        }
+
+        var SUM = (Number(AtBeginning) + Number(Additions)) - (Number(Sold_Discarded) + Number(Depreciation));
+        $("#objCapitalStructure_Industrial_Net_closing_Balance").val(SUM);
+    }
+    function Text_NetClosingBalance3() {
+        var AtBeginning = $("#objCapitalStructure_Residential_AtBeginning").val();
+        if (AtBeginning == "") {
+            AtBeginning = 0;
+        }
+        var Additions = $("#objCapitalStructure_Residential_Additions").val();
+        if (Additions == "") {
+            Additions = 0;
+        }
+        var Sold_Discarded = $("#objCapitalStructure_Residential_Sold_Discarded").val();
+        if (Sold_Discarded == "") {
+            Sold_Discarded = 0;
+        }
+        var Depreciation = $("#objCapitalStructure_Residential_Depreciation").val();
+        if (Depreciation == "") {
+            Depreciation = 0;
+        }
+
+        var SUM = (Number(AtBeginning) + Number(Additions)) - (Number(Sold_Discarded) + Number(Depreciation));
+        $("#objCapitalStructure_Residential_Net_closing_Balance").val(SUM);
+    }
+    function Text_NetClosingBalance4() {
+        var AtBeginning = $("#objCapitalStructure_P_M_T_AtBeginning").val();
+        if (AtBeginning == "") {
+            AtBeginning = 0;
+        }
+        var Additions = $("#objCapitalStructure_P_M_T_Additions").val();
+        if (Additions == "") {
+            Additions = 0;
+        }
+        var Sold_Discarded = $("#objCapitalStructure_P_M_T_Sold_Discarded").val();
+        if (Sold_Discarded == "") {
+            Sold_Discarded = 0;
+        }
+        var Depreciation = $("#objCapitalStructure_P_M_T_Depreciation").val();
+        if (Depreciation == "") {
+            Depreciation = 0;
+        }
+
+        var SUM = (Number(AtBeginning) + Number(Additions)) - (Number(Sold_Discarded) + Number(Depreciation));
+        $("#objCapitalStructure_P_M_T_Net_closing_Balance").val(SUM);
+    }
+    function Text_NetClosingBalance5() {
+        var AtBeginning = $("#objCapitalStructure_Exp_AtBeginning").val();
+        if (AtBeginning == "") {
+            AtBeginning = 0;
+        }
+        var Additions = $("#objCapitalStructure_Exp_Additions").val();
+        if (Additions == "") {
+            Additions = 0;
+        }
+        var Sold_Discarded = $("#objCapitalStructure_Exp_Sold_Discarded").val();
+        if (Sold_Discarded == "") {
+            Sold_Discarded = 0;
+        }
+        var Depreciation = $("#objCapitalStructure_Exp_Depreciation").val();
+        if (Depreciation == "") {
+            Depreciation = 0;
+        }
+
+        var SUM = (Number(AtBeginning) + Number(Additions)) - (Number(Sold_Discarded) + Number(Depreciation));
+        $("#objCapitalStructure_Exp_Net_closing_Balance").val(SUM);
+    }
+
+    function Text_NetClosing_Total() {
+        var Land_AtBeginning = $("#objCapitalStructure_Land_Net_closing_Balance").val();
+        if (Land_AtBeginning == "") {
+            Land_AtBeginning = 0;
+        }
+        var Industrial_AtBeginning = $("#objCapitalStructure_Industrial_Net_closing_Balance").val();
+        if (Industrial_AtBeginning == "") {
+            Industrial_AtBeginning = 0;
+        }
+        var Residential_AtBeginning = $("#objCapitalStructure_Residential_Net_closing_Balance").val();
+        if (Residential_AtBeginning == "") {
+            Residential_AtBeginning = 0;
+        }
+        var P_M_T_AtBeginning = $("#objCapitalStructure_P_M_T_Net_closing_Balance").val();
+        if (P_M_T_AtBeginning == "") {
+            P_M_T_AtBeginning = 0;
+        }
+        var Exp_AtBeginning = $("#objCapitalStructure_Exp_Net_closing_Balance").val();
+        if (Exp_AtBeginning == "") {
+            Exp_AtBeginning = 0;
+        }
+        var SUM = Number(Land_AtBeginning) + Number(Industrial_AtBeginning) + Number(Residential_AtBeginning) + Number(P_M_T_AtBeginning) + Number(Exp_AtBeginning);
+        $("#objCapitalStructure_Total_Net_closing_Balance").val(SUM);
+
+    }
+</script>
+
+<script>
+    $("#objCapitalStructure_Land_AtBeginning").on("change", function () {
+        Text_NetClosingBalance1();
+        Text_NetClosing_Total();
+    });
+    $("#objCapitalStructure_Land_Additions").on("change", function () {
+        Text_NetClosingBalance1();
+        Text_NetClosing_Total();
+    });
+    $("#objCapitalStructure_Land_Sold_Discarded").on("change", function () {
+        Text_NetClosingBalance1();
+        Text_NetClosing_Total();
+    });
+    $("#objCapitalStructure_Land_Depreciation").on("change", function () {
+        Text_NetClosingBalance1();
+        Text_NetClosing_Total();
+    });
+    //---------------------------------------------------------------------
+    $("#objCapitalStructure_Industrial_AtBeginning").on("change", function () {
+        Text_NetClosingBalance2();
+        Text_NetClosing_Total();
+    });
+    $("#objCapitalStructure_Industrial_Additions").on("change", function () {
+        Text_NetClosingBalance2();
+        Text_NetClosing_Total();
+    });
+    $("#objCapitalStructure_Industrial_Sold_Discarded").on("change", function () {
+        Text_NetClosingBalance2();
+        Text_NetClosing_Total();
+    });
+    $("#objCapitalStructure_Industrial_Depreciation").on("change", function () {
+        Text_NetClosingBalance2();
+        Text_NetClosing_Total();
+    });
+    //---------------------------------------------------------------------
+    $("#objCapitalStructure_Residential_AtBeginning").on("change", function () {
+        Text_NetClosingBalance3();
+        Text_NetClosing_Total();
+    });
+    $("#objCapitalStructure_Residential_Additions").on("change", function () {
+        Text_NetClosingBalance3();
+        Text_NetClosing_Total();
+    });
+    $("#objCapitalStructure_Residential_Sold_Discarded").on("change", function () {
+        Text_NetClosingBalance3();
+        Text_NetClosing_Total();
+    });
+    $("#objCapitalStructure_Residential_Depreciation").on("change", function () {
+        Text_NetClosingBalance3();
+        Text_NetClosing_Total();
+    });
+    //---------------------------------------------------------------------
+    $("#objCapitalStructure_P_M_T_AtBeginning").on("change", function () {
+        Text_NetClosingBalance4();
+        Text_NetClosing_Total();
+    });
+    $("#objCapitalStructure_P_M_T_Additions").on("change", function () {
+        Text_NetClosingBalance4();
+        Text_NetClosing_Total();
+    });
+    $("#objCapitalStructure_P_M_T_Sold_Discarded").on("change", function () {
+        Text_NetClosingBalance4();
+        Text_NetClosing_Total();
+    });
+    $("#objCapitalStructure_P_M_T_Depreciation").on("change", function () {
+        Text_NetClosingBalance4();
+        Text_NetClosing_Total();
+    });
+    //---------------------------------------------------------------------
+    $("#objCapitalStructure_Exp_AtBeginning").on("change", function () {
+        Text_NetClosingBalance5();
+        Text_NetClosing_Total();
+    });
+    $("#objCapitalStructure_Exp_Additions").on("change", function () {
+        Text_NetClosingBalance5();
+        Text_NetClosing_Total();
+    });
+    $("#objCapitalStructure_Exp_Sold_Discarded").on("change", function () {
+        Text_NetClosingBalance5();
+        Text_NetClosing_Total();
+    });
+    $("#objCapitalStructure_Exp_Depreciation").on("change", function () {
+        Text_NetClosingBalance5();
+        Text_NetClosing_Total();
+    });
+
+    function ValidateStaffDetails() {
+        var StaffDetails = document.getElementsByClassName("StaffDetails");
+
+        for (var i = 0; i < StaffDetails.length; i++) {
+            if (StaffDetails[i].value == "") {
+                StaffDetails[i].focus();
+                swal("", "Please fill all details of Staff Details part..!", "warning");
+                return false;
+            }
+        }
+    }
+
+    function ValidateWorkDetails() {
+       
+        if (!blankFieldValidation("objWork_NoOfDaysMineWorked", "number of days the mine worked..")) {
+            return false;
+        }
+        if (!blankFieldValidation("objWork_NoOfShiftPerDay", "No of shifts per day..")) {
+            return false;
+        }
+      
+        else {
+            var Reason = document.getElementsByName("Reason");
+            var NoOfDaysMineStop = document.getElementsByName("NoOfDaysMineStop");
+
+            for (var i = 0; i < NoOfDaysMineStop.length; i++) {
+                if (NoOfDaysMineStop[i].value > 0) {
+                    if (Reason[i].value == "") {
+                        Reason[i].focus();
+                        swal("", "Plase fill Reason and NoOfDaysMineStop in Worl Details Part..!", "warning");
+                        return false;
+                    }
+                }
+            }
+        }
+    }
+
+    function ValidateSalaryWages() {
+
+
+        var BGD = $("#objSalaryWages_BG_Direct").val();
+        var BGD1 = $("#objSalaryWages_OC_Direct").val();
+        var BGD2 = $("#objSalaryWages_AG_Direct").val();
+
+
+        if (!blankFieldValidation("objSalaryWages_WorkingBelowGrounddate_str", "In workings below ground on (date) field")) {
+            return false;
+        }
+        if (!blankFieldValidation("objSalaryWages_WorkingBelowNo", "In workings below ground on (number) field")) {
+            return false;
+        }
+        if (!blankFieldValidation("objSalaryWages_WorkingOnMinedate_str", "In all in the mine on (date) field")) {
+            return false;
+        }
+        if (!blankFieldValidation("objSalaryWages_WorkingOnMineNo", "In all in the mine on (number) field")) {
+            return false;
+        }
+      
+        else if (BGD == "" && BGD1 == "" && BGD2 == "") {
+
+            $("#objSalaryWages_BG_Direct").focus();
+            swal("", "Atleast one Direct Work should be filled !", "warning");
+            return false;
+
+
+        }
+        var BG = document.getElementsByClassName("BG");
+        var OC = document.getElementsByClassName("OC");
+        var AG = document.getElementsByClassName("AG");
+
+        for (var i = 0; i < BG.length; i++) {
+            if (BG[i].value > 0 && i <= BG.length) {
+                for (var j = 0; j < BG.length; j++) {
+                    if (BG[j].value == "") {
+                        swal("", "Below Ground field is required.!", "warning");
+                        BG[j].focus();
+                        return false
+                        break;
+                    }
+                }
+            }
+        }
+        for (var i = 0; i < OC.length; i++) {
+            if (OC[i].value > 0 && i <= OC.length) {
+                for (var j = 0; j < OC.length; j++) {
+                    if (OC[j].value == "") {
+                        swal("", "Opencast field is required.!", "warning");
+                        OC[j].focus();
+                        return false
+                        break;
+                    }
+                }
+            }
+        }
+        for (var i = 0; i < AG.length; i++) {
+            if (AG[i].value > 0 && i <= AG.length) {
+                for (var j = 0; j < AG.length; j++) {
+                    if (AG[j].value == "") {
+                        swal("", "Above Ground field is required.!", "warning");
+                        AG[j].focus();
+                        return false
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    function ValidateCapitalStructure() {
+      
+        if (!blankFieldValidation("objCapitalStructure_ValueofFixedAssets", "Value of Fixed Assets field")) {
+            return false;
+        }
+        if (!blankFieldValidation("objCapitalStructure_OtherMineCode", "Mine Code/Mine Name field")) {
+            return false;
+        }
+        var CapitalStructure = document.getElementsByClassName("CapitalStructure");
+        for (var i = 0; i < CapitalStructure.length; i++) {
+            if (CapitalStructure[i].value == "") {
+                swal("", "Please fill all the fields of PART-II A (Capital Structure).!", "warning");
+                CapitalStructure[i].focus();
+                return false
+                break;
+            }
+        }
+    }
+
+    function ValidateSource() {
+        var Source = document.getElementsByClassName("Source");
+        for (var i = 0; i < Source.length; i++) {
+            if (Source[i].value == "") {
+                swal("", "Please fill all the fields of PART-II A (Source of Finance/Interest and Rent).!", "warning");
+                Source[i].focus();
+                return false;
+            }
+        }
+    }
+
+    function ValidatePartII() {
+        for (var i = 0; i < 2; i++) {
+            if (ValidateStaffDetails() == false) {
+                return false;
+            }
+            else if (ValidateWorkDetails() == false) {
+                return false;
+            }
+            else if (ValidateSalaryWages() == false) {
+                return false;
+            }
+            else if (ValidateCapitalStructure() == false) {
+                return false;
+            }
+            else if (ValidateSource() == false) {
+                return false;
+            }
+            else { return true; }
+        }
+    }
+</script>
+
+
+
+

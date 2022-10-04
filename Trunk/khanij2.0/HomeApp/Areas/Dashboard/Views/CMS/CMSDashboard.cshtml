@@ -1,0 +1,60 @@
+﻿@using HomeApp.Web;
+@using HomeEF;
+@using Microsoft.Extensions.Configuration
+@using Microsoft.AspNetCore.Http;
+@using Microsoft.Extensions.Options;
+@inject IConfiguration configuration
+@inject IHttpContextAccessor HttpContextAccessor
+@inject IOptions<KeyList> _objKeyList
+@{
+    ViewData["Title"] = "CMSDashboard";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+    List<MenuEF> index = HttpContextAccessor.HttpContext.Session.Get<List<MenuEF>>("CMSDashboard");
+}
+<link rel="stylesheet" href='@Url.Content("~/CMScss/landing.css")' type="text/css" />
+<script>
+    $(document).ready(function () {
+        loadNavigation('CMSDashboard', 'CMS Dashboard', 'masone', 'tl', 'CMS', '', ' ');
+    });
+</script>
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        @Html.Partial("_CMSnavigation")
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="landing-section">
+                    <div class="row">
+                        @{
+                            if (index != null)
+                            {
+                                foreach (var item in index)
+                                {
+                                    foreach (var items in item.childMenuList)
+                                    {
+                                        <div class="col-lg-2 col-md-3 col-sm-12">
+                                            <div class="portlet">
+                                                <div class="icon"><i class="@items.GifIcon"></i></div>
+                                                <div class="title my-3">
+                                                    @items.MenuName
+                                                </div>
+                                                <div class="description">
+                                                    <p>
+                                                        @items.Description
+                                                    </p>
+                                                </div>
+                                                <a class="menu-link" href="@_objKeyList.Value.HomeUrl@items.Area/@items.Controller/@items.ActionName"></a>
+                                            </div>
+                                        </div>
+                                    }
+                                }
+                            }
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- MAIN CONTENT AREA ENDS -->
+</section>
+

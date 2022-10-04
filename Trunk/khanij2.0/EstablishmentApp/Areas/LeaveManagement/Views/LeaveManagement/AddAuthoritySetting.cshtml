@@ -1,0 +1,412 @@
+﻿@model EstablishmentEf.AuthoritySetting
+@{
+    ViewData["Title"] = "AddAuthoritySetting";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+
+@if (TempData["msg"] != null)
+{
+    <script>
+        swal("",'@TempData["msg"]', "success");
+
+    </script>
+    TempData["msg"] = null;
+
+}
+<script>
+    $(document).ready(function () {
+        $("#Submit").click(function () {
+            if (!DropDownValidation("intStateId", "State")) {
+                return false;
+            }
+            if (!DropDownValidation("intDepartmentId", "Department")) {
+                return false;
+            }
+            if (!DropDownValidation("intDistrictId", "District")) {
+                return false;
+            }
+
+
+            if (!DropDownValidation("intVerifyDesignationId", "Verify Designation")) {
+                return false;
+            }
+            if (!DropDownValidation("intForwardDepartmentId", "Forward Department")) {
+                return false;
+            }
+            if (!DropDownValidation("intForwardDesignationId", "Forward Designation")) {
+                return false;
+            }
+
+
+            if (!DropDownValidation("intOicOfficerId", "OIC Officer")) {
+                return false;
+            }
+            if (!DropDownValidation("intOicApproveDesignationId", "OIC approve designation")) {
+                return false;
+            }
+            if (!DropDownValidation("intOicApproveUserId", "OIC approve user")) {
+                return false;
+            }
+
+            if (!DropDownValidation("intDaysExceed1", "Days Exceed first level")) {
+                return false;
+            }
+            if (!DropDownValidation("intNextApprovedDesignationId1", "Next approve/reject designation")) {
+                return false;
+            }
+            if (!DropDownValidation("intNextApprovedUserId1", "Next approve/reject user")) {
+                return false;
+            }
+
+            if (!DropDownValidation("intDaysExceed2", "Days Exceed second level")) {
+                return false;
+            }
+            if (!DropDownValidation("intNextApprovedDesignationId2", "Next approve/reset designation")) {
+                return false;
+            }
+            if (!DropDownValidation("intNextApprovedUserId2", "Next approve/reset user")) {
+                return false;
+            }
+
+
+        });
+
+    });
+</script>
+
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+
+        @*@Html.Partial("_navigation")*@
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="javascript:void(0);">
+                                Add Authority
+                            </a>
+                        </li>
+                        <li class="nav-item">
+
+                            <a class="nav-link " href="@Url.Content("~/LeaveManagement/LeaveManagement/ViewAuthoritySetting")">
+                                    View Authority
+                                </a>
+</li>
+                    </ul>
+
+                    @*@Html.Partial("_util")*@
+                </div>
+
+                <section class="box form-container">
+                    <div class="content-body">
+                        <script>
+                            $(document).ready(function () {
+
+                                $("#intStateId").change(function () {
+                                    $.ajax({
+                                        type: "POST",
+                                        url: '@Url.Content("~/LeaveManagement/LeaveManagement/BindDistrict")',
+
+                                        data: {
+                                            "Stateid": $('#intStateId').val()
+
+
+                                        },
+                                        dataType: "json",
+                                        success: function (data ) {
+
+                                            $("#intDistrictId").empty();
+
+                                            var ops = '<option value="">Select</option>';
+                                            for (var i = 0; i < data.length; i++) {
+                                                ops += '<option value="' + data[i].value + '">' + data[i].text + '</option>';
+                                            }
+
+                                            $("#intDistrictId").html(ops);
+
+                                        },
+                                        error: function()
+                                        {
+                                            alert('Error');
+
+                                        }
+                                    });
+
+                                });
+
+                                $("#intOicApproveDesignationId").change(function () {
+                                    $.ajax({
+                                        type: "POST",
+                                        url: '@Url.Content("~/LeaveManagement/LeaveManagement/BindOICApproveUser")',
+
+                                        data: {
+                                            "UserTypeId": $('#intOicApproveDesignationId').val()
+                                        },
+                                        dataType: "json",
+                                        success: function (data ) {
+
+                                            $("#intOicApproveUserId").empty();
+
+                                            var ops = '<option value="">Select</option>';
+                                            for (var i = 0; i < data.length; i++) {
+                                                ops += '<option value="' + data[i].value + '">' + data[i].text + '</option>';
+                                            }
+
+                                            $("#intOicApproveUserId").html(ops);
+
+                                        },
+                                        error: function()
+                                        {
+                                            alert('Error');
+
+                                        }
+                                    });
+
+                                });
+                                $("#intNextApprovedDesignationId1").change(function () {
+                                    $.ajax({
+                                        type: "POST",
+                                        url: '@Url.Content("~/LeaveManagement/LeaveManagement/BindNextApproveUser1")',
+
+                                        data: {
+                                            "UserTypeId": $('#intNextApprovedDesignationId1').val()
+                                        },
+                                        dataType: "json",
+                                        success: function (data ) {
+
+                                            $("#intNextApprovedUserId1").empty();
+
+                                            var ops = '<option value="">Select</option>';
+                                            for (var i = 0; i < data.length; i++) {
+                                                ops += '<option value="' + data[i].value + '">' + data[i].text + '</option>';
+                                            }
+
+                                            $("#intNextApprovedUserId1").html(ops);
+
+                                        },
+                                        error: function()
+                                        {
+                                            alert('Error');
+
+                                        }
+                                    });
+
+                                });
+                                $("#intNextApprovedDesignationId2").change(function () {
+                                    $.ajax({
+                                        type: "POST",
+                                        url: '@Url.Content("~/LeaveManagement/LeaveManagement/BindNextApproveUser2")',
+
+                                        data: {
+                                            "UserTypeId": $('#intNextApprovedDesignationId2').val()
+                                        },
+                                        dataType: "json",
+                                        success: function (data ) {
+
+                                            $("#intNextApprovedUserId2").empty();
+
+                                            var ops = '<option value="">Select</option>';
+                                            for (var i = 0; i < data.length; i++) {
+                                                ops += '<option value="' + data[i].value + '">' + data[i].text + '</option>';
+                                            }
+
+                                            $("#intNextApprovedUserId2").html(ops);
+
+                                        },
+                                        error: function()
+                                        {
+                                            alert('Error');
+
+                                        }
+                                    });
+
+                                });
+                                
+                            });
+                        </script>
+                        @using (Html.BeginForm("AddAuthoritySetting", "LeaveManagement", FormMethod.Post, new { AUTOCOMPLETE = "Off", id = "form1" }))
+                        {
+                            @Html.AntiForgeryToken();
+                            <div class="row">
+                                <div class="col-lg-12 col-md-12 col-sm-12">
+                                    <h5 class="text-brown font-weight-bold mt-0">Apply Authorities</h5>
+                                </div>
+                                <div class="col-xl-12">
+                                    <div class="bg-light p-2 form-group border">
+                                        <div class="row">
+
+                                            <div class="col-lg-3 col-md-6 col-sm-12">
+                                                <label class="col-form-label font-weight-bolder pt-0">State<span class="text-danger">*</span></label>
+                                                @Html.DropDownListFor(m => m.intStateId, ViewBag.State as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control form-control-sm searchableselect" })
+                                                @Html.HiddenFor(m => m.intAuthorityId)
+                                            </div>
+                                            <div class="col-lg-3 col-md-6 col-sm-12">
+                                                <label class="col-form-label font-weight-bolder pt-0">Department<span class="text-danger">*</span></label>
+                                                @Html.DropDownListFor(m => m.intDepartmentId, ViewBag.Department as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control form-control-sm searchableselect" })
+
+                                            </div>
+                                            <div class="col-lg-3 col-md-6 col-sm-12">
+                                                <label class="col-form-label font-weight-bolder pt-0">District <span class="text-danger">*</span></label>
+                                                @Html.DropDownListFor(m => m.intDistrictId, ViewBag.District as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control form-control-sm searchableselect" })
+
+                                            </div>
+               
+
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-xl-4">
+                                    <h5 class="text-brown font-weight-bold mt-0">Verify</h5>
+                                    <div class="bg-light p-2 form-group border">
+                                        <div class="row">
+                                            <div class="col-lg-12 col-md-12 col-sm-12">
+                                                <label class="col-form-label font-weight-bolder pt-0">Designation<span class="text-danger">*</span></label>
+                                                @Html.DropDownListFor(m => m.intVerifyDesignationId, ViewBag.VerifyDesignation as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control form-control-sm searchableselect" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                               
+                                <div class="col-xl-8">
+                                    <h5 class="text-brown font-weight-bold mt-0">Forward</h5>
+                                    <div class="bg-light p-2 form-group border">
+                                        <div class="row">
+
+                                            <div class="col-lg-6 col-md-6 col-sm-12">
+                                                <label class="col-form-label font-weight-bolder pt-0">Department<span class="text-danger">*</span></label>
+                                                @Html.DropDownListFor(m => m.intForwardDepartmentId, ViewBag.ForwardDepartment as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control form-control-sm searchableselect" })
+                                            </div>
+                                            <div class="col-lg-6 col-md-6 col-sm-12">
+                                                <label class="col-form-label font-weight-bolder pt-0">Designation<span class="text-danger">*</span></label>
+
+                                                @Html.DropDownListFor(m => m.intForwardDesignationId, ViewBag.ForwardDesignation as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control form-control-sm searchableselect" })
+                                                @*<select class="form-control form-control-sm searchableselect">
+                                    <option>select</option>
+                                </select>*@
+                                            </div>
+
+
+                                        </div>
+                                    </div>
+                                </div>
+                               
+                                <div class="col-xl-4">
+                                    <h5 class="text-brown font-weight-bold mt-0">OIC Establishment</h5>
+                                    <div class="bg-light p-2 form-group border">
+                                        <div class="row">
+                                            <div class="col-lg-12 col-md-12 col-sm-12">
+                                                <label class="col-form-label font-weight-bolder pt-0">Officer<span class="text-danger">*</span></label>
+                                                @Html.DropDownListFor(m => m.intOicOfficerId, ViewBag.OICOfficer as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control form-control-sm searchableselect" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-xl-8">
+                                    <h5 class="text-brown font-weight-bold mt-0">Approve/Reject</h5>
+                                    <div class="bg-light p-2 form-group border">
+                                        <div class="row">
+
+                                            <div class="col-lg-6 col-md-6 col-sm-12">
+                                                <label class="col-form-label font-weight-bolder pt-0">Designation<span class="text-danger">*</span></label>
+                                                @Html.DropDownListFor(m => m.intOicApproveDesignationId, ViewBag.OICApproveDesignation as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control form-control-sm searchableselect" })
+                                            </div>
+                                            <div class="col-lg-6 col-md-6 col-sm-12">
+                                                <label class="col-form-label font-weight-bolder pt-0">User<span class="text-danger">*</span></label>
+                                                @Html.DropDownListFor(m => m.intOicApproveUserId, ViewBag.OICApproveUserId as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control form-control-sm searchableselect" })
+                                            </div>
+
+
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-xl-4">
+                                    <h5 class="text-brown font-weight-bold mt-0">Days Exceed </h5>
+                                    <div class="bg-light p-2 form-group border">
+                                        <div class="row">
+                                            <div class="col-lg-12 col-md-12 col-sm-12">
+                                                <label class="col-form-label font-weight-bolder pt-0">If No. of Days Exceed<span class="text-danger">*</span></label>
+                                                @Html.DropDownListFor(m => m.intDaysExceed1, ViewBag.DaysExceed1 as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control form-control-sm searchableselect" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-xl-8">
+                                    <h5 class="text-brown font-weight-bold mt-0">Next Approve/Reject </h5>
+                                    <div class="bg-light p-2 form-group border">
+                                        <div class="row">
+
+                                            <div class="col-lg-6 col-md-6 col-sm-12">
+                                                <label class="col-form-label font-weight-bolder pt-0">Designation<span class="text-danger">*</span></label>
+                                                @Html.DropDownListFor(m => m.intNextApprovedDesignationId1, ViewBag.NextApproveDesignation1 as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control form-control-sm searchableselect" })
+                                            </div>
+                                            <div class="col-lg-6 col-md-6 col-sm-12">
+                                                <label class="col-form-label font-weight-bolder pt-0">User<span class="text-danger">*</span></label>
+                                                @Html.DropDownListFor(m => m.intNextApprovedUserId1, ViewBag.NextApprovedUserId1 as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control form-control-sm searchableselect" })
+                                            </div>
+
+
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-xl-4">
+                                    <h5 class="text-brown font-weight-bold mt-0">Days Exceed </h5>
+                                    <div class="bg-light p-2 form-group border">
+                                        <div class="row">
+                                            <div class="col-lg-12 col-md-12 col-sm-12">
+                                                <label class="col-form-label font-weight-bolder pt-0">If No. of Days Exceed<span class="text-danger">*</span></label>
+                                                @Html.DropDownListFor(m => m.intDaysExceed2, ViewBag.DaysExceed2 as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control form-control-sm searchableselect" })
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-xl-8">
+                                    <h5 class="text-brown font-weight-bold mt-0">Next Approve and Reset </h5>
+                                    <div class="bg-light p-2 form-group border">
+                                        <div class="row">
+
+                                            <div class="col-lg-6 col-md-6 col-sm-12">
+                                                <label class="col-form-label font-weight-bolder pt-0">Designation<span class="text-danger">*</span></label>
+                                                @Html.DropDownListFor(m => m.intNextApprovedDesignationId2, ViewBag.NextApprovedDesignation2 as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control form-control-sm searchableselect" })
+                                            </div>
+                                            <div class="col-lg-6 col-md-6 col-sm-12">
+                                                <label class="col-form-label font-weight-bolder pt-0">User<span class="text-danger">*</span></label>
+                                                @Html.DropDownListFor(m => m.intNextApprovedUserId2, ViewBag.NextApprovedUserId2 as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control form-control-sm searchableselect" })
+                                            </div>
+
+
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                                <div class="col-sm-6 ">
+                                    <input type="submit" id="Submit" name="Submit" value='@ViewBag.Button' class="btn btn-primary btn-md ml-0" />
+                                    <input type="reset" id="Reset" value="Reset" class="btn btn-danger btn-md" />
+
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+    <!-- MAIN CONTENT AREA ENDS -->
+</section>
+
+<script>
+    indicateMe = "yes"
+
+    $(document).ready(function () {
+        loadNavigation('AddAuthoritySetting', 'glholiday', 'plappleav', 'tl', 'Leave', 'Add Authority Setting', ' ');
+        $('.searchableselect').searchableselect();
+
+
+    });
+</script>

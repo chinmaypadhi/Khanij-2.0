@@ -1,0 +1,48 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+
+@using Microsoft.Extensions.Configuration
+@inject IConfiguration configuration
+<link rel="stylesheet" href='@Url.Content("~/CMScss/landing.css")' type="text/css" />
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        @*@Html.Partial("_CMSnavigation")*@
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="landing-section">
+                    <div class="row">
+                        @{
+                            foreach (var item in ViewData["Index"] as List<EstablishmentEf.MenuEF>)
+                            {
+                                foreach (var items in item.childMenuList)
+                                {
+                                    <div class="col-lg-2 col-md-3 col-sm-12">
+                                        @{
+                                            string DomenNAme = configuration.GetSection("KeyList")["DomenNAme"];
+                                        }
+                                        <div class="portlet">
+                                            <div class="icon"><i class="@items.GifIcon"></i></div>
+                                            <div class="title my-3">
+                                                @items.MenuName
+                                            </div>
+                                            <div class="description">
+                                                <p>
+                                                    @items.Description
+                                                </p>
+                                            </div>
+                                            <a class="menu-link" href="http://@items.url@DomenNAme/@items.Area/@items.Controller/@items.ActionName"></a>
+                                        </div>
+                                    </div>
+                                }
+                            }
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- MAIN CONTENT AREA ENDS -->
+</section>

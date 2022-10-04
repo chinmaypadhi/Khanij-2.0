@@ -1,0 +1,130 @@
+﻿@*// *********************************************************************************************************
+    //  View Name                : ViewList
+    //  Desciption               : Assessment File view
+    //  Created By               : Lingaraj Dalai
+    //  Created On               : 30 April 2021
+    // ********************************************************************************************************
+*@
+@model StarratingEF.AddFilemaster
+@using StarratingEF;
+@{
+    ViewData["Title"] = "ViewList";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+
+<script>
+
+    excelMe = "yes"
+    pdfMe = "yes"
+    printMe = "yes"
+    backMe="yes"
+    $(document).ready(function () {
+        loadNavigation('ViewList', 'glStar', 'pl', 'tl', 'Star Rating Minor Minerals', 'Additional Files', '');
+        $('.searchableselect').searchableselect();
+        $('#datatable').DataTable();
+        $('.shorting-lnk').click(function () {
+            $('.shorting-lnk i').toggleClass('fa-sort-amount-up-alt fa-sort-amount-down-alt ');
+        });
+        $('.filter-dropdown').hide();
+        $('.filter-lnk').click(function () {
+            $(this).toggleClass('active');
+            $(this).siblings('.filter-dropdown').slideToggle();
+        });
+        $('.filter-btn').click(function () {
+            $(this).parent('.shorting-cell .filter-dropdown').slideUp();
+            if ($(this).parent().parent('.shorting-cell').find('.filter-lnk').hasClass('active')) {
+                $(this).parent().siblings('.filter-lnk').removeClass('active');
+            }
+
+        });
+        $("#excelIcon").click(function () {
+            exportTableToExcel("datatable", "text")
+        });
+
+    });
+</script>
+<section class="wrapper main-wrapper row">
+    @if (ViewBag.msg != null)
+    {
+        <script>
+         var vv = '@ViewBag.msg';
+        if (vv == 1) {
+            swal("", "Files uploaded successfully.","success");
+        }
+        else {
+            swal("",vv,"success");
+        }
+        </script>
+    }
+    <div class="col-12">
+        @Html.Partial("_CMSnavigation")
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link" href="~/Starrating/AddFile/Add/@ViewBag.AssesmentID">
+                                Add
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="javascript:void(0);">
+                                View
+                            </a>
+                        </li>
+                    </ul>
+                    @Html.Partial("_CMSutil")
+                </div>
+
+                <section class="box form-container">
+                    <div class="content-body">
+
+                        <div class="row">
+                            <div class="col-lg-6 col-md-6 col-sm-12">
+                                <div id="viewtable">
+                                    <table id="datatable" class="table table-sm table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th width="30">Sl#</th>
+                                                <th>FileName</th>
+                                                <th>Attachment</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @{ int i = 1;
+                                            }
+                                            @foreach (var b in ViewBag.ViewList)
+                                            {
+                                                <tr>
+                                                    <td>
+                                                        @i
+                                                        @{ i++; }
+                                                    </td>
+                                                    <td>@b.OtherName</td>
+                                                    <td>
+
+                                                        @if (b.FileName != null)
+                                                        {
+                                                            <a href='../../../Upload/SR_UploadedFiles/@b.FileName@b.FileExtension' target="_blank" height='30' width='30'>
+                                                                <i class="icon-download-solid" aria-hidden="true">
+                                                                </i>
+                                                            </a>
+                                                        }
+                                                        <input type="hidden" value="@b.AssesmentID" id="hfAssesmentID" />
+                                                        @Html.HiddenFor(m => m.AssesmentID)
+                                                    </td>
+                                                </tr>
+                                            }
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+</section>
+
+

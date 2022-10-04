@@ -1,0 +1,142 @@
+﻿
+@{
+    ViewData["Title"] = "RevenueViewEdit";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+
+<script>
+    $(document).ready(function () {
+        loadNavigation('ViewList', 'glhelpdesk', 'plraiseticket', 'tl', 'Website', 'Notification', ' ');
+
+    });
+</script>
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        @Html.Partial("_navigation")
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link" href="~/Website/Graph/RevenueAdd">
+                                Add
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="javascript:void(0);">
+                                View
+                            </a>
+                        </li>
+                    </ul>
+                    @Html.Partial("_util")
+                </div>
+                <section class="box form-container">
+                    <div class="content-body">
+                        <div>
+                            <select id="financialyear" class="form-group">
+                                @{
+                                    foreach (var obj in (IEnumerable<string>)ViewData["list"])
+                                    {
+                                        <option>@obj</option>
+                                    }
+                                }
+                            </select>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div id="viewtable">
+                                    <table id="datatable" class="table table-sm table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th style="display:none">ID</th>
+                                                <th>Financial Year</th>
+                                                <th>MineralName</th>
+                                                <th>DMF</th>
+                                                <th>NMET</th>
+                                                <th>Royalty</th>
+                                                <th class="text-center noprint">Edit</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+    <!-- MAIN CONTENT AREA ENDS -->
+</section>
+<script>
+    $(document).ready(function () {
+        //------------Table data fillup on ready function--
+        if ($('#financialyear').val() != "") {
+            $.ajax({
+                async: true,
+                type: "get",
+                url: "/Website/Revenue/ViewbyFinancialyear",
+                data: { 'financialyear': $('#financialyear').val() },
+                datatype: "json",
+                traditional: true,
+                success: function (data) {
+                    debugger;
+                    $('#datatable tbody').empty();
+                    $.each(data, function (ind, item) {
+                        debugger
+                        var rows = "";
+                        rows += "<tr>";
+                        rows += "<td style='display:none'>" + item.id + "</td>";
+                        rows += "<td>" + item.financialYear + "</td>";
+                        rows += "<td>" + item.mineralName + "</td>";
+                        rows += "<td>" + item.dmf + "</td>";
+                        rows += "<td>" + item.nmet + "</td>";
+                        rows += "<td>" + item.royalty + "</td>";
+                        rows += "<td class='noprint text-center'><a href = '/Website/Revenue/EditByID/" + item.id + "' class='text-success btn-sm'><i class='icon-pencil-alt-solid'></i></a></td>";
+                        rows += "</tr>";
+                        $('#datatable tbody').append(rows);
+                    });
+                }
+            });
+        }
+        //$('.searchableselect').searchableselect();
+        debugger;
+        loadNavigation('Add', 'glRoleRes', 'plUser', 'tl', 'Master', 'Mineral Form', ' ');
+        //------------On Mineral Category Change Bind Mineral Name--
+        $('#financialyear').change(function () {
+            debugger;
+            if ($('#financialyear').val() != "") {
+                $.ajax({
+                    async: true,
+                    type: "get",
+                    url: "/Website/Revenue/ViewByFinancialyear",
+                    data: { 'financialyear': $('#financialyear').val() },
+                    datatype: "json",
+                    traditional: true,
+                    success: function (data) {
+                        debugger;
+                        $('#datatable tbody').empty();
+                        $.each(data, function (ind, item) {
+                            debugger
+                            var rows = "";
+                            rows += "<tr>";
+                            rows += "<td style='display:none'>" + item.id + "</td>";
+                            rows += "<td>" + item.financialYear + "</td>";
+                            rows += "<td>" + item.mineralName + "</td>";
+                            rows += "<td>" + item.dmf + "</td>";
+                            rows += "<td>" + item.nmet + "</td>";
+                            rows += "<td>" + item.royalty + "</td>";
+                            rows += "<td class='noprint text-center'><a href = '/Website/Revenue/EditByID/" + item.id + "' class='text-success btn-sm'><i class='icon-pencil-alt-solid'></i></a></td>";
+                            rows += "</tr>";
+                            $('#datatable tbody').append(rows);
+                        });
+                    }
+                });
+            }
+        });
+    });
+</script>
+

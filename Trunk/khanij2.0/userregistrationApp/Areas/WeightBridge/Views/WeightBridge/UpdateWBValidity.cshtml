@@ -1,0 +1,190 @@
+﻿@model userregistrationEF.ViewWeighBridgeModel
+@{
+    ViewData["Title"] = "UpdateWBValidity";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+
+<script>
+    
+    $(document).ready(function () {
+        loadNavigation('UpdateWBValidity', 'weigbrig', 'weigbrigthree', 'tl', 'Weighbridge', 'Weighbridge Renew', ' ');
+        $('.datepicker').datetimepicker({
+            format: 'LT',
+            format: 'DD-MMM-YYYY',
+            icons: {
+                previous: 'icon-angle-left-solid',
+                next: 'icon-angle-right-solid',
+            }
+        });
+        $('.datepicker').val('');
+    });
+</script>
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        @Html.Partial("_CMSnavigation")
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-lg-6">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="javascript:void(0);">
+                                Add
+                            </a>
+                        </li>
+                    </ul>
+                    @Html.Partial("_CMSutil")
+                </div>
+                <section class="box form-container">
+                    <div class="content-body">
+                        <form id="form1" action="/WeightBridge/WeightBridge/RequestWBValidity" method="post" enctype="multipart/form-data">
+                            <div class="row mb-3">
+                                <label class="col-lg-3 col-12 col-form-label">Weighbridge Name</label>
+                                <div class="col-lg-3 col-12">
+                                    <label class="form-control-plaintext"><span class="colon">:</span><span class="font-weight-bold">@Model.WeighBridgeName</span></label>
+                                </div>
+
+                                <label class="col-lg-3 col-12 col-form-label">Stamp Valid From</label>
+                                <div class="col-lg-3 col-12">
+                                    <label class="form-control-plaintext"><span class="colon">:</span><span class="font-weight-bold">@Model.StampValidFrom.ToString("dd MMM yyyy")</span></label>
+                                </div>
+
+                                <label class="col-lg-3 col-12 col-form-label">Stamp Valid Till</label>
+                                <div class="col-lg-3 col-12">
+                                    <label class="form-control-plaintext"><span class="colon">:</span><span class="font-weight-bold">@Model.StampValidTo.ToString("dd MMM yyyy")</span></label>
+                                </div>
+                                <div class="col-lg-3 d-lg-block d-md-none"></div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-6 col-md-6">
+                                    <label class="col-form-label">New Stamp Valid from<span class="text-danger">*</span></label>
+                                    <div class="form-group">
+                                        <div class="input-group">
+                                            <input id="StampValidFrom" name="StampValidFrom" type="text" class="form-control datepicker">
+                                            <div class="input-group-prepend">
+                                                <label class="input-group-text" for="txtTenderDate1"><i class="icon-calendar-alt-solid"></i></label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 col-md-6">
+                                    <label class="col-form-label">New Stamp Valid to <span class="text-danger">*</span></label>
+                                    <div class="form-group">
+                                        <div class="input-group">
+                                            <input name="StampValidTo" id="StampValidTo" type="text" class="form-control datepicker">
+                                            <div class="input-group-prepend">
+                                                <label class="input-group-text" for="txtTenderDate2"><i class="icon-calendar-alt-solid"></i></label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 col-md-6">
+                                    <label class="col-form-label">Upload Stamp Copy <span class="text-danger">*</span></label>
+                                    <div class="form-group">
+                                        <div class="custom-file">
+                                            <input type="file" id="StampCopy" name="StampCopy" class="custom-file-input">
+                                            <label class="custom-file-label">Choose file...</label>
+                                        </div>
+                                        <small class="text-danger"><strong>(.jpg, .jpeg, .png, .pdf)</strong> files with <strong> &#60; 2 MB </strong> size only.</small>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 d-lg-block d-md-none"></div>
+                                <div class="col-12">
+                                    <label class="col-form-label">Remarks <span class="text-danger">*</span></label>
+                                    <div class="form-group">
+                                        <textarea id="Remarks" name="Remarks" class="form-control" maxlength="100" rows="2"></textarea>
+                                        <small class="text-danger">Maximum <strong> 500</strong> characters allowed</small>
+                                    </div>
+                                </div>
+
+                            </div>
+                            <div class="mt-3">
+                                <input name="WeighBridgeID" type="hidden" value="@Model.WeighBridgeID" />
+                                <input id="btnsubmit" type="button" value="Submit" class="btn btn-success" />
+                                <a class="btn btn-danger ml-2" onclick="reset()">RESET</a>
+                                <a class="btn btn-danger ml-2" href="/WeightBridge/WeightBridge/IndividualRegistrationView">BACK</a>
+                            </div>
+                        </form>
+                        
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+    <!-- MAIN CONTENT AREA ENDS -->
+</section>
+<script>
+    $('#btnsubmit').click(function (e) {
+        if (validate()) {
+            e.preventDefault();
+            swal({
+                title: "Are you sure ??",
+                icon: "warning",
+                buttons: ["No", "Yes"],
+            })
+                .then((submit) => {
+                    if (submit) {
+                        
+                        $("#form1").submit();
+                    }
+                });
+        }
+        else {
+            return false;
+        }
+    });
+    $('#StampCopy').on('change', function () {
+        debugger;
+        var fileExtension = ['jpg', 'jpeg', 'png', 'pdf'];
+        if ($.inArray($(this).val().split('.').pop().toLowerCase(), fileExtension) == -1) {
+            swal("", "Only formats are allowed : " + fileExtension.join(', '), "warning");
+            $(this).focus();
+            return false;
+        }
+
+        if (Number(this.files[0].size) > 2097152) {
+            swal("", 'Try to upload file less than 2MB!', "warning");
+            $(this).val('');
+            $(this).focus();
+            return false;
+        }
+        else {
+            var fileName = $(this).val().split("\\").pop();
+            $(this).next('.custom-file-label').html(fileName);
+        }
+
+    });
+    function validate() {
+        if (new Date($('#StampValidFrom').val()) < new Date()) {
+            swal('', 'Stamp Valid From cannot be less than current date', 'warning');
+            return false;
+        }
+        if (new Date($('#StampValidTo').val()) < new Date()) {
+            swal('', 'Stamp Valid To cannot be less than current date', 'warning');
+            return false;
+        }
+        if (new Date($('#StampValidTo').val()) < new Date($('#StampValidFrom').val())) {
+            swal('', 'Stamp Valid To must be greater than Stamp Valid From', 'warning');
+            return false;
+        }
+        if ($('#StampCopy').val() == "") {
+            swal("", "Please Upload Stamp Copy", "warning");
+            $('#StampCopy').focus();
+            return false;
+        }
+        if ($('#Remarks').val() == '') {
+            swal('', 'Please specify Remarks', 'warning');
+            return false;
+        }
+        return true;
+    };
+    function reset() {
+        debugger
+        location.reload();
+    }
+</script>
+
+
+
+
+

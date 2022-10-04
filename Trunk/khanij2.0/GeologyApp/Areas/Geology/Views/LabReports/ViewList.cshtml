@@ -1,0 +1,186 @@
+﻿@*// *********************************************************************************************************
+    //  View Name                : ViewList
+    //  Desciption               : To View and Submit Lab Report Details
+    //  Created By               : Lngaraj Dalai
+    //  Created On               : 24 Feb 2021
+    // ********************************************************************************************************
+*@
+@model GeologyEF.LabReportmaster
+@using GeologyApp.Web
+@{
+    ViewData["Title"] = "ViewList";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+@if (ViewBag.msg != null)
+{
+    <script>
+        swal("",'@ViewBag.msg',"success");
+    </script>
+}
+<script>
+    $(document).ready(function () {
+        loadNavigation('ViewLabReport', 'glgeology', 'pllabrep', 'tl', 'Geology', 'Lab Report', ' ');
+        $('.shorting-lnk').click(function () {
+            $('.shorting-lnk i').toggleClass('fa-sort-amount-up-alt fa-sort-amount-down-alt ');
+        });
+        $('.filter-dropdown').hide();
+        $('.filter-lnk').click(function () {
+            $(this).toggleClass('active');
+            $(this).siblings('.filter-dropdown').slideToggle();
+        });
+        $('.filter-btn').click(function () {
+            $(this).parent('.shorting-cell .filter-dropdown').slideUp();
+            if ($(this).parent().parent('.shorting-cell').find('.filter-lnk').hasClass('active')) {
+                $(this).parent().siblings('.filter-lnk').removeClass('active');
+            }
+        });
+        $("#excelIcon").click(function () {
+            exportTableToExcel("datatable", "text")
+        });
+    });
+    function onApproval(LabReport_Id) {
+        if (confirm("Are you sure you want to submit lab report?")) {
+            $.ajax({
+                url: '@Url.Action("SendForForward", "LabReports",new { Area="Geology"})',
+                type: "POST",
+                data: { LabReport_Id: LabReport_Id },
+                success: function (data) {
+                    if (data == 1) {
+                        swal("", "Lab Report submit successfully", "success");
+                    }
+                    else if (data == 3) {
+                        swal("", "Something went wrong. Please try again!", "error");
+                    }
+                    setTimeout(function () {
+                        window.location.href = "@Url.Action("ViewList", "LabReports", new { Area = "Geology" })";
+                    }, 5000);
+                }
+            })
+        }
+    }
+</script>
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        @Html.Partial("_CMSnavigation")
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link" href="~/Geology/LabReports/Add">
+                                Add
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="javascript:void(0);">
+                                View
+                            </a>
+                        </li>
+                    </ul>
+                    @Html.Partial("_CMSutil")
+                    @Html.AntiForgeryToken()
+                </div>
+                <section class="box form-container">
+                    <div class="content-body">
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <table id="table-exports" class="table table-sm table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th rowspan="2" width="30">
+                                                Sl#
+                                            </th>
+                                            <th rowspan="2">FPO Code</th>
+                                            <th rowspan="2">Report MM/Year</th>
+                                            <th colspan="5" class="text-center">Area Details</th>
+                                            <th rowspan="2">Camp Incharge</th>
+                                            <th rowspan="2">Designation</th>
+                                            <th rowspan="2">Type of Sample</th>
+                                            <th rowspan="2">No of Samples</th>
+                                            <th rowspan="2">Type of Study</th>
+                                            <th rowspan="2">Submission Date</th>
+                                            <th rowspan="2" class="text-center">Attachment</th>
+                                            <th rowspan="2">Status</th>
+                                            <th rowspan="2" width="60px" class="text-center">Action</th>
+                                        </tr>
+                                        <tr>
+                                            <th>Name of Camp</th>
+                                            <th>Village</th>
+                                            <th>Tehsil</th>
+                                            <th>District</th>
+                                            <th>Regional Office</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @{ int i = 1;
+                                        }
+                                        @foreach (var b in ViewBag.ViewList)
+                                        {
+                                            <tr>
+                                                <td>
+                                                    @i
+                                                    @{ i++; }
+                                                </td>
+                                                <td>@b.FPO_Code</td>
+                                                <td>@b.Report_MY</td>
+                                                <td>@b.Location</td>
+                                                <td>@b.VillageName</td>
+                                                <td>@b.TehsilName</td>
+                                                <td>@b.DistrictName</td>
+                                                <td>@b.RegionalOfficeName</td>
+                                                <td>@b.GeologistName</td>
+                                                <td>@b.Designation</td>
+                                                <td>@b.Type_Of_Sample</td>
+                                                <td>@b.No_Of_Sample</td>
+                                                <td>@b.Type_of_Study</td>
+                                                <td>
+                                                    @if (b.Date_of_Submission != null)
+                                                    {
+                                                        @Convert.ToDateTime(b.Date_of_Submission).ToString("dd/MM/yyyy")
+                                                    }
+                                                </td>
+                                                <td class="text-center">
+                                                    @if (b.AttechmentName != null)
+                                                    {
+                                                        <a href='~/Geology/LabReports/DownloadLab?filename=@b.AttechmentName' height='30' width='30'>
+                                                            <i class="icon-download-solid h4 text-danger" aria-hidden="true">
+                                                            </i>
+                                                        </a>
+                                                    }
+                                                </td>
+                                                <td>@b.ApproveStatus </td>
+                                                <td class="noprint text-center">
+                                                    @if (b.Approve_Status == 0)
+                                                    {
+                                                        @*<a href="@Url.Content("~/Geology/LabReports/Add/")@b.LabReport_Id"
+                                                               class="btn-floating btn-outline-primary btn-sm"
+                                                               title="Edit"><i class="icon-pencil-alt-solid"></i></a>
+                                                            <a href="@Url.Content("~/Geology/LabReports/Delete/")@b.LabReport_Id"
+                                                               class="btn-floating btn-outline-danger btn-sm" onclick="return confirm('Are you sure to Delete?')"
+                                                               title="Delete"><i class="icon-trash-alt-solid"></i></a>*@
+                                                        <a href="@CustomQueryStringHelper.EncryptString("Geology","Add","LabReports",new {id=@b.LabReport_Id })" class="btn-floating btn-outline-primary btn-sm"
+                                                           title="Edit">
+                                                            <i class="icon-pencil-alt-solid"></i>
+                                                        </a>
+                                                        <a href="@CustomQueryStringHelper.EncryptString("Geology","Delete","LabReports",new {id=@b.LabReport_Id })" class="btn-floating btn-outline-danger btn-sm" onclick="return confirm('Are you sure to Delete?')"
+                                                           title="Delete">
+                                                            <i class="icon-trash-alt-solid"></i>
+                                                        </a>
+                                                        <a class="btn btn-primary btn-sm" onclick="onApproval(this.id)"
+                                                           title="Submit" id="@b.LabReport_Id"><i class="icon-share-square"></i></a>
+                                                    }
+                                                    <input type="hidden" value="@b.LabReport_Id" id="hfLabReportId" />
+                                                </td>
+                                            </tr>
+                                        }
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+</section>
+

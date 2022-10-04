@@ -1,0 +1,335 @@
+﻿@*// *********************************************************************************************************
+    //  View Name                : eReturnDashboard
+    //  Desciption               : Dashboard of Monthly Return for F1 and F2
+    //  Created By               : Debaraj Swain
+    //  Created On               : 01 Jun 2021
+    // ********************************************************************************************************
+*@
+@model ReturnEF.MonthlyReturnModelNonCoal
+@{
+    ViewData["Title"] = "e-Return Dashboard";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<section class="wrapper main-wrapper row">
+    @if (TempData["msg"] != null)
+    {
+        <script>
+             swal("", "@TempData["msg"]", "success");
+        </script>
+    }
+    @if (TempData["result"] != null)
+    {
+        <script>
+             swal("", "@TempData["result"]", "success");
+        </script>
+    }
+    @if (ViewBag.msg != null)
+    {
+        <script>
+                      swal("",@ViewBag.msg, "success");
+        </script>
+    }
+
+    <div class="col-12">
+        @Html.Partial("_CMSnavigation")
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item mr-md-1">
+                            <a class="nav-link" href="@Url.Action("eReturnDashboard", "eReturnProcess")">
+                                Dashboard
+                            </a>
+                        </li>
+                    </ul>
+                    @Html.Partial("_CMSutil")
+                </div>
+                 
+                <section class="box form-container">
+
+
+                    <div class="content-body pt-0">
+                        <div class="legend-box">
+                            <ul class="d-flex mb-1 justify-content-end list-unstyled">
+                                <li><span class="bg-success"></span> Active</li>
+                                <li><span class="bg-warning"></span> Inactive</li>
+                            </ul>
+                        </div>
+
+
+                        <div class="panel-heading" style="background-color: #8d3610;">
+                            <div class="row">
+                                <div class="col-xs-6 col-sm-4">
+                                    <div class="row">
+                                        <div class="col-sm-12 col-lg-12 col-md-12 margin-top-left_header">
+                                            <span class="strong" style="color: #FCF9F1; font-size: 12px;">Details Of Monthly E-Return</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-xs-3 col-sm-4">
+                                    <div class="row">
+                                        <span style="color: #FCF9F1; font-size: 12px;">Financial Year</span><br />
+                                        <div class="col-sm-6 col-lg-6 col-md-6">
+                                            @Html.DropDownListFor(model => model.Years, ViewBag.ViewFYList as IEnumerable<SelectListItem>, new { @class = "form-control", autofocus = "autofocus", required = "required" })
+                                        </div>
+                                        <div class="col-sm-6 col-lg-6 col-md-6">
+
+                                        </div>
+
+                                    </div>
+                                </div>
+                                <div class="col-xs-3 col-sm-4">
+                                    <div class="row">
+                                        <span class="lead" style="color: #FCF9F1;font-size: 12px;">
+                                            <label id="FormType"></label>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <div class="row" style="margin-top:30px">
+                            <div class="col-sm-12">
+                                <div class="table-responsive" id="viewtable">
+                                    <table id="tblMonthly" class="table table-sm table-bordered">
+                                        <thead>
+                                            <tr>
+
+
+                                                <th>
+
+                                                    Month-Year
+                                                </th>
+                                                <th>
+
+                                                    Status
+                                                </th>
+                                                <th>
+                                                    Modified On
+                                                </th>
+                                                <th>
+                                                    FILL
+                                                </th>
+                                                <th>
+                                                    Print
+                                                </th>
+                                                  
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                        </tbody>
+                                    </table>
+                                </div>
+
+
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<script>
+    excelMe = "yes"
+    pdfMe = "yes"
+    printMe = "yes"
+
+
+
+    $(document).ready(function () {
+        loadNavigation('ViewPaymentHead', 'glTMng', 'plpaymenthead', 'tl', 'e-Return', 'Monthly Return', ' ');
+
+        $('.searchableselect').searchableselect();
+
+        $('#datatable').DataTable();
+
+        $('.shorting-lnk').click(function () {
+            $('.shorting-lnk i').toggleClass('fa-sort-amount-up-alt fa-sort-amount-down-alt ');
+        });
+        $('.filter-dropdown').hide();
+        $('.filter-lnk').click(function () {
+            $(this).toggleClass('active');
+            $(this).siblings('.filter-dropdown').slideToggle();
+        });
+        $('.filter-btn').click(function () {
+            $(this).parent('.shorting-cell .filter-dropdown').slideUp();
+            if ($(this).parent().parent('.shorting-cell').find('.filter-lnk').hasClass('active')) {
+                $(this).parent().siblings('.filter-lnk').removeClass('active');
+            }
+
+        });
+    });
+</script>
+
+<script>
+    var WindowH = $(window).height();
+    $('.content').height(WindowH - 275);
+    $(window).resize(function () {
+        var WindowH = $(window).height();
+        $('.content').height(WindowH - 275);
+    });
+
+    $(document).ready(function () {
+
+        getMonthlyReturn();
+    })
+    function getMonthlyReturn() {
+        try {
+
+            var Fyear = $("#Years").val();
+            var d = new Date();
+            n = d.getMonth() + 1;
+            Y = d.getFullYear();
+
+
+
+            $.ajax({
+
+                type: "POST",
+                url: '@Url.Action("GetMonthlyReturn", "eReturnProcess", new { Area = "eReturn_NonCoal" })',
+                data: { 'FinancialYear': Fyear },
+                cache: false,
+
+                datatype: "JSON",
+                success: function (result) {
+
+                    $("#tblMonthly tbody").empty();
+
+                    //Here mineralTypename should be get from user session as per the login By Debaraj Swain
+
+                     var _MineralType = 'Major Mineral';
+
+                    // End  //
+                    if (result != null) {
+                        if (_MineralType == "Minor Mineral") {
+                            $('#tblMonthly tbody').append('<tr><td colspan="5"><hr style="margin: 0px" /></td> </tr>')
+                            for (i = 0; i < result.length; i++) {
+                                $('#tblMonthly tbody').append('<tr><td style="width: 30%;"><span class="strong" style="color: #484827; font-size: 14px;">'
+                                  + result[i].monthYear + '</span></td><td style="width: 20%; text-align: center; border-left: 1px solid #70ADD6;"><span class="strong" style="color: #4848279; font-size: 14px;">'
+                                  + (result[i].status) + '</td><td style="width: 20%; text-align: center; border-left: 1px solid #70ADD6;"><span class="strong" style="color: #4848279; font-size: 14px;">'
+                                  + result[i].modifiedOn
+                                  + '</span></td><td style="width: 15%; text-align:center; border-left: 1px solid #70ADD6;">' +
+
+                                    (result[i].status != 'Filled' ? '<a href="' + '@Url.Action("FormXV", "MinorEReturn", new { Area = "eReturn" })' + '?MonthYear=' + result[i].monthYear + '"><input type="button" value="FILL" id="FILL"  style="background-color: #8d3610; color: #FCF9F1;width: 100px" />': '')
+
+                                  + '</a></td><td style="width: 15%; text-align:center; border-left: 1px solid #70ADD6;">' +
+                                    (result[i].status == 'Filled' ? '<a href="' + '@Url.Action("FormXVPrint", "MinorEReturn", new { Area = "eReturn" })' + '?Month_Year=' + result[i].monthYear + '"><input type="button" value="Print" id="Print"  style="  text-align:center; background-color: #8d3610; color: #FCF9F1;width: 100px " />' : '')
+                                   + '</a></td> </tr>')
+
+                                $('#tblMonthly tbody').append('<tr><td colspan="5"><hr style="margin: 0px" /></td> </tr>')
+                                if (result[i].formType != null && result[i].formType != '') {
+                                    $("#FormType").text(result[i].formType);
+                                }
+                                else { $("#FormType").text('Form XV'); }
+                            }
+                        }
+                        else {
+                            if (result[0].mineralName != 'Coal') {
+                                if (result[0].mineralName == 'Iron ore' || result[0].mineralName == 'Limestone' || result[0].mineralName == 'Graphite' || result[0].mineralName == 'Bauxite' || result[0].mineralName == 'Moulding Sand' || result[0].mineralName == 'Dolomite') {
+                                    $('#tblMonthly tbody').append('<tr><td colspan="5"><hr style="margin: 0px" /></td> </tr>')
+                                    for (i = 0; i < result.length; i++) {
+                                        $('#tblMonthly tbody').append('<tr><td>'
+                                          + result[i].monthYear + '</td>'+
+                                            (result[i].status == 'Filled' ? '<td class="text-success">' + result[i].status + '</td>' : '<td class="text-success">' + result[i].status + '</td>')
+                                          +'<td>'+ result[i].modifiedOn+'</td>'
+                                          + '<td>' +
+
+                                            (result[i].status != 'Filled' ? '<a class="btn-outline-primary btn-sm" href="' + '@Url.Action("PartOne", "eReturnProcess", new { Area = "eReturn_NonCoal" })' + '?MonthYear=' + result[i].encryptedId + '"><input type="button" value="FILL" id="FILL" style="background-color: #8d3610; color: #FCF9F1; width: 100px" />' : '')
+
+                                          + '</a></td><td>' +
+                                            (result[i].status == 'Filled' ? '<a class="btn-outline-primary btn-sm" href="' + '@Url.Action("GeteReturnFormOneDetails", "eReturnProcess", new { Area = "eReturn_NonCoal" })' + '?Month_Year=' + result[i].encryptedId + '"><input type="button" value="Print" id="Print"  style=" text-align:center; background-color: #8d3610; color: #FCF9F1;width: 100px " />' : '')
+                                           + '</a></td> </tr>')
+
+                                        $('#tblMonthly tbody').append('<tr><td colspan="5"><hr style="margin: 0px" /></td> </tr>')
+                                        if (result[i].formType != null && result[i].formType != '') {
+                                            $("#FormType").text(result[i].formType);
+                                        }
+                                        else { $("#FormType").text('Form F1'); }
+                                    }
+                                }
+                                else if (result[0].mineralName == 'Tin Ore' || result[0].mineralName == 'Copper' || result[0].mineralName == 'Gold' || result[0].mineralName == 'Lead' || result[0].mineralName == 'Pyrites' || result[0].mineralName == 'Tin' || result[0].mineralName == 'Tungsten' || result[0].mineralName == 'Zinc') {
+                                    $('#tblMonthly tbody').append('<tr><td colspan="5"><hr style="margin: 0px" /></td> </tr>')
+                                    for (i = 0; i < result.length; i++) {
+                                        $('#tblMonthly tbody').append('<tr><td>'
+                                          + result[i].monthYear + '</td>'+
+                                            (result[i].status == 'Filled' ? '<td class="text-success">' + result[i].status + '</td>' : '<td class="text-success">' + result[i].status + '</td>')
+                                          +'<td>'+result[i].modifiedOn+'</td>'
+                                          + '<td>' +
+
+                                            (result[i].status != 'Filled' ? '<a class="btn-outline-primary btn-sm" href="' + '@Url.Action("PartOneForm2", "eReturmForm2", new { Area = "eReturn_NonCoal" })' + '?MonthYear=' + result[i].encryptedId + '"><input type="button" value="FILL" id="FILL" style="background-color: #8d3610; color: #FCF9F1;width: 100px" />': '')
+
+                                          + '</a></td><td>' +
+                                            (result[i].status == 'Filled' ? '<a class="btn-outline-primary btn-sm" href="' + '@Url.Action("PrintFormF2", "eReturmForm2", new { Area = "eReturn_NonCoal" })' + '?MonthYear=' + result[i].encryptedId + '"><input type="button" value="Print" id="Print" c style="background-color: #8d3610; color: #FCF9F1;width: 100px" />' : '')
+                                           + '</a></td> </tr>')
+
+                                        $('#tblMonthly tbody').append('<tr><td colspan="5"><hr style="margin: 0px" /></td> </tr>')
+
+                                        if (result[i].formType != null && result[i].formType != '') {
+                                            $("#FormType").text(result[i].formType);
+                                        }
+                                        else { $("#FormType").text('Form F2'); }
+                                    }
+                                }
+                                else if (result[0].mineralName == 'Precious stone' || result[0].mineralName == 'Semi-precious stone') {
+                                    $('#tblMonthly tbody').append('<tr><td colspan="5"><hr style="margin: 0px" /></td> </tr>')
+                                    for (i = 0; i < result.length; i++) {
+                                        $('#tblMonthly tbody').append('<tr><td style="width: 30%;"><span class="strong" style="color: #484827; font-size: 14px;">'
+                                          + result[i].monthYear + '</span></td><td style="width: 20%; text-align: center; border-left: 1px solid #70ADD6;"><span class="strong" style="color: #4848279; font-size: 14px;">'
+                                          + (result[i].status) + '</td><td style="width: 20%; text-align: center; border-left: 1px solid #70ADD6;"><span class="strong" style="color: #4848279; font-size: 14px;">'
+                                          + result[i].modifiedOn
+                                          + '</span></td><td style="width: 15%; text-align:center; border-left: 1px solid #70ADD6;">' +
+
+                                            (result[i].status != 'Filled' ? '<a href="' + '@Url.Action("PartOneForm3", "eRetrunForm3", new { Area = "eReturn" })' + '?MonthYear=' + result[i].monthYear + '"><input type="button" value="FILL" id="FILL"  style="float: right; background-color:#8d3610; color: #FCF9F1; margin-right: 40px;width: 100px" />': '')
+
+                                          + '</a></td><td style="width: 15%; text-align:center; border-left: 1px solid #70ADD6;">' +
+                                            (result[i].status == 'Filled' ? '<a href="#"><input type="button" value="Print" id="Print"  style="float: right; background-color: #8d3610; color: #FCF9F1; margin-right: 35px;width: 100px" />' : '')
+                                           + '</a></td> </tr>')
+                                        $('#tblMonthly tbody').append('<tr><td colspan="5"><hr style="margin: 0px" /></td> </tr>')
+                                        if (result[i].formType != null && result[i].formType != '') {
+                                            $("#FormType").text(result[i].formType);
+                                        }
+                                        else { $("#FormType").text('Form F3'); }
+                                    }
+                                }
+                    }
+                    else {
+                        $('#tblMonthly tbody').append('<tr><td colspan="5"><hr style="margin: 0px" /></td> </tr>')
+                        for (i = 0; i < result.length; i++) {
+                            $('#tblMonthly tbody').append('<tr><td>'
+                              + result[i].monthYear + '</td>'+
+                                (result[i].status == 'Filled' ? '<td class="text-success">' + result[i].status + '</td>' : '<td class="text-success">' + result[i].status + '</td>')
+                              +'<td>'+ result[i].modifiedOn+'</td>'
+                              + '<td>' +
+
+                                (result[i].status != 'Filled' ? '<a class="btn-outline-primary btn-sm" href="' + '@Url.Action("FORMII", "EReturnCoal", new { Area = "EReturnCoal" })' + '?MonthYear=' + result[i].encryptedId + '"><input type="button" value="FILL" id="FILL"  style="background-color: #8d3610; color: #FCF9F1;width: 100px " />': '')
+
+
+                                      + '</a></td><td>' +
+                                (result[i].Status == 'Filled' ? '<a class="btn-outline-primary btn-sm" href="' + '@Url.Action("PrintCoalFIRSTSCHEDULE_FORMII", "EReturnCoal", new { Area = "EReturnCoal" })' + '?Month_Year=' + result[i].encryptedId + '"><input type="button" value="Print" id="Print" style="background-color: #8d3610; color: #FCF9F1;width: 100px" />' : '')
+                                       + '</a></td> </tr>')
+                            $('#tblMonthly tbody').append('<tr><td colspan="5"><hr style="margin: 0px" /></td> </tr>')
+                            if (result[i].formType != null && result[i].formType != '') {
+                                $("#FormType").text(result[i].formType);
+                            }
+                            else { $("#FormType").text('FIRST SCHEDULE FORM II'); } 
+                        }
+                    }
+                }
+            }
+
+                }
+            });
+}
+    catch (e)
+    { }
+}
+</script>
+

@@ -1,0 +1,280 @@
+﻿using Microsoft.AspNetCore.Http;
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Text;
+
+namespace userregistrationEF
+{
+    public class LicenseApplication
+    {
+
+        public int? SRNO { get; set; }
+        public int? LicenseAppId { get; set; }
+        public int? DistrictId { get; set; }
+        public string DistrictName { get; set; }
+        public int? MINERAL_ID { get; set; }
+        public int? MineralTypeId { get; set; }
+        public string MINERALTYPE_NAME { get; set; }
+        public string MINERAL_NAME { get; set; }
+
+        //public decimal? StorageCapicity { get; set; }
+        public string StorageCapicity { get; set; }
+        //public decimal? Period { get; set; }
+        public string Period { get; set; }
+
+        public string Panchayat { get; set; }
+        public string PoliceStation { get; set; }
+
+        public string Place { get; set; }
+        public string ApplicantName { get; set; }
+        public string CompleteAddress { get; set; }
+
+        public int? CompanyId { get; set; }
+        public string CompanyName { get; set; }
+
+        public int? AppVillageId { get; set; }
+        public string AppVillageName { get; set; }
+        public int? AppTehsilId { get; set; }
+        public string AppTehsilName { get; set; }
+        public int? AppDistrictId { get; set; }
+        public string AppDistrictName { get; set; }
+        public int? ApplicantTypeId { get; set; }
+        public string ApplicantTypeName { get; set; }
+        public string SecurityDepositLastDate { get; set; }
+
+        public string NatureofBusiness { get; set; }
+        public string Form4Path { get; set; }
+        public string Form6Path { get; set; }
+
+        public int? IntendMineralProductId { get; set; }
+        public string IntendMineralProductName { get; set; }
+
+        // public HttpPostedFileBase NO_MINING_DUE_CERTIFICATE { get; set; }
+        public string NO_MINING_DUE_CERTIFICATE_FILE_PATH { get; set; }
+        public string NO_MINING_DUE_CERTIFICATE_FILE_NAME { get; set; }
+
+        // public HttpPostedFileBase AFFIDAVITE { get; set; }
+        public string AFFIDAVITE_FILE_PATH { get; set; }
+        public string AFFIDAVITE_FILE_NAME { get; set; }
+
+        // public HttpPostedFileBase AFFIDAVITE_JOINTLY { get; set; }
+        public string AFFIDAVITE_JOINTLY_FILE_PATH { get; set; }
+        public string AFFIDAVITE_JOINTLY_FILE_NAME { get; set; }
+
+        //  public HttpPostedFileBase MAP_LAND_CERTIFICATE { get; set; }
+        public string MAP_LAND_CERTIFICATE_FILE_PATH { get; set; }
+        public string MAP_LAND_CERTIFICATE_FILE_NAME { get; set; }
+
+
+        // public HttpPostedFileBase LATEST_REVENEW_CERTIFICATE { get; set; }
+        public string LATEST_REVENEW_CERTIFICATE_FILE_PATH { get; set; }
+        public string LATEST_REVENEW_CERTIFICATE_FILE_NAME { get; set; }
+
+        // public HttpPostedFileBase OWNER_LAND_CERTIFICATE { get; set; }
+        public string OWNER_LAND_CERTIFICATE_FILE_PATH { get; set; }
+        public string OWNER_LAND_CERTIFICATE_FILE_NAME { get; set; }
+
+
+        // public HttpPostedFileBase NOC_OTHER_CERTIFICATE { get; set; }
+        public string NOC_OTHER_CERTIFICATE_FILE_PATH { get; set; }
+        public string NOC_OTHER_CERTIFICATE_FILE_NAME { get; set; }
+
+        public string MineralFormName { get; set; }
+        public string MineralGradeName { get; set; }
+        public int? FF_MineralTypeId { get; set; }
+        public string MINERAL_Count_String { get; set; }
+        public string MINERAL_FORM_String { get; set; }
+        public string MINERAL_GRADE_String { get; set; }
+
+        public string MobileNo { get; set; }
+         
+        public string EmailAddress { get; set; }
+        public string LICENSE_APP_CODE { get; set; }
+        public DateTime SubmissionDate { get; set; }
+        public string ApplicationReceivedDate { get; set; }
+        public string PaymentRecieptId { get; set; }
+        public string PAYMENTID { get; set; }
+        public decimal? TotalPayment { get; set; }
+        public string Status { get; set; }
+        public string ActiveStatus { get; set; }
+        public string Action { get; set; }
+
+        public string GrantOrderNo { get; set; }
+        public string GrantOrderDate { get; set; }
+        public string Remarks { get; set; }
+
+        public string TransactionalID { get; set; }
+        public string DSCLesseeFilePath { get; set; }
+        public string GeneratedBy { get; set; }
+        public string GeneratedDesignation { get; set; }
+        public string GeneratedDateTime { get; set; }
+        public string GeneratedDSC { get; set; }
+        public string ChallanNumber { get; set; }
+        public string ChallanDate { get; set; }
+        public string PaymentMode { get; set; }
+        public string PaymentBank { get; set; }
+
+        public string ApplicationFor { get; set; }
+        public int? LicenseeTypeId { get; set; }
+        public string LicenseeTypeName { get; set; }
+        public string LicenseTypeName { get; set; }
+        public int? MineralId { get; set; }
+        public string MineralName { get; set; }
+
+        public string North { get; set; }
+        public string East { get; set; }
+        public string West { get; set; }
+        public string South { get; set; }
+
+        public string SecurityAmount { get; set; }
+        public string SecurityDate { get; set; }
+        public string SecurityReceipteNo { get; set; }
+        public string SecurityBank { get; set; }
+        public string SecurityMode { get; set; }
+
+        public string SecurityAmountChallanNumber { get; set; }
+
+        public string SecurityAmountTreasuryDate { get; set; }
+        public string SecurityAmountTreasuryNumber { get; set; }
+
+        public string P_Mode { get; set; }
+        public string NetBanking_mode { get; set; }
+
+        public List<MineralAssignment> MineralCount { get; set; }
+        public List<string> Conditions { get; set; }
+        public List<int?> Mineral_Count { get; set; }
+        public List<CapacityQuantityModel> QuantityList { get; set; }
+        public List<int?> MineralGradeCount { get; set; }
+        public List<int?> MineralFormCount { get; set; }
+
+        public int? UserId { get; set; }
+        public int? UserLoginId { get; set; }
+        public int? MineralNatureId { get; set; }
+        public string MineralNature { get; set; }
+
+        public int? MineralGradeId { get; set; }
+        public string MineralGrade { get; set; }
+
+        public int? TehsilID { get; set; }
+        public string TehsilName { get; set; }
+
+        public int? VillageID { get; set; }
+        public string VillageName { get; set; }
+        public string MineralIdList { get; set; }
+        public DateTime? PaymentDoneDate { get; set; }
+
+
+        public string FromDate { get; set; }
+        public string ToDate { get; set; }
+
+        public int? LicenseType { get; set; } 
+        public string Form4FilePath { get; set; }
+        public string Form6FilePath { get; set; }
+        public string StatusId { get; set; }
+        
+        public int? ExtendDeedNoOfDays { get; set; }
+        public string ExtendedDeedStatus { get; set; }
+        public string DeedFineAmount { get; set; }
+        public string DeedAmountDate { get; set; }
+        public string DeedReceiptNo { get; set; }
+        public string DeedBankName { get; set; }
+        public string DeedAmountMode { get; set; }
+        public string ValidityStatus { get; set; }
+        public decimal? DeedFineAmountPaid { get; set; } 
+        public string Lease_Deed_File_Name { get; set; }
+        public string Lease_Deed_File_Path { get; set; }
+        public string LeaseUploadLastDate { get; set; }
+        public string ApproveExtendedDeedStatus { get; set; }
+        public int? Lease_Deed_Validity { get; set; }
+        public string MineralNatureList { get; set; }
+        public string ApplicantType { get; set; }
+        public int? AppliedBy { get; set; }
+        public string AppliedName { get; set; }
+        public string UserName { get; set; }
+        public string AppliedApplicantName { get; set; }
+        public string LeaseUploadFirstDate { get; set; } 
+        public class MineralAssignment
+        {
+            public int? Value { get; set; }
+        }
+
+        public class CapacityQuantityModel
+        {
+            public CapacityQuantityModel()
+            {
+                ID = 0;
+                MineralId = 0;
+                Quantity = 0;
+                MineralName = "";
+            }
+            public int? ID { get; set; }
+            public int? MineralId { get; set; }
+            public decimal? Quantity { get; set; }
+            public string MineralName { get; set; } 
+            
+        }
+    }
+
+    public class CreateLicenseApplication : LicenseApplication
+    {
+        public IFormFile NO_MINING_DUE_CERTIFICATE { get; set; }
+        public IFormFile AFFIDAVITE { get; set; }
+        public IFormFile AFFIDAVITE_JOINTLY { get; set; }
+        public IFormFile MAP_LAND_CERTIFICATE { get; set; }
+        public IFormFile LATEST_REVENEW_CERTIFICATE { get; set; }
+        public IFormFile OWNER_LAND_CERTIFICATE { get; set; }
+        public IFormFile NOC_OTHER_CERTIFICATE { get; set; }
+        public DataTable dataTable { get; set; }
+        public string _mineralId { get; set; }
+        public string _mineralForm { get; set; }
+        public string _mineralGrade { get; set; }
+
+    }
+
+    public class LicenseeCondition
+    {
+        public int? LicenseeConditionId { get; set; }
+        public string LicenseeConditionName { get; set; }
+    }
+
+    public class LicenseFinalApproval
+    {
+        public string MOBILENO { get; set; }
+        public string EMAILADDRESS { get; set; }
+        public string APPLICANTNAME { get; set; }
+        public string LICENSE_APP_CODE { get; set; }
+        public string USERNAME { get; set; }
+        public string PASSWORD { get; set; }
+        public string application_tyep { get; set; }
+        public string Status { get; set; }
+        public string License_SI_NO { get; set; }
+        public string ApprovedGrantOn { get; set; }
+    }
+
+    public class LeaseDeedModel
+    {
+        public int? LicenseAppId { get; set; }
+        public int? UserId { get; set; }
+        public IFormFile LeaseDeedFile { get; set; }
+        public string Lease_Deed_File_Path { get; set; }
+        public string Lease_Deed_File_Name { get; set; }
+        public int? ApprovedDeedBy { get; set; }
+        public int? ExtendDeedNoOfDays { get; set; }
+        public string ExtendedDeedStatus { get; set; }
+        public string SecurityDate { get; set; } 
+        public string DeedFineAmount { get; set; }
+        public string DeedAmountDate { get; set; }
+        public string DeedReceiptNo { get; set; }
+        public string DeedBankName { get; set; }
+        public string DeedAmountMode { get; set; }
+        public string ValidityStatus { get; set; }
+        public decimal? DeedFineAmountPaid { get; set; } 
+        public string LeaseUploadLastDate { get; set; }
+        public string LeaseUploadFirstDate { get; set; }
+        public string ApproveExtendedDeedStatus { get; set; }
+        public int? Lease_Deed_Validity { get; set; }
+        public string ActiveStatus { get; set; }
+    }
+
+}

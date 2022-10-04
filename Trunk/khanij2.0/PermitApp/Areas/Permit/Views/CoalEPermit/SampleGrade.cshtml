@@ -1,0 +1,114 @@
+﻿@model PermitEF.SampleGradeModel
+@using PermitApp.Helper;
+@{
+    ViewData["Title"] = "Sample Grade List";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+
+<section class="wrapper main-wrapper row">
+    <div class="col-12" id="mainDiv">
+        @Html.Partial("_CMSnavigation")
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                   
+                    @Html.Partial("_CMSutil")
+                </div>
+
+                <section class="box form-container">
+
+                        <div class="content-body">
+
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <table id="table-exports" class="table table-sm table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th width="10">Sl No.</th>
+                                                <th>Lessee Name</th>
+                                                <th>E-Permit No</th>
+                                                <th>Mineral Name</th>
+                                                <th>Mineral Form</th>
+                                                <th>Mineral Grade</th>
+                                                <th>Dispatch Qty</th>
+                                                <th>Updated Grade Qty</th>
+                                                <th>Updated Grade</th>
+                                                <th>Updated Grade Date</th>
+                                                <th>Pending For Update Grade</th>
+                                                <th>Payment Details</th>
+                                                <th>Payment Status</th>
+                                                <th>Grade Update</th>
+
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach (var b in ViewBag.ViewList)
+                                            {
+                                            <tr class="active-row">
+                                                <td>@b.SRNumber</td>
+
+                                                <td>
+                                                    @b.LesseeName
+                                                </td>
+
+                                                <td>@b.BulkPermitNo</td>
+                                                <td>@b.MineralName</td>
+                                                <td>@b.MineralNature</td>
+                                                <td>@b.PermitGrade</td>
+
+                                                <td>@b.DipatchQty</td>
+                                                <td>
+                                                    @b.UpdateGradeQty
+                                                </td>
+                                                <td>
+                                                    @b.Updatedgrade
+                                                </td>
+                                                <td>
+                                                    @b.UpdateGradeDate
+                                                </td>
+                                                <td>
+                                                    @b.PendingforUpdateGrade
+                                                </td>
+                                                <td>
+                                                    @b.PaymentDetails
+                                                </td>
+                                                @if(b.PaymentDetails=="Payment Verification Pending")
+                                                {
+                                                <td><a class='btn btn-primary' style='cursor: pointer; cursor: hand;' onclick=CheckPaymentStatus(@b.BulkPermitId)>@b.PaymentStatus</a></td>
+                                                }
+                                                else
+                                                {
+                                                <td>
+                                                    @b.PaymentStatus
+                                                </td>
+                                                }
+                                                @if(b.UpdateGradeStatus=="PENDING")
+                                                {
+                                                <td>
+                                                    <a class='btn btn-primary' style='cursor: pointer; cursor: hand;' href="@CustomQueryStringHelper.EncryptString("Permit","UpdateSampleGrade","CoalEPermit",new {BulkPermitId=@b.BulkPermitId })">Update Grade</a>
+                                                </td>
+                                                }
+                                                else
+                                                {
+                                                <td>
+                                                    @b.UpdateGradeStatus
+                                                </td>
+                                                }
+
+                                            </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+
+
+                                </div>
+                            </div>
+                        </div>
+                   
+                </section>
+            </div>
+        </div>
+    </div>
+    <!-- MAIN CONTENT AREA ENDS -->
+</section>

@@ -1,0 +1,173 @@
+﻿@model IEnumerable<EpassEF.ViewModel.PurchaserConsigneeByPermitIdViewModel>
+@{
+    ViewData["Title"] = "PurchaserConsigneeByPermitId";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+@inject EpassApp.KhanijSecurity.KhanijIDataProtection protector;
+@if ((TempData["AckMsg"] != null))
+
+{
+    <script>
+        if ('@TempData["AckMsg"]' != null) {
+                swal("", '@TempData["AckMsg"]', "warning");
+
+
+        }
+    </script>
+}
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        @*<uc1:navigation runat="server" ID="navigation" />*@
+        @Html.Partial("_CMSnavigation")
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+
+                        <li class="nav-item">
+                            <a class="nav-link active" href="javascript:void(0);">
+                                Purchaser Consignee
+                            </a>
+                        </li>
+                    </ul>
+                    @*<uc1:util runat="server" ID="util" />*@
+                    @Html.Partial("_CMSutil")
+                </div>
+
+                <section class="box form-container">
+                    <div class="search-box">
+                        <div class="searchform px-3 pt-3">
+                            <div class="row">
+
+
+                                <div class="col-sm-4">
+                                    <div class="form-group row">
+                                        <label for="inputText" class="col-sm-3 col-form-label">
+                                            From Date
+                                        </label>
+                                        <div class="col-sm-8">
+                                            <div class="input-group">
+                                                <input type="text" class="form-control datepicker" id="inputDate1">
+                                                <div class="input-group-prepend">
+                                                    <label class="input-group-text" for="inputDate1"><i class="far fa-calendar"></i></label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-4">
+                                    <div class="form-group row">
+                                        <label for="inputText" class="col-sm-3 col-form-label">
+                                            To Date
+                                        </label>
+                                        <div class="col-sm-8">
+                                            <div class="input-group">
+                                                <input type="text" class="form-control datepicker" id="inputDate2">
+                                                <div class="input-group-prepend">
+                                                    <label class="input-group-text" for="inputDate2"><i class="far fa-calendar"></i></label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+
+                                <div class="col-sm-2">
+                                    <a href="#" class="btn btn-sm btn-success m-0 waves-effect waves-light"> Show </a>
+                                </div>
+
+
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="content-body pt-0">
+                        <a class="btn btn-success mt-3" href="@Url.Content("~/Epass/PurchaserConsignee/AddPurchaserConsignee?id="+@TempData["BulkpermitId"])">Add New</a>
+                        <div class="legend-box">
+                            <ul class="d-flex mb-1 justify-content-end list-unstyled">
+                                <li><span class="bg-success"></span> Active</li>
+                                <li><span class="bg-warning"></span> Inactive</li>
+                            </ul>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-12">
+
+
+                                <table id="table-exports" class="table table-sm table-bordered">
+
+                                    @if (Enumerable.Count(Model) != 0)
+                                    {
+                                        <thead>
+                                            <tr>
+
+                                                <th>Sl#</th>
+                                                <th>E-Permit No.</th>
+                                                <th>Purchaser Consignee Name</th>
+                                                <th>Destination</th>
+                                                <th>Transportation Mode</th>
+                                                <th>Route Name</th>
+                                                <th>Check Post Name</th>
+                                                <th>RPT Generated By</th>
+                                                <th width="50" class="noprint">Action</th>
+                                            </tr>
+                                        </thead>
+
+                                        <tbody>
+                                            @{ int i = 1;
+                                            }
+                                            @*@foreach (var Permit in ViewBag.Consignee)*@
+                                            @foreach (var Permit in Model)
+                                            {
+                                                <tr class="active-row">
+                                                    <td>@i</td>
+                                                    <td>@Permit.BulkPermitNo</td>
+                                                    <td>@Permit.PurchaserConsigneeName</td>
+                                                    <td>@Permit.Destination</td>
+                                                    <td>@Permit.TransportationMode</td>
+                                                    <td>@Permit.RouteName</td>
+                                                    <td>@Permit.CheckPostName</td>
+                                                    <td>@Permit.RCR_RTP_BY</td>
+
+                                                    <td>
+                                                        @*<a class="btn btn-info btn-sm" name="#BackendProcced" href="@Url.Action("AddPurchaserConsignee", "PurchaserConsignee", new { Area = "Epass" })?Pcid=@Permit.PCId&BULKPERMITID=@Permit.BulkPermitId"
+                                           class="btn-floating btn-outline-primary btn-sm"
+                                           title="Take Action" id="BackendProcced">Edit</a>
+                                        @Html.ActionLink("Delete", "", "");*@
+
+                                                        <a class="text-danger btn-sm" name="#BackendProcced" href="@Url.Action("Delete", "PurchaserConsignee", new { Area = "Epass" })?id=@Permit.PCId&bulkid=@Permit.BulkPermitId"
+                                                          
+                                                           title="Delete" id="BackendProcced" onclick="return confirm('Are you sure you want to delete?');">
+                                                            <i class="icon-trash-alt-solid"></i></a>
+                                                    </td>
+                                                </tr>
+                                                i++;
+                                            }
+
+
+
+                                        </tbody>
+                                    }
+
+                                    else
+                                    {
+                                        <tr>
+                                            <td>No Data Found</td>
+
+                                        </tr>
+                                    }
+                                </table>
+
+
+
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+    <!-- MAIN CONTENT AREA ENDS -->
+</section>

@@ -1,0 +1,195 @@
+﻿@*// *********************************************************************************************************
+    //  View Name                : GrievanceComplaint_List
+    //  Desciption               : Show all grievance complaint list
+    //  Created By               : Debaraj Swain
+    //  Created On               : 27 May 2021
+    // ********************************************************************************************************
+*@
+@using SupportApp.Web;
+@model SupportEF.PublicGrievanceModel
+@{
+    ViewData["Title"] = "Grievance Requests";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        @Html.Partial("_CMSnavigation")
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="@Url.Action("GrievanceComplaint_List", "Grievance")">
+                                Grievance Complaint List
+                            </a>
+                        </li>
+                    </ul>
+                    @Html.Partial("_CMSutil")
+                </div>
+                <section class="box form-container">
+                    <div class="content-body pt-0">
+                        <div class="legend-box">
+                            <ul class="d-flex mb-1 justify-content-end list-unstyled">
+                                <li><span class="bg-success"></span> Active</li>
+                                <li><span class="bg-warning"></span> Inactive</li>
+                            </ul>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <table id="table-exports" class="table table-sm table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>Complaint No.</th>
+                                            <th>Subject of Complaint</th>
+                                            <th>Name of Complainer</th>
+                                            <th>Complain related to Person</th>
+                                            <th>Date of Complaint</th>
+                                            <th>District Name</th>
+                                            <th>Status</th>
+                                            <th>Complaint Solving Date</th>
+                                            <th>Remarks</th>
+                                            <th>Complaint Attachment</th>
+                                            <th>View Details</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var b in ViewBag.GCAllReport)
+                                        {
+                                            <tr class="active-row">
+                                                <td><p class="m-0">@b.ComplaintNumber <input type="hidden" id="hfComplaindID" name="ComplainedID" value=@b.GRIEVANCE_COMPLAINT_ID /></p> </td>
+                                                <td><p class="m-0">@b.SUBJECT_OF_COMPLAINT</p> </td>
+                                                <td><p class="m-0">@b.NAME_OF_COMPLAINER</p> </td>
+                                                <td><p class="m-0">@b.TO_WHOM_AGAINST_COMPLAINT</p> </td>
+                                                <td><p class="m-0">@b.Date</p> </td>
+                                                <td><p class="m-0">@b.DISTRICT_NAME</p> </td>
+                                                <td><p class="m-0">@b.Complaint_Status</p> </td>
+                                                <td><p class="m-0">@b.FromDate</p> </td>
+                                                <td><p class="m-0">@b.MINING_INSPECTER_REMARKS</p> </td>
+                                                <td>
+                                                    <p class="m-0">
+                                                        @if (!string.Equals(@b.ATTACHMENT_FILE_NAME, ""))
+                                                        {
+                                                            <a href="@CustomQueryStringHelper.EncryptString("Grievance","DownloadFiles","Grievance",new {filename=@b.ATTACHMENT_FILE_NAME,foldername = "Register" })">
+                                                                @*<a href="@Url.Action("DownloadFiles", "Grievance", new { filename = @b.ATTACHMENT_FILE_NAME, foldername = "Register" })">*@
+                                                                <i class="icon-download-solid"></i>
+                                                            </a>
+                                                        }
+                                                        else
+                                                        {
+                                                            <a href="#">
+                                                                No Files
+                                                            </a>
+                                                        }
+                                                    </p>
+                                                </td>
+                                                <td>
+                                                    <p class="m-0">
+                                                        <a href="@CustomQueryStringHelper.EncryptString("Grievance","Register","Grievance",new {id=@b.GRIEVANCE_COMPLAINT_ID })" class="btn btn-primary btn-md ml-0" title="View Details">View Details</a>
+                                                        @*<a href="@Url.Content("~/Grievance/Grievance/Register/")@b.GRIEVANCE_COMPLAINT_ID" class="btn btn-primary btn-md ml-0" title="View Details">View Details</a>*@
+                                                    </p>
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+</section>
+<script type="text/javascript">
+    function onBtnForwardSubmit() {
+        debugger;
+
+        var _UserType = $("#UserType option:selected").val();
+
+        var _MINING_INSPECTER_ID = $("#MINING_INSPECTER_ID option:selected").val();
+        var _COC = $("#COC option:selected").val();
+        var _DD_DMO_REMARKS = $("#DD_DMO_REMARKS").val();
+
+        if (_UserType == null || _UserType == 0 || _UserType == "") {
+            alert("User Type Required !");
+            return false;
+        }
+        if (_MINING_INSPECTER_ID == null || _MINING_INSPECTER_ID == 0 || _MINING_INSPECTER_ID == "") {
+            alert("MI (Mining Inspector) / AMO (Asistant Mining Officer) Required !");
+            return false;
+        }
+        if (_DD_DMO_REMARKS == null || _DD_DMO_REMARKS == 0 || _DD_DMO_REMARKS == "") {
+            alert("Remarks Required !");
+            return false;
+        }
+        $.ajax({
+            type: "POST",
+
+            url: "/Grievance/Grievance/SendGrievanceComplaintToMiningInspector",
+
+
+            data: {
+                "GRIEVANCE_COMPLAINT_ID": $("#hidupdate").val(),
+                "ACTIVE_STATUS": $("#ACTIVE_STATUS").val(),
+                "DD_DMO_REMARKS": _DD_DMO_REMARKS,
+                "MINING_INSPECTER_ID": _MINING_INSPECTER_ID,
+                "UserType": _UserType,
+                "COC": _COC
+            },
+            dataType: "json",
+            success: function (result) {
+                if (result != null) {
+                    if (result == "1") {
+                        swal("","Complaint request forwarded successfully","success");
+                    }
+                    else if (result == "4") {
+                        swal("", "Enter all required fields !", "warning");
+                    }
+
+                    else {
+                        swal("", "Complaint request not forwarded !", "warning");
+                    }
+                    setTimeout(function () {
+                                window.location.href = '@Url.Action("GetGrievanceComplaint_List_For_DD", "Grievance")'
+                            }, 5000);
+                }
+
+            }
+        });
+    }
+</script>
+<script>
+    $(document).ready(function () {
+        loadNavigation('GrievanceComplaint_List', 'glTMng', 'plpaymenthead', 'tl', 'Grievance', 'Grievance Complaint List', ' ');
+        $('.searchableselect').searchableselect();
+        $('.shorting-lnk').click(function () {
+            $('.shorting-lnk i').toggleClass('fa-sort-amount-up-alt fa-sort-amount-down-alt ');
+        });
+        $('.filter-dropdown').hide();
+        $('.filter-lnk').click(function () {
+            $(this).toggleClass('active');
+            $(this).siblings('.filter-dropdown').slideToggle();
+        });
+        $('.filter-btn').click(function () {
+            $(this).parent('.shorting-cell .filter-dropdown').slideUp();
+            if ($(this).parent().parent('.shorting-cell').find('.filter-lnk').hasClass('active')) {
+                $(this).parent().siblings('.filter-lnk').removeClass('active');
+            }
+
+        });
+        @*if (@ViewBag.tablerecordconnt != 0) {
+            $('#btnSubmit').show();
+        }
+        else {
+            $('#btnSubmit').hide();
+        }*@
+         if (@ViewBag.GCAllReport != null) {
+            $('#btnSubmit').show();
+        }
+        else {
+            $('#btnSubmit').hide();
+        }
+    });
+</script>
+

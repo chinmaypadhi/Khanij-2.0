@@ -1,0 +1,299 @@
+﻿@*// *********************************************************************************************************
+    //  View Name                : Notification
+    //  Desciption               : To View Website Notification Details
+    //  Created By               : Lingaraj Dalai
+    //  Created On               : 11 Nov 2021
+    // ********************************************************************************************************
+*@
+@model HomeEF.ViewNotificationModel
+@using Microsoft.AspNetCore.Mvc.Localization
+@using HomeEF;
+@using Microsoft.Extensions.Options;
+@using HomeApp.Services;
+@using HomeApp;
+@inject IOptions<KeyList> _objKeyList
+@inject IHtmlLocalizer<CommonResources> SharedLocalizer
+@inject CommonLocalizationService commonlocalizer
+@{
+    ViewData["Title"] = "Notification";
+    Layout = "~/Views/Shared/_WebHeaderLayout.cshtml";
+}
+<script>
+    $(document).ready(function () {
+        $('.datepicker').datetimepicker({
+            format: 'DD-MMM-YYYY'
+        }).keydown(false);
+        BindNotificationTypeData();
+        $('.Notification').addClass('active');
+        $(".noti-archive").hide();
+        $(".back").hide();
+        $("#hdnStatus").val('Active');
+        $(".arc").click(function () {
+            $(".noti-archive , .back").show();
+            $(".noti-active , .arc").hide();
+            $("#hdnStatus").val('Archive');
+        });
+        $(".back").click(function () {
+            $(".noti-archive , .back").hide();
+            $(".noti-active , .arc").show();
+            $("#hdnStatus").val('Active');
+        });
+        Paging();
+    });
+    /*Bind Notification Type details*/
+    function BindNotificationTypeData() {
+        debugger;
+        $.ajax({
+            url: '/Website/Notification/GetNotificationTypeDetails',
+            dataType: 'json',
+            type: 'post',
+            success: function (data) {
+                debugger;
+                $('#NotificationTypeId').html('');
+                $('#NotificationTypeId').append("<option value=''>Select</option>");
+                $.each(data, function (ind, item) {
+                    $('#NotificationTypeId').append("<option value='" + item.inT_NOTIFICATION_TYPE_ID + "'>" + item.vcH_NOTIFICATION_NAME + "</option>");
+                });
+                if ($('#NotificationTypeId').val() == null) {
+                    $('#NotificationTypeId').html('');
+                    $('#NotificationTypeId').append("<option value=''>Select</option>");
+                    $.each(data, function (ind, item) {
+                        $('#NotificationTypeId').append("<option value='" + item.inT_NOTIFICATION_TYPE_ID + "'>" + item.vcH_NOTIFICATION_NAME + "</option>");
+                    });
+                }
+            },
+            error: function (err) {
+            }
+        });
+    }
+    /*Search Notification details*/
+    function SearchNotificationList() {
+        $.ajax({
+            url: '/Website/Website/SearchNotificationList',
+            dataType: 'json',
+            type: 'post',
+            data: {
+                "NotificationType": $("#NotificationTypeId").val(),
+                "Fromdate": $("#txtFromDate").val(),
+                "Todate": $("#txtToDate").val(),
+                "Status": $("#hdnStatus").val()
+            },
+            success: function (data) {
+                if ($("#hdnStatus").val() == "Active")
+                    $(".noti-active").empty().append(data);
+                else
+                    $(".noti-archive").empty().append(data);
+
+            },
+            error: function (err) {
+            }
+        });
+    }
+    //Pagination
+    function Paging() {
+        pageSize = 4;
+        incremSlide = 5;
+        startPage = 0;
+        numberPage = 0;
+        if (($(".line-content").length - 1) > pageSize) {
+            var pageCount = ($(".line-content").length - 1) / pageSize;
+            var totalSlidepPage = Math.floor(pageCount / incremSlide);
+            for (var i = 0; i < pageCount; i++) {
+                $("#pagin").append('<li class="page-item"><a class="page-link">' + (i + 1) + '</a></li>');
+                if (i > pageSize) {
+                    $("#pagin li").eq(i).hide();
+                }
+            }
+            var prev = $("<li/>").addClass("prev").html("<i class='fa fa-angle-double-left'></i>").click(function () {
+                startPage -= 5;
+                incremSlide -= 5;
+                numberPage--;
+                slide();
+            });
+            prev.hide();
+            var next = $("<li/>").addClass("next").html("<i class='fa fa-angle-double-right'></i>").click(function () {
+                startPage += 5;
+                incremSlide += 5;
+                numberPage++;
+                slide();
+            });
+            if (totalSlidepPage > 0) {
+                $("#pagin").prepend(prev).append(next);
+            }
+            $("#pagin li").first().find("a").addClass("current");
+            slide = function (sens) {
+                $("#pagin li").hide();
+                for (t = startPage; t < incremSlide; t++) {
+                    $("#pagin li").eq(t + 1).show();
+                }
+                if (startPage == 0) {
+                    next.show();
+                    prev.hide();
+                } else if (numberPage == totalSlidepPage) {
+                    next.hide();
+                    prev.show();
+                } else {
+                    next.show();
+                    prev.show();
+                }
+            }
+            showPage = function (page) {
+                $(".line-content").hide();
+                $(".line-content").each(function (n) {
+                    if (n >= pageSize * (page - 1) && n < pageSize * page)
+                        $(this).show();
+                });
+            }
+            showPage(1);
+            $("#pagin li a").eq(0).addClass("current");
+            $("#pagin li a").click(function () {
+                $("#pagin li a").removeClass("current");
+                $(this).addClass("current");
+                showPage(parseInt($(this).text()));
+            });
+        }
+    }
+</script>
+<style>
+    .current {
+        background: #bb3900;
+        color: white;
+    }
+
+    #pagin li {
+        display: inline-block;
+        cursor: pointer;
+    }
+
+    .prev {
+        cursor: pointer;
+    }
+
+    .next {
+        cursor: pointer;
+    }
+
+    .last {
+        cursor: pointer;
+        margin-left: 5px;
+    }
+
+    .first {
+        cursor: pointer;
+        margin-right: 5px;
+    }
+</style>
+<div class="inner-naviagtion">
+    <div class="container">
+        <nav aria-label="breadcrumb mb-0">
+            <ol class="breadcrumb ">
+                <li class="breadcrumb-item"><a href="@_objKeyList.Value.HomeUrl"><span class="fas fa-home"></span></a></li>
+                <li class="breadcrumb-item active text-white" aria-current="page">@SharedLocalizer["Notification"]</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+<div class="inner-content tender-sec">
+    <div class="container">
+        <div class="d-flex justify-content-between align-item-center">
+            <h3 class="heading">Notification</h3>
+            <div>
+                <div>
+                    <a href="javascript:void(0);" class="btn btn-danger arc">Archive</a>
+                    <a href="javascript:void(0);" class="btn btn-dark back">Back</a>
+                    <input type="hidden" id="hdnStatus">
+                </div>
+            </div>
+        </div>
+        <div class="bg-light pt-md-3 pb-md-0 pb-3 px-3 mb-4">
+            <div class="row">
+                <div class="col-lg-3 col-md-4">
+                    <div class="form-group">
+                        <label>Type</label>
+                        <select id="NotificationTypeId" name="INT_NOTIFICATION_TYPE_ID" class="form-control searchableselect" autofocus="autofocus">
+                        </select>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-3">
+                    <div class="form-group">
+                        <label>From Date</label>
+                        <div class="input-group">
+                            <input id="txtFromDate" type="text" class="form-control datepicker" name="DTM_FROM_DATE">
+                            <div class="input-group-prepend">
+                                <label class="input-group-text" for="txtFromDate"><i class="far fa-calendar"></i></label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-3">
+                    <div class="form-group">
+                        <label>To Date</label>
+                        <div class="input-group">
+                            <input id="txtToDate" type="text" class="form-control datepicker" name="DTM_TO_DATE">
+                            <div class="input-group-prepend">
+                                <label class="input-group-text" for="txtToDate"><i class="far fa-calendar"></i></label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-1">
+                    <label class="invisible d-md-block d-none">button</label>
+                    <button type="button" class="btn btn-success d-flex" onclick="SearchNotificationList()">Search</button>
+                </div>
+                <div class="col-md-1">
+                    <label class="invisible d-md-block d-none">button</label>
+                    <a href="~/Website/Website/Notification" class="btn btn-secondary d-flex">Clear</a>
+                </div>
+            </div>
+        </div>
+        <div class="noti-active">
+            @{
+                foreach (var item in ViewData["ActiveNotificationTable"] as List<HomeEF.ViewNotificationModel>)
+                {
+                    <div class="line-content tender-card @item.VCH_NOTIFICATION_NAME">
+                        <p class="mb-4">@item.VCH_NOTIFICATION_SUB</p>
+                        <p class="mb-0 ">
+                            <small><i class="far fa-calendar-alt mr-2"></i> Publish On : @item.DTM_PUBLISHED_ON</small>
+                        </p>
+                        <div class="downloads">
+                            <a href='/@item.VCH_UPLOAD_FILE' target='_blank'><i class="fas fa-file-pdf ml-2"></i></a>
+                        </div>
+                    </div>
+                }
+            }
+        </div>
+        <div class="noti-archive">
+            @{
+                foreach (var item in ViewData["ArchiveNotificationTable"] as List<HomeEF.ViewNotificationModel>)
+                {
+                    <div class="line-content tender-card @item.VCH_NOTIFICATION_NAME">
+                        <p class="mb-4">@item.VCH_NOTIFICATION_SUB</p>
+                        <p class="mb-0 ">
+                            <small><i class="far fa-calendar-alt mr-2"></i> Publish On : @item.DTM_PUBLISHED_ON</small>
+                        </p>
+                        <div class="downloads">
+                            <a href='/@item.VCH_UPLOAD_FILE' target='_blank'><i class="fas fa-file-pdf ml-2"></i></a>
+                        </div>
+                    </div>
+                }
+            }
+        </div>
+        <nav aria-label="Page navigation">
+            <ul class="pagination justify-content-center" id="pagin">
+            </ul>
+        </nav>
+        @*<nav aria-label="Page navigation">
+                <ul class="pagination justify-content-center">
+                    <li class="page-item disabled">
+                        <a class="page-link" href="#" tabindex="-1" aria-disabled="true"><i class="fa fa-angle-double-left"></i></a>
+                    </li>
+                    <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                    <li class="page-item"><a class="page-link" href="#">2</a></li>
+                    <li class="page-item"><a class="page-link" href="#">3</a></li>
+                    <li class="page-item">
+                        <a class="page-link" href="#"><i class="fa fa-angle-double-right"></i></a>
+                    </li>
+                </ul>
+            </nav>*@
+    </div>
+</div>

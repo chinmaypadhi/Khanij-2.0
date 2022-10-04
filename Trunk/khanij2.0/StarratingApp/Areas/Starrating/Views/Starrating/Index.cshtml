@@ -1,0 +1,461 @@
+﻿@*// *********************************************************************************************************
+    //  View Name                : Index
+    //  Desciption               : View Lesse Starrating details
+    //  Created By               : Lingaraj Dalai
+    //  Created On               : 16 April 2021
+    // ********************************************************************************************************
+*@
+@model StarratingEF.AssessmentListmaster
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+
+<script>
+    excelMe = "yes"
+    pdfMe = "yes"
+    printMe = "yes"
+    $(document).ready(function () {
+        loadNavigation('Index', 'glStar', 'pl', 'tl', 'Starrating', 'Star Rating Minor Minerals', '');
+
+        $('.searchableselect').searchableselect();
+
+        $('#datatable').DataTable();
+
+        $('.shorting-lnk').click(function () {
+            $('.shorting-lnk i').toggleClass('fa-sort-amount-up-alt fa-sort-amount-down-alt ');
+        });
+        $('.filter-dropdown').hide();
+        $('.filter-lnk').click(function () {
+            $(this).toggleClass('active');
+            $(this).siblings('.filter-dropdown').slideToggle();
+        });
+        $('.filter-btn').click(function () {
+            $(this).parent('.shorting-cell .filter-dropdown').slideUp();
+            if ($(this).parent().parent('.shorting-cell').find('.filter-lnk').hasClass('active')) {
+                $(this).parent().siblings('.filter-lnk').removeClass('active');
+            }
+
+        });
+        $("#excelIcon").click(function () {
+            exportTableToExcel("datatable", "text")
+        });
+        BindFYData();
+        if (@Model.Count == 0) {
+            $(".createstarrating").show();
+            $(".starratingexist").hide();
+        }
+        else {
+            $(".createstarrating").hide();
+            $(".starratingexist").show();
+        }
+        $("#lblstarRatingLE").html(Starrating(@Model.LStar));
+        $("#lblstarRatingMI").html(Starrating(@Model.MIStar));
+        $("#lblstarRatingDD").html(Starrating(@Model.DDStar));
+        $("#lblstarRatingDGM").html(Starrating(@Model.DGMStar));
+    });
+    /*Bind FY details*/
+    function BindFYData() {
+        $.ajax({
+            url: '/Starrating/Starrating/GetFinancialYearlist',
+            dataType: 'json',
+            type: 'post',
+            success: function (data) {
+                debugger;
+                var row = "";
+                $('#ReportingYear').html('');
+                row += "<option value=''>Select</option>";
+                $.each(data, function (ind, item) {
+                    row += "<option value='" + item.year + "'>" + item.year + "</option>";
+                });
+                $('#ReportingYear').html(row);
+                if ($("#hfFinancialYear").val() != "") {
+                    $("#ReportingYear").val($("#hfFinancialYear").val());
+                }
+            },
+            error: function (err) {
+            }
+        });
+    }
+    function Starrating(points) {
+        debugger;
+        var tbl = "";
+        if (points== 5) {
+            tbl = "<span class='icon-star-solid text-warning'></span><span class='icon-star-solid text-warning'></span ><span class='icon-star-solid text-warning'></span><span class='icon-star-solid text-warning'></span><span class='icon-star-solid text-warning'></span>"
+        }
+        else if (points==4) {
+            tbl = "<span class='icon-star-solid text-warning'></span><span class='icon-star-solid text-warning'></span><span class='icon-star-solid text-warning'></span><span class='icon-star-solid text-warning'></span><span class='icon-star-solidtext-light'></span>"
+        }
+        else if (points==3) {
+            tbl = "<span class='icon-star-solid text-warning'></span><span class='icon-star-solid text-warning'></span><span class='icon-star-solid text-warning'><span class='icon-star-solidtext-light'></span><span class='icon-star-solidtext-light'></span>"
+        }
+        else if (points==2) {
+            tbl = "<span class='icon-star-solid text-warning'></span><span class='icon-star-solid text-warning'></span><span class='icon-star-solidtext-light'></span><span class='icon-star-solidtext-light'></span><span class='icon-star-solidtext-light'></span>"
+        }
+        else if (points==1) {
+            tbl = "<span class='icon-star-solid text-warning'></span><span class='icon-star-solidtext-light'></span><span class='icon-star-solidtext-light'></span><span class='icon-star-solidtext-light'></span><span class='icon-star-solidtext-light'></span>"
+        }
+        else {
+            tbl = "No Rating";
+        }
+        return tbl;
+    }
+    function SearchYear() {
+        $("#hfFinancialYear").val($("#ReportingYear").val());
+    }
+</script>
+<script type="text/javascript">
+    $(window).on('load', function () {
+        $('#Usermanual').modal('show');
+    });
+</script>
+<section class="wrapper main-wrapper row">
+    @if (ViewBag.msg != null)
+    {
+    <script>
+         var vv = '@ViewBag.msg';
+        if (vv >0) {
+            swal("","Assessment submitted successfully.","success");
+        }
+        else {
+            swal("",vv,"warning");
+        }
+    </script>
+    }
+    <div class="col-12">
+        @Html.Partial("_CMSnavigation")
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <section class="box form-container">
+                    <!-- Button trigger modal -->
+                    @using (Html.BeginForm("Index", "Starrating", FormMethod.Post, new { AUTOCOMPLETE = "Off", id = "form1" }))
+                    {
+                    @Html.AntiForgeryToken()
+                    <div class="clearfix"></div>
+                    <div class="content-body">
+                        <div class="row form-group">
+                            <label class="col-lg-3">
+                                Financial Year  <select id="ReportingYear" name="ReportingYear" Class="form-control searchableselect" onchange="SearchYear()">
+                                    <option value="">Select</option>
+                                    @Html.HiddenFor(m => m.Year, new { @id = "hfFinancialYear" })
+                                </select>
+                            </label>
+                            <div class="mt-3">
+                                <input type="submit" class="btn btn-success btn-md ml-0" name="Show1" id="Submit" value="Search">
+                            </div>
+                            <div class="col-lg-6 text-right">
+                                <a href="@Url.Content("~/Starrating/AddFile/ViewList/")@Model.AssesmentID" class="btn btn-primary btn-md starratingexist">Add New File</a>
+                                <a href="@Url.Content("~/StarRating/StarRating/EditLE/")@Model.AssesmentID" class="btn btn-dark  btn-md starratingexist">View</a>
+                                <button type="button" class="btn btn-danger text-white btn-md  user-manual-btn" data-toggle="modal" data-target="#Usermanual" title="Click to view User Manual">
+                                    <i class="icon-info-solid"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <a class="btn btn-danger createstarrating" style="text-transform:uppercase;font:bold;font-size:large;" href="~/StarRating/StarRating/Create">Proceed for filing star rating template</a>
+                        <div class="row flex-md-row-reverse starratingexist">
+                            <div class="col-xl-7 col-lg-6">
+                                <div class="user-info-detilas min-height-380">
+                                    <h4>Basic Details</h4>
+                                    <div class="row">
+                                        <label class="col-md-5  col-form-label">Lessee Code</label>
+                                        <div class="col-md-7">
+                                            <label class="form-control-plaintext"><span class="colon">:</span><span class="font-weight-bold text-warning">@Model.Lessee_Code</span></label>
+                                        </div>
+                                        <label class="col-md-5 col-form-label">Name</label>
+                                        <div class="col-md-7">
+                                            <label class="form-control-plaintext"><span class="colon">:</span>@Model.ApplicantName</label>
+                                        </div>
+                                        <label class="col-md-5 col-form-label">State</label>
+                                        <div class="col-md-7">
+                                            <label class="form-control-plaintext"><span class="colon">:</span>@Model.StateName</label>
+                                        </div>
+                                        <label class="col-md-5 col-form-label">District</label>
+                                        <div class="col-md-7">
+                                            <label class="form-control-plaintext"><span class="colon">:</span>@Model.DistrictName</label>
+                                        </div>
+                                        <label class="col-md-5 col-form-label">Address</label>
+                                        <div class="col-md-7">
+                                            <label class="form-control-plaintext"><span class="colon">:</span>@Model.Address</label>
+                                        </div>
+                                        <label class="col-md-5 col-form-label">Mineral Name</label>
+                                        <div class="col-md-7">
+                                            <label class="form-control-plaintext"><span class="colon">:</span>@Model.MineralName</label>
+                                        </div>
+                                        <label class="col-md-5 col-form-label">Reporting Year</label>
+                                        <div class="col-md-7">
+                                            <label class="form-control-plaintext"><span class="colon">:</span>@Model.ReportingYear</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xl-5 col-lg-6">
+                                <div class="user-info-detilas bg-light">
+                                    <h4 class="text-left">Rating Points</h4>
+                                    <div class="rating-list">
+                                        <div class="rating-list-details">
+                                            <h5>Lessee Point</h5>
+                                            <div class="stars">
+                                                <label id="lblstarRatingLE"></label>
+                                                <span class="ml-3">( <strong class="text-warning">@Model.LStar </strong>/ 5 )</span>
+                                            </div>
+                                        </div>
+                                        <div class="marks">
+                                            <h2>@Model.PointObtained <small class="d-block">out of 100</small></h2>
+                                        </div>
+                                    </div>
+                                    <div class="rating-list">
+                                        <div class="rating-list-details">
+                                            <h5>MI Point</h5>
+                                            <div class="stars">
+                                                <label id="lblstarRatingMI"></label>
+                                                <span class="ml-3">( <strong class="text-warning">@Model.MIStar </strong>/ 5 )</span>
+                                            </div>
+                                        </div>
+                                        <div class="marks">
+                                            <h2>@Model.MIPoint <small class="d-block">out of 100</small></h2>
+                                        </div>
+                                    </div>
+                                    <div class="rating-list">
+                                        <div class="rating-list-details">
+                                            <h5>DD Point</h5>
+                                            <div class="stars">
+                                                <label id="lblstarRatingDD"></label>
+                                                <span class="ml-3">( <strong class="text-warning">@Model.DDStar </strong>/ 5 )</span>
+                                            </div>
+                                        </div>
+                                        <div class="marks">
+                                            <h2>@Model.DDPoint <small class="d-block">out of 100</small></h2>
+                                        </div>
+                                    </div>
+                                    <div class="rating-list">
+                                        <div class="rating-list-details">
+                                            <h5>DGM Point</h5>
+                                            <div class="stars">
+                                                <label id="lblstarRatingDGM"></label>
+                                                <span class="ml-3">( <strong class="text-warning">@Model.DGMStar </strong>/ 5 )</span>
+                                            </div>
+                                        </div>
+                                        <div class="marks">
+                                            <h2>@Model.DGMPoint <small class="d-block">out of 100</small></h2>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal fade" id="Usermanual" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h3 class="modal-title font-weight-bold mt-0" id="staticBackdropLabel">INSTRUCTION</h3>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <div class="modal-body user-manual">
+                                        <p class="text-danger">Note : Once the form is successfully submitted , it can not be edited</p>
+                                        <h5 class="mb-4 font-weight-bold">Self-assesment template for star rating of minor minerals leases</h5>
+                                        <div class="row mb-3">
+                                            <div class="col-lg-6 border-right">
+                                                <h5>
+                                                    <span class="font-weight-bold text-brown">स्टार रेटिंग प्रणाली में भाग लेने हेतु पात्रता एवं आवश्यक शर्तें</span>
+                                                </h5>
+                                                <ul>
+                                                    <li>
+                                                        समस्त संबंधित पट्टेदारों को 1 जुलाई से 31 जुलाई तक विगत वित्तीय वर्ष के विवरण के साथ स्टार रेटिंग टेम्प्लेट भरना अनिवार्य है।
+                                                    </li>
+                                                    <li>
+                                                        स्वनिर्धारण प्रपत्र भरने के पूर्व पात्रता संबंधित सभी मापदण्डो का आंकलन पटटेधारी द्वारा स्वयं किया जावे।
+                                                    </li>
+                                                    <li>
+                                                        स्वनिर्धारण प्रपत्र भरने के पूर्व समस्त मॉड्यूल्स तथा आवश्यक दस्तावेजो कि जांच कर ली जावें।
+                                                    </li>
+                                                    <li>
+                                                        स्टार रेटिंग टेम्प्लेट भरने हेतु वित्तीय वर्ष में खदान 180 दिन कार्यशील होना तथा औसत दैनिक मजदूरो की संख्या 15 या अधिक होना अनिवार्य  है।
+                                                    </li>
+                                                    <li>
+                                                        स्टार रेटिंग टेम्प्लेट भरते समय खदान निलंबित अवस्था में नहीं होना चाहिए।
+                                                    </li>
+                                                    <li>
+                                                        50% से अधिक अंक प्राप्त करने वाले खदानो पर Star Rating Award  प्रणाली लागू होगी।
+                                                    </li>
+                                                    <li>
+                                                        स्टार रेटिंग टेम्प्लेट स्वंय पट्टेदार द्वारा अथवा खदान में कार्यरत मेनेजर/मुंशी/अन्य अधिकृत व्यक्ति के वैद्य हस्ताक्षर के माध्यम से ही भरा जावेगा।
+                                                    </li>
+                                                    <li>
+                                                        पट्टेदार द्वारा अपलोड किये जाने वाले दस्तावेज स्व-हस्ताक्षरित होने चाहिए।
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                            <div class="col-lg-6">
+                                                <h5>
+                                                    <span class="font-weight-bold text-brown">Eligibility Criteria and Condition for Filing Star Rating Template</span>
+                                                </h5>
+                                                <ul>
+                                                    <li>
+                                                        All concern Minor mineral leassee to ensure filling up self-assessment template from 1st of July to 31st of July, every year for previous financial year.
+                                                    </li>
+
+                                                    <li>
+                                                        Lessee must check the eligibility criteria before filing up self assessment template.
+                                                    </li>
+
+                                                    <li>
+                                                        Lessee should read & check all the modules that will be applicable to him before filing the self assessment template.
+                                                    </li>
+
+                                                    <li>
+                                                        The quarry leases, that have worked for 180 days and their average daily employment was 15 person or more in the concerned Financial Year, are eligible for filling up self-assessment template.
+                                                    </li>
+
+                                                    <li>
+                                                        Mine should not be under suspension on the day of filing of template.
+                                                    </li>
+
+                                                    <li>
+                                                        For awarding star rating, the leases must obtain atleast 50% .
+                                                    </li>
+
+                                                    <li>
+                                                        Template should be filled by Owner/ Nominated person; through duly signed documents and once template submitted, it cannot be edited by the lessee.
+                                                    </li>
+
+                                                    <li>	Copies of all the supporting documents uploaded by the lessee should be self-attested.</li>
+                                                </ul>
+
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-lg-6 border-right">
+                                                <h5>
+                                                    <span class="font-weight-bold text-brown">स्टार रेटिंग प्रणाली के अंतर्गत अपलोड किये जाने वाले आवश्यक दस्तावेज</span>
+                                                </h5>
+                                                <ul>
+                                                    <li>
+                                                        पर्यावरण सम्मति आदेश की छायाप्रति ।
+                                                    </li>
+                                                    <li>
+                                                        जल/वायु से संबंधित अनापत्ति प्रमाण पत्र की छाया प्रति।
+                                                    </li>
+                                                    <li>
+                                                        डी.जी.एम.एस./ब्लास्टिंग लाइंसेंस/वन विभाग का अनापत्ति प्रमाण पत्र (यदि लागू हो तो)।
+                                                    </li>
+                                                    <li>
+                                                        जल एवं वायु सम्मति में उल्लेखित आवश्यक शर्तों के पालन प्रतिवेदन से संबंधित   दस्तावेज।
+                                                    </li>
+                                                    <li>
+                                                        पर्यावरण सम्मति में उल्लेखित आवश्यक शर्तों के पालन प्रतिवेदन से संबंधित दस्तावेज।
+                                                    </li>
+                                                    <li>
+                                                        खदान क्षेत्र में पेयजल एवं स्वच्छता को दर्शाते हुये फोटो ग्राफ।
+                                                    </li>
+                                                    <li>
+                                                        खदान में कार्यरत महिलाओं हेतु मूलभूत सुविधाओं जैसे कि- झुला घर, शौचालय तथा आराम करने हेतु शैड आदि को दर्शाते हुये फोटो ग्राफ।
+                                                    </li>
+                                                    <li>
+                                                        मासिक, अर्धवार्षिक एवं वार्षिक विवरणी तथा अंतिम कर-निर्धारण की प्रति।
+                                                    </li>
+                                                    <li>
+                                                        खदान में कार्यरत माईन्स मेनेजर, फोरमैन, माईनिंग मेट एवं ब्लास्टर के नियुक्ति आदेश/पत्र, सैलेरी स्लिप एवं तकनीकी योग्यता संबंधित प्रमाण पत्र की प्रति।
+                                                    </li>
+                                                    <li>
+                                                        खदान के नक्शे की प्रति जिसमे अक्षांश एवं देशांस अंकित हो।
+                                                    </li>
+                                                    <li>
+                                                        खदान के सीमा स्तभ्भ को दर्शाते हुये फोटो ग्राफ।
+                                                    </li>
+                                                    <li>
+                                                        खदान क्षेत्र में रोपित पौधो/वृक्षों को दर्शाते हुये फोटो ग्राफ।
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                            <div class="col-lg-6">
+                                                <h5>
+                                                    <span class="font-weight-bold text-brown">Important documents to be uploaded for Minor Minerals Star Ratings System</span>
+                                                </h5>
+                                                <ul>
+                                                    <li>
+                                                        Copy of Environment Clearance (EC).
+                                                    </li>
+
+                                                    <li>
+                                                        Certificate related to AIR/WATER Consent.
+                                                    </li>
+
+                                                    <li>
+                                                        Certificate related to DGMS/Blasting License/Forest NOC (If Applicable).
+                                                    </li>
+
+                                                    <li>
+                                                        Compliance of conditions as per AIR/WATER Consent.
+                                                    </li>
+
+                                                    <li>
+                                                        Compliance of conditions as per Environment Clearance Parameters.
+                                                    </li>
+
+                                                    <li>
+                                                        Photograph to be uploaded, showing provision of drinking water and sanitation facility.
+                                                    </li>
+
+                                                    <li>
+                                                        Photograph to be uploaded, showing provision of basic amenities to women employees i.e. Crèche, Toilet and Restrooms.
+                                                    </li>
+
+                                                    <li>
+                                                        Copy of all returns and last assessment.
+                                                    </li>
+
+                                                    <li>
+                                                        Copy of appointment order, salary slip and technically qualifying certificate of competent person as - Mines Manager, Foreman, Mining Mate and Blaster.
+                                                    </li>
+
+                                                    <li>
+                                                        Authenticated lease sketch with boundary coordinates.
+                                                    </li>
+
+                                                    <li>
+                                                        Photograph to be uploaded, showing boundary pillars.
+                                                    </li>
+
+                                                    <li>
+                                                        Photograph to be uploaded, showing plantation within lease area.
+                                                    </li>
+
+                                                </ul>
+                                            </div>
+
+                                        </div>
+                                        <div class="separator separator-dashed mt-3"></div>
+                                        <div class="row">
+                                            <div class="col-lg-12">
+                                                <h5 class="text-brown font-weight-bold mt-0">In case of any query please contact</h5>
+                                                <div class="row">
+                                                    <div class="col-lg-6 border-right">
+                                                        <p class="mb-1">  <span class="text-dark font-weight-bold">Shri Mahesh Babu</span> , Additional Director (DGM) </p>
+                                                        <p class="mb-1">Nodal officer, Star Rating </p>
+                                                        <p class="mb-0"> <i class="fas fa-phone-alt"></i> <span class="text-warning font-weight-bold">9425228164</span></p>
+                                                    </div>
+                                                    <div class="col-lg-6">
+                                                        <p class="mb-1"> <span class="text-dark font-weight-bold mb-1">Ms. Seema Rath</span> , (DGM)</p>
+                                                        <p class="mb-0"> <i class="fas fa-phone-alt"></i><span class="text-warning font-weight-bold">7000513386</span> </p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-danger btn-md" data-dismiss="modal">Close</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    }
+                </section>
+            </div>
+        </div>
+    </div>
+</section>
+
+

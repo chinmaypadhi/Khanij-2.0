@@ -1,0 +1,100 @@
+﻿@model IEnumerable<MasterEF.RegionalModel>
+@{
+    ViewData["Title"] = "ViewList";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+@using MasterApp.Web;
+
+@if (ViewBag.msg != null)
+{
+    <script>
+
+ swal("",'@ViewBag.msg',"success");
+    </script>
+}
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        @Html.Partial("_CMSnavigation")
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item"><a class="nav-link" href="/Master/Division/Add">Add</a></li>
+                        <li class="nav-item"><a class="nav-link active" href="/Master/Division/ViewList">View</a></li>
+                    </ul>
+                    @Html.Partial("_CMSutil")
+                </div>
+                <section class="box form-container">
+
+                    <div class="content-body">
+
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="legend-box">
+                                    <ul class="d-flex mb-1 justify-content-end list-unstyled">
+                                        <li><span class="bg-success"></span> Active</li>
+                                        <li><span class="bg-warning"></span> Inactive</li>
+                                    </ul>
+                                </div>
+                                <table id="table-exports" class="table table-sm table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th width="30">Sl#</th>
+                                            <th> State Name </th>
+                                            <th> Division Name</th>
+                                            <th> Status </th>
+                                            <th width="100" class="text-center noprint">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @{
+                                            var count = 0;
+                                            foreach (var item in Model)
+                                            {
+                                                count++;
+                                                var dyclass = @item.Status == "Active" ? "active-row" : "inactive-row";
+
+                                                <tr class="@dyclass">
+                                                    <td>@count</td>
+                                                    <td>@item.StateName</td>
+                                                    <td>@item.RegionalName</td>
+                                                    @if (@item.Status == "Active")
+                                                    {
+                                                        <td class="text-success">@item.Status</td>
+                                                    }
+                                                    else
+                                                    {
+                                                        <td class="text-orange">@item.Status</td>
+                                                    }
+                                                    <td class="noprint text-center">
+                                                        <a href="@CustomQueryStringHelper.EncryptString("Master","Add","Division",new {id=item.RegionalID })"
+                                                           class="btn-floating btn-outline-primary btn-sm"
+                                                           title="Edit"><i class="icon-pencil-alt-solid"></i></a>
+                                                        <a href="@CustomQueryStringHelper.EncryptString("Master","Delete","Division",new {id=item.RegionalID })"
+                                                           class="btn-floating btn-outline-danger btn-sm"
+                                                           title="Delete" onclick="return confirm('Are you sure to Delete?')"><i class="icon-trash-alt-solid"></i></a>
+                                                    </td>
+                                                </tr>
+                                            }
+                                        }
+
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+    <!-- MAIN CONTENT AREA ENDS -->
+</section>
+
+<script>
+    $(document).ready(function () {
+        debugger;
+        loadNavigation('ViewList', 'glRoleRes', 'plUser', 'tl', 'Master', 'Division', ' ');
+        $('.searchableselect').searchableselect();
+    });
+</script>

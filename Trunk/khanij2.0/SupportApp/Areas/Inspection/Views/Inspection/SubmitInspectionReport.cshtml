@@ -1,0 +1,999 @@
+﻿@*// *********************************************************************************************************
+    //  View Name                : SubmitInspectionReport
+    //  Desciption               : Add Inspection Report
+    //  Created By               : Debaraj Swain
+    //  Created On               : 01 Jun 2021
+    // ********************************************************************************************************
+*@
+@using SupportApp.Web;
+@model SupportEF.InspectionModel
+@{
+    ViewData["Title"] = "ProfileView";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+
+}
+<link rel="stylesheet" href="~/css/bootstrap-datetimepicker.min.css" type="text/css" />
+<script src="~/js/moment.min.js"></script>
+<script src="~/js/bootstrap-datetimepicker.min.js"></script>
+<script src='@Url.Content("~/js/sweetalert.min.js")'></script>
+<script src="~/js/specialChar.js"></script>
+<script src="~/js/CSMValidation.js"></script>
+<script>
+    $(document).ready(function () {
+        $('.datepicker').datetimepicker({
+            format: 'LT',
+            format: 'DD-MM-YYYY',
+            daysOfWeekDisabled: [],
+        });
+    });
+</script>
+<script type="text/javascript">
+    function numericOnly() {
+        debugger;
+        var keycode = event.which;
+        if (!(event.shiftKey == false && (keycode == 8 || keycode == 37 || keycode == 39 || (keycode >= 48 && keycode <= 57)))) {
+            event.preventDefault();
+            return false;
+        }
+    }
+    var specialKeys = new Array();
+    specialKeys.push(8); //Backspace
+    function numericdotOnly(elementRef) {
+        var keyCodeEntered = (event.which) ? event.which : (window.event.keyCode) ? window.event.keyCode : -1;
+        if ((keyCodeEntered >= 48) && (keyCodeEntered <= 57)) {
+            return true;
+        }
+        // '.' decimal point...
+        else if (keyCodeEntered == 46) {
+            // Allow only 1 decimal point ('.')...
+            if ((elementRef.value) && (elementRef.value.indexOf('.') >= 0))
+                return false;
+            else
+                return true;
+        }
+        return false;
+    }
+    function lettersOnly() {
+        var regex = new RegExp("^[a-zA-Z ]+$");
+        var key = String.fromCharCode(!event.charCode ? event.which : event.charCode);
+        if (!regex.test(key)) {
+            event.preventDefault();
+            return false;
+        }
+    }
+
+</script>
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        <!-- MAIN CONTENT AREA STARTS -->
+        @Html.Partial("_CMSnavigation")
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="@Url.Action("SubmitInspectionReport", "Inspection")">
+                                Submission of Inspection Report
+                            </a>
+                        </li>
+                    </ul>
+                    @Html.Partial("_CMSutil")
+                </div>
+                <section class="box form-container">
+                    <div class="content-body">
+                        @using (Html.BeginForm("SubmitInspectionReport", "Inspection", FormMethod.Post, new { AUTOCOMPLETE = "Off", id = "__EUAntiForgeryForm", @enctype = "multipart/form-data", @class = "form-horizontal bordered-row" }))
+                        {
+
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="form-group row">
+                                        <h4 style="color:red">1) Details</h4>
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-6">
+                                    <div class="form-group row">
+                                        <label for="dropdownDepart" class="col-sm-4 col-form-label">Subject of Inspection<span class="text-danger">*</span></label>
+                                        <div class="col-sm-7">
+
+                                            @if (Model != null && (Model.insId == null || Model.insId <= 0))
+                                            {
+                                                @(Html.TextBoxFor(model => model.insSubject, new { @class = "form-control", @maxlength = "100" }))
+                                            }
+                                            else
+                                            {
+                                                @(Html.TextBoxFor(model => model.insSubject, new { @class = "form-control", @readonly = "readonly" }))
+                                            }
+                                            @Html.ValidationMessageFor(x => x.insSubject, "", new { @class = "text-danger", @maxlength = 100 })
+                                        </div>
+                                    </div>
+                                </div>
+                                @*<div class="col-sm-6">
+                                    </div>*@
+                                <div class="col-sm-6">
+                                    <div class="form-group row">
+                                        <label for="dropdownDepart" class="col-sm-4 col-form-label">Date of Inspection  <span class="text-danger">*</span></label>
+                                        <div class="col-sm-7">
+                                            @if (Model != null && (Model.insId == null || Model.insId <= 0))
+                                            {
+                                                <div class="input-group">
+                                                    <input type="text" class="form-control datepicker" id="insDate" name="insDate">
+                                                    <div class="input-group-prepend">
+                                                        <label class="input-group-text" for="inputDate1"><i class="icon-calendar-alt-solid"></i></label>
+                                                    </div>
+                                                </div>
+                                            }
+                                            else
+                                            {
+                                                <div class="input-group">
+                                                    <input type="text" class="form-control datepicker" id="insDate" readonly="readonly">
+                                                    <div class="input-group-prepend">
+                                                        <label class="input-group-text" for="inputDate1"><i class="icon-calendar-alt-solid"></i></label>
+                                                    </div>
+                                                </div>
+                                            }
+                                            @Html.ValidationMessageFor(x => x.insDate, "", new { @class = "text-danger" })
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-6">
+                                    <div class="form-group row">
+                                        <label for="inputLoginId" class="col-sm-4 col-form-label">User Code of Inspecting Officer </label>
+                                        <div class="col-sm-7">
+
+                                            @(Html.TextBoxFor(model => model.inspectorCode, new { @class = "form-control", @readonly = "readonly" }))
+                                            @Html.ValidationMessageFor(x => x.inspectorCode, "", new { @class = "text-danger" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group row">
+                                        <label for="dropdownDepart" class="col-sm-4 col-form-label">Name of Inspecting Officer</label>
+                                        <div class="col-sm-7">
+                                            @(Html.TextBoxFor(model => model.inspectorName, new { @class = "form-control", @readonly = "readonly" }))
+                                            @Html.ValidationMessageFor(x => x.inspectorName, "", new { @class = "text-danger" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group row">
+                                        <label for="inputLoginId" class="col-sm-4 col-form-label">Designation of Inspecting Officer </label>
+                                        <div class="col-sm-7">
+                                            @(Html.TextBoxFor(model => model.inspectorDesignation, new { @class = "form-control", @readonly = "readonly" }))
+                                            @Html.ValidationMessageFor(x => x.inspectorDesignation, "", new { @class = "text-danger" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group row">
+                                        <label for="dropdownDepart" class="col-sm-4 col-form-label">District</label>
+                                        <div class="col-sm-7">
+                                            @(Html.TextBoxFor(model => model.District, new { @class = "form-control", @readonly = "readonly" }))
+                                            @Html.ValidationMessageFor(x => x.District, "", new { @class = "text-danger" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group row">
+                                        <label for="dropdownDepart" class="col-sm-4 col-form-label"> State </label>
+                                        <div class="col-sm-7">
+                                            @(Html.TextBoxFor(model => model.State, new { @class = "form-control", @readonly = "readonly" }))
+                                            @Html.ValidationMessageFor(x => x.State, "", new { @class = "text-danger" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group row">
+                                        <label for="dropdownDepart" class="col-sm-4 col-form-label">Pin code</label>
+                                        <div class="col-sm-7">
+                                            @(Html.TextBoxFor(model => model.PinCode, new { @onkeypress = "return isNumber(event)", @class = "form-control", @maxlength = "6" }))
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group row">
+                                        <label for="dropdownDepart" class="col-sm-4 col-form-label">Mobile Number of Inspecting Officer</label>
+                                        <div class="col-sm-7">
+                                            @(Html.TextBoxFor(model => model.insMobileNo, new { @class = "form-control", @readonly = "readonly" }))
+                                            @Html.ValidationMessageFor(x => x.insMobileNo, "", new { @class = "text-danger" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group row">
+                                        <label for="dropdownDepart" class="col-sm-4 col-form-label">E-Mail ID of Inspecting Officer</label>
+                                        <div class="col-sm-7">
+                                            @(Html.TextBoxFor(model => model.insEmail, new { @class = "form-control", @readonly = "readonly" }))
+                                            @Html.ValidationMessageFor(x => x.insEmail, "", new { @class = "text-danger" })
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-6">
+                                    <div class="form-group row">
+                                        <label for="dropdownDepart" class="col-sm-4 col-form-label">User Type<span class="text-danger">*</span></label>
+                                        <div class="col-sm-7">
+                                            @if (Model != null && (Model.insId == null || Model.insId <= 0))
+                                            {
+                                                @Html.DropDownListFor(model => model.LesseeLicenseeUserTypeId, ViewBag.ViewUTList as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control", autofocus = "autofocus", })
+                                            }
+                                            else
+                                            {
+                                                @(Html.TextBoxFor(model => model.LesseeLicenseeUserTypeName, new { @class = "form-control", @readonly = "readonly" }))
+                                            }
+                                            @Html.ValidationMessageFor(x => x.LesseeLicenseeUserTypeId, "", new { @class = "text-danger" })
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-6">
+                                    <div class="form-group row">
+                                        <label for="dropdownDepart" class="col-sm-4 col-form-label">Name of Lessee/Licensee/End User<span class="text-danger">*</span></label>
+                                        <div class="col-sm-7">
+                                            @if (Model != null && (Model.insId == null || Model.insId <= 0))
+                                            {
+                                                <select name="IdofLesseeLicensee" id="IdofLesseeLicensee" class="form-control"></select>
+                                            }
+                                            else
+                                            {
+                                                @(Html.TextBoxFor(model => model.NameofLesseeLicensee, new { @class = "form-control", @readonly = "readonly" }))
+                                            }
+                                            @Html.ValidationMessageFor(x => x.IdofLesseeLicensee, "", new { @class = "text-danger" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+
+                                </div>
+
+                                <div class="col-sm-12">
+                                    <div class="form-group row">
+                                        <h6 style="color:red">Lease/License/Permit Details</h6>
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-6">
+                                    <div class="form-group row">
+                                        <label for="inputLoginId" class="col-sm-4 col-form-label">Village</label>
+                                        <div class="col-sm-7">
+                                            @(Html.TextBoxFor(model => model.LesseeLicenseeVillage, new { @class = "form-control", @readonly = "readonly" }))
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group row">
+                                        <label for="dropdownDepart" class="col-sm-4 col-form-label"> Tehsil</label>
+                                        <div class="col-sm-7">
+                                            @(Html.TextBoxFor(model => model.LesseeLicenseeTehsil, new { @class = "form-control", @readonly = "readonly" }))
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group row">
+                                        <label for="dropdownDepart" class="col-sm-4 col-form-label"> District </label>
+                                        <div class="col-sm-7">
+                                            @(Html.TextBoxFor(model => model.LesseeLicenseeDistrict, new { @class = "form-control", @readonly = "readonly" }))
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group row">
+                                        <label for="dropdownDepart" class="col-sm-4 col-form-label"> Panchayat </label>
+                                        <div class="col-sm-7">
+                                            @(Html.TextBoxFor(model => model.LesseeLicenseePanchayat, new { @class = "form-control", @readonly = "readonly" }))
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group row">
+                                        <label for="dropdownDepart" class="col-sm-4 col-form-label"> Police Station </label>
+                                        <div class="col-sm-7">
+                                            @(Html.TextBoxFor(model => model.LesseeLicenseePoliceStation, new { @class = "form-control", @readonly = "readonly" }))
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group row">
+                                        <label for="dropdownDepart" class="col-sm-4 col-form-label"> PinCode </label>
+                                        <div class="col-sm-7">
+                                            @(Html.TextBoxFor(model => model.LesseeLicenseePinCode, new { @class = "form-control", @readonly = "readonly" }))
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group row">
+                                        <label for="dropdownDepart" class="col-sm-4 col-form-label"> Mobile Number of Lessee/Licensee/End User </label>
+                                        <div class="col-sm-7">
+                                            @(Html.TextBoxFor(model => model.LesseeLicenseeMobile, new { @class = "form-control", @readonly = "readonly" }))
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group row">
+                                        <label for="dropdownDepart" class="col-sm-4 col-form-label"> E-Mail Id of Lessee/Licensee/End User </label>
+                                        <div class="col-sm-7">
+                                            @(Html.TextBoxFor(model => model.LesseeLicenseeEmail, new { @class = "form-control", @readonly = "readonly" }))
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    @if (Model != null && (Model.insId == null || Model.insId <= 0))
+                                    {
+                                        <div class="form-group row" id="divCon">
+                                            <h4 style="color:red">2)Terms And Condition Of Inspection</h4>
+                                        </div>
+                                    }
+                                </div>
+                                <div class="col-sm-12" id="divconVis">
+                                    @if (Model != null && (Model.insId == null || Model.insId <= 0))
+                                    {
+                                        <table border="1" style="width: 100%; margin: 10px 0;">
+                                            <thead>
+                                                <tr>
+                                                    <th style="display: none;"></th>
+                                                    <th>Terms And Condition</th>
+                                                    <th>Satisfied</th>
+                                                    <th>Remarks</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="tbodyTearms">
+                                            </tbody>
+                                        </table>
+                                    }
+                                    else
+                                    {
+
+                                    }
+
+                                </div>
+                            </div>
+                            <div class="row" id="divHide">
+                                <div class="col-sm-12">
+                                    <div class="form-group row">
+                                        <h4 style="color:red">3)Attachment</h4>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group row">
+                                        <label for="dropdownDepart" class="col-sm-4 col-form-label"> Inspection Report Attachment <span class="text-danger">*</span></label>
+                                        <div class="col-sm-7">
+
+                                            @if (Model != null && (Model.insId == null || Model.insId <= 0))
+                                            {
+
+
+                                                <input name="InspectionReport" type="file" class="form-control custom-file-input" id="InspectionReport">
+                                                <label class="custom-file-label">Choose Files</label>
+                                                <small class="text-danger">Only <strong> jpg, jpeg, png, pdf, tif</strong> file types with size less than <strong>2 MB </strong> are allowed.</small>
+
+                                            }
+
+                                            else
+                                            {
+                                                @if (Model.Inspection_Report_FILE_NAME == null || Model.Inspection_Report_FILE_NAME == "")
+                                                {
+                                                    <a href="#">
+                                                        No Files Found
+                                                    </a>
+                                                }
+                                                else
+                                                {
+
+                                                    @*<a href="@Url.Action("DownloadFiles", "Inspection", new { filename = Model.Inspection_Report_FILE_NAME, foldername = "InspectionReportDoc" })">*@
+                                                    <a href="@CustomQueryStringHelper.EncryptString("Inspection","DownloadFiles","Inspection",new {filename = Model.Inspection_Report_FILE_NAME, foldername = "InspectionReportDoc" })">
+                                                        <i class="icon-download-solid" aria-hidden="true"></i>
+                                                    </a>
+                                                }
+
+                                            }
+                                            @Html.ValidationMessageFor(x => x.InspectionReport, "", new { @class = "text-danger" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group row">
+                                        <label for="dropdownDepart" class="col-sm-4 col-form-label"> Panchnama </label>
+                                        <div class="col-sm-7">
+                                            @if (Model != null && (Model.insId == null || Model.insId <= 0))
+                                            {
+
+
+                                                <input name="Panchaname" type="file" class="form-control custom-file-input" id="Panchaname">
+                                                <label class="custom-file-label">Choose Files</label>
+                                                <small class="text-danger">Only <strong> jpg, jpeg, png, pdf, tif</strong> file types with size less than <strong>2 MB </strong> are allowed.</small>
+                                            }
+
+                                            else
+                                            {
+                                                @if (Model.Panchnama_FILE_NAME == null || Model.Panchnama_FILE_NAME == "")
+                                                {
+                                                    <a href="#">
+                                                        No Files Found
+                                                    </a>
+                                                }
+                                                else
+                                                {
+                                                    <a href="@CustomQueryStringHelper.EncryptString("Inspection","DownloadFiles","Inspection",new {filename = Model.Panchnama_FILE_NAME, foldername = "Panchnama" })">
+                                                        @*<a href="@Url.Action("DownloadFiles", "Inspection", new { filename = Model.Panchnama_FILE_NAME, foldername = "Panchnama" })">*@
+                                                        <i class="icon-download-solid" aria-hidden="true"></i>
+                                                    </a>
+                                                }
+
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group row">
+                                        <label for="dropdownDepart" class="col-sm-4 col-form-label"> Bayan <span class="text-danger">*</span></label>
+                                        <div class="col-sm-7">
+
+
+
+                                            @if (Model != null && (Model.insId == null || Model.insId <= 0))
+                                            {
+                                                <input name="Bayan" type="file" class="form-control custom-file-input" id="Bayan">
+                                                <label class="custom-file-label">Choose Files</label>
+                                                <small class="text-danger">Only <strong> jpg, jpeg, png, pdf, tif</strong> file types with size less than <strong>2 MB </strong> are allowed.</small>
+                                            }
+
+                                            else
+                                            {
+                                                @if (Model.Bayan_FILE_NAME == null || Model.Bayan_FILE_NAME == "")
+                                                {
+                                                    <a href="#">
+                                                        No Files Found
+                                                    </a>
+                                                }
+                                                else
+                                                {
+                                                    <a href="@CustomQueryStringHelper.EncryptString("Inspection","DownloadFiles","Inspection",new {filename = Model.Bayan_FILE_NAME, foldername = "Bayan" })">
+                                                        @*<a href="@Url.Action("DownloadFiles", "Inspection", new { filename = Model.Bayan_FILE_NAME, foldername = "Bayan" })">*@
+                                                        <i class="icon-download-solid" aria-hidden="true"></i>
+                                                    </a>
+                                                }
+
+                                            }
+                                            @Html.ValidationMessageFor(x => x.Bayan, "", new { @class = "text-danger" })
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-6">
+                                    <div class="form-group row">
+                                        <label for="dropdownDepart" class="col-sm-4 col-form-label"> Photos </label>
+                                        <div class="col-sm-7">
+
+                                            @if (Model != null && (Model.insId == null || Model.insId <= 0))
+                                            {
+                                                <input name="Photos" type="file" class="form-control custom-file-input" id="Photos">
+                                                <label class="custom-file-label">Choose Files</label>
+                                                <small class="text-danger">Only <strong> jpg, jpeg, png, pdf, tif</strong> file types with size less than <strong>2 MB </strong> are allowed.</small>
+
+                                            }
+
+                                            else
+                                            {
+                                                @if (Model.Photos_FILE_NAME == null || Model.Photos_FILE_NAME == "")
+                                                {
+                                                    <a href="#">
+                                                        No Files Found
+                                                    </a>
+                                                }
+                                                else
+                                                {
+                                                    <a href="@CustomQueryStringHelper.EncryptString("Inspection","DownloadFiles","Inspection",new {filename = Model.Photos_FILE_NAME, foldername = "Photos" })">
+                                                        @*<a href="@Url.Action("DownloadFiles", "Inspection", new { filename = Model.Photos_FILE_NAME, foldername = "Photos" })">*@
+                                                        <i class="icon-download-solid" aria-hidden="true"></i>
+                                                    </a>
+                                                }
+
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-6">
+                                    <div class="form-group row">
+                                        <label for="dropdownDepart" class="col-sm-4 col-form-label"> Others</label>
+                                        <div class="col-sm-7">
+
+
+
+                                            @if (Model != null && (Model.insId == null || Model.insId <= 0))
+                                            {
+
+                                                <input name="Others" type="file" class="form-control custom-file-input" id="Others">
+                                                <label class="custom-file-label">Choose Files</label>
+                                                <small class="text-danger">Only <strong> jpg, jpeg, png, pdf, tif</strong> file types with size less than <strong>2 MB </strong> are allowed.</small>
+
+                                            }
+
+                                            else
+                                            {
+                                                @if (Model.Others_FILE_NAME == null || Model.Others_FILE_NAME == "")
+                                                {
+                                                    <a href="#">
+                                                        No Files Found
+                                                    </a>
+                                                }
+                                                else
+                                                {
+                                                    <a href="@CustomQueryStringHelper.EncryptString("Inspection","DownloadFiles","Inspection",new {filename = Model.Others_FILE_NAME, foldername = "Others" })">
+                                                        @*<a href="@Url.Action("DownloadFiles", "Inspection", new { filename = Model.Others_FILE_NAME, foldername = "Others" })">*@
+                                                        <i class="icon-download-solid" aria-hidden="true"></i>
+                                                    </a>
+                                                }
+
+                                            }
+
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-6">
+                                </div>
+                                @if (Model != null && (Model.insId == null || Model.insId <= 0))
+                                {
+                                    <div class="row" id="divButtons">
+                                        <div class="col-xs-12  text-center">
+
+                                            @*<button class="btn btn-primary" id="btnNext2" onclick="return OnSubmitForm();">Submit</button>*@
+                                            <input type="button" value="Submit" id="btnNext2" onclick="return OnSubmitForm();" class="btn btn-primary btn-md" />
+                                            <input type="reset" value="Clear" id="bReset" class="btn btn-primary btn-md" onclick="return OnClear();" style="margin-right: 10px; background: #583B2C none repeat scroll 0 0;" onclick="@("window.location.href='" + @Url.Action("ProfileView", "EndUserProfile") + "'")    ;" />
+                                        </div>
+                                    </div>
+                                }
+
+
+
+
+                            </div>
+
+                        }
+                    </div>
+                </section>
+
+            </div>
+            <div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<input type="hidden" id="ForDetails" value=@ViewBag.Details />
+
+@*//update time*@
+@if (ViewBag.showDetails != null)
+
+{
+    int slno = 1;
+    foreach (var x in ViewBag.showDetails)
+    {
+        <input type="hidden" id="hdninsSubject" value=@x.inspectorName />
+        <input type="hidden" id="hdninsDate" value=@x.insDate />
+        <input type="hidden" id="hdnPinCode" value=@x.PinCode />
+        <input type="hidden" id="hdnLesseeLicenseeUserTypeId" value=@x.insId />
+        <input type="hidden" id="hdnLesseeLicenseeId" value=@x.IdofLesseeLicensee />
+
+        if (slno == 1)
+        {
+            break;
+        }
+    }
+
+
+    int Remsn = 1;
+    int IsSatisfied = 100;
+    foreach (var x in ViewBag.showDetails)
+    {
+        <input type="hidden" id=@Remsn value=@x.VALUE />
+        <input type="hidden" id="@IsSatisfied" value=@x.SRNO />
+        Remsn += 1;
+        IsSatisfied -= 1;
+
+    }
+
+
+
+
+
+}
+
+@{if (TempData["resultFailed"] != null)
+    {
+        <script>
+
+            swal("", "@TempData["resultFailed"]", "warning");
+
+        </script>
+    }
+}
+@{if (TempData["result"] != null)
+    {
+        <script>
+
+            swal("", "@TempData["result"]", "success");
+
+
+        </script>
+    }
+}
+<script>
+     function LesseeLicenseeChange() {
+        var IdofLesseeLicensee = $('#IdofLesseeLicensee').val();
+        $.ajax({
+            type: "POST",
+            url: '@Url.Action("GetLesseeLicenseeUserData", "Inspection", new { Area = "Inspection" })',
+            data: { 'IdofLesseeLicensee': IdofLesseeLicensee },
+            dataType: "json",
+            success: function (result) {
+                debugger;
+                if (result != null) {
+                    $("#LesseeLicenseeDistrict").val(result.lesseeLicenseeDistrict).change();
+                    $("#LesseeLicenseeVillage").val(result.lesseeLicenseeVillage).change();
+                    $("#LesseeLicenseeTehsil").val(result.lesseeLicenseeTehsil).change();
+                    $("#LesseeLicenseePanchayat").val(result.lesseeLicenseePanchayat).change();
+                    $("#LesseeLicenseePinCode").val(result.lesseeLicenseePinCode).change();
+                    $("#LesseeLicenseePoliceStation").val(result.lesseeLicenseePoliceStation).change();
+                    $("#LesseeLicenseeMobile").val(result.lesseeLicenseeMobile).change();
+                    $("#LesseeLicenseeEmail").val(result.lesseeLicenseeEmail).change();
+                }
+                else {
+                    swal("", "Data Not Available.", "warning");
+                }
+            }
+        });
+    }
+</script>
+<script>
+    var filesize = 0;
+    var Bayansize = 0;
+
+    $('input[name="Application"]').bind('change', function () {
+        filesize = this.files[0].size;
+        return false;
+    });
+
+    $('input[name="Bayan"]').bind('change', function () {
+        Bayansize = this.files[0].size;
+        return false;
+    });
+
+    var inspectionReportDoc = 0;
+    var PanchNamaDoc = 0;
+    var BayanDoc = 0;
+    var PhotoDoc = 0;
+    var OthersDoc = 0;
+    function checkFields() {
+        debugger;
+        var valid = 1;
+
+        if (!blankFieldValidation("insSubject", "Subject of Inspection.")) {
+            valid = 0;
+            return false;
+        }
+        else if (!blankFieldValidation("insDate", "Date of Inspection.")) {
+            valid = 0;
+            return false;
+        }
+        else if (!blankFieldValidation("IdofLesseeLicensee", "Name of Lessee/Licensee.")) {
+            valid = 0;
+            return false;
+        }
+        else if (!DropDownValidation("LesseeLicenseeUserTypeId", "User Type")) {
+            valid = 0;
+            return false;
+        }
+        else if (!DropDownValidation("IdofLesseeLicensee", "Name of Lessee/Licensee/End User")) {
+            valid = 0;
+            return false;
+        }
+
+
+        if (inspectionReportDoc == 0) {
+            valid = 0;
+            swal("", "Upload Inspection Report.", "warning");
+            return false;
+        }
+
+        if (BayanDoc == 0) {
+            valid = 0;
+            swal("", "Upload Bayan Copy.", "warning");
+            return false;
+        }
+
+        $(".issuenceCheckbox").each(function (i, v) {
+            var element = $(v).parent().parent()[0];
+            var isChecked = false;
+            var isNullOrEmpty = false;
+            $(element).children('td').each(function (id, val) {
+                if (id == 2) {
+                    isChecked = $(val).children().is(':checked');
+                }
+                if (id == 3) {
+                    if ($(val).children().val() == null || $(val).children().val() == '') {
+                        isNullOrEmpty = true;
+                    }
+                }
+            });
+            if (!isChecked && isNullOrEmpty) {
+                swal("", "Please Enter Remarks", "warning");
+                $(v).focus();
+                valid = 0;
+                return false;
+            } else {
+
+            }
+        });
+        return valid;
+    }
+    function OnSubmitForm() {
+        debugger;
+        var checkdata = checkFields();
+        if (checkdata == 1) {
+            if (confirm("Are you confirmed to submit Inspection Report ?")) {
+                $("#__EUAntiForgeryForm").submit();
+            }
+            else {
+                return false;
+            }
+        }
+        else
+            return false;
+    }
+
+    function OnClear() {
+        if (confirm("Are you confirmed to clear Inspection Report ?")) {
+            window.location.reload();
+        }
+        else {
+            return false;
+        }
+    }
+</script>
+<script>
+    function filterUserType() {
+        return {
+            userTypeId: $("#LesseeLicenseeUserTypeId").val()
+        };
+    }
+    function onRoleType(e) {
+        getConditionList();
+    }
+    function getConditionList() {
+        debugger;
+        var TypeId = $("#LesseeLicenseeUserTypeId").val();
+        $.ajax({
+            type: "POST",
+        url: '@Url.Action("getIssuanceOfNotice", "Inspection", new { Area = "Inspection" })',
+            data: { 'TypeId': TypeId },
+            cache: false,
+
+            datatype: "JSON",
+            success: function (result) {
+                debugger;
+                console.log(result);
+                if (result != null) {
+                    resultdata = result;
+                    $('#tbodyTearms').empty();
+                    for (var index in result) {
+                        var tr = $("<tr>");
+                        var td0 = $("<td style='display:none;'>").append("<input type='hidden' name='issuanceOfNoticeId' value=" + result[index].issuanceOfNoticeId + " />");
+                        var td1 = $("<td class='paddings'>").html(result[index].issuanceOfNoticeText);
+                        var td2 = $("<td class='paddings'>").append($("<input type='checkbox' class='issuenceCheckbox' name='isSatisfied' value='" + result[index].issuanceOfNoticeId + "' checked />"));
+                        var td3 = $("<td class='paddings'>").append($("<textarea class='fullwidth' name='remarks'>"));
+                        tr.append(td0);
+                        tr.append(td1);
+                        tr.append(td2);
+                        tr.append(td3);
+                        $('#tbodyTearms').append(tr)
+                    }
+                }
+            }
+        });
+    }
+    $('.issuenceCheckbox').change(function () {
+        console.log("Changed");
+    });
+    function isNumber(evt) {
+        evt = (evt) ? evt : window.event;
+        var charCode = (evt.which) ? evt.which : evt.keyCode;
+        if (charCode > 31 && (charCode < 48 || charCode > 57)) {
+            return false;
+        }
+        return true;
+    }
+</script>
+<script>
+    indicateMe = "yes"
+    $(document).ready(function () {
+        loadNavigation('AddMineralForm', 'glTMng', 'plmineralform', 'tl', 'Inspection', ' Add Inspection', '');
+        $('.searchableselect').searchableselect();
+    });
+</script>
+<script>
+    $(document).ready(function () {
+        debugger;
+        if ($('#ForDetails').val()=="detailsData") {
+
+            $("#btnNext2").hide();
+            $("#bReset").hide();
+            $("#divHide").hide();
+            $("#insSubject").val($("#hdninsSubject").val());
+            $("#insSubject").attr("disabled", "disabled");
+            $("#PinCode").val($("#hdnPinCode").val());
+            $("#PinCode").attr("disabled", "disabled");
+           
+           
+            $("#insDate").val($("#hdninsDate").val());
+            //$("#LesseeLicenseeUserTypeId option:selected").val($('#hdnLesseeLicenseeUserTypeId').val());
+            ChangeUserType();
+            $("#LesseeLicenseeUserTypeId").attr("disabled", "disabled");
+
+            $("#divCon").hide();
+            $("#divconVis").hide();
+            
+            
+        }
+
+
+
+        $('#InspectionReport').on("change", function () {
+            debugger;
+            var label = $(this).siblings('.custom-file-label');
+            var files = $(this)[0].files;
+            var Size = files[0].size;
+            if (Size < 2048000) {
+                label.html(files[0].name);
+                inspectionReportDoc = files.length;
+            }
+            else {
+                swal("", "Please make sure your Inspection Document is less than 2 MB!", "warning");
+                $('#doc').focus();
+
+            }
+
+        });
+        $('#Panchaname').on("change", function () {
+            debugger;
+            var label = $(this).siblings('.custom-file-label');
+            var files = $(this)[0].files;
+            var Size = files[0].size;
+            if (Size < 2048000) {
+                label.html(files[0].name);
+                PanchNamaDoc = files.length;
+            }
+            else {
+
+                swal("", "Please make sure your Panchnama Document is less than 2 MB!", "warning");
+                $('#doc').focus();
+
+            }
+
+        });
+
+        $('#Bayan').on("change", function () {
+            debugger;
+            var label = $(this).siblings('.custom-file-label');
+            var files = $(this)[0].files;
+            var Size = files[0].size;
+            if (Size < 2048000) {
+                label.html(files[0].name);
+                BayanDoc = files.length;
+            }
+            else {
+                swal("", "Please make sure your Bayan Document is less than 2 MB!", "warning");
+                $('#doc').focus();
+
+            }
+
+        });
+
+        $('#Photos').on("change", function () {
+            debugger;
+            var label = $(this).siblings('.custom-file-label');
+            var files = $(this)[0].files;
+            var Size = files[0].size;
+            if (Size < 2048000) {
+                label.html(files[0].name);
+                PhotoDoc = files.length;
+            }
+            else {
+                swal("", "Please make sure your Photos is less than 2 MB!", "warning");
+                $('#doc').focus();
+
+            }
+        });
+        $('#Others').on("change", function () {
+            debugger;
+            var label = $(this).siblings('.custom-file-label');
+            var files = $(this)[0].files;
+            var Size = files[0].size;
+            if (Size < 2048000) {
+                label.html(files[0].name);
+                OthersDoc = files.length;
+            }
+            else {
+                swal("", "Please make sure your Other Document is less than 2 MB!", "warning");
+                $('#doc').focus();
+            }
+        });
+    });
+</script>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#LesseeLicenseeUserTypeId").change(function () {
+
+            ChangeUserType();
+        });
+
+        $("#IdofLesseeLicensee").change(function () {
+            LesseeLicenseeChange();
+        });
+
+    });
+    function ChangeUserType() {
+
+           onRoleType()
+            var TypeId = $("#LesseeLicenseeUserTypeId").val();
+            if (TypeId == "") {
+                TypeId = 0;
+            }
+
+            $('#IdofLesseeLicensee').empty();
+            var v = "";
+
+            if (TypeId != 0) {
+
+                $.ajax({
+                    type: "POST",
+                    url: '@Url.Action("GetLesseeLicenseeUserDropDown", "Inspection", new { Area = "Inspection" })',
+                    data: { 'TypeId': TypeId },
+                    cache: false,
+
+                    datatype: "JSON",
+                    success: function (SList) {
+                        debugger
+                        $('#IdofLesseeLicensee').append('<option value="0">Select Name of Lessee/Licensee/End User*</option>');
+                        $.each(SList, function (i, item) {
+
+                            $('#IdofLesseeLicensee').append('<option value="' + item.value + '">' + item.text + '</option>');
+
+                        });
+                        if ($('#ForDetails').val() == "detailsData") {
+                            debugger;
+                            $("#IdofLesseeLicensee").val($("#hdnLesseeLicenseeId").val());
+                             $("#IdofLesseeLicensee").trigger("change");
+                             $("#IdofLesseeLicensee").attr("disabled", "disabled");
+                        }
+
+                    }
+
+
+                });
+            }
+            else {
+                swal("", "Select Grade", "warning");
+            }
+    }
+</script>
+
+
+
+
+
+
+
+
+
+
+

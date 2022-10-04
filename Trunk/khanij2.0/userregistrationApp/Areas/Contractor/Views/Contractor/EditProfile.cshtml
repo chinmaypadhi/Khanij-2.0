@@ -1,0 +1,923 @@
+﻿@*// *********************************************************************************************************
+    //  View Name                : EditProfile
+    //  Desciption               : Bind Tailingdam profile details
+    //  Created By               : Lingaraj Dalai
+    //  Created On               : 02 June 2022
+    // ********************************************************************************************************
+*@
+@model userregistrationEF.cls_TailingDam;
+@using userregistrationEF;
+@using  Microsoft.AspNetCore.Http;
+@inject Microsoft.Extensions.Options.IOptions<userregistrationEF.KeyList> metaOptions
+@inject IHttpContextAccessor HttpContextAccessor
+@{
+    ViewData["Title"] = "EditProfile";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+@if (TempData["Message"] != null)
+{
+<script>
+    var vv = '@TempData["Message"]';
+    if (vv == 0) {
+        swal("", "Record already existed with either applicant name or mobile number or email address  .", "warning");
+    }
+    else if (vv == 1) {
+        swal("", "Profile updated successfully.", "success");
+    }
+    else if (vv == 2) {
+        swal("", "Something Errror occured. Please Try After Sometime!!", "error");
+    }
+</script>
+}
+
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        <!-- MAIN CONTENT AREA STARTS -->
+        @Html.Partial("_CMSnavigation")
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" id="navlinkAdd" href="javascript:void(0);">
+                                Add
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="~/Contractor/Contractor/Profile">
+                                View
+                            </a>
+                        </li>
+                    </ul>
+                    @Html.Partial("_CMSutil")
+                </div>
+                <section class="box form-container">
+                    <div class="content-body">
+                        @using (Html.BeginForm("EditProfile", "Contractor", FormMethod.Post, new { AUTOCOMPLETE = "Off", id = "form1", enctype = "multipart/form-data" }))
+                        {
+                        @Html.HiddenFor(x => x.UserId)
+                        @Html.HiddenFor(x => x.TailingDumpID)
+                        @Html.AntiForgeryToken()
+                        <h5 class="font-weight-bold text-brown">Owner Details</h5>
+                        <div class="row">
+                            <div class="col-lg-3 col-md-6 col-sm-12 form-group divRevRecovery">
+                                <label class="col-form-label pt-0 font-weight-bolder">Name of the Authorised Person <span class="text-danger">*</span></label>
+                                <input id="OwnerName" name="OwnerName" value="@Model.OwnerName" maxlength="100" type="text" class="form-control readonly">
+                            </div>
+                            <div class="col-lg-5 col-md-6 col-sm-12 form-group divRevRecovery">
+                                <label for="inputLoginId" class="col-form-label font-weight-bolder">Designation <span class="text-danger">*</span></label>
+                                <input id="Designation" name="Designation" value="@Model.Designation" maxlength="50" type="text" class="form-control readonly">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-3 col-md-6 col-sm-12 form-group">
+                                <label class="col-form-label pt-0 font-weight-bolder">Company <span class="text-danger">*</span></label>
+                                <select id="CompanyId" name="CompanyId" class="form-control readonly">
+                                    <option value="">Select</option>
+                                    @{
+                                            List<CompanyDetails> lstCompanyDetails = (List<CompanyDetails>)ViewData["CompanyDetails"];
+                                            if (lstCompanyDetails != null)
+                                            {
+                                                foreach (var item in lstCompanyDetails)
+                                                {
+                                        <option value="@item.CompanyId">@item.CompanyName</option>
+                                                }
+                                            }
+                                    }
+                                </select>
+                                <input type="hidden" value="@Model.CompanyId" id="hdnCompanyId" />
+                            </div>
+                            <div class="col-lg-5 col-md-6 col-sm-12 form-group">
+                                <label for="inputLoginId" class="col-form-label font-weight-bolder">Address <span class="text-danger">*</span></label>
+                                <textarea id="Address" name="Address" maxlength="500" class="form-control readonly" rows="2">@Model.Address</textarea>
+                                <small class="text-danger">Maximum character should be <strong>500</strong></small>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-3 col-md-6 col-sm-12 form-group">
+                                <label class="col-form-label pt-0 font-weight-bolder">Mobile Number <span class="text-danger">*</span></label>
+                                <input id="MobileNo" name="MobileNo" value="@Model.MobileNo" maxlength="10" type="text" class="form-control" />
+                            </div>
+                            <div class="col-lg-5 col-md-6 col-sm-12 form-group">
+                                <label for="inputLoginId" class="col-form-label font-weight-bolder">E-mail ID <span class="text-danger">*</span></label>
+                                <input name="EmailID" maxlength="50" id="EmailID" value="@Model.EmailID" type="text" class="form-control" />
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-3 col-md-6 col-sm-12 form-group">
+                                <label class="col-form-label pt-0 font-weight-bolder">Order No. <span class="text-danger">*</span></label>
+                                <input id="OrderNo" name="OrderNo" value="@Model.OrderNo" maxlength="50" type="text" class="form-control readonly">
+                            </div>
+                            <div class="col-lg-5 col-md-6 col-sm-12 form-group">
+                                <label for="inputLoginId" class="col-form-label font-weight-bolder">E-mail ID <span class="text-danger">*</span></label>
+                                <div class="custom-file">
+                                    <input name="Tailing_SCAN_COPY" type="file" class="form-control custom-file-input">
+                                    <label class="custom-file-label">Choose Files</label>
+                                    <small class="text-danger">Files type <strong>(.docx, .pdf)</strong> with maximum <strong>2MB</strong></small>
+                                </div>
+                                @if (Model.TailingCopyPath != null)
+                                    {
+                                <label class="form-control-plaintext"> <a href='~/@Model.TailingCopyPath' title="" class="ml-2" data-original-title="Download Document" target="_blank"><i class="icon-file-pdf-solid h5 text-danger"></i></a></label>
+                                    }
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-3 col-md-6 col-sm-12 form-group divRevRecovery">
+                                <label class="col-form-label pt-0 font-weight-bolder">Order Date <span class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control datepicker readonly" id="OrderDate" name="OrderDate" value="@Model.OrderDate">
+                                    <div class="input-group-prepend">
+                                        <label class="input-group-text" for="OrderDate"><i class="icon-calendar-alt-solid"></i></label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-3 col-md-6 col-sm-12 form-group divRevRecovery">
+                                <label class="col-form-label pt-0 font-weight-bolder">Period Validity From <span class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control datepicker readonly" id="PeriodValidityFrom" name="PeriodValidityFrom" value="@Model.PeriodValidityFrom">
+                                    <div class="input-group-prepend">
+                                        <label class="input-group-text" for="PeriodValidityFrom"><i class="icon-calendar-alt-solid"></i></label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-md-6 col-sm-12 form-group divRevRecovery">
+                                <label class="col-form-label pt-0 font-weight-bolder">Period Validity To <span class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control datepicker readonly" id="PeriodValidityTo" name="PeriodValidityTo" value="@Model.PeriodValidityTo">
+                                    <div class="input-group-prepend">
+                                        <label class="input-group-text" for="PeriodValidityTo"><i class="icon-calendar-alt-solid"></i></label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <h5 class="font-weight-bold text-brown">Site Details</h5>
+                        <div class="row">
+                            <div class="col-lg-3 col-md-6 col-sm-12 form-group divRevRecovery">
+                                <label class="col-form-label pt-0 font-weight-bolder">District <span class="text-danger">*</span></label>
+                                <select id="DistrictId" name="DistrictId" class="form-control readonly">
+                                    <option value="">Select</option>
+                                    @{
+                                            List<CommonAddressDetails> lstDistrictDetails = (List<CommonAddressDetails>)ViewData["DistrictDetails"];
+                                            if (lstDistrictDetails != null)
+                                            {
+                                                foreach (var item in lstDistrictDetails)
+                                                {
+                                        <option value="@item.DistrictID">@item.DistrictName</option>
+                                                }
+                                            }
+                                    }
+                                </select>
+                                <input type="hidden" value="@Model.DistrictId" id="hfDistrictId" />
+                            </div>
+                            <div class="col-lg-5 col-md-6 col-sm-12 form-group divRevRecovery">
+                                <label for="inputLoginId" class="col-form-label font-weight-bolder">Tehsil <span class="text-danger">*</span></label>
+                                <select id="TehsilId" name="TehsilId" class="form-control readonly">
+                                    <option value="">Select</option>
+                                </select>
+                                <input type="hidden" value="@Model.TehsilId" id="hdnTehsilId" />
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-3 col-md-6 col-sm-12 form-group divRevRecovery">
+                                <label class="col-form-label pt-0 font-weight-bolder">Village <span class="text-danger">*</span></label>
+                                <select id="VillageId" name="VillageId" class="form-control readonly">
+                                    <option>Select</option>
+                                </select>
+                                <input type="hidden" value="@Model.VillageId" id="hdnVillageId" />
+                            </div>
+                            <div class="col-lg-5 col-md-6 col-sm-12 form-group divRevRecovery">
+                                <label for="inputLoginId" class="col-form-label font-weight-bolder">Area (In Hectare) <span class="text-danger">*</span></label>
+                                <input id="Area" name="Area" value="@Model.Area" maxlength="100" type="text" class="form-control readonly">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-3 col-md-6 col-sm-12 form-group divRevRecovery">
+                                <label class="col-form-label pt-0 font-weight-bolder">Type of Site <span class="text-danger">*</span></label>
+                                <select id="TypeOfSite" name="TypeOfSite" class="form-control readonly">
+                                    <option value="">Select</option>
+                                    @{
+                                            List<TypeOfSite> lstTypeOfSite = (List<TypeOfSite>)ViewData["TypeOfSiteDetails"];
+                                            if (lstTypeOfSite != null)
+                                            {
+                                                foreach (var item in lstTypeOfSite)
+                                                {
+                                        <option value="@item.Value">@item.Text</option>
+                                                }
+                                            }
+                                    }
+                                </select>
+                                <input type="hidden" value="@Model.TypeOfSite" id="hdnSite" />
+                            </div>
+                            <div class="col-lg-5 col-md-6 col-sm-12 form-group divRevRecovery">
+                                <label for="inputLoginId" class="col-form-label font-weight-bolder">Mineral Type <span class="text-danger">*</span></label>
+                                <select id="MineralTypeId" name="MineralTypeId" class="form-control  readonly">
+                                    <option value="">Select</option>
+                                    @{
+                                            List<MineralType> lstMineralType = (List<MineralType>)ViewData["MineralType"];
+                                            if (lstMineralType != null)
+                                            {
+                                                foreach (var item in lstMineralType)
+                                                {
+                                        <option value="@item.Value">@item.Text</option>
+                                                }
+                                            }
+                                    }
+                                </select>
+                                <input type="hidden" value="@Model.MineralTypeId" id="hdnMineralTypeId" />
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-3 col-md-6 col-sm-12 form-group divRevRecovery">
+                                <label class="col-form-label pt-0 font-weight-bolder">Mineral Name <span class="text-danger">*</span></label>
+                                <select id="MineralId" name="MineralId" class="form-control  readonly">
+                                    <option value="">Select</option>
+                                </select>
+                                <input type="hidden" value="@Model.MineralId" id="hdnMineralId" />
+                            </div>
+                            <div class="col-lg-5 col-md-6 col-sm-12 form-group divRevRecovery">
+                                <label for="inputLoginId" class="col-form-label font-weight-bolder">Mineral Form <span class="text-danger">*</span></label>
+                                <select id="MineralFormId" name="MineralFormId" class="form-control readonly">
+                                    <option value="">Select</option>
+                                </select>
+                                <input type="hidden" value="@Model.MineralFormId" id="hdnMineralFormId" />
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-3 col-md-6 col-sm-12 form-group divRevRecovery">
+                                <label class="col-form-label pt-0 font-weight-bolder">Mineral Grade <span class="text-danger">*</span></label>
+                                <select id="MineralGradeId" name="MineralGradeId" class="form-control">
+                                    <option value="">Select</option>
+                                </select>
+                                <input type="hidden" value="@Model.MineralGradeId" id="hdnMineralGradeId" />
+                            </div>
+                            <div class="col-lg-5 col-md-6 col-sm-12 form-group divRevRecovery">
+                                <label for="inputLoginId" class="col-form-label font-weight-bolder">Current Stock (As on date) (Metric Tonne) <span class="text-danger">*</span></label>
+                                <input id="CurrentStock" name="CurrentStock" value="@Model.CurrentStock" maxlength="50" type="text" class="form-control readonly">
+                            </div>
+                        </div>
+                        <div class="row mt-4">
+                            <div class="col-sm-12">
+                                <input type="submit" id="btnSaveTailingDam" value="Update Profile" class="btn btn-success btn-md ml-0 waves-effect waves-light btnsave">
+                                <a href="~/Contractor/Contractor/EditProfile" class="btn btn-danger btn-md ml-0 waves-effect waves-light btnreset">Reset</a>
+                            </div>
+                        </div>
+                        }
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        loadNavigation('Profile', 'glUIS', 'pllesseprof', 'tl', 'Tailing Dam', 'Profile', ' ');
+        $('.selectpicker').selectpicker();
+        $('.searchableselect').searchableselect();
+        $('.readonly').css("pointer-events", "none");
+        if ($('#hdnCompanyId').val() != "") {
+            $('#CompanyId').val($('#hdnCompanyId').val());
+        }
+        if ($('#hfDistrictId').val() != "") {
+            $('#DistrictId').val($('#hfDistrictId').val());
+            BindTehsildata();
+        }
+
+        if ($('#hdnSite').val() != "") {
+            $('#TypeOfSite').val($('#hdnSite').val());
+        }
+        if ($('#hdnMineralTypeId').val() != "") {
+            $('#MineralTypeId').val($('#hdnMineralTypeId').val());
+            BindMineraldata();
+        }
+        $('.datepicker').datetimepicker({
+            format: 'LT',
+            format: 'DD-MM-YYYY'
+            //daysOfWeekDisabled: [0, 6],
+        });
+        $('#DivTailingDam').hide();
+        $('#lblUserId').hide();
+        $('#DivUserId').hide();
+        $('#DivPassword').hide();
+        $('.reg-app, .veh-own-reg').addClass('active');
+
+        $('#ddlPurpose').change(function () {
+            if ($(this).val() == "Tailing Dam") {
+                $('#DivTailingDam').show();
+            }
+            else {
+                $('#DivTailingDam').hide();
+                $('#DivUserId').hide();
+                $('#DivPassword').hide();
+                $('#lblUserId').hide();
+                $('input:radio[name=radio-iRequirement]:checked').prop('checked', false).checkboxradio("refresh");
+            }
+        });
+
+        $("#MobileNo").keydown(function (e) {
+            // Allow: backspace, delete, tab, escape, enter and .
+            if ($.inArray(e.keyCode, [46, 8, 9, 27, 13, 110, 190]) !== -1 ||
+                // Allow: Ctrl+A, Command+A
+                (e.keyCode === 65 && (e.ctrlKey === true || e.metaKey === true)) ||
+                // Allow: home, end, left, right, down, up
+                (e.keyCode >= 35 && e.keyCode <= 40)) {
+                // let it happen, don't do anything
+                return;
+            }
+            // Ensure that it is a number and stop the keypress
+            if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) {
+                e.preventDefault();
+            }
+        });
+
+        $("#Area").keydown(function (e) {
+            // Allow: backspace, delete, tab, escape, enter and .
+            if ($.inArray(e.keyCode, [46, 8, 9, 27, 13, 110, 190]) !== -1 ||
+                // Allow: Ctrl+A, Command+A
+                (e.keyCode === 65 && (e.ctrlKey === true || e.metaKey === true)) ||
+                // Allow: home, end, left, right, down, up
+                (e.keyCode >= 35 && e.keyCode <= 40)) {
+                // let it happen, don't do anything
+                return;
+            }
+            // Ensure that it is a number and stop the keypress
+            if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) {
+                e.preventDefault();
+            }
+        });
+
+        $("#CurrentStock").keydown(function (e) {
+            // Allow: backspace, delete, tab, escape, enter and .
+            if ($.inArray(e.keyCode, [46, 8, 9, 27, 13, 110, 190]) !== -1 ||
+                // Allow: Ctrl+A, Command+A
+                (e.keyCode === 65 && (e.ctrlKey === true || e.metaKey === true)) ||
+                // Allow: home, end, left, right, down, up
+                (e.keyCode >= 35 && e.keyCode <= 40)) {
+                // let it happen, don't do anything
+                return;
+            }
+            // Ensure that it is a number and stop the keypress
+            if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) {
+                e.preventDefault();
+            }
+        });
+
+        $('#TailingDamCOPY').on('change', function () {
+            debugger;
+            var fileExtension = ['jpg', 'jpeg', 'png', 'pdf'];
+            if ($.inArray($(this).val().split('.').pop().toLowerCase(), fileExtension) == -1) {
+                swal("", "Only formats are allowed : " + fileExtension.join(', '), "warning");
+                $(this).focus();
+                return false;
+            }
+
+            if (Number(this.files[0].size) > 2097152) {
+                swal("", 'Try to upload file less than 2MB!', "warning");
+                $(this).val('');
+                $(this).focus();
+                return false;
+            }
+            else {
+                var fileName = $(this).val().split("\\").pop();
+                $(this).next('.custom-file-label').html(fileName);
+            }
+
+        });
+
+        $('#DistrictId').change(function () {
+            debugger;
+            if ($(this).val() != "") {
+                $('#DistrictName').val($("#DistrictId option:selected").text());
+                $.ajax({
+                    url: "/Contractor/Contractor/GetTehsilDataFromDistrictID",
+                    data: { 'DistrictId': $(this).val() },
+                    dataType: 'json',
+                    type: 'post',
+                    success: function (data) {
+                        debugger;
+                        if (data.length > 0) {
+                            $('#TehsilId').html('')
+                            $('#TehsilId').append("<option value=''>Select</option>");
+                            $.each(data, function (ind, item) {
+                                $('#TehsilId').append("<option value='" + item.tehsilID + "'>" + item.tehsilName + "</option>");
+                            });
+                            if ($('#hdnTehsilId').val() != "") {
+                                $('#TehsilId').val($('#hdnTehsilId').val());
+                            }
+                        }
+                    },
+                    error: function (err) {
+
+                    }
+                });
+            }
+            else {
+                $('#TehsilId').html('')
+                $('#TehsilId').append("<option value=''>Select</option>");
+                $('#VillageId').html('');
+                $('#VillageId').append("<option value=''>Select</option>");
+            }
+        });
+
+        $('#TehsilId').change(function () {
+            if ($(this).val() != "") {
+                $.ajax({
+                    url: "/Contractor/Contractor/GetVillageDataFromTehsilID",
+                    data: { 'TehsilId': $(this).val() },
+                    dataType: 'json',
+                    type: 'post',
+                    success: function (data) {
+                        if (data.length > 0) {
+                            $('#VillageId').html('')
+                            $('#VillageId').append("<option value=''>Select</option>");
+                            $.each(data, function (ind, item) {
+                                $('#VillageId').append("<option value='" + item.villageID + "'>" + item.villageName + "</option>");
+                            });
+                        }
+                    },
+                    error: function (err) {
+
+                    }
+                });
+            }
+            else {
+                $('#VillageId').html('');
+                $('#VillageId').append("<option value=''>Select</option>");
+            }
+        });
+
+        $('#MineralTypeId').change(function () {
+            debugger;
+            if ($(this).val() != "") {
+                $.ajax({
+                    url: "/Contractor/Contractor/GetCascadeMineral",
+                    data: { 'mineraltypeid': $(this).val() },
+                    dataType: 'json',
+                    type: 'post',
+                    success: function (data) {
+                        debugger;
+                        if (data.length > 0) {
+                            $('#MineralId').html('');
+                            $('#MineralId').append("<option value=''>Select</option>");
+                            $.each(data, function (ind, item) {
+                                $('#MineralId').append("<option value='" + item.mineralID + "'>" + item.mineralName + "</option>");
+                            });
+                        }
+                    },
+                    error: function (err) { }
+                });
+            }
+            else {
+                $('#MineralId').html('');
+                $('#MineralId').append("<option value=''>Select</option>");
+                $('#MineralFormId').html('');
+                $('#MineralFormId').append("<option value=''>Select</option>");
+                $('#MineralGradeId').html('');
+                $('#MineralGradeId').append("<option value=''>Select</option>");
+            }
+        });
+
+        $('#MineralId').change(function () {
+            if ($(this).val() != "") {
+                $.ajax({
+                    url: "/Contractor/Contractor/GetCascadeMineralNature",
+                    data: { 'mineral': $(this).val() },
+                    dataType: 'json',
+                    type: 'post',
+                    success: function (data) {
+                        debugger;
+                        if (data.length > 0) {
+                            $('#MineralFormId').html('');
+                            $('#MineralFormId').append("<option value=''>Select</option>");
+                            $.each(data, function (ind, item) {
+                                $('#MineralFormId').append("<option value='" + item.mineralNatureId + "'>" + item.mineralNature + "</option>");
+                            });
+                        }
+                    },
+                    error: function (err) { }
+                });
+            }
+            else {
+                $('#MineralFormId').html('');
+                $('#MineralFormId').append("<option value=''>Select</option>");
+                $('#MineralGradeId').html('');
+                $('#MineralGradeId').append("<option value=''>Select</option>");
+            }
+        });
+
+        $('#MineralFormId').change(function () {
+            debugger;
+            if ($(this).val() != "") {
+                $.ajax({
+                    url: "/Contractor/Contractor/GetCascadeMineralGrade",
+                    data: { 'mineralNature': $(this).val() },
+                    dataType: 'json',
+                    type: 'post',
+                    success: function (data) {
+                        debugger;
+                        if (data.length > 0) {
+                            $('#MineralGradeId').html('');
+                            $('#MineralGradeId').append("<option value=''>Select</option>");
+                            $.each(data, function (ind, item) {
+                                $('#MineralGradeId').append("<option value='" + item.mineralGradeId + "'>" + item.mineralGrade + "</option>");
+                            });
+                        }
+                    },
+                    error: function (err) { }
+                });
+            }
+            else {
+                $('#MineralGradeId').html('');
+                $('#MineralGradeId').append("<option value=''>Select</option>");
+            }
+        });
+
+        $('#btnSaveTailingDam').click(function () {
+            if (ValidateTailingDam()) {
+                $('#form1').submit();
+            }
+            else {
+                return false;
+            }
+        });
+    });
+    /*Added to Bind details for edit*/
+    function BindTehsildata() {
+        if ($("#DistrictId").val() != "") {
+            $('#DistrictName').val($("#DistrictId option:selected").text());
+            $.ajax({
+                url: "/Contractor/Contractor/GetTehsilDataFromDistrictID",
+                data: { 'DistrictId': $("#DistrictId").val() },
+                dataType: 'json',
+                type: 'post',
+                success: function (data) {
+                    debugger;
+                    if (data.length > 0) {
+                        $('#TehsilId').html('')
+                        $('#TehsilId').append("<option value=''>Select</option>");
+                        $.each(data, function (ind, item) {
+                            $('#TehsilId').append("<option value='" + item.tehsilID + "'>" + item.tehsilName + "</option>");
+                        });
+                        if ($('#hdnTehsilId').val() != "") {
+                            $('#TehsilId').val($('#hdnTehsilId').val());
+                        }
+                        BindVillagedata();
+                    }
+                },
+                error: function (err) {
+
+                }
+            });
+        }
+        else {
+            $('#TehsilId').html('')
+            $('#TehsilId').append("<option value=''>Select</option>");
+            $('#VillageId').html('');
+            $('#VillageId').append("<option value=''>Select</option>");
+        }
+    }
+    function BindVillagedata() {
+        if ($("#TehsilId").val() != "") {
+            $.ajax({
+                url: "/Contractor/Contractor/GetVillageDataFromTehsilID",
+                data: { 'TehsilId': $("#TehsilId").val() },
+                dataType: 'json',
+                type: 'post',
+                success: function (data) {
+                    if (data.length > 0) {
+                        $('#VillageId').html('')
+                        $('#VillageId').append("<option value=''>Select</option>");
+                        $.each(data, function (ind, item) {
+                            $('#VillageId').append("<option value='" + item.villageID + "'>" + item.villageName + "</option>");
+                        });
+                        if ($('#hdnVillageId').val() != "") {
+                            $('#VillageId').val($('#hdnVillageId').val());
+                        }
+                    }
+                },
+                error: function (err) {
+
+                }
+            });
+        }
+        else {
+            $('#VillageId').html('');
+            $('#VillageId').append("<option value=''>Select</option>");
+        }
+    }
+    function BindMineraldata() {
+        if ($("#MineralTypeId").val() != "") {
+            $.ajax({
+                url: "/Contractor/Contractor/GetCascadeMineral",
+                data: { 'mineraltypeid': $("#MineralTypeId").val() },
+                dataType: 'json',
+                type: 'post',
+                success: function (data) {
+                    debugger;
+                    if (data.length > 0) {
+                        $('#MineralId').html('');
+                        $('#MineralId').append("<option value=''>Select</option>");
+                        $.each(data, function (ind, item) {
+                            $('#MineralId').append("<option value='" + item.mineralID + "'>" + item.mineralName + "</option>");
+                        });
+                        if ($('#hdnMineralId').val() != "") {
+                            $('#MineralId').val($('#hdnMineralId').val());
+                        }
+                        BindMineralFormdata();
+                    }
+                },
+                error: function (err) { }
+            });
+        }
+        else {
+            $('#MineralId').html('');
+            $('#MineralId').append("<option value=''>Select</option>");
+            $('#MineralFormId').html('');
+            $('#MineralFormId').append("<option value=''>Select</option>");
+            $('#MineralGradeId').html('');
+            $('#MineralGradeId').append("<option value=''>Select</option>");
+        }
+    }
+    function BindMineralFormdata() {
+        if ($("#MineralId").val() != "") {
+            $.ajax({
+                url: "/Contractor/Contractor/GetCascadeMineralNature",
+                data: { 'mineral': $("#MineralId").val() },
+                dataType: 'json',
+                type: 'post',
+                success: function (data) {
+                    debugger;
+                    if (data.length > 0) {
+                        $('#MineralFormId').html('');
+                        $('#MineralFormId').append("<option value=''>Select</option>");
+                        $.each(data, function (ind, item) {
+                            $('#MineralFormId').append("<option value='" + item.mineralNatureId + "'>" + item.mineralNature + "</option>");
+                        });
+                        if ($('#hdnMineralFormId').val() != "") {
+                            $('#MineralFormId').val($('#hdnMineralFormId').val());
+                        }
+                        BindMineralGradedata();
+                    }
+                },
+                error: function (err) { }
+            });
+        }
+        else {
+            $('#MineralFormId').html('');
+            $('#MineralFormId').append("<option value=''>Select</option>");
+            $('#MineralGradeId').html('');
+            $('#MineralGradeId').append("<option value=''>Select</option>");
+        }
+    }
+    function BindMineralGradedata() {
+        if ($("#MineralFormId").val() != "") {
+            $.ajax({
+                url: "/Contractor/Contractor/GetCascadeMineralGrade",
+                data: { 'mineralNature': $("#MineralFormId").val() },
+                dataType: 'json',
+                type: 'post',
+                success: function (data) {
+                    debugger;
+                    if (data.length > 0) {
+                        $('#MineralGradeId').html('');
+                        $('#MineralGradeId').append("<option value=''>Select</option>");
+                        $.each(data, function (ind, item) {
+                            $('#MineralGradeId').append("<option value='" + item.mineralGradeId + "'>" + item.mineralGrade + "</option>");
+                        });
+                        if ($('#hdnMineralGradeId').val() != "") {
+                            $('#MineralGradeId').val($('#hdnMineralGradeId').val());
+                        }
+                    }
+                },
+                error: function (err) { }
+            });
+        }
+        else {
+            $('#MineralGradeId').html('');
+            $('#MineralGradeId').append("<option value=''>Select</option>");
+        }
+    }
+    /*End here*/
+    function onRadioChange() {
+        if ($("#radioYes").is(":checked")) {
+            $('#DivUserId').show();
+            $('#DivPassword').show();
+            $('#lblUserId').show();
+        }
+        else if ($("#radioYes").is(":checked")) {
+            $('#DivUserId').hide();
+            $('#DivPassword').hide();
+            $('#lblUserId').hide();
+        }
+        else {
+            $('#DivUserId').hide();
+            $('#DivPassword').hide();
+            $('#lblUserId').hide();
+        }
+    }
+
+    function ValidateTailingDam() {
+        if ($('#OwnerName').val() == "") {
+            swal("", "Please Enter Owner Name", "warning");
+            $('#OwnerName').focus();
+            return false;
+        }
+
+        if (CheckSpaceAtFirstPlaceAndLastPlace($('#OwnerName').val()) == false) {
+            swal("", "Please Check Owner Name For Spaces at Beginning And End Place", "warning");
+            $("#OwnerName").focus();
+            return false;
+        }
+
+        if ($('#Designation').val() == "") {
+            swal("", "Please Enter Designation", "warning");
+            $('#Designation').focus();
+            return false;
+        }
+
+        if (CheckSpaceAtFirstPlaceAndLastPlace($('#Designation').val()) == false) {
+            swal("", "Please Check Designation For Spaces at Beginning And End Place", "warning");
+            $("#Designation").focus();
+            return false;
+        }
+
+        if ($('#CompanyId').val() == "") {
+            swal("", "Please Select Company", "warning");
+            $('#CompanyId').focus();
+            return false;
+        }
+
+        if ($('#Address').val() == "") {
+            swal("", "Please Enter Address", "warning");
+            $('#CompanyId').focus();
+            return false;
+        }
+
+        if (CheckSpaceAtFirstPlaceAndLastPlace($('#Address').val()) == false) {
+            swal("", "Please Check Address For Spaces at Beginning And End Place", "warning");
+            $("#Address").focus();
+            return false;
+        }
+
+        if ($('#MobileNo').val() == "") {
+            swal("", "Please Enter MobileNo", "warning");
+            $('#MobileNo').focus();
+            return false;
+        }
+
+        if ($('#MobileNo').val() != "") {
+            if ($('#MobileNo').val().length != 10) {
+                swal("", "Please Enter Valid MobileNo", "warning");
+                $('#MobileNo').focus();
+                return false;
+            }
+        }
+
+        if ($('#EmailID').val() == "") {
+            swal("", "Please Enter EmailId", "warning");
+            $('#EmailID').focus();
+            return false;
+        }
+
+        if (ValidateEmailAddressNoMsg(document.getElementById("EmailID")) == false) {
+            swal("", "Please Enter Valid EmailId", "warning");
+            $('#EmailID').focus();
+            return false;
+        }
+
+        if ($('#OrderNo').val() == "") {
+            swal("", "Please Enter OrderNo", "warning");
+            $('#OrderNo').focus();
+            return false;
+        }
+
+        if (CheckSpaceAtFirstPlaceAndLastPlace($('#OrderNo').val()) == false) {
+            swal("", "Please Check OrderNo For Spaces at Beginning And End Place", "warning");
+            $("#OrderNo").focus();
+            return false;
+        }
+
+        if ($('#TailingDamCOPY').val() == "") {
+            swal("", "Please Choose Order Copy", "warning");
+            $('#TailingDamCOPY').focus();
+            return false;
+        }
+
+        if ($('#DistrictId').val() == "") {
+            swal("", "Please Select District", "warning");
+            $('#DistrictId').focus();
+            return false;
+        }
+
+        if ($('#TehsilId').val() == "") {
+            swal("", "Please Select Tehsil", "warning");
+            $('#TehsilId').focus();
+            return false;
+        }
+
+        if ($('#VillageId').val() == "") {
+            swal("", "Please Select Village", "warning");
+            $('#VillageId').focus();
+            return false;
+        }
+
+        if ($('#Area').val() == "") {
+            swal("", "Please Enter Area", "warning");
+            $('#Area').focus();
+            return false;
+        }
+
+        if ($('#TypeOfSite').val() == "") {
+            swal("", "Please Select TypeOfSite", "warning");
+            $('#TypeOfSite').focus();
+            return false;
+        }
+
+        if ($('#MineralTypeId').val() == "") {
+            swal("", "Please Select Mineral Type", "warning");
+            $('#MineralTypeId').focus();
+            return false;
+        }
+
+        if ($('#MineralId').val() == "") {
+            swal("", "Please Select Mineral Name", "warning");
+            $('#MineralId').focus();
+            return false;
+        }
+
+        if ($('#MineralFormId').val() == "") {
+            swal("", "Please Select Mineral Form", "warning");
+            $('#MineralFormId').focus();
+            return false;
+        }
+
+        if ($('#MineralGradeId').val() == "") {
+            swal("", "Please Select Mineral Grade", "warning");
+            $('#MineralGradeId').focus();
+            return false;
+        }
+
+        if ($('#CurrentStock').val() == "") {
+            swal("", "Please Enter Current Stock", "warning");
+            $('#CurrentStock').focus();
+            return false;
+        }
+
+        if ($('#OrderDate').val() == "") {
+            swal("", "Please Enter Order Date", "warning");
+            $('#OrderDate').focus();
+            return false;
+        }
+
+        if ($('#TailingDamCaptcha').val() == "") {
+            swal("", "Please Enter Captcha", "warning");
+            $('#TailingDamCaptcha').focus();
+            return false;
+        }
+
+        if ($('#capt1').html() != $('#TailingDamCaptcha').val()) {
+            swal("", "Please Enter Valid Captcha", "warning");
+            $('#TailingDamCaptcha').focus();
+            updateCaptcha();
+            return false;
+        }
+        return true;
+    }
+
+    function ValidateEmailAddressNoMsg(inputText) {
+        debugger;
+        var mailformat = /^\w+([\.-]?\w+)*@@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+        if (inputText.value.match(mailformat)) {
+            inputText.focus();
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+
+    function CheckSpaceAtFirstPlaceAndLastPlace(str) {
+        var regex = /^(?!\s)(?![\s\S]*\s$)[a-zA-Z0-9\s()-]+$/;
+        return regex.test(str);
+    }
+
+    $("#EmailID").keydown(function (evt) {
+        debugger;
+        evt = (evt) ? evt : window.event;
+        var charCode = (evt.which) ? evt.which : evt.keyCode;
+        if (charCode == 32) {
+            return false;
+        }
+        return true;
+
+    });
+
+    function ChangeCheckBoxStatus() {
+        if ($('input[type="checkbox"]').is(':checked') == true) {
+            $('input[type="checkbox"]').prop('checked', false);
+        }
+    }
+
+</script>

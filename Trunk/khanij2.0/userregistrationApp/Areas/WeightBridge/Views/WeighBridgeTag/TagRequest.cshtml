@@ -1,0 +1,573 @@
+﻿
+@{
+    ViewData["Title"] = "TagRequest";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+
+<script>
+
+    $(document).ready(function () {
+        loadNavigation('IndividualRegistrationRequestNew', 'weigbrig', 'weigbrigtwo', 'tl', 'Weighbridge', 'Approve Tag Weighbridge', ' ');
+        $('.searchableselect').searchableselect();
+        $('.shorting-lnk').click(function () {
+            $('.shorting-lnk i').toggleClass('fa-sort-amount-up-alt fa-sort-amount-down-alt ');
+        });
+        $('.datepicker').datetimepicker({
+            format: 'LT',
+            format: 'DD-MMM-YYYY',
+            daysOfWeekDisabled: [],
+        });
+    });
+</script>
+@if (TempData["Status"] != null)
+{
+    <script>
+    var vv = '@TempData["Status"]';
+    if (vv == '1') {
+        swal("", "@TempData["Message"]", "success");
+    }
+    else {
+        swal("", "@TempData["Message"]", "warning");
+    }
+    </script>
+}
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        @Html.Partial("_CMSnavigation")
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link" href="/WeightBridge/WeighBridgeTag/WBTag">
+                                Add
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/WeightBridge/WeighBridgeTag/WBTagView">
+                                View
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="/WeightBridge/WeighBridgeTag/TagRequest">
+                                Tag Request
+                            </a>
+                        </li>
+                    </ul>
+                    @Html.Partial("_CMSutil")
+                </div>
+                <section class="box form-container">
+                    <div class="content-body">
+                        <div class="row">
+                            <div class="col-sm-12">
+
+                                <table id="table-exports" class="table table-sm table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>Application No./ Date</th>
+                                            <th>Applicant Name /Registration code</th>
+                                            <th>Weighbridge Name</th>
+                                            <th>Address/District</th>
+                                            <th>Status</th>
+                                            <th>Stamp Valid From</th>
+                                            <th>Stamp Valid To</th>
+                                            <th>History</th>
+                                            <th width="150" class="text-center noprint">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @{
+                                            foreach (var item in (List<userregistrationEF.ViewWeighBridgeTagModel>)ViewData["WBTagList"])
+                                            {
+                                                <tr>
+                                                    <td><a data-toggle="modal" onclick="GetWBDetailsByID(@item.WeighBridgeID)" data-target="#exampleModal" class="text-primary">@item.ApplicationNo</a> <br />@item.AppliedDate.ToString("dd-MMM-yyyy") </td>
+                                                    <td>@item.ApplicantName <br /> @item.UserCode</td>
+                                                    <td>@item.WeighBridgeName</td>
+                                                    <td>@item.Address<br />@item.DistrictName</td>
+                                                    @{
+                                                        if (item.Status == "11")
+                                                        {
+                                                            <td class="text-info">New <strong>Tag Approval</strong> Request<br> on  @item.AppliedDate.ToString("dd MMM yyyy")</td>
+                                                        }
+                                                    }
+
+
+                                                    <td>@item.StampValidFrom.ToString("dd-MMM-yyyy")</td>
+                                                    <td>@item.StampValidTo.ToString("dd-MMM-yyyy")</td>
+                                                    <td><a data-toggle="modal" data-target="#ModalStatusHistory" onclick="GetHistoryByID(@item.WeighBridgeTagID)" class="text-primary">Log Details</a></td>
+                                                    <td class="text-center noprint">
+                                                        @{
+                                                            if (item.Status == "11")
+                                                            {
+                                                                <button type="button" onclick="GetWBDetailsByTagID(@item.WeighBridgeTagID, @item.UserID,@item.ActivityId)" class="btn btn-success btn-sm" data-toggle="modal" data-target="#exampleModal2">Take Action</button>
+                                                            }
+                                                        }
+
+                                                    </td>
+                                                </tr>
+                                            }
+                                        }
+                                    </tbody>
+                                </table>
+
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+    <!-- MAIN CONTENT AREA ENDS -->
+</section>
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h6 class="modal-title" id="exampleModalLabel">
+                    Weigh Bridge Owner Registration Details
+
+                </h6>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body mineral-concesion-details">
+                <p> <small><span id="spusertype"></span> Name : <span id="spName" class="font-weight-bold"></span></small> | <small> Code : <span id="spCode" class="font-weight-bold"></span></small></p>
+                <p class="font-weight-bold"> WeighBridge Information</p>
+                <div class="row">
+                    <label class="col-lg-3 col-12 col-form-label">Weigh Bridge Name</label>
+                    <div class="col-lg-3 col-12">
+                        <label id="lblWeighBridgeName" class="form-control-plaintext"><span class="colon">:</span></label>
+                    </div>
+
+                    <label class="col-lg-3 col-12 col-form-label">Supervisor Name</label>
+                    <div class="col-lg-3 col-md-6 col-sm-12">
+                        <label id="lblSupervisorName" class="form-control-plaintext"><span class="colon">:</span></label>
+                    </div>
+
+                    <label class="col-lg-3 col-12 col-form-label">Contact Number</label>
+                    <div class="col-lg-3 col-md-6 col-sm-12">
+                        <label id="lblSupervisorContact" class="form-control-plaintext"><span class="colon">:</span></label>
+                    </div>
+                    <label class="col-lg-3 col-12 col-form-label">Capacity</label>
+                    <div class="col-lg-3 col-12">
+                        <label id="lblcapacity" class="form-control-plaintext"><span class="colon">:</span></label>
+                    </div>
+                    <label class="col-lg-3 col-12 col-form-label">Land / Area Type</label>
+                    <div class="col-lg-3 col-12">
+                        <label id="lblareatype" class="form-control-plaintext"><span class="colon">:</span></label>
+                    </div>
+
+                    <label class="col-lg-3 col-12 col-form-label">Area of Land</label>
+                    <div class="col-lg-3 col-12">
+                        <label id="lblareaofland" class="form-control-plaintext"><span class="colon">:</span></label>
+                    </div>
+
+                    <label class="col-lg-3 col-12 col-form-label">Location</label>
+                    <div class="col-lg-3 col-12">
+                        <label id="lbllocation" class="form-control-plaintext"><span class="colon">:</span></label>
+                    </div>
+
+                    <label class="col-lg-3 col-12 col-form-label">Electricity Availability</label>
+                    <div class="col-lg-3 col-12">
+                        <label id="lblelectricityavail" class="form-control-plaintext"><span class="colon">:</span>yes</label>
+                    </div>
+                    <label class="col-lg-3 col-12 col-form-label">Internet Availability</label>
+                    <div class="col-lg-3 col-12">
+                        <label id="lblinternetavail" class="form-control-plaintext"><span class="colon">:</span>yes</label>
+                    </div>
+                </div>
+                <hr />
+                <p class="font-weight-bold"> Technical Information</p>
+                <div class="row">
+                    <label class="col-lg-3 col-12 col-form-label">Make</label>
+                    <div class="col-lg-3 col-md-6 col-sm-12">
+                        <label id="lblmake" class="form-control-plaintext"><span class="colon">:</span></label>
+                    </div>
+
+                    <label class="col-lg-3 col-12 col-form-label">Model</label>
+                    <div class="col-lg-3 col-md-6 col-sm-12">
+                        <label id="lblmodel" class="form-control-plaintext"><span class="colon">:</span></label>
+                    </div>
+
+                    <label class="col-lg-3 col-12 col-form-label">Modem Baud Rate</label>
+                    <div class="col-lg-3 col-12">
+                        <label id="lblmodembaudrate" class="form-control-plaintext"><span class="colon">:</span></label>
+                    </div>
+
+                    <label class="col-lg-3 col-12 col-form-label">Data Bit</label>
+                    <div class="col-lg-3 col-12">
+                        <label id="lbldatabit" class="form-control-plaintext"><span class="colon">:</span></label>
+                    </div>
+
+                    <label class="col-lg-3 col-12 col-form-label">Stop Bit</label>
+                    <div class="col-lg-3 col-12">
+                        <label id="lblstopbit" class="form-control-plaintext"><span class="colon">:</span></label>
+                    </div>
+
+                    <label class="col-lg-3 col-12 col-form-label">Parity</label>
+                    <div class="col-lg-3 col-12">
+                        <label id="lblparity" class="form-control-plaintext"><span class="colon">:</span></label>
+                    </div>
+
+                    <label class="col-lg-3 col-12 col-form-label">String Read From HyperTerminal</label>
+                    <div class="col-lg-3 col-12">
+                        <label id="lblhyperterminalread" class="form-control-plaintext"><span class="colon">:</span></label>
+                    </div>
+                </div>
+                <hr />
+                <p class="font-weight-bold"> Location Information</p>
+                <div class="row">
+                    <label class="col-lg-3 col-12 col-form-label">Point 1</label>
+                    <div class="col-lg-3 col-12">
+                        <label id="Lat1" class="form-control-plaintext"></label>
+                        <label id="Lon1" class="form-control-plaintext"></label>
+                    </div>
+                    <label class="col-lg-3 col-12 col-form-label">Point 2</label>
+                    <div class="col-lg-3 col-12">
+                        <label id="Lat2" class="form-control-plaintext"></label>
+                        <label id="Lon2" class="form-control-plaintext"></label>
+                    </div>
+                    <label class="col-lg-3 col-12 col-form-label">Point 3</label>
+                    <div class="col-lg-3 col-12">
+                        <label id="Lat3" class="form-control-plaintext"></label>
+                        <label id="Lon3" class="form-control-plaintext"></label>
+                    </div>
+                    <label class="col-lg-3 col-12 col-form-label">Point 4</label>
+                    <div class="col-lg-3 col-12">
+                        <label id="Lat4" class="form-control-plaintext"></label>
+                        <label id="Lon4" class="form-control-plaintext"></label>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Take action -->
+<div class="modal fade take-action-model" id="exampleModal2" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog  modal-dialog-scrollable modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h6 class="modal-title" id="exampleModalLabel">
+                    Take Action
+                </h6>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form id="form1" action="/WeightBridge/WeighBridgeTag/TagApprove" method="post">
+                <div class="modal-body mineral-concesion-details">
+                    <div class="row mb-3">
+
+                        <label class="col-lg-4 col-12 col-form-label"><span id="spFormusertype"></span> Name</label>
+                        <div class="col-lg-8 col-12">
+                            <label id="spFormapplicantName" class="form-control-plaintext font-weight-bold"></label>
+                        </div>
+                        <label class="col-lg-4 col-12 col-form-label">District</label>
+                        <div class="col-lg-8 col-12">
+                            <label id="spFormdistrict" class="form-control-plaintext font-weight-bold">
+                            </label>
+                        </div>
+
+
+                    </div>
+                    <div class="form-group row">
+                        <label for="inputPassword" class="col-lg-4 col-form-label">Remark <span class="text-danger">*</span></label>
+                        <div class="col-lg-8">
+                            <textarea id="ApproveRemarks" name="ApproveRemarks" class="form-control" rows="3"></textarea>
+                            <small class="text-danger">Maximum character should be <strong>500</strong></small>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="inputPassword" class="col-lg-4 col-form-label">Action <span class="text-danger">*</span></label>
+                        <div class="col-lg-8">
+                            <select class="form-control" rows="3" name="ActionType" id="selectAction">
+                                @*<option value="0">Select</option>
+                    <option value="2">Approve</option>
+                    <option value="3">Reject</option>*@
+                            </select>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <input id="ApproveType" name="ApproveType" type="hidden" />
+                    <input type="hidden" id="WeighBridgeTagID" name="WeighBridgeTagID" value="" />
+                    <input type="hidden" id="HdnActivityID" name="ActivityId" value="" />
+                    @*<button id="btnforward" type="button" class="btn btn-success" onclick="Approve('Approve')">Approve</button>*@
+                    @*<button id="btnobject" type="button" class="btn btn-danger" onclick="Approve('Objected')">Object</button>*@
+                    @*<button id="btnrejecte" type="button" class="btn btn-danger" onclick="Approve('Reject')">Reject</button>*@
+                    <button id="btnSubmit" type="button" class="btn btn-success" onclick="Approve()">Submit</button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="ModalStatusHistory" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h6 class="modal-title" id="exampleModalLabel">
+                    History
+                </h6>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="timeline" id="timeline">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        loadNavigation('Add', 'glhelpdesk', 'plraiseticket', 'tl', 'Weighbridge', 'Tag Weighbridge Request', ' ');
+    });
+    function GetWBDetailsByID(weighbridgeID) {
+        $.ajax({
+            type: "post",
+            url: "/WeightBridge/WeightBridge/GetWBDetailsByID",
+            data: { 'weighbridgeID': weighbridgeID },
+            datatype: "json",
+            traditional: true,
+            success: function (data) {
+                debugger;
+                console.log(data);
+                $('#spusertype').text(data.userType);
+                $('#spName').text(data.applicantName);
+                $('#spCode').text(data.userCode);
+                $('#lblWeighBridgeName').text(data.weighBridgeName);
+                $('#lblSupervisorName').text(data.supervisorName);
+                $('#lblSupervisorContact').text(data.supervisorContact);
+                $('#lbllocation').text(data.location);
+                $('#lblmake').text(data.make);
+                $('#lblmodel').text(data.model);
+                $('#lblmodembaudrate').text(data.modelBaudRate);
+                $('#lbldatabit').text(data.dataBit);
+                $('#lblstopbit').text(data.stopBit);
+                $('#lblparity').text(data.parity);
+                $('#lblhyperterminalread').text(data.hyperterminalReading);
+                $('#lblcapacity').text(data.capacity + ' mt.');
+                $('#lblareatype').text(data.landAreaType);
+                $('#lblareaofland').text(data.areaofLand + ' hect.');
+                $('#lblelectricityavail').text((data.electricityAvailablity === true) ? 'Yes' : 'No');
+                $('#lblinternetavail').text((data.internetAvailability === true) ? 'Yes' : 'No');
+                $('#Lat1').text('Lattitude : ' + data.lat1);
+                $('#Lon1').text('Longitude : ' + data.lon1);
+                $('#Lat2').text('Lattitude : ' + data.lat2);
+                $('#Lon2').text('Longitude : ' + data.lon2);
+                $('#Lat3').text('Lattitude : ' + data.lat3);
+                $('#Lon3').text('Longitude : ' + data.lon3);
+                $('#Lat4').text('Lattitude : ' + data.lat4);
+                $('#Lon4').text('Longitude : ' + data.lon4);
+            }
+        });
+    }
+    //for on take action click
+    function GetWBDetailsByTagID(weighbridgeTagID, TagUserID, ActivityId) {
+        GetWBActionByActivityID(ActivityId)
+        $('#WeighBridgeTagID').val(weighbridgeTagID);
+        $.ajax({
+            type: "post",
+            url: "/WeightBridge/WeighBridgeTag/WeighBridgeByUser",
+            data: { 'TagUserID': TagUserID },
+            datatype: "json",
+            traditional: true,
+            success: function (data) {
+                debugger;
+                console.log(data);
+                $('#spFormapplicantName').text(data.applicantName);
+                $('#spFormdistrict').text(data.districtName);
+                $('#ApproveRemarks').val('');
+            }
+        });
+    }
+    function GetHistoryByID(weighbridgeTagID) {
+        $.ajax({
+            type: "post",
+            url: "/WeightBridge/WeighBridgeTag/GetHistoryByWBTagID",
+            data: { 'weighbridgeTagID': weighbridgeTagID },
+            datatype: "json",
+            traditional: true,
+            success: function (data) {
+                debugger;
+                console.log(data);
+                $('#timeline').empty();
+                var elements = "";
+                $.each(data, function (ind, item) {
+                    debugger
+                    if (item.status == '5') {
+                        elements += "<div class='timeline__content'>";
+                        elements += "<span class='content_degination'>DD</span>";
+                        elements += "<span class='content_tag approve'><i class='icon-check-double-solid mr-2'></i>Approved</span>";
+                        elements += "<span class='content_date'>" + ChangeDateFormat(item.approvedOn) + "</span>";
+                        elements += "<p class='content_p'>" + item.approveRemarks + "</p>";
+                        elements += "</div>";
+                    }
+                    if (item.status == '4') {
+                        elements += "<div class='timeline__content'>";
+                        elements += "<span class='content_degination'>DD</span>";
+                        elements += "<span class='content_tag reject'><i class='icon-trash-alt-solid mr-2'></i>Reject</span>";
+                        elements += "<span class='content_date'>" + ChangeDateFormat(item.approvedOn) + "</span>";
+                        elements += "<p class='content_p'>" + item.approveRemarks + "</p>";
+                        elements += "</div>";
+                    }
+                    if (item.status == '3') {
+                        elements += "<div class='timeline__content'>";
+                        elements += "<span class='content_degination'>DD</span>";
+                        elements += "<span class='content_tag reject'><i class='icon-times-solid mr-2'></i>Objection</span>";
+                        elements += "<span class='content_date'>" + ChangeDateFormat(item.approvedOn) + "</span>";
+                        elements += "<p class='content_p'>" + item.approveRemarks + "</p>";
+                        elements += "</div>";
+                    }
+                    if (item.status == '2') {
+                        elements += "<div class='timeline__content'>";
+                        elements += "<span class='content_degination'>" + item.applicantName + "<br> <small class='font-weight-bold'> (Applicant) </small></span>";
+                        elements += "<span class='content_tag verify'><i class='icon-check-solid mr-2'></i>Forwarded</span>";
+                        elements += "<span class='content_date'>" + ChangeDateFormat(item.appliedDate) + "</span>";
+                        elements += "<p class='content_p'>";
+                        elements += "<span class='font-weight-bold d-block'>Weight Bridge Name</span> " + item.weighBridgeName + "";
+                        elements += "<span class='font-weight-bold d-block'>District</span> " + item.districtName + "";
+                        elements += "</p>";
+                        elements += "</div>";
+                    }
+                    if (item.status == '12') {
+                        elements += "<div class='timeline__content'>";
+                        elements += "<span class='content_degination'>" + item.applicantName + "<br> <small class='font-weight-bold'> (Applicant) </small></span>";
+                        elements += "<span class='content_tag reject'><i class='icon-trash-alt-solid mr-2'></i>Tag Weighbridge Forwarded</span>";
+                        elements += "<span class='content_date'>" + ChangeDateFormat(item.appliedDate) + "</span>";
+                        elements += "<p class='content_p'>";
+                        elements += "<span class='font-weight-bold d-block'>Weighbridge Name</span> " + item.weighBridgeName + "";
+                        elements += "<span class='font-weight-bold d-block'>District</span> " + item.districtName + "";
+                        elements += "</p>";
+                        elements += "</div>";
+                    }
+                    if (item.status == '11') {
+                        elements += "<div class='timeline__content'>";
+                        elements += "<span class='content_degination'>" + item.applicantName + "<br> <small class='font-weight-bold'> (Applicant) </small></span>";
+                        elements += "<span class='content_tag verify'><i class='icon-check-solid mr-2'></i>Tag Weighbridge Forwarded</span>";
+                        elements += "<span class='content_date'>" + ChangeDateFormat(item.appliedDate) + "</span>";
+                        elements += "<p class='content_p'>";
+                        elements += "<span class='font-weight-bold d-block'>Weighbridge Name</span> " + item.weighBridgeName + "";
+                        elements += "<span class='font-weight-bold d-block'>District</span> " + item.districtName + "";
+                        elements += "</p>";
+                        elements += "</div>";
+                    }
+                    if (item.status == '1') {
+                        elements += "<div class='timeline__content'>";
+                        elements += "<span class='content_degination'>" + item.applicantName + "<br> <small class='font-weight-bold'> (Applicant) </small></span>";
+                        elements += "<span class='content_tag approve'><i class='icon-check-double-solid mr-2'></i>Tag Weighbridge Registered</span>";
+                        elements += "<span class='content_date'>" + ChangeDateFormat(item.appliedDate) + "</span>";
+                        elements += "<p class='content_p'>";
+                        elements += "<span class='font-weight-bold d-block'>Weight Bridge Name</span> " + item.weighBridgeName + "";
+                        elements += "<span class='font-weight-bold d-block'>District</span> " + item.districtName + "";
+                        elements += "</p>";
+                        elements += "</div>";
+                    }
+                });
+                $('#timeline').append(elements);
+
+            }
+        });
+    }
+    function ChangeDateFormat(date) {
+        const formattedDate = new Date(date).toLocaleDateString('en-GB', {
+            day: 'numeric', month: 'short', year: 'numeric'
+        }).replace(/ /g, '-');
+        console.log(formattedDate);
+        return formattedDate;
+    }
+    function Approve() {
+        if ($('#ApproveRemarks').val() == '') {
+            swal('', 'Please Enter Approval Remarks', 'warning');
+            $('#ApproveRemarks').trigger('click');
+            return false;
+        }
+        if ($('#selectAction').val() == '0') {
+            swal('', 'Please select the action type', 'warning');
+            $('#selectAction').trigger('click');
+            return false;
+        }
+
+        $('#ApproveType').val($("#selectAction").val());
+        if (confirm("Before Approving you need to apply your Digital Signature. Are you confirm to Proceed ?")) {
+            var Postdata = 'action=signdoc' + "\n" + 'datatosign=Digital Signature Required' + "\n" + 'signaction=sign' + "\n" + 'filepath=' + "\n" + 'panNumberParam=' + "\n" + 'expirycheck=false' + "\n" + 'issuername=' + "\n" + 'certclass=1|2|3' + "\n" + 'certtype=ALL';
+            connection.send(Postdata);
+            connection.onerror = function (error) {
+                swal("", 'Please check the server connection: ' + error + '', "warning");
+                swal("", error, "warning");
+            };
+            connection.onmessage = function (e) { // when DSC is success then following function executed.
+                if (e.data.indexOf("subProtocol") == -1) {
+                    $.ajax(
+                        {
+                            async: false,
+                            url: '@Url.Action("CheckVerifyResponse", "WeightBridge", new { Area = "WeightBridge" })',
+                            type: "POST",
+                            data: { contentType: "pkcs7", signDataBase64Encoded: e.data, responseType: "plain" },
+                            success: function (msg) {
+                                if (msg == "SUCCESS") {
+                                    $("#form1").submit();
+                                }
+                            }
+                        });
+                }
+                else {
+                    alert(e.data);
+                }
+            };
+        }
+        else {
+            return false;
+        }
+
+    }
+    try {
+        var connection = new WebSocket('wss://localhost.emudhra.com:1645');
+        connection.onopen = function () {
+            console.log('Connection Opened');
+        };
+        connection.onerror = function (error) {
+        };
+        connection.onmessage = function (e) {
+            if (e.data.indexOf("subProtocol") == -1) {
+            }
+        };
+    }
+    catch (e) {
+        swal("", "No DSC Connection Found", "warning");
+    }
+
+    function GetWBActionByActivityID(ActivityId) {
+        debugger;
+        $.ajax({
+            type: "post",
+            url: '@Url.Action("viewActionList", "WeighBridgeTag", new { Area = "WeightBridge" })',
+            data: { 'ActivityId': ActivityId },
+            datatype: "json",
+            success: function (data) {
+                var html = '';
+                html = '<option value="0">Select</option>';
+                for (var i = 0; i < data.length; i++)
+                {
+                    html += "<option value='" + data[i].value + "'>" + data[i].text + "</option>";
+                }
+                $('#selectAction').html(html);
+            }
+        });
+    }
+</script>
+

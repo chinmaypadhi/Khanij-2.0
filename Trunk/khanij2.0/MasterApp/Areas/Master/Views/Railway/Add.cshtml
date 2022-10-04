@@ -1,0 +1,184 @@
+﻿@model MasterEF.RailwayModel
+@using MasterEF
+@{
+    ViewData["Title"] = "Add";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+@if (ViewBag.msg != null)
+{
+    <script>
+
+ swal("",'@ViewBag.msg',"success");
+    </script>
+}
+
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        @Html.Partial("_CMSnavigation")
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item"><a class="nav-link active" href="/Master/Railway/Add">Add</a></li>
+                        <li class="nav-item"><a class="nav-link" href="/Master/Railway/ViewList">View</a></li>
+                    </ul>
+                    @Html.Partial("_CMSutil")
+                </div>
+                <section class="box form-container">
+                    <div class="content-body">
+                        <form action="Add" method="post" id="form1" autocomplete="off">
+                            <input type="hidden" name="RailwayID" id="hdnRailwayID" value="@Model.RailwayID" />
+                            @Html.AntiForgeryToken()
+                            <div class="row">
+                                <div class="col-lg-6 col-12">
+                                    <div class="form-group row">
+                                        <label for="inputName" class="col-sm-4 col-form-label">Station Name <span class="text-danger"></span></label>
+                                        <div class="col-sm-7">
+                                            <input type="text" id="txtRailwayName" name="RailwayName" title="Station Name" value="@Model.RailwayName" class="form-control" Onkeypress="return inputLimiter(event,'NameCharacters')" />
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-6 col-12">
+                                    <div class="form-group row">
+                                        <label for="inputName" class="col-sm-4 col-form-label">Siding Name<span class="text-danger">*</span></label>
+                                        <div class="col-sm-7">
+                                            <input type="text" id="txtRailwaySlidingName" name="RailwaySlidingName" title="Siding Name" value="@Model.RailwaySlidingName" class="form-control" Onkeypress="return inputLimiter(event,'NameCharacters')" />
+                                            <span class="text-danger">@Html.ValidationMessageFor(m => m.RailwaySlidingName)</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-6 col-12">
+                                    <div class="form-group row">
+                                        <label for="inputName" class="col-sm-4 col-form-label">Siding Type<span class="text-danger"></span></label>
+                                        <div class="col-sm-7">
+                                            <input type="text" id="txtRailwaySlidingType" name="RailwaySlidingType" title="Siding Type" value="@Model.RailwaySlidingType" class="form-control" Onkeypress="return inputLimiter(event,'NameCharacters')" />
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-6 col-12">
+                                    <div class="form-group row">
+                                        <label for="inputName" class="col-sm-4 col-form-label">Authority Name<span class="text-danger"></span></label>
+                                        <div class="col-sm-7">
+                                            <input type="text" id="txtRailwayAuthorityName" name="RailwayAuthorityName" title="Authority Name" value="@Model.RailwayAuthorityName" class="form-control" Onkeypress="return inputLimiter(event,'NameCharacters')" />
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-6 col-12">
+                                    <div class="form-group row">
+                                        <label for="inputName" class="col-sm-4 col-form-label">Address<span class="text-danger"></span></label>
+                                        <div class="col-sm-7">
+                                            <textarea id="txtAddress" name="Address" title="Address" class="form-control" Onkeypress="return inputLimiter(event,'NameCharacters')">@Model.Address</textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 col-12">
+                                    <div class="form-group row">
+                                        <label for="inputLoginId" class="col-sm-4 col-form-label">Railway Zone<span class="text-danger">*</span></label>
+                                        <div class="col-sm-7">
+                                            <select id="ddlRailwayZoneID" name="RailwayZoneID" Class="form-control searchableselect" title="Railway Zone">
+                                                <option value="">Select</option>
+                                                @{
+                                                    List<RailwayZoneModel> lstrailwayZoneModels = (List<RailwayZoneModel>)ViewData["RailwayZone"];
+                                                    if (lstrailwayZoneModels != null)
+                                                    {
+                                                        foreach (var item in lstrailwayZoneModels)
+                                                        {
+                                                            if (item.RailwayZoneID == Model.RailwayZoneID)
+                                                            {
+                                                                <option selected="selected" value="@item.RailwayZoneID">@item.RailwayZoneName</option>
+                                                            }
+                                                            else
+                                                            {
+                                                                <option value="@item.RailwayZoneID">@item.RailwayZoneName</option>
+                                                            }
+
+                                                        }
+                                                    }
+                                                }
+                                            </select>
+                                            <span class="text-danger">@Html.ValidationMessageFor(m => m.RailwayZoneID)</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 col-12">
+                                    <div class="form-group row">
+                                        <label for="inputName" class="col-sm-4 col-form-label">Contact No<span class="text-danger"></span></label>
+                                        <div class="col-sm-7">
+                                            <input type="text" id="txtContactNo" name="ContactNo" value="@Model.ContactNo" title="Contact No" class="form-control" Onkeypress="return inputLimiter(event,'NameCharacters')" />
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-6 col-12">
+                                    <div class="form-group row">
+                                        <label for="inputName" class="col-sm-4 col-form-label">Email Address<span class="text-danger"></span></label>
+                                        <div class="col-sm-7">
+                                            <input type="text" id="txtMailID" name="MailID" value="@Model.MailID" title="Email Address" class="form-control" />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 col-12">
+                                    <div class="form-group row">
+                                        <label for="inputName" class="col-sm-4 col-form-label">Status <span class="text-danger">*</span></label>
+                                        <div class="col-sm-7">
+                                            <div class="py-2">
+                                                @Html.RadioButtonFor(n => n.IsActive, true, new { @checked = true, @class = "custom-radio", id = "Rdbtn_Active" })
+                                                <label class="radio-label">Active</label>
+                                                @Html.RadioButtonFor(n => n.IsActive, false, new { @class = "custom-radio", id = "Rdbtn_Inactive" })
+                                                <label class="radio-label">Inactive</label>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6 offset-lg-2 offset-md-4">
+                                    <input type="submit" value='@ViewBag.Button' class="btn btn-primary btn-md ml-0" name="Submit" id="Submit" />
+                                    <a href="/Master/Railway/Add" class="btn btn-danger btn-md">Reset</a>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+    <!-- MAIN CONTENT AREA ENDS -->
+</section>
+<input type="hidden" id="hdnRailwayZoneID" value="@Model.RailwayZoneID" />
+
+<script>
+    indicateMe = "yes"
+    $(document).ready(function () {
+        $('.searchableselect').searchableselect();
+        debugger;
+        loadNavigation('Add', 'glRoleRes', 'plUser', 'tl', 'Master', 'Railway', ' ');
+        //--------------
+        if ($('#hdnRailwayZoneID').val() != "") {
+            $('#ddlRailwayZoneID').val($('#hdnRailwayZoneID').val());
+        }
+        //---------------
+        $("#Submit").click(function () {
+            debugger;
+            if ($('#txtRailwaySlidingName').val() == "") {
+                swal("", "Please Enter Siding Name", "warning");
+                $("#txtRailwaySlidingName").focus();
+                return false;
+            }
+
+            if ($('#ddlRailwayZoneID').val() == "") {
+                swal("", "Please Select Railway Zone", "warning");
+                $("#ddlRailwayZoneID").focus();
+                return false;
+            }
+
+        });
+        //----------------------------
+    });
+
+</script>
+

@@ -1,0 +1,64 @@
+﻿@*// *********************************************************************************************************
+    //  View Name                : DEMOBANK
+    //  Desciption               : Application Fees Payment Information
+    //  Created By               : Akshaya Dalei
+    //  Created On               : 24 July 2021
+    // ********************************************************************************************************
+*@
+@using IntegrationEF;
+@using IntegrationApp.Web;
+@using IntegrationApp.Helper
+@using  Microsoft.AspNetCore.Http;
+@using Microsoft.Extensions.Options;
+@inject IHttpContextAccessor HttpContextAccessor
+@inject IOptions<KeyList> objKeyList
+@{
+    ViewBag.Title = "License Payment Process";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    UserLoginSession profile = HttpContextAccessor.HttpContext.Session.Get<UserLoginSession>(KeyHelper.UserKey);
+}
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        @Html.Partial("_CMSnavigation")
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            DEMO BANK Payment Information
+                        </li>
+                    </ul>
+                    @Html.Partial("_CMSutil")
+                </div>
+
+                <section class="box form-container">
+                    <div class="content-body">
+                        <div><h3 style="color:green">Success</h3></div>
+                        @if (profile.UserType == "Transporter/Vehicle Owner")
+                        {
+                            var urlvehicle = objKeyList.Value.Redirecturl + "VehicleOwner/Vehicle/VehicleDetails";
+                            <a href='@urlvehicle'>Back to Vehicle Details</a>
+                        }
+                        else if (profile.UserType == "Licensee")
+                        {
+                            var urlLicense = objKeyList.Value.Redirecturl + "Licensee/LicenseApplication/LicenseApprovalList";
+                            <a href='@urlLicense'>Back to License Details</a>
+                        }
+                        else if (profile.UserType == "Licensee Renewal")
+                        {
+                            var urlLicense = objKeyList.Value.Redirecturl + "Licensee/LicenseeRenewal/LicenseApprovalList";
+                            <a href='@urlLicense'>Back to License Details</a>
+                        }
+                        else if (profile.UserType == "License Application")
+                        {
+                            var urlLicense = objKeyList.Value.Redirecturl + "Licensee/LicenseApplication/LicenseApprovalList";
+                            <a href='@urlLicense'>Back to License Details</a>
+                        }
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+</section>
+

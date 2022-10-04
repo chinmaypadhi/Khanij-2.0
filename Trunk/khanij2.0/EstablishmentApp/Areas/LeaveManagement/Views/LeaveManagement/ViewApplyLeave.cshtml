@@ -1,0 +1,171 @@
+﻿@*// *********************************************************************************************************
+    //  View Name                : View Apply leave
+    //  Desciption               : To View Apply leave Details
+    //  Created By               : Suresh kumar behera
+    //  Created On               : 13-nov-2021
+    // ********************************************************************************************************
+*@
+
+@model IEnumerable<EstablishmentEf.ApplyLeaveQuery>;
+@{
+    ViewData["Title"] = "ViewApplyLeave";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+@using EstablishmentApp.Web;
+
+@if (TempData["msg"] != null)
+{
+    <script>
+        var vv = '@TempData["msg"]';
+        if (vv == 1) {
+            swal("", "Apply leave successfully.", "success");
+        }
+        else if (vv == 2) {
+            swal("", "leave allready exists.", "warning");
+        }
+        else if (vv == 3) {
+            swal("", "leave updated sucessfully", "success");
+        }
+        else if (vv == 4) {
+            swal("", "leave  cancelled sucessfully", "success");
+        }
+        else if (vv == 5) {
+            swal("", "leave  allredy approved", "warning");
+        }
+        else {
+            swal("", "Something Errror occured. Please Try After Sometime!!", "error");
+        }
+    </script>
+
+    TempData["msg"] = null;
+
+}
+
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        @*@Html.Partial("_navigation")*@
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link" href="@Url.Content("~/LeaveManagement/LeaveManagement/AddApplyLeave")">
+                                Add ApplyLeave
+                            </a>
+                        </li>
+                        <li class="nav-item">
+
+                            <a class="nav-link active" href="javascript:void(0);">
+                                View ApplyLeave
+                            </a>
+                        </li>
+                    </ul>
+
+                    @*@Html.Partial("_util")*@
+                </div>
+
+                <section class="box form-container">
+                    <div class="content-body pt-0">
+                        <div class="legend-box">
+                            <ul class="d-flex mb-1 justify-content-end list-unstyled">
+                                <li><span class="bg-success"></span> Active</li>
+                                <li><span class="bg-warning"></span> Inactive</li>
+                            </ul>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-12">
+                                @*<div class="table-responsive" id="viewtable">*@
+                                <table id="table-exports" class="table table-sm table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th width="30px">Sl#</th>
+                                            <th>Employee Name</th>
+                                            <th>Designation</th>
+                                            <th>Office Level</th>
+                                            <th>Leave Type</th>
+                                            <th>Applied On</th>
+                                            <th>From Date</th>
+                                            <th>To Date</th>
+                                            <th>No. of days</th>
+                                            <th>Reason</th>
+                                            <th>Status</th>
+                                            <th>Pendig With/ Approved By</th>
+                                            <th width="60px" class="noprint">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+
+                                        @{
+                                            var count = 0;
+                                            foreach (var item in Model)
+                                            {
+                                                count++;
+                                                <tr class="active-row">
+
+                                                    <td>@count</td>
+                                                    <td>@item.EmployeeName</td>
+                                                    <td>@item.Designation</td>
+                                                    <td>@item.OfficeLevel</td>
+                                                    <td>@item.LeaveType</td>
+                                                    <td>@item.AppliedOn</td>
+                                                    <td>@item.dtFromDate</td>
+                                                    <td>@item.dtToDate</td>
+                                                    <td>@item.NoOfDays</td>
+                                                    <td>@item.varReason</td>
+                                                    <td>@item.Status</td>
+                                                    <td>@item.ActionTakenTo</td>
+                                                    <td class="noprint">
+                                                        @if (item.intStep == 1)//----forward
+                                                        {
+                                                            <a href="@CustomQueryStringHelper.EncryptString("LeaveManagement","AddApplyLeave","LeaveManagement",new {id=item.intLeaveId })"
+                                                               class="btn-floating btn-outline-primary btn-sm"
+                                                               title="Edit"><i class="icon-pencil-alt-solid"></i></a>
+                                                            <a href="@CustomQueryStringHelper.EncryptString("LeaveManagement","DeleteApplyLeave","LeaveManagement",new {id=item.intLeaveId })"
+                                                               class="btn-floating btn-outline-danger btn-sm"
+                                                               title="Delete" onclick="return confirm('Are you sure to Delete?')"><i class="icon-trash-alt-solid"></i></a>
+
+
+                                                            @*<a href="@Url.Content("~/LeaveManagement/LeaveManagement/AddApplyLeave/")@protector.Decode(Convert.ToString(@item.intLeaveId))" class="btn-outline-primary btn-sm"><i class="icon-pencil-alt-solid"></i></a>
+                                                            <a href="@Url.Content("~/LeaveManagement/LeaveManagement/DeleteApplyLeave/")@protector.Decode(Convert.ToString(@item.intLeaveId))" class="btn-outline-danger btn-sm" onclick="return confirm('Are you sure to cancel?')"><i class="icon-times-solid"></i></a>*@
+                                                        }
+                                                    </td>
+                                                </tr>
+
+                                            }
+                                        }
+
+                                    </tbody>
+                                </table>
+                                @*</div>*@
+                            </div>
+                        </div>
+                    </div>
+
+                </section>
+            </div>
+        </div>
+    </div>
+    <!-- MAIN CONTENT AREA ENDS -->
+</section>
+
+<script>
+
+    $(document).ready(function () {
+        loadNavigation('ViewApplyLeave', 'glholiday', 'plappleav', 'tl', 'Leave', 'View ApplyLeave', ' ');
+
+        $('.searchableselect').searchableselect();
+
+        $('.shorting-lnk').click(function () {
+            $('.shorting-lnk i').toggleClass('fa-sort-amount-up-alt fa-sort-amount-down-alt ');
+        });
+
+        $('.datepicker').datetimepicker({
+            format: 'LT',
+            format: 'DD-MM-YYYY',
+            daysOfWeekDisabled: [0, 6],
+        });
+    });
+</script>
+
+

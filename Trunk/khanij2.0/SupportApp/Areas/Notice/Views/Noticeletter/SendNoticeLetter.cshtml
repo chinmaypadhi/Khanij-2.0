@@ -1,0 +1,225 @@
+﻿@model SupportEF.NoticeLetterEF
+@{
+    ViewData["Title"] = "SendNoticeLetter";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+<style type="text/css">
+    select.selectcontent option {
+        cursor: pointer;
+    }
+</style>
+<script type="text/javascript">
+    indicateMe = "yes"
+    $(document).ready(function () {
+        if ('@TempData["SuccMessage"]' != '' && '@TempData["SuccMessage"]' != null) {
+            swal("", '@TempData["SuccMessage"]', "success");
+        }
+        loadNavigation('SendNoticeLetter', 'glTMng', 'plpaymenthead', 'tl', 'Notice', 'Send Notice/Letter', ' ');
+        $('.searchableselect').searchableselect();
+        var filesize = 0;
+        $('.custom-file-input').on("change", function () {
+            debugger;
+            $("input[name='submit']").attr('disabled', false);
+            filesize = this.files[0].size;
+            var val = $(this).val().toLowerCase(),
+                regex = new RegExp("(.*?)\.(pdf|jpeg|jpg|png|xls|tif)$");
+            var label = $(this).siblings('.custom-file-label');
+            var files = $(this)[0].files;
+            if (files.length > 0) {
+                label.html(files.length + ' Files Selected');
+            }
+            else if (files.length == 0) { label.html(files[0].name); }
+            if (!(regex.test(val))) {
+                swal("", ".docx  type is not an allowed file type. You can use only jpg, jpeg, png, pdf, tif types of file(s). ", "warning");
+                this.value = '';
+                $("input[name='Submit']").attr('disabled', true);
+                label.html('Choose Files');
+                return false;
+            }
+            else if (filesize > 2048000) {
+                swal("", "File size must be 2 MB !", "warning");
+                $("input[name='submit']").attr('disabled', true);
+                return false;
+            }
+            return false;
+        });
+        $("#RoleTypeId").change(function () {
+            var RoleTypeId = $('#RoleTypeId').val();
+            if (RoleTypeId == "") {
+                RoleTypeId = 0;
+            }
+            $('#ddlUserName').empty();
+            var v = "";
+            if (RoleTypeId != 0) {
+                $.ajax({
+                    type: "POST",
+                    url: "/Notice/NoticeLetter/GetUserList",
+                    data: { 'intRoleTypeID': RoleTypeId },
+                    cache: false,
+                    datatype: "JSON",
+                    success: function (SList) {
+                        $.each(SList, function (i, item) {
+                            var opt = new Option(item.applicantName, item.userID);
+                            $('#ddlUserName').append(opt).selectpicker('refresh');
+                        });
+                    }
+                });
+            }
+            else {
+                swal("",'Select User Type',"warning");
+            }
+
+        });
+    });
+    function Validate() {
+        var Iss = false;
+        var description = CKEDITOR.instances['NoticeText'].getData().replace(/<[^>]*>/gi, '').length;
+        if (!DropDownValidation("RoleTypeId", "User Type")) {
+            return false;
+        }
+        else if (!DropDownValidation("ddlUserName", "User Name")) {
+            return false;
+        }
+        else if (!blankFieldValidation("txtNoticeSubject123", "Notice Subject")) {
+            return false;
+        }
+        else if (!description) {
+            swal("", 'Please provide the Message.', "warning");
+            return false;
+        }
+        Iss = true;
+        return Iss;
+    }
+</script>
+
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        @Html.Partial("_CMSnavigation")
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="javascript:void(0);">
+                                Send Notice/Letter
+                            </a>
+                        </li>
+                    </ul>
+                    @Html.Partial("_CMSutil")
+                </div>
+                <section class="box form-container">
+                    <div class="content-body">
+                        @using (Html.BeginForm("SendNoticeLetter", "Noticeletter", FormMethod.Post, new { enctype = "multipart/form-data", AUTOCOMPLETE = "Off", id = "form1" }))
+                        {
+                        <div class="form-group row">
+                            <div class="col-sm-4">
+                                <label class="col-form-label font-weight-bolder pt-0">Select User Type</label>
+                                @Html.DropDownListFor(model => model.RoleTypeId, ViewBag.ViewUserTypeList as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control searchableselect", autofocus = "autofocus", required = "required" })
+                            </div>
+                            <div class="col-sm-8">
+                                <label class="col-form-label font-weight-bolder pt-0">Name of User</label>
+                                <select id="ddlUserName" name="userIds" data-style="bg-white" class="selectpicker form-control form-group selectcontent" onmousemove="showIETooltip();" onmouseout="hideIETooltip();" multiple></select>
+                            </div>
+                            @*<div class="col-sm-4">
+                                <label class="col-form-label font-weight-bolder pt-0">Name of User static</label>
+                                <select multiple data-style="bg-white" class="selectpicker form-control selectcontent" onmousemove="showIETooltip();" onmouseout="hideIETooltip();">
+                                    <option>Govt. ITI, Bhubaneswar</option>
+                                    <option>KIIT Industrial Training</option>
+                                    <option value="select" title="Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor.
+                                                    Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis">
+                                        Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor.
+                                        Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis
+                                    </option>
+                                </select>
+                            </div>*@
+                        </div>
+                            <div class="form-group row">
+                                <div class="col-sm-12">
+                                    <label class="col-form-label font-weight-bolder pt-0">Subject</label>
+                                    <input id="txtNoticeSubject123" type="text" class="form-control" name="NoticeSubject">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-sm-12">
+                                    <label class="col-form-label font-weight-bolder">Message</label>
+                                    @Html.TextAreaFor(m => m.NoticeDescription, new { @class = "form-control", @autofocus = "autofocus", @width = "400", @id = "NoticeText" })
+                                    @Html.ValidationMessageFor(m => m.NoticeDescription, "", new { @class = "text-danger" })
+                                    <script src="https://cdn.ckeditor.com/4.15.1/standard/ckeditor.js"></script>
+                                    <script>
+                                        CKEDITOR.replace('NoticeText');
+                                    </script>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-sm-4">
+                                    <label class="col-form-label font-weight-bolder">Upload Notice</label>
+                                    <div class="custom-file">
+                                        <input type="file" class="custom-file-input" id="customFile" name="UploadFile" multiple>
+                                        <label class="custom-file-label" for="customFile">Choose Files</label>
+                                        <div class="col-lg-12 col-md-12 col-sm-12 text-center">Maximum allowed file size is <strong>2MB</strong>.</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-sm-12">
+                                    @*<input type="submit" value='@ViewBag.Button' class="btn btn-primary btn-md ml-0" name="submit" id="submit" onclick="return checkValidation()" />*@
+                                    <input type="submit" value='@ViewBag.Button' name="submit" class="btn btn-success btn-md ml-0 waves-effect waves-light  btnsave" id="submit" onclick="return Validate()">
+                                    <a href="~/Notice/NoticeLetter/SendNoticeLetter" class="btn btn-danger btn-md">Reset</a>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+    <!-- MAIN CONTENT AREA ENDS -->
+</section>
+
+<script>
+    $(document).ready(function () {
+        var maxLength = 100;
+        $('.selectcontent > option').text(function (i, text) {
+            if (text.length > maxLength) {
+                return text.substr(0, maxLength) + '...';
+            }
+        });
+        function showIETooltip(e) {
+            if (!e) { var e = window.event; }
+            var obj = e.srcElement;
+            var objHeight = obj.offsetHeight;
+            var optionCount = obj.options.length;
+            var eX = e.offsetX;
+            var eY = e.offsetY;
+
+            //vertical position within select will roughly give the moused over option...
+            var hoverOptionIndex = Math.floor(eY / (objHeight / optionCount));
+
+            var tooltip = document.getElementById('dvDiv');
+            tooltip.innerHTML = obj.options[hoverOptionIndex].title;
+
+            mouseX = e.pageX ? e.pageX : e.clientX;
+            mouseY = e.pageY ? e.pageY : e.clientY;
+
+            tooltip.style.left = mouseX + 10;
+            tooltip.style.top = mouseY;
+
+            tooltip.style.display = 'block';
+
+            var frm = document.getElementById("frm");
+            frm.style.left = tooltip.style.left;
+            frm.style.top = tooltip.style.top;
+            frm.style.height = tooltip.offsetHeight;
+            frm.style.width = tooltip.offsetWidth;
+            frm.style.display = "block";
+        }
+        function hideIETooltip(e) {
+            var tooltip = document.getElementById('dvDiv');
+            var iFrm = document.getElementById('frm');
+            tooltip.innerHTML = '';
+            tooltip.style.display = 'none';
+            iFrm.style.display = 'none';
+        }
+    });
+</script>

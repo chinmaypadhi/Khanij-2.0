@@ -1,0 +1,1169 @@
+﻿@model HelpDeskEF.RaiseTicket
+@using HelpdeskApp.Web;
+@{
+    ViewData["Title"] = "Nxtview";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+@if (ViewBag.Takeactionmsg != null)
+{
+<script>
+       swal("", '@ViewBag.Takeactionmsg', "success");
+</script>
+}
+<script>
+    $(document).ready(function () {
+        loadNavigation('NxtView', 'glRoleRes', 'plUser', 'tl', 'Helpdesk', 'Raise Ticket', ' ');
+        $('.searchableselect').searchableselect();
+        /******************FILE UPLOAD********************************/
+        $('.custom-file-input').on("change", function () {
+            debugger;
+            $("button[type='submit']").attr('disabled', false);
+            var label = $(this).siblings('.custom-file-label');
+            var files = $(this)[0].files;
+            var filesize = this.files[0].size;
+            var val = $(this).val().toLowerCase(),
+                regex = new RegExp("(.*?)\.(jpeg|jpg|png|pdf|tif)$");
+            if (!(regex.test(val))) {
+                swal("", "docx,xlsx,csv type is not an allowed file type. You can use only jpg, jpeg, png, pdf, tif types of file(s). ", "warning");
+                this.value = '';
+                $("button[type='submit']").attr('disabled', true);
+                return false;
+            }
+            else if (filesize > 2048000) {
+                swal("", "File size must be 2 MB !", "warning");
+                $("button[type='submit']").attr('disabled', true);
+                return false;
+            }
+            else if (files.length > 0) {
+                label.html(files.length + ' Files Selected');
+            }
+            else if (files.length == 0) { label.html(files[0].name); }
+        });
+        /***************END*************************/
+        $('.datepicker').datetimepicker({
+            format: 'LT',
+            format: "DD/MM/YYYY",
+            daysOfWeekDisabled: [],
+            widgetPositioning: {
+                horizontal: 'auto',
+                vertical: 'bottom'
+            }
+        }).keydown(false);
+        /***************END*************************/
+        $('#DivOsuUpdateStatus').on('hidden.bs.modal', function () {
+            $('#DivOsuUpdateStatus form')[0].reset();
+            $("#OsuUpdate").val('');
+            $(".custom-file-label").html("Choose Files");
+            $("#lblUpdateRemark").html("500");
+        });
+        $('#Pullticket').on('hidden.bs.modal', function () {
+            $('#Pullticket form')[0].reset();
+            $("#lblPullRemark").html("500");
+        });
+        $('#Reopenticket').on('hidden.bs.modal', function () {
+            $('#Reopenticket form')[0].reset();
+            $("#Reopenfile").val('');
+            $(".custom-file-label").html("Choose Files");
+            $("#lblReopenRemark").html("500");
+        });
+        $('#EditModal').on('hidden.bs.modal', function () {
+            $('#EditModal form')[0].reset();
+            $("#filesupport").val('');
+            $(".custom-file-label").html("Choose Files");
+            $("#lblRemark").html("500");
+        });
+        $('#FetchUserlist').on('hidden.bs.modal', function () {
+            $('#FetchUserlist form')[0].reset();
+            $("#lblForwardRemark").html("500");
+        });
+        $('#CloseTicket').on('hidden.bs.modal', function () {
+            $('#CloseTicket form')[0].reset();
+            $("#Photo").val('');
+            $(".custom-file-label").html("Choose Files");
+            $("#lblCloseremark").html("500");
+        });
+    });
+</script>
+<script>
+    function onpullTicketSubmit() {//Pull Ticket Submit Click
+        debugger;
+        var Ticketid = $("#hid").val();
+        var _remarks = $("#PullRemark").val();
+        if ($.trim(_remarks) == null || $.trim(_remarks) == "" || $.trim(_remarks) == " ") {
+            swal("", 'Remarks Required !', "warning");
+            return false;
+        }
+        else {
+            $.ajax({
+                type: "POST",
+                url: "/Helpdesk/RaiseTicket/PullTicket",
+                data: {
+                    "TicketId": parseInt(Ticketid),
+                    "remarks": _remarks,
+                },
+                dataType: "json",
+                success: function (result) {
+                    if (result != null) {
+                        if (result == "1") {
+                            swal("", "Ticket pull back successfully.", "success");
+                            setTimeout(function () {
+                                location.reload()
+                            }, 5000);
+                        }
+                        else {
+                            swal("", "Something went wrong ! Please try again later.", "error");
+                        }
+                    }
+                }
+            });
+        }
+    }
+    function PullTicket(id) {//Pull Ticket Ticket Id Assign to Hidden Field
+        $("#hid").val(id);
+    }
+    function ReopenTicket(id) {
+
+        $("#hidReopen").val(id);
+
+    }
+    function Updatestatus(id) {
+
+        $("#hidupdate").val(id);
+
+    }
+    function onCloseBtnClick() {
+        $('#Pullbackticket').modal('hide');
+        $('#Reopenticket').modal('hide');
+    }
+    function CountUpdateRemark() {
+        $("#lblUpdateRemark").text(500 - (document.getElementById("UpdateRemark").value.length));
+    }
+    function CountPullRemark() {
+        $("#lblPullRemark").text(500 - (document.getElementById("PullRemark").value.length));
+    }
+    function CountReopenRemark() {
+        $("#lblReopenRemark").text(500 - (document.getElementById("ReopenRemark").value.length));
+    }
+    function CountRemark() {
+        $("#lblRemark").text(500 - (document.getElementById("Remark").value.length));
+    }
+    function CountForwardRemark() {
+        $("#lblForwardRemark").text(500 - (document.getElementById("ForwardRemark").value.length));
+    }
+    function CountCloseremark() {
+        $("#lblCloseremark").text(500 - (document.getElementById("Closeremark").value.length));
+    }
+</script>
+<script>
+    $(function () {
+        var rowCount = $('#table-exports tr').length;
+        if (rowCount == 0) {
+            var row = $("#table-exports")[0].insertRow(-1);
+            var cell = $(row.insertCell(-1));
+            cell.html("No records found.");
+            cell.attr("colspan", "4").attr("align", "center");
+        }
+        var lbl_SolvedTicket = 0;
+        var lbl_ReopenTicket = 0;
+        var lbl_ActionRequired = 0;
+        var lbl_UnderProcessing = 0;
+        var lbl_Initiated = 0;
+        $('#table-exports tr').each(function (index, tr) {
+            if (!this.rowIndex) return;
+            var editBtn = (this).cells[0].innerText + '#btnEdit';
+            //var backend = (this).cells[index - 1].innerText + '#hfBackendApprove';
+            var staus = $(this).find("p #hfPersonId");
+            var isbackend = $(this).find("p #hfBackendApprove");
+            var forwardBtn = (this).cells[0].innerText + '#btnforwardticket';
+            var osuUpdateBtn = (this).cells[0].innerText + '#OsuUpdateStatus';
+            var closeBtn = (this).cells[0].innerText + '#btncloseticket';
+            var reOpenBtn = (this).cells[0].innerText + '#btnReopenticket';
+            var pullTicketBtn = (this).cells[0].innerText + '#btnpullticket';
+            var BackendTicket = (this).cells[0].innerText + '#BackendTicket';
+            var BackendProcced = (this).cells[0].innerText + '#BackendProcced';
+            var BtnUpdate = (this).cells[0].innerText + '#btnupdate';
+            var DiffMinutes = $(this).find("p #hfDiffMinute");
+            var DiffMinuteForOSU = $(this).find("p #hfDiffMinuteForOSUFMS");
+            var UserType = '@ViewBag.userType';
+            var Status = staus[0].value;
+            var IsBackendApprove = isbackend[0].value;
+            var DiffMinute = DiffMinutes[0].value;
+            var DiffMinuteForOSUFMS = DiffMinuteForOSU[0].value;
+            $('[name = "' + BackendProcced + '"]').hide();
+            $('[name = "' + BackendTicket + '"]').hide();
+            if (Status == 9) {
+                $(this).closest('tr').addClass('action-required-row');
+                lbl_ReopenTicket = lbl_ReopenTicket + 1;
+            }
+            else if (Status == 8) {
+                $(this).closest('tr').addClass('solved-ticket-row');
+                lbl_SolvedTicket = lbl_SolvedTicket + 1;
+            }
+            else if (parseInt(Status) == 1 && parseInt(DiffMinute) > 0) {
+
+                $(this).closest('tr').addClass('white');
+                lbl_ActionRequired = lbl_ActionRequired + 1;
+            }
+            else if ((Status == 3 || Status == 4 || Status == 5) && DiffMinute > 0 && DiffMinuteForOSUFMS > 0) {
+                $(this).closest('tr').addClass('ticket-under-processing-row');
+
+                lbl_UnderProcessing = lbl_UnderProcessing + 1;
+            }
+            else {
+                lbl_Initiated = lbl_Initiated + 1;
+            }
+            if (UserType == "FMS" || UserType == "FMS USER" || UserType == "OSU" || UserType == "OSU USER") {
+
+                //$('[name = "' + responseUserBtn + '"]').hide();
+                $('[name = "' + forwardBtn + '"]').hide();
+                $('[name = "' + closeBtn + '"]').show();
+                $('[name = "' + reOpenBtn + '"]').hide();
+                $('[name = "' + editBtn + '"]').hide();
+                $('[name = "' + pullTicketBtn + '"]').hide();
+                if (Status == 3 || Status == 4 || Status == 5) {
+                    $('[name = "' + osuUpdateBtn + '"]').show();
+                    //$('[name = "' + replyBtn + '"]').hide();
+                }
+                else if (Status == 8 || Status == 9) {
+                    $('[name = "' + closeBtn + '"]').hide();
+                    $('[name = "' + osuUpdateBtn + '"]').hide();
+                    $('[name = "' + editBtn + '"]').hide();
+                    //$('[name = "' + replyBtn + '"]').hide();
+                }
+                if (UserType == "OSU" || UserType == "OSU USER") {
+                    if (IsBackendApprove == 1 && Status == 4) {
+                        $('[name = "' + BackendProcced + '"]').show();
+                    }
+                    else {
+                        if (Status == 8) {
+                            $('[name = "' + BackendTicket + '"]').hide();
+                        }
+                        else {
+                            $('[name = "' + BackendTicket + '"]').show();
+                        }
+                    }
+                }
+                else {
+                    // $('[name = "' + BackendProcced + '"]').hide();
+                    $('[name = "' + BackendProcced + '"]').hide();
+                    $('[name = "' + BackendTicket + '"]').show();
+                }
+            }
+            else if (UserType == "HELPDESK USER" || UserType == "HELPDESK") {
+                $('[name = "' + closeBtn + '"]').show();
+                $('[name = "' + reOpenBtn + '"]').hide();
+                $('[name = "' + osuUpdateBtn + '"]').hide();
+                $('[name = "' + editBtn + '"]').show();
+                $('[name = "' + forwardBtn + '"]').hide();
+                if (Status == 1 || Status == 9) {
+                    //$('[name = "' + responseUserBtn + '"]').show();
+                    $('[name = "' + forwardBtn + '"]').show();
+                    $('[name = "' + pullTicketBtn + '"]').hide();
+                }
+                else if (Status == 6 || Status == 3 || Status == 4) {
+                    //$('[name = "' + responseUserBtn + '"]').show();
+                    $('[name = "' + forwardBtn + '"]').hide();
+                    $('[name = "' + pullTicketBtn + '"]').show();
+                }
+                else if (Status == 8) {
+                    $('[name = "' + closeBtn + '"]').hide();
+                    $('[name = "' + osuUpdateBtn + '"]').hide();
+                    //$('[name = "' + replyBtn + '"]').hide();
+                    //$('[name = "' + responseUserBtn + '"]').hide();
+                    $('[name = "' + forwardBtn + '"]').hide();
+                    $('[name = "' + editBtn + '"]').hide();
+                    $('[name = "' + pullTicketBtn + '"]').hide();
+                }
+            }
+            else if (UserType == "PMU") {
+                $('[name = "' + forwardBtn + '"]').hide();
+                $('[name = "' + closeBtn + '"]').hide();
+                $('[name = "' + reOpenBtn + '"]').hide();
+                $('[name = "' + editBtn + '"]').hide();
+                $('[name = "' + pullTicketBtn + '"]').hide();
+                $('[name = "' + osuUpdateBtn + '"]').hide();
+                $('[name = "' + BackendTicket + '"]').show();
+            }
+            else if (UserType == "DGM") {
+                $('[name = "' + forwardBtn + '"]').hide();
+                $('[name = "' + closeBtn + '"]').hide();
+                $('[name = "' + reOpenBtn + '"]').hide();
+                $('[name = "' + editBtn + '"]').hide();
+                $('[name = "' + pullTicketBtn + '"]').hide();
+                $('[name = "' + osuUpdateBtn + '"]').hide();
+                $('[name = "' + BackendTicket + '"]').show();
+            }
+            else if (UserType == "Admin") {
+                //$('[name = "' + responseUserBtn + '"]').hide();
+                //$('[name = "' + replyBtn + '"]').hide();
+                $('[name = "' + forwardBtn + '"]').hide();
+                $('[name = "' + osuUpdateBtn + '"]').hide();
+                $('[name = "' + closeBtn + '"]').hide();
+                $('[name = "' + reOpenBtn + '"]').hide();
+                $('[name = "' + editBtn + '"]').hide();
+                $('[name = "' + pullTicketBtn + '"]').hide();
+            }
+            else if (UserType == "District User") {
+                $('[name = "' + forwardBtn + '"]').hide();
+                $('[name = "' + closeBtn + '"]').hide();
+                $('[name = "' + reOpenBtn + '"]').hide();
+                $('[name = "' + editBtn + '"]').hide();
+                $('[name = "' + pullTicketBtn + '"]').hide();
+                $('[name = "' + osuUpdateBtn + '"]').hide();
+                $('[name = "' + BackendTicket + '"]').show();
+            }
+            else {
+                $('[name = "' + forwardBtn + '"]').hide();
+                $('[name = "' + osuUpdateBtn + '"]').hide();
+                //$('[name = "' + replyBtn + '"]').hide();
+                $('[name = "' + closeBtn + '"]').hide();
+                $('[name = "' + reOpenBtn + '"]').hide();
+                $('[name = "' + editBtn + '"]').hide();
+                $('[name = "' + pullTicketBtn + '"]').hide();
+                if (Status == 8) {
+                    $('[name = "' + closeBtn + '"]').hide();
+                    $('[name = "' + reOpenBtn + '"]').show();
+                    $('[name = "' + editBtn + '"]').hide();
+                    $('[name = "' + BtnUpdate + '"]').hide();
+                }
+            }
+            $("#lblSolvedTicket").text(lbl_SolvedTicket);
+            $("#lblReopenTicket").text(lbl_ReopenTicket);
+            $("#lblActionRequired").text(lbl_ActionRequired);
+            $("#lblUnderProcessing").text(lbl_UnderProcessing);
+            $("#lblInitiated").text(lbl_Initiated);
+        });
+    });
+    function backcall() {
+        setTimeout(function () {// wait for 5 secs(2)
+            location.reload(); // then reload the page.(3)
+        }, 5000);
+    }
+    function onBtnForwardSubmit() {
+        var _remarks = $('#ForwardRemark').val();
+        var _UserTypeId = $("#UserType").val();
+        var _DistrictId = $("#DistrictID").val();
+        var _FMSUserId = $("#Fmsuser option:selected").val();
+        var _OSUUserId = $("#Osuuser").val();
+        var _TicketId = $("#hidticket").val();
+        if (_UserTypeId == null || _UserTypeId == "" || _UserTypeId == "0") {
+            swal("","User Type Required !","warning");
+            return false;
+        }
+        if (_remarks == null || _remarks == "") {
+            swal("","Remarks Required !", "warning");
+            return false;
+        }
+        if (_UserTypeId == "14") {
+            if (_DistrictId == null || _DistrictId == "" || _DistrictId == "0") {
+                swal("","District Required !", "warning");
+                return false;
+            }
+            else {
+                if (_FMSUserId == null || _FMSUserId == "") {
+                   swal("","FMS Users Required !", "warning");
+                    return false;
+                }
+                else {
+                    $.ajax({
+                        type: "POST",
+                        url: "/Helpdesk/RaiseTicket/Update",
+                        data: {
+                            "TicketId": parseInt(_TicketId),
+                            "UserTypeId": _UserTypeId,
+                            "DistrictId": _DistrictId,
+                            "remarks": _remarks,
+                            "FMSUserId": _FMSUserId,
+                            "OSUUserId": _OSUUserId
+                        },
+                        dataType: "json",
+                        success: function (result) {
+                            if (result != null) {
+                                if (result == "1") {
+                                    swal("","Request forwarded to FMS User Successfully.", "success");
+                                    backcall();
+                                }
+                                else if (result == "3" || result == "4") {
+                                    swal("","This ticket has been forwarded by HelpDesk User to any (OSU/FMS User)", "warning");
+                                    backcall();
+                                }
+                                else {
+                                    swal("","Request not forwarded ! Please try again later.","error");
+                                }
+                            }
+                        }
+                    });
+                }
+            }
+        }
+        else {
+            if (_OSUUserId == null || _OSUUserId == "" || _OSUUserId == "0") {
+               swal("","OSU Users Required !", "warning");
+                return false;
+            }
+            else {
+                $.ajax({
+                    type: "POST",
+                    url: "/Helpdesk/RaiseTicket/Update",
+                    data: {
+                        "TicketId": parseInt(_TicketId),
+                        "UserTypeId": _UserTypeId,
+                        "DistrictId": _DistrictId,
+                        "remarks": _remarks,
+                        "FMSUserId": _FMSUserId,
+                        "OSUUserId": _OSUUserId
+                    },
+                    dataType: "json",
+                    success: function (result) {
+                        if (result != null) {
+                            if (result == "1") {
+                                swal("","Request forwarded to OSU User Successfully.", "success");
+                                backcall();
+                                return true;
+                            }
+                            else if (result == "3" || result == "4") {
+                                swal("","This ticket has been forwarded by HelpDesk User to any (OSU/FMS User)", "success");
+                                backcall();
+                            }
+                            else {
+                                swal("","Request not forwarded ! Please try again later.","warning");
+                                return true;
+                            }
+                        }
+                    }
+                });
+            }
+        }
+    }
+    $(document).ready(function () {
+        $(document).on("click", ".popup", function () {
+            var passedID = $(this).data('id');
+            $(".modal-body .hiddenid").val(passedID);
+            //$('.icon-edit1').on("click", function () {
+            $("#EditModal").modal('show');
+        });
+    });
+    function Closeuser(id) {
+        $("#hidclose").val(id);
+    }
+    $(document).on("click", "#btnUpdate", function () {
+        if (!blankFieldValidation("UpdateRemark", "Remark")) {
+            return false;
+        }
+    });
+    $(document).on("click", "#btnUpdate1", function () {
+        if (!blankFieldValidation("Remark", "Remark")) {
+            return false;
+        }
+    });
+    $(document).on("click", "#btnReopen", function () {
+        if (!blankFieldValidation("ReopenRemark", "Remark")) {
+            return false;
+        }
+    });
+    $(document).on("click", "#btnclose", function () {
+        if (!blankFieldValidation("Closeremark", "Remark")) {
+            return false;
+        }
+    });
+    function Edituser(id) {
+        debugger;
+        $("#hidticket").val(id);
+        $('#DistrictID').empty();
+        var v = "";
+        $("#divfms").hide();
+        $("#divosu").hide();
+        $.ajax({
+            type: "POST",
+            url: "/Helpdesk/RaiseTicket/GetDistrictDataForUser",
+            cache: false,
+            datatype: "JSON",
+            success: function (SList) {
+                $("#DistrictID").append($("<option>Select</option>"));
+                $("#Fmsuser").append($("<option>Select</option>"));
+                $("#Osuuser").append($("<option>Select</option>"));
+                $.each(SList, function (i, item) {
+                    $("#DistrictID").append($("<option></option>").val(item.districtID).html(item.districtName));
+                });
+            },
+            failure: function (response) {
+                console.log(response.responseText);
+            },
+            error: function (jqxhr, status, exception) {
+                swal("",'Exception:', +exception.alert+'',"error");
+            }
+        });
+    }
+    $(function () {
+        $("#UserType").change(function () {
+            debugger;
+            var usertype = $("#Usertype").val();
+            var optionSelected = $("option:selected", this);
+            var valueSelected = this.value;
+            if (valueSelected == "18") {//For OSU
+                $("#divdistrict").hide();
+                $("#divfms").hide();
+                $("#divosu").show();
+                $.ajax({
+                    type: "POST",
+                    url: "/Helpdesk/RaiseTicket/GetFMSUsersList",
+                    data: {
+                        "Usertype": usertype,
+                        "Districtid": 0,
+                        "type": "2",
+                    },
+                    cache: false,
+                    datatype: "JSON",
+                    success: function (SList) {
+                        $("#Osuuser").append($("<option>Select</option>"));
+                        $.each(SList, function (i, item) {
+                            $("#Osuuser").append($("<option></option>").val(item.userid).html(item.applicantName));
+                        });
+                    },
+                    failure: function (response) {
+                        console.log(response.responseText);
+                    },
+                    error: function (jqxhr, status, exception) {
+                        swal("",'Exception:', +exception.alert+'',"error");
+                    }
+                });
+            }
+            else {
+                $("#divdistrict").show();
+                $("#divfms").show();
+                $("#divosu").hide();
+            }
+        });
+        $("#DistrictID").change(function () {
+            $("#divfms").show();
+            var usertype = $("#Usertype").val();
+            var optionSelected = $("option:selected", this);
+            var valueSelected = this.value;
+            $('#Fmsuser').empty();
+            var did = valueSelected;
+            $.ajax({
+                type: "POST",
+                url: "/Helpdesk/RaiseTicket/GetFMSUsersList",
+                data: {
+                    "Usertype": usertype,
+                    "Districtid": did,
+                    "type": "1"
+                    ,
+                },
+                cache: false,
+                datatype: "JSON",
+                success: function (SList) {
+                    $("#Fmsuser").append($("<option>Select</option>"));
+                    $.each(SList, function (i, item) {
+                        $("#Fmsuser").append($("<option></option>").val(item.userid).html(item.applicantName));
+                    });
+                },
+                failure: function (response) {
+                    console.log(response.responseText);
+                },
+                error: function (jqxhr, status, exception) {
+                    swal("", 'Exception:', +exception.alert + '', "error");
+                }
+            });
+        });
+    });
+    function Edit(id) {
+        var data = {
+            REVIEWID: id,
+        };
+        $.ajax({
+            type: "POST",
+            url: "/Helpdesk/RaiseTicket/FetchComplinerdtls",
+            content: "application/json; charset=utf-8",
+            dataType: "json",
+            data: { "ticketid": parseInt(id) },
+            success: function (result1) {
+                $("#ComplanierName").text(result1.complainerName);
+                $("#Cmobile").text(result1.complainerMobileNumber);
+                $("#Cemail").text(result1.complainerEmailID);
+                $("#Cdistrict").text(result1.districtName);
+                $("#Cticket").text(result1.ticketNumber);
+                $("#Cprior").text(result1.priorityName);
+                $("#Cstatus").text(result1.status);
+                $("#Cdate").text(result1.createdon);
+                var url = window.location.origin;
+                $("#Cdoc tbody").empty();
+                for (i = 0; i < result1.attachments.length; i++) {
+                    debugger;
+                    /*$("#Cdoc").append('<a href="/Helpdesk/RaiseTicket/DownloadFiles?filename=' + result1.attachments[i].fileName + '&foldername=HepldeskFile">' + result1.attachments[i].fileName + '<i class="icon-download-solid"></i></a>');*/
+                    $("#Cdoc tbody").append('<tr><td>' + (i + 1) + '</td><td>' + result1.attachments[i].fileName + '</td><td><a href="/Helpdesk/RaiseTicket/DownloadFiles?filename=' + result1.attachments[i].fileName + '&foldername=HepldeskFile"><i class="icon-download-solid"></i></a></td></tr>');
+                }
+            }
+        });
+        $.ajax({
+            type: "POST",
+            url: "/Helpdesk/RaiseTicket/EdittComponent",
+            content: "application/json; charset=utf-8",
+            dataType: "json",
+            data: data,
+            success: function (result) {
+                debugger;
+                $("#popupTable").empty();
+                $("#Chistory").empty();
+                for (i = 0; i < result.length; i++) {
+                    if (result != null) {
+                        var html = "";
+                       // src = '"~/img/profile.jpg"'
+                        //$('#popupTable').append('<tr><td>' + result[i].userName + '</td><td>' + result[i].createdon + '</td><td>' + result[i].remarks + '</td><td>' + result[i].status + '</td></tr>');
+                        //$('#popupTable').append('<tr><td style="width:10%">' + result[i].ComplainerName + '</td><td style="width:10%">' + result[i].TicketRaisedDateTime + '</td><td style="width:60%">' + result[i].SolutionDescription + '</td><td style="width:20%">' + result[i].Status + '</td></tr>');
+                        html += '<div class="histroy-section"><div class="histroy-section-user ">';
+                        html += '<div class="histroy-section-media-image"><img src = /CMSimg/profile.jpg alt="user-image" class="rounded-circle img-inline" height="50px" width="50px"> </div><h4>' + result[i].userName + '</h4></div>';
+                        html += '<div class="histroy-section-detail"><p class="mb-1"><strong>Remark :</strong>' + result[i].remarks + '</p>';
+                        html += '<p class="mb-1"><strong>Status :</strong> <span class="text-success">' + result[i].status + '</span></p>';
+                        html += ' <div class="histroy-section-date"><strong>Action Taken On :</strong>  ' + result[i].createdon + '</div>';
+                        html += '</div>';
+                        html += '</div>';
+                        $("#Chistory").append(html);
+                    }
+                }
+                if (result.length == 0) {
+                    $('#popupTable').append('<tr><td colspan="4"> <center> <h3>No Data Found </h3></center></td></tr>');
+                }
+            }
+        });
+    }
+</script>
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        @Html.Partial("_CMSnavigation")
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link" href="~/Helpdesk/RaiseTicket/Add">
+                                Add
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="javascript:void(0);">
+                                View
+                            </a>
+                        </li>
+                    </ul>
+                    @Html.Partial("_CMSutil")
+                </div>
+                <section class="box form-container">
+                    <div class="searchform px-3 py-3">
+                        <form asp-action="Nxtview" asp-controller="RaiseTicket" method="post" enctype="multipart/form-data">
+                            <div class="row align-items-lg-center form-group">
+                                <label class="col-lg-1 col-md-4 col-sm-12 col-form-label">From Date</label>
+                                <div class="col-lg-3 col-md-6 col-sm-12 mb-lg-0 mb-3">
+                                    <div class="input-group">
+                                        @Html.TextBoxFor(model => model.fromdate, new { @class = "form-control datepicker", id = "fromdate" })
+                                        <div class="input-group-prepend">
+                                            <label class="input-group-text" for="fromdate"><i class="icon-calendar-alt-solid"></i></label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <label class="col-lg-1 col-md-4 col-sm-12 col-form-label">To Date</label>
+                                <div class="col-lg-3 col-md-6 col-sm-12 mb-lg-0 mb-3">
+                                    <div class="input-group">
+                                        @Html.TextBoxFor(model => model.todate, new { @class = "form-control datepicker", id = "todate" })
+                                        <div class="input-group-prepend">
+                                            <label class="input-group-text" for="todate"><i class="icon-calendar-alt-solid"></i></label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-2">
+                                    <button class="btn btn-md btn-success m-0" id="btnShow">Search</button>
+                                </div>
+                            </div>
+                            <div class="row align-items-lg-center d-none">
+                                <label class="col-lg-1 col-md-4 col-sm-12 col-form-label">Priority</label>
+                                <div class="col-lg-2 col-md-6 col-sm-12 mb-lg-0 mb-3">
+                                    <select class="form-control">
+                                        <option value="">Select</option>
+                                        <option value="1">High</option>
+                                        <option value="2">Medium</option>
+                                        <option value="3">Low</option>
+                                        <option value="5">Average</option>
+                                        <option value="10">Pace</option>
+                                    </select>
+                                </div>
+                                <label class="col-lg-1 col-md-4 col-sm-12 col-form-label">Status</label>
+                                <div class="col-lg-2 col-md-6 col-sm-12 mb-lg-0 mb-3">
+                                    <select class="form-control">
+                                        <option value="">Select</option>
+                                        <option value="1">Solved</option>
+                                        <option value="2">Initiated</option>
+                                        <option value="3">Reopened</option>
+                                        <option value="5">Under Proccessing</option>
+                                        <option value="10">Action required</option>
+                                    </select>
+                                </div>
+                                <div class="col-sm-2">
+                                    <button class="btn btn-sm btn-success m-0" id="btnShow">Search</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="content-body">
+                        <p class="mb-0 font-italic text-right text-danger">
+                            <small>
+                                Last Month Summary Dt <span class="text-primary"> @Html.DisplayFor(model => model.fromdate)</span>
+
+                                to <span class="text-primary">@Html.DisplayFor(model => model.todate)</span>
+                            </small>
+                        </p>
+                        <div class="summary-cards">
+                            <div class="sum-details ">
+                                <p>Ticket Initiated</p>
+                                <h4 class="text-primary"><span id="lblInitiated">0</span></h4>
+                            </div>
+                            <div class="sum-details  ">
+                                <p>Ticket Under Processing</p>
+                                <h4 class="text-warning"><span id="lblUnderProcessing">0</span></h4>
+                            </div>
+                            <div class="sum-details ">
+                                <p>Solved Ticket</p>
+                                <h4 class="text-success"><span id="lblSolvedTicket">0</span></h4>
+                            </div>
+                            <div class="sum-details ">
+                                <p>Reopened Ticket</p>
+                                <h4 class="text-dark"><span id="lblReopenTicket">0</span></h4>
+                            </div>
+                            <div class="sum-details">
+                                <p>Action Required</p>
+                                <h4 class="text-danger"><span id="lblActionRequired">0</span></h4>
+                            </div>
+                        </div>
+                        <div class="separator separator-dashed "></div>
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <table id="table-exports" class="table table-sm table-bordered">
+                                    @{ int i = 1;
+                                    }
+                                    @foreach (var b in ViewBag.ViewList)
+                                    {
+                                        @if (i == 1)
+                                        {
+                                            <thead>
+                                                <tr>
+                                                    <th width="30">Sl#</th>
+                                                    <th>Ticket Number / Date & time</th>
+                                                    <th>Complainer Details</th>
+                                                    <th>Module</th>
+                                                    <th width="300">Problem Description</th>
+                                                    <th>Status</th>
+                                                    <th width="100">Close Date & time</th>
+                                                    <th width="100">Days/Time Taken For Close</th>
+                                                    <th width="160px">Actions</th>
+                                                    <th></th>
+                                                </tr>
+                                            </thead>
+                                        }
+                                        <tbody>
+                                            <tr>
+                                                <td>
+                                                    @b.SrNo
+                                                    @{ i++; }
+                                                </td>
+                                                <td>
+                                                    <a href="javascript:void(0);" data-toggle="modal" title="View Status" data-id="@b.TicketID" data-target="#FetchTicketDetails" onclick="Edit(@b.TicketID)"><strong> @b.TicketNumber</strong></a>
+                                                    <small class="text-dark d-block"><i class="fas fa-calendar-alt"></i>&nbsp; @b.TicketRaisedDateTime</small>
+                                                    <div class="d-block">
+
+                                                        @if (@b.PriorityName == "High")
+                                                        {
+                                                            <small class="text-danger">Priority:- @b.PriorityName</small>
+                                                        }
+                                                        else if (@b.PriorityName == "Medium")
+                                                        {
+                                                            <small class="text-warning">Priority:- @b.PriorityName</small>
+                                                        }
+                                                        else if (@b.PriorityName == "Low")
+                                                        {
+                                                            <small class="text-info">Priority:- @b.PriorityName</small>
+                                                        }
+                                                        else if (@b.PriorityName == "Average")
+                                                        {
+                                                            <small class="text-brown">Priority:- @b.PriorityName</small>
+                                                        }
+                                                        else if (@b.PriorityName == "Pace")
+                                                        {
+                                                            <small class="text-success">Priority:- @b.PriorityName</small>
+                                                        }
+
+                                                        <small class="d-block">District:- @b.DistrictName</small>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    @b.ComplainerName
+                                                    <small class="d-block"><i class="fas fa-phone-alt"></i>&nbsp; @b.ComplainerMobileNumber</small>
+                                                    <small class="d-block text-info"><i class="fas fa-envelope"></i>&nbsp; @b.ComplainerEmailID</small>
+                                                </td>
+                                                <td>@b.ModuleName</td>
+                                                <td>@b.ProblemDescription</td>
+
+                                                @*<td></td>*@
+                                                <td>@b.Status_Details</td>
+                                                <td>@b.CloseDateTime</td>
+                                                <td>
+                                                    <p class="m-0">
+                                                        @b.DaysTimeTaken<input type="hidden" id="hfPersonId" name="PersonId" value=@b.Ticketstatus />
+                                                        <input type="hidden" id="hfDiffMinute" name="DiffMinute" value=@b.DiffMinute />
+                                                        <input type="hidden" id="hfDiffMinuteForOSUFMS" name="DiffMinuteForOSUFMS" value=@b.DiffMinuteForOSUFMS />
+                                                        <input type="hidden" id="hfBackendApprove" name="PersonId" value=@b.IsBackendApprove />
+                                                    </p>
+                                                </td>
+                                                <td>
+                                                    @if (ViewBag.UsertypeId != 3 && ViewBag.UsertypeId != 5 && ViewBag.UsertypeId != 13 && ViewBag.UsertypeId != 14 && ViewBag.UsertypeId != 18 && ViewBag.UsertypeId != 19)
+                                                    {
+                                                        <a class="btn btn-outline-primary btn-sm popup mb-1" data-toggle="modal" name="@b.SrNo#btnupdate" id="btnupdate" data-id="@b.TicketID">
+                                                            Update
+                                                        </a>
+                                                    }
+                                                    <a class="btn btn-outline-dark btn-sm mb-1" href="javascript:void(0);" data-toggle="modal" id="OsuUpdateStatus" name="@b.SrNo#OsuUpdateStatus" data-id="@b.TicketID" data-target="#DivOsuUpdateStatus" onclick="Updatestatus(@b.TicketID)">Update Status</a>
+                                                    <a class="btn btn-outline-warning btn-sm mb-1" href="javascript:void(0);" data-toggle="modal" id="btnforwardticket" data-id="@b.TicketID" name="@b.SrNo#btnforwardticket" data-target="#FetchUserlist" onclick="Edituser(@b.TicketID)">Forward</a>
+                                                    <a class="btn btn-outline-danger  btn-sm mb-1" href="javascript:void(0);" data-toggle="modal" data-id="@b.TicketID" id="btncloseticket" name="@b.SrNo#btncloseticket" data-target="#CloseTicket" onclick="Closeuser(@b.TicketID)">Close</a>
+                                                    <a class="btn btn-outline-info btn-sm mb-1" href="javascript:void(0);" data-toggle="modal" data-id="btnpullticket" id="btnpullticket" name="@b.SrNo#btnpullticket" data-target="#Pullticket" onclick="PullTicket(@b.TicketID)">Pull</a>
+                                                    <a class="btn btn-outline-info btn-sm mb-1" href="javascript:void(0);" data-toggle="modal" data-id="btnReopenticket" id="btnReopenticket" name="@b.SrNo#btnReopenticket" data-target="#Reopenticket" onclick="ReopenTicket(@b.TicketID)">Reopen Ticket</a>
+                                                    <a href="@CustomQueryStringHelper.EncryptString("Helpdesk","Add","Backend",new {id=b.TicketID })" class="btn btn-outline-info btn-sm mb-1" id="BackendTicket" name="@b.SrNo#BackendTicket">Take Action</a>
+                                                    <a href="@CustomQueryStringHelper.EncryptString("Helpdesk","SRExecution","Backend",new {id=b.TicketID })" class="btn btn-outline-success btn-sm mb-1" name="@b.SrNo#BackendProcced" id="BackendProcced">Proceed Backend Excecution</a>
+                                                </td>
+                                                <td>
+                                                    @*<a class="btn-floating btn-outline-primary btn-sm" href="@Url.Content("~/Helpdesk/RaiseTicket/Add/")@b.TicketID"
+                                            title="Edit" id="btnEdit" name="@b.SrNo#btnEdit"><i class="icon-pencil-alt-solid"></i></a>*@
+                                                    <a href="@CustomQueryStringHelper.EncryptString("Helpdesk","Add","RaiseTicket",new {id=b.TicketID })" class="btn-floating btn-outline-primary btn-sm" data-original-title="Edit" title="Edit" id="btnEdit" name="@b.SrNo#btnEdit"><i class="icon-pencil-alt-solid"></i></a>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    }
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                <div class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true" id="DivOsuUpdateStatus">
+                    <div class="modal-dialog modal-md">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="Comp_MHDR">Update Status</h5>
+                                <button type="button" class="close" aria-label="Close" id="CloseMeeting" data-dismiss="modal">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <form asp-action="Updatestatus" asp-controller="RaiseTicket" method="post" enctype="multipart/form-data">
+                                <div class="modal-body">
+                                    <div class="form-group row">
+                                        <label class="col-12 col-md-4 control-label" for="demo-text-input">Remark <span class="text-danger">*</span></label>
+                                        <div class="col-12 col-md-8 col-xl-8">
+                                            <span class="colon">:</span>
+                                            @Html.Hidden("hidupdate", "", new { @class = "hiddenid" })
+                                            @Html.TextBoxFor(m => m.UpdateRemark, new { @class = "form-control", @rows = 3, @cols = "30", @onkeyup = "CountUpdateRemark()" })
+                                            <small class="text-danger">Maximum <strong><label id="lblUpdateRemark" class="col-form-label">500</label></strong> characters</small>
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label class="col-12 col-md-4 control-label">
+                                            Supporting Document
+                                        </label>
+                                        <div class="col-12 col-md-8 col-xl-8">
+                                            <span class="colon">:</span>
+                                            <div class="custom-file">
+                                                <div class="custom-file">
+                                                    <input type="file" class="custom-file-input" id="OsuUpdate" name="@Html.NameFor(Model => Model.Photo)" multiple>
+                                                    <label class="custom-file-label" for="customFile">Choose Files</label>
+                                                    <small class="text-danger">Only <strong class="font-weight-bold"> jpg, jpeg, png, pdf, tif</strong> file types with size less than <strong>2 MB </strong> are allowed.</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button class="btn btn-success btn-sm" id="btnUpdate" type="submit">Update</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>             
+                <div id="Pullticket" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">                  
+                    <div class="modal-dialog modal-md">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title mt-0" id="Comp_MHDR">Pull Ticket</h5>
+                                <button type="button" class="close" aria-label="Close" id="CloseMeeting" data-dismiss="modal">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <!-- Modal content-->
+                            <div class="modal-body">
+                                <form action="">
+                                    <div class="form-group row">
+                                        <label class="col-sm-4 control-label" for="demo-text-input">Remark </label>
+                                        <div class="col-sm-8">
+                                            @Html.Hidden("hid", "", new { @class = "hiddenid" })
+                                            @Html.TextAreaFor(m => m.PullRemark, new { @class = "form-control", @rows = 3, @cols = "30", @onkeyup = "CountPullRemark()" })
+                                            <small class="text-danger">Maximum <strong><label id="lblPullRemark" class="col-form-label">500</label></strong> characters</small>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-primary btn-sm" data-dismiss="modal" onclick="return onpullTicketSubmit();">Pull Ticket</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true" id="Reopenticket">
+                    <div class="modal-dialog modal-md">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title mt-0" id="Comp_MHDR">Reopen Ticket</h5>
+                                <button type="button" class="close" aria-label="Close" id="CloseMeeting" data-dismiss="modal">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <!-- Modal content-->
+
+                            <div class="modal-body">
+                                <form asp-action="ReopenTicket" asp-controller="RaiseTicket" method="post" enctype="multipart/form-data">
+                                    <div class="modal-body">
+                                        <div class="form-group row">
+                                            <label class="col-sm-3 control-label" for="demo-text-input">Remark <span class="text-danger">*</span></label>
+                                            <div class="col-sm-2">
+                                                <span class="colon">:</span>
+                                            </div>
+                                            <div class="col-sm-7">
+                                                @Html.Hidden("hidReopen", "", new { @class = "hiddenid" })
+                                                @Html.TextAreaFor(m => m.ReopenRemark, new { @class = "form-control", @rows = 3, @cols = "30", @onkeyup = "CountReopenRemark()" })
+                                                <small class="text-danger">Maximum <strong><label id="lblReopenRemark" class="col-form-label">500</label></strong> characters</small>
+                                            </div>
+                                        </div>
+                                        <div class="form-group row">
+                                            <label class="col-sm-3 control-label" for="demo-text-input">Supporting Document </label>
+                                            <div class="col-sm-2">
+                                                <span class="colon">:</span>
+                                            </div>
+                                            <div class="col-sm-7">
+                                                <div class="custom-file">
+                                                    <div class="custom-file">
+                                                        <input type="file" class="custom-file-input" id="Reopenfile" name="@Html.NameFor(Model => Model.Photo)" multiple>
+                                                        <label class="custom-file-label" for="customFile">Choose Files</label>
+                                                        <small class="text-danger">Only <strong class="font-weight-bold"> jpg, jpeg, png, pdf, tif</strong> file types with size less than <strong>2 MB </strong> are allowed.</small>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button class="btn btn-success mb-1 btn-md" id="btnReopen" type="submit">Reopen Ticket</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true" id="EditModal">
+                <div class="modal-dialog modal-md">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title mt-0" id="Comp_MHDR">Update Ticket</h5>
+                            <button type="button" class="close" aria-label="Close" id="CloseMeeting" data-dismiss="modal">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <form asp-action="CreateEdit" asp-controller="RaiseTicket" method="post" enctype="multipart/form-data">
+                            <div class="modal-body">
+                                <div class="form-group row">
+                                    <label class="col-12 col-md-4 control-label" for="demo-text-input">Remark <span class="text-danger">*</span></label>
+                                    <div class="col-12 col-md-8 col-xl-8">
+                                        @Html.Hidden("hid", "", new { @class = "hiddenid" })
+                                        @Html.TextAreaFor(m => m.Remark, new { @class = "form-control", @rows = 3, @cols = "30",@onkeyup = "CountRemark()" })
+                                        <small class="text-danger">Maximum <strong><label id="lblRemark" class="col-form-label">500</label></strong> characters</small>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-12 col-md-4 control-label">
+                                        Supporting Document
+                                    </label>
+                                    <div class="col-12 col-md-8 col-xl-8">
+                                        <div class="custom-file">
+                                            <div class="custom-file">
+                                                <input type="file" class="custom-file-input" id="filesupport" name="@Html.NameFor(Model => Model.Photo)" multiple>
+                                                <label class="custom-file-label" for="customFile">Choose Files</label>
+                                                <small class="text-danger">Only <strong class="font-weight-bold"> jpg, jpeg, png, pdf, tif</strong> file types with size less than <strong>2 MB </strong> are allowed.</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button class="btn btn-success btn-sm" id="btnUpdate1" type="submit">Update</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true" id="FetchTicketDetails">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title mt-0" id="Comp_MHDR">Ticket Status</h5>
+                            <button type="button" class="close" aria-label="Close" id="CloseMeeting" data-dismiss="modal">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="user-info-detilas mb-3">
+                                <div class="row">
+                                    <div class="col-md-7">
+                                        <h6 class="m-0 mb-2"><small class="d-block mb-1 text-dark">Complainer Name</small><span id="ComplanierName"></span></h6>
+                                        <p class="mb-1">Mobile No: <span class="text-dark font-weight-bold" id="Cmobile"></span></p>
+                                        <p class="mb-1">Email Id: <span class="text-dark font-weight-bold" id="Cemail"></span></p>
+                                        <p class="mb-1">District: <span class="text-dark font-weight-bold" id="Cdistrict"></span></p>
+                                        <p class="mb-1">Supported Document : @*<span id="Cdoc"></span>*@</p>
+
+                                    </div>
+                                    <div class="col-md-5 right-section">
+                                        <h6 class="m-0 mb-2 text-info"><small class="d-block  mb-1 text-dark">Ticket No.</small> <span id="Cticket"></span></h6>
+                                        <p class="mb-1">Created On: <span class="text-dark font-weight-bold" id="Cdate"></span></p>
+                                        <p class="mb-1">Priority: <span class="text-dark font-weight-bold" id="Cprior"></span></p>
+                                        <p class="mb-1">Status: <span class="text-danger font-weight-bold" id="Cstatus"> </span></p>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-12">
+                                        <div class="table-responsive">
+                                            <table class="table table-bordered" id="Cdoc">
+                                                <thead>
+                                                    <tr>
+                                                        <th width="30px">Sl#</th>
+                                                        <th>Supporting Documents</th>
+                                                        <th></th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <h6 class="text-dark font-weight-bold">Action History</h6>
+                            <div id="Chistory"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true" id="FetchUserlist">
+                <div class="modal-dialog modal-md">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title mt-0" id="Comp_MHDR">Forward Ticket</h5>
+                            <button type="button" class="close" aria-label="Close" id="CloseMeeting" data-dismiss="modal">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <form action="">
+                                <div class="form-group row">
+                                    <label class="col-sm-4 control-label" for="demo-text-input">User Type <span class="text-danger">*</span></label>
+                                    <div class="col-sm-8">
+                                        @Html.Hidden("hidticket", "", new { @class = "hiddenid" })
+                                        @Html.DropDownList("UserType", new List<SelectListItem>
+                                             {
+                                             new SelectListItem{ Text="Select", Value = "0" },
+                                             new SelectListItem{ Text="FMS User", Value = "14" },
+                                             new SelectListItem{ Text="OSU User", Value = "18" },
+                                             }, new { @class = "form-control", autofocus = "autofocus" })
+                                    </div>
+                                </div>
+                                <div class="form-group row" id="divdistrict">
+                                    <label class="col-sm-4 control-label" for="demo-text-input">District <span class="text-danger">*</span></label>
+                                    <div class="col-sm-8">
+                                        <select asp-for="DistrictID"
+                                                class="form-control searchableselect"
+                                                asp-items="@(new SelectList(Enumerable.Empty<SelectListItem>(),"Value", "Text"))">
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group row" id="divfms">
+                                    <label class="col-sm-4 control-label" for="demo-text-input">Fms User <span class="text-danger">*</span></label>
+                                    <div class="col-sm-8">
+                                        <select asp-for="Fmsuser"
+                                                class="form-control searchableselect"
+                                                asp-items="@(new SelectList(Enumerable.Empty<SelectListItem>(),"Value", "Text"))">
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group row" id="divosu">
+                                    <label class="col-sm-4 control-label" for="demo-text-input">OSU User <span class="text-danger">*</span></label>
+                                    <div class="col-sm-8">
+                                        <select asp-for="Osuuser"
+                                                class="form-control searchableselect"
+                                                asp-items="@(new SelectList(Enumerable.Empty<SelectListItem>(),"Value", "Text"))">
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-sm-4 control-label" for="demo-text-input">Remarks <span class="text-danger">*</span></label>
+                                    <div class="col-sm-8">
+                                        @Html.TextAreaFor(m => m.ForwardRemark, new { @class = "form-control", @rows = 3, @cols = "30",@onkeyup = "CountForwardRemark()" })
+                                        <small class="text-danger">Maximum <strong><label id="lblForwardRemark" class="col-form-label">500</label></strong> characters</small>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn btn-success btn-sm" id="btnForward" onclick="onBtnForwardSubmit();" type="submit">Forward</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true" id="CloseTicket">
+                <div class="modal-dialog modal-md">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title mt-0" id="Comp_MHDR">Close Ticket</h5>
+                            <button type="button" class="close" aria-label="Close" id="CloseMeeting" data-dismiss="modal">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <form asp-action="Close" asp-controller="RaiseTicket" method="post" enctype="multipart/form-data">
+                            <div class="modal-body">
+                                <div class="form-group row">
+                                    <label class="col-sm-4 control-label">Remark <span class="text-danger">*</span></label>
+                                    <div class="col-sm-8 control-label">
+                                        @Html.Hidden("hidclose", "", new { @class = "hiddenid" })
+                                        @Html.TextAreaFor(m => m.Closeremark, new { @class = "form-control", @rows = 3, @cols = "30",@onkeyup = "CountCloseremark()" })
+                                        <small class="text-danger">Maximum <strong><label id="lblCloseremark" class="col-form-label">500</label></strong> characters</small>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-sm-4 control-label">
+                                        Document
+                                    </label>
+                                    <div class="col-sm-8 control-label">
+                                        <div class="custom-file">
+                                            <div class="custom-file">
+                                                <input type="file" class="custom-file-input" id="Photo" name="@Html.NameFor(Model =>Model.Photo)" multiple>
+                                                <label class="custom-file-label" for="customFile">Choose Files</label>
+                                                <small class="text-danger">Only <strong class="font-weight-bold"> jpg, jpeg, png, pdf, tif</strong> file types with size less than <strong>2 MB </strong> are allowed.</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button class="btn btn-success btn-sm" id="btnclose" type="submit">Update</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- MAIN CONTENT AREA ENDS -->
+</section>
+
+
+

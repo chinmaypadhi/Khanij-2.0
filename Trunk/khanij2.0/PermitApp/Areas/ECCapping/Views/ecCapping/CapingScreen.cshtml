@@ -1,0 +1,426 @@
+﻿@model PermitEF.ECCappingEF
+@{
+    ViewData["Title"] = "CapingScreen";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var YEAR = ViewBag.Year;
+    var stock = ViewBag.Stock;
+    
+    var msg = ViewBag.msg;
+
+}
+
+@*<style>
+    table, th, td {
+        border: 1px solid black;
+    }
+</style>*@
+<div class="main-tab">
+    <ul class="nav nav-tabs">
+        <li class="nav-item active">
+            <a class="nav-link active" href="javascript:void(0);">
+                Add
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="~/ECCapping/ecCapping/CapingScreenView">
+                View
+            </a>
+        </li>
+    </ul>
+
+</div>
+
+
+<section class="box form-container">
+    <div class="col-12">
+        <div class="panel panel-primary">
+            @using (Html.BeginForm("CapingScreen", "ecCapping", FormMethod.Post, new { @id = "ECCappingform" }))
+            {
+
+
+                <div class="content-body">
+
+
+                    <div class="row">
+                        <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="col-md-12 ">
+                                        <span class="text-danger">*</span>
+                                        @if (@YEAR != null)
+                                        {
+                                        <label class="col-lg-3 col-lg-5 col-sm-12 col-form-label">Financial Year :</label>
+                                        <select class="k-input ddlDropdown ECCaping k-valid " name="FinancialYear" id="Year" onchange="return Prevcapp();">
+                                            <option value="0">Select Financial Year</option>
+                                            <option value="@YEAR">@YEAR</option>
+                                        </select>  @*<i class="fas fa-info-circle" id="inf">(ECCapping Details)</i>*@
+
+                                        }
+                                        else
+                                        {
+
+                                        <label class="col-lg-3 col-lg-5 col-sm-12 col-form-label">Financial Year :</label>
+                                        <select class="k-input ddlDropdown ECCaping k-valid " name="FinancialYear" id="Year" onchange="return Prevcapp();">
+                                            <option value="0">Select Financial Year</option>
+                                            <option value="@YEAR" selected>@YEAR</option>
+                                        </select>  @*<i class="fas fa-info-circle" id="inf">(ECCapping Details)</i>*@
+
+                                        }
+
+                                        <div class="row">
+                                        </div>
+                                        <div class="row">
+                                        </div>
+
+                                        <div class="table-responsive">
+                                            <table id="tblHistory2" class="table table-sm table-bordered">
+                                            </table>
+                                        </div>
+                                        <div class="table-responsive">
+                                            <table id="tblHistory3" class="table table-sm table-bordered">
+                                            </table>
+                                        </div>
+
+                                    </div>
+                                    </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <fieldset>
+                        <legend> Grade Wise Opening Stock  </legend>
+                        <div class="row">
+                            <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12">
+                                <div class="row">
+                                    <div class="col-lg-12">
+
+
+                                        @if (stock != null)
+                                        {
+                                            foreach (var i in stock)
+                                            {
+
+                                                <div class="col-md-12 ">
+                                                    <span class="text-danger">*</span>   <label class="col-lg-3 col-lg-5 col-sm-12 col-form-label">@i.MineralGrade (in MT.)</label>
+                                                    <input type="text" class="k-textbox ECCaping k-valid" style="width: 220px;" name="GradeWise_OpeningStock" onkeypress="return specialcharactertextbox();" id="Stock_Dataid">
+                                                    <input type="hidden" name="MineralGradeId" value="@i.MineralGradeId" />
+
+                                                </div>
+                                            }
+                                        }
+
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </fieldset>
+                    <br />
+
+                    @*<div class="row" id="divRejectRemarks">
+                        <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12">
+                            <div class="row">
+                                <div class="col-xs-12">
+                                    <div class="col-md-12 ">
+                                        <label>Remarks :</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>*@
+                    <div class="col-md-12" style="margin-left:41%">
+                        <input type="button" value="Submit" onclick="return onBtnSubmit();" class="btn btn-primary btn-md ml-0 waves-effect waves-light" />
+                        <input type="reset" value="Reset" class="btn btn-danger btn-md ml-0 waves-effect waves-light" />
+                    </div>
+                </div>
+            }
+        </div>
+
+    </div>
+
+
+
+
+
+    <!--<div id="myModal" class="modal fade" role="dialog" data-dismiss="modal" aria-labelledby="gridSystemModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+
+                </div>
+                EC Details
+                <div class="modal-body">
+                    <div class="form-group">
+                        <table class="table table-sm table-bordered" id="CustomerGrid">
+                            <thead>
+                                <tr>
+                                    <th>Financial Year</th>
+                                    <th>EC Qty.</th>
+                                    <th>Remamining Qty.</th>
+
+                                </tr>
+                            </thead>
+                            <tbody id="Eccaptab">
+                            </tbody>
+                        </table>
+                    </div>
+
+
+
+                </div>
+
+            </div>-->
+    <!-- /.modal-content -->
+    <!--</div>--><!-- /.modal-dialog -->
+    <!--</div>-->
+
+    @*<div class="modal fade" id="Notice_model2" tabindex="-1" role="dialog" aria-labelledby="basicModal" aria-hidden="true">
+        <div class="modal-dialog  modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">EC Capping Details</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="table-responsive">
+                        <table id="tblHistory2" class="table table-sm table-bordered">
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>*@
+
+
+
+
+
+
+
+
+
+</section>
+
+
+<script>
+
+    $(document).ready(function () {
+       // $("#myModal").modal('hide');
+        //$('#Notice_model2').modal('hide');
+        if (@msg != 0) {
+            if (@msg == 1) {
+
+                swal({
+                    title: "Current Financial Year Data Is Already Exists!",
+
+                    type: "warning"
+                }).then(okay => {
+                    if (okay) {
+                        window.location.href = '@Url.Action("CapingScreenView", "ecCapping")'
+                    }
+                });
+            }
+             if (@msg == 2) {
+
+                swal({
+                    title: "Data  Already Exists!",
+
+                    type: "warning"
+                }).then(okay => {
+                    if (okay) {
+
+                    }
+                });
+            }
+
+        }
+        else
+        {
+
+        }
+    });
+
+
+    function onBtnSubmit() {
+        var var_ECCaping = document.getElementsByClassName("ECCaping");
+
+        if ($("#Year").val() == 0)
+        {
+
+            swal('Please Choose One Financial Year!');
+            $("#Year").focus();
+            return false;
+
+        }
+
+        for (var i = 0; i < var_ECCaping.length; i++) {
+
+            if (var_ECCaping[i].value == "") {
+              
+                swal('Opening Stocks Cannot Be Blank!');
+                var_ECCaping[i].focus();
+                return false;
+            }
+
+        }
+
+
+
+
+         if (confirm("Before Declare Opening Stock you need to apply your Digital Signature. Are you sure to submit your request of opening stock ?")) {
+
+            var Postdata = 'action=signdoc' + "\n" + 'datatosign=Digital Signature Required' + "\n" + 'signaction=sign' + "\n" + 'filepath=' + "\n" + 'panNumberParam=' + "\n" + 'expirycheck=false' + "\n" + 'issuername=' + "\n" + 'certclass=1|2|3' + "\n" + 'certtype=ALL';
+            connection.send(Postdata);
+            connection.onerror = function (error) {
+                alert('Please check the server connection: ' + error);
+                alert(error);
+            };
+
+            connection.onmessage = function (e) { // when DSC is success then following function executed.
+                if (e.data.indexOf("subProtocol") == -1) {
+                    if (e.data == '' || e.data == undefined || e.data == null) {
+                        e.preventDefault();
+                    }
+                    else {
+                        $("#DSCResponse").val(e.data).change();
+                        $.ajax(
+                        {
+                           url: "/ECCapping/ecCapping/CheckVerifyResponse",
+                            type: "POST",
+                            data: { contentType: "pkcs7", signDataBase64Encoded: e.data, responseType: "plain" },
+                                success: function (msg) {
+                                    debugger;
+                                if (msg == "SUCCESS") {
+                                    $("#ECCappingform").submit();
+
+                                    return true;
+                                }
+                                else {
+                                    return false;
+                                }
+                            }
+                        });
+                    }
+                }
+                else {
+                    return false;
+                }
+            }
+
+        }
+        else {
+            return false;
+        }
+
+
+
+
+
+
+
+
+
+
+    }
+
+    //following code is for DSC Signature
+    try {
+        var connection = new WebSocket('wss://localhost.emudhra.com:8080');
+
+        connection.onopen = function () {
+            console.log('Connection Opened');
+        };
+        connection.onerror = function (error) {
+            //  alert('Please check the DSC connection: ' + error);
+        };
+        connection.onmessage = function (e) {
+            if (e.data.indexOf("subProtocol") == -1) {
+                //  alert(e.data);
+            }
+        };
+    }
+    catch (e) {
+        swal("No DSC Connection Found");
+    }
+    //-----------------------------
+ /*   $("#inf").click(function () {*/
+
+        function Prevcapp() {
+
+            $("#myModal").modal('show');
+
+            $.ajax(
+                {
+
+                    url: '@Url.Action("ECCappingPreviousDetails", "ecCapping", new { Area = "ECCapping" })',
+                    type: "POST",
+                    data: { "id": 0 },
+                    dataType: "json",
+                    success: function (data)
+                    {
+                        var res;
+                        debugger;
+                        
+                        
+
+
+                        if (data != "")
+                        {
+                            var row = '<thead><tr><th width="30px">Sl#</th><th>Financial Year</th><th>ECApprovedQuantity</th><th>RemainingQuantity</th></tr ></thead >'
+                            for (var i = 0; i < data.length; i++)
+                            {
+                                row += '<tr><th width="30px">' + (parseInt(i) + 1) + '</th><th>' + data[i].FinancialYear + '</th><th>' + data[i].ECQuantity + '</th><th>' + data[i].RemainingQuantity + '</th></tr >'
+                            }
+                            $("#tblHistory2").html(row);
+                        }
+                        else
+                        {
+
+                            swal({
+                                title: "Previous Year Data Is Not Available!",
+
+                                type: "warning"
+                            }).then(okay => {
+                                if (okay) {
+
+                                }
+                            });
+
+                        }
+                        
+                       // $('#Notice_model2').modal('show');
+                    },
+                    error: function () {
+                        alert('Error');
+                    }
+
+                });
+        }
+   /* });*/
+
+
+
+
+
+
+
+    //$("#Stock_Dataid").keypress(function (event) {
+        function specialcharactertextbox() { 
+
+         
+        var character = String.fromCharCode(event.keyCode);
+                return isValid(character);
+        }
+/*});*/
+
+function isValid(str) {
+    return !/[~`!#$%\^&*()+=\-\[\]\\';,/{}|\\":<>\?]/g.test(str);
+}
+</script>

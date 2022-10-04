@@ -1,0 +1,125 @@
+﻿@{
+    ViewData["Title"] = "Add";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+@model PaymentHeadViewModel
+@using MasterEF
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        @Html.Partial("_CMSnavigation")
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="/Master/PaymentHeadMaster/Add">
+                                Add New Payment Head
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/Master/PaymentHeadMaster/ViewList">
+                                View
+                            </a>
+                        </li>
+                    </ul>
+                    @Html.Partial("_CMSutil")
+                </div>
+                <section class="box form-container">
+                    <div class="content-body">             
+                        <div class="offset-sm-6"></div>
+                        <div class="District-Account" id="IdDIVDistrictWiseAccount">
+                            <form id="form1" action="UpdatePaymentHead" method="post">
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                        <div class="form-group row">
+                                            <label for="inputName" class="col-sm-3 col-form-label text-left">Select Payment Type<span class="text-danger">*</span></label>
+                                            <div class="col-sm-7">
+                                                <select id="ddlDistrictWisePaymentType" name="PaymentTypeId" class="form-control form-control-sm searchableselect">
+                                                    <option value="">Select Payment Type</option>
+                                                    @{
+                                                        List<SinglePaymentHeadModel> DistrictWisePaymentHeadModels = (List<SinglePaymentHeadModel>)ViewData["PaymentType"];
+                                                        if (DistrictWisePaymentHeadModels != null)
+                                                        {
+                                                            foreach (var item in DistrictWisePaymentHeadModels)
+                                                            {
+
+                                                                <option value="@item.PaymentTypeId">@item.PaymentType</option>
+                                                            }
+                                                        }
+                                                    }
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="offset-sm-6"></div>
+                                    <div class="col-sm-12">
+                                        <table class="table   table-bordered">
+                                            <thead>
+                                                <tr>
+                                                    <th></th>
+                                                    <th></th>
+                                                    <th>District Name</th>
+                                                    <th>Head Of Account</th>
+                                                    <th>SBI Scheme Code</th>
+                                                    <th>HDFC Scheme Code</th>
+                                                    <th>ICICI Scheme Code</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @{
+
+                                                    var i = 0;
+                                                   
+                                                    foreach (var item in Model.objPaymentHead)
+                                                    {
+
+                                                        <tr>
+                                                            <td><input type="hidden" name='[@i].DistrictId' value="@item.DistrictId.ToString()" /></td>
+                                                            <td><input type="hidden" name='[@i].PaymentHeadId' value="@item.PaymentHeadId.ToString()" /></td>
+                                                            <td>@Html.Label(item.DistrictName)</td>
+                                                            <td><input type="text" name='[@i].HeadOFAccount' value="@item.HeadOFAccount.ToString()" /></td>
+                                                            <td><input type="text" name='[@i].SBISchemeCode' value="@item.SBISchemeCode.ToString()" /></td>
+                                                            <td><input type="text" name='[@i].HDFCSchemeCode' value="@item.HDFCSchemeCode.ToString()" /></td> 
+                                                            <td><input type="text" name='[@i].ICICISchemeCode' value="@item.ICICISchemeCode.ToString()" /></td>
+
+
+
+                                                        </tr>
+                                                        i++;
+                                                    }
+
+                                                }
+
+                                            </tbody>
+                                        </table>
+                                    </div>
+
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-sm-6 ">
+                                        <input type="submit" value="@ViewBag.Button" name="Submit" id="Submit" class="btn btn-primary btn-md ml-0">
+                                        <a href="/Master/PaymentHeadMaster/Add" class="btn btn-danger btn-md">Reset</a>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+        </div>
+</section> 
+<input type="hidden" id="hdnPaymentTypeId" value="@ViewBag.PaymentTypeId" /> 
+<script>
+    indicateMe = "yes"
+    $(document).ready(function () {
+        $('.searchableselect').searchableselect();
+        loadNavigation('UpdateDistrictWise', 'glRoleRes', 'plUser', 'tl', 'Master', 'Payment Head', ' ');     
+        if ($('#hdnPaymentTypeId').val() != "") {
+            $('#ddlDistrictWisePaymentType').val($('#hdnPaymentTypeId').val());
+        }
+    });
+</script>

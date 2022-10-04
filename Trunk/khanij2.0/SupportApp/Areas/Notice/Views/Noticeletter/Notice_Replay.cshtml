@@ -1,0 +1,107 @@
+﻿@model SupportEF.NoticeLetterEF
+@{
+    ViewData["Title"] = "Notice_Replay";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+<script>
+    indicateMe = "yes"
+    $(document).ready(function () {
+        loadNavigation('Notice_Replay', 'glTMng', 'plpaymenthead', 'tl', 'Notice', 'Compose Notice', ' ');
+    });
+</script>
+<script>
+    function checkValidation() {
+        if ($('#NoticeDescription').val() == '') {
+            swal("",'Please Enter Notice Description!',"warning");
+            $('#NoticeDescription').focus();
+            return false;
+        }
+
+        ////if ($('#submit').val() == 'Submit') {
+        ////    return confirm('Are you sure to Submit?');
+        ////} else {
+        ////    return confirm('Are you sure to Update?');
+        ////}
+    }
+</script>
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        @Html.Partial("_CMSnavigation")
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="javascript:void(0);">
+                                Compose Notice
+                            </a>
+                        </li>
+                    </ul>
+                    @Html.Partial("_CMSutil")
+                </div>
+                <section class="box form-container">
+                    <div class="content-body">
+                        @using (Html.BeginForm("Notice_Replay", "Noticeletter", FormMethod.Post, new { enctype = "multipart/form-data", AUTOCOMPLETE = "Off", id = "form1" }))
+                        {
+                            <input type="hidden" value="@ViewBag.noticeId" name="NoticeID" id="notice" />
+                            //@Html.HiddenFor(e => e.NoticeID)
+                            @*@foreach (var b in ViewBag.NoticeDetails)
+            {*@
+                            <div class="form-group row">
+                                <div class="col-sm-12">
+                                    <label class="col-form-label font-weight-bolder pt-0">Subject</label>
+                                    @* <p class="m-0">@b.NoticeSubject</p>*@
+                                    @*@Html.TextBoxFor(m => m.NoticeSubject, new { @class = "form-control" })*@
+                                    @foreach (var notice in (IEnumerable<SupportEF.NoticeLetterEF>)ViewBag.NoticeDetails)
+                                    {
+                                        @Html.TextBox("Subject", notice.NoticeSubject, new { @class = "form-control", @readonly = "readonly" });
+                                         @Html.HiddenFor(e => notice.NoticeID)
+
+
+                                    }
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <div class="col-sm-12">
+                                    <label class="col-form-label font-weight-bolder">Message</label>
+                                    @*<p class="m-0">@b.NoticeDescription</p>*@
+                                    @Html.TextAreaFor(m => m.NoticeDescription, new { @class = "form-control", @cols = 10, @rows = 10 })
+                                </div>
+                            </div>
+                            @*}*@
+                            <div class="form-group row">
+                                <div class="col-sm-4">
+                                    <label class="col-form-label font-weight-bolder">Upload Notice</label>
+                                    <div class="custom-file">
+                                        <input type="file" class="custom-file-input" id="customFile" name="UploadFile" multiple>
+                                        <label class="custom-file-label" for="customFile">Choose Files</label>
+                                        <div class="col-lg-12 col-md-12 col-sm-12 text-center">Maximum allowed file size is <strong>2MB</strong>.</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-sm-12">
+                                    <input type="submit" value='@ViewBag.Button' class="btn btn-primary btn-md ml-0" name="submit" id="submit" onclick="return checkValidation();" />
+                                    @*<a href="#" class="btn btn-danger btn-md">Send</a>*@
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+    <!-- MAIN CONTENT AREA ENDS -->
+</section>
+<script>
+    $(document).ready(function () {
+
+        @*if ('@TempData["SuccMessage"]' != '' && '@TempData["SuccMessage"]' != null)
+                {
+                    swal("", '@TempData["SuccMessage"]', "success");
+                }*@
+
+    });
+</script>

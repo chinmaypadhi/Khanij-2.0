@@ -1,0 +1,1083 @@
+﻿@*// *********************************************************************************************************
+    //  View Name                : App_Action_ViewMPR
+    //  Desciption               : To Approve,Reject,Download Monthly Progress Report Details
+    //  Created By               : Lingaraj Dalai
+    //  Created On               : 18 Feb 2021
+    // ********************************************************************************************************
+*@
+@model GeologyEF.MPRmaster
+@using GeologyEF;
+@using GeologyApp.Web;
+@using Microsoft.AspNetCore.Mvc;
+@using  Microsoft.AspNetCore.Http;
+@inject IHttpContextAccessor HttpContextAccessor
+@{
+    ViewData["Title"] = "App_Action_ViewMPR";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+    UserLoginSession profile = HttpContextAccessor.HttpContext.Session.Get<UserLoginSession>(KeyHelper.UserKey);
+}
+<style>
+    .center-header-txt {
+        text-align: center;
+        font-size: 1.1rem;
+        margin-bottom: .5rem;
+    }
+
+    .full-width {
+        width: 100%;
+    }
+
+    strong {
+        font-weight: 600;
+    }
+
+    .text-number {
+        font-size: 20px;
+    }
+
+    .text-label {
+        font-size: 16px;
+    }
+
+    .fixTableHead {
+        overflow-y: auto;
+        max-height: 500px;
+        margin-bottom: 1rem;
+    }
+
+        .fixTableHead th {
+            position: sticky;
+            top: 0;
+        }
+</style>
+<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.3.3/jspdf.min.js"></script>
+<script src="https://html2canvas.hertzen.com/dist/html2canvas.js"></script>
+<script>
+    backMe="yes"
+    $(document).ready(function () {
+        loadNavigation('App_Action_ViewMPR', 'glTMng', 'plFPOOrder', 'tl', 'Geology', 'Monthly Progress Report', '');
+    });
+    function fnPrintFrom(e) {
+        //document.getElementById("PrintDiv").style.visibility = "hidden";
+        ////e.style.visibility = "hidden"
+        //var filename = "Monthly Progress Report.pdf";
+        //kendo.drawing.drawDOM($("#printMPRApprovalForm"), { forcePageBreak: '.page-break' }).then(function (group) {
+        //    kendo.drawing.exportPDF(group, {
+        //        //paperSize: "A3",
+        //        margin: { top: "2mm", right: "2mm", bottom: "2mm", left: "2mm" }, landscape: false
+        //    }).done(function (data) {
+        //        kendo.saveAs({
+        //            dataURI: data,
+        //            fileName: filename
+        //        });
+        //    });
+        //});
+        ////e.style.visibility = "initial"
+        //document.getElementById("PrintDiv").style.visibility = "initial";
+        html2canvas($('#printMPRApprovalForm'), {
+            onrendered: function (canvas) {
+                var data = canvas.toDataURL();
+                var docDefinition = {
+                    content: [{
+                        image: data,
+                        width: 500
+                    }]
+                };
+                pdfMake.createPdf(docDefinition).download("MonthlyProgressReport.pdf");
+            }
+        });
+
+    }
+    function onPrint() {
+        debugger;
+        var HTML_Width = 500;//$("#printForcefullyData").width();
+        var HTML_Height = $("#printForcefullyData").height();
+        var top_left_margin = 15;
+        var PDF_Width = HTML_Width + (top_left_margin * 2);
+        var PDF_Height = (PDF_Width * 1.5) + (top_left_margin * 2);
+        var canvas_image_width = HTML_Width;
+        var canvas_image_height = HTML_Height;
+        var totalPDFPages = Math.ceil(HTML_Height / PDF_Height) - 1;
+        html2canvas($("#printForcefullyData")[0], { allowTaint: true }).then(function (canvas) {
+            debugger;
+            canvas.getContext('2d');
+
+            console.log(canvas.height + "  " + canvas.width);
+
+
+            var data = canvas.toDataURL("image/JPEG", 1.0);
+            var pdf = new jsPDF('p', 'pt', [PDF_Width, PDF_Height]);
+            pdf.addImage(data, 'JPEG', top_left_margin, top_left_margin, canvas_image_width, canvas_image_height);
+
+
+            for (var i = 1; i <= totalPDFPages; i++) {
+                pdf.addPage(PDF_Width, PDF_Height);
+                pdf.addImage(data, 'JPEG', top_left_margin, -(PDF_Height * i) + (top_left_margin * 4), canvas_image_width, canvas_image_height);
+            }
+
+            data = pdf.save("MonthlyProgressReport.pdf");
+
+        });
+    }
+    function fnForward() {
+        if (confirm("Are you sure you want to forward to DGM ?")) {
+            $.ajax({
+                url: '@Url.Action("FORWARD_TO_DGM", "MPRCreator", new { Area = "Geology" })',
+                type: "POST",
+                data: { MPR_Id: $("#MPR_Id").val() },
+                success: function (data) {
+                    if (data == 1) {
+                        swal("","Report forwarded succeessfully.","success");
+                    }
+                    else {
+                        swal("","Report forwarded error.","error");
+                    }
+                     setTimeout(function () {
+                                 window.location.href = '@Url.Action("MPRForwarder", "MPRCreator", new { Area = "Geology" })';
+                            }, 5000);
+                }
+            });
+        }
+    }
+    function fnForward_ReferBack() {
+        if (!blankFieldValidation("Remarks", "Remarks")) {
+            return false;
+        }
+        else {
+            if (confirm("Are you sure you want to Referred Back?")) {
+                $.ajax({
+                    url: '@Url.Action("FORWARDER_REFER_BACK", "MPRCreator", new { Area = "Geology" })',
+                    type: "POST",
+                    data: { MPR_Id: $("#MPR_Id").val(), Remarks: $("#Remarks").val() },
+                    success: function (data) {
+                        if (data == 1) {
+                            swal("","Referred Back Successfully.","success");
+                        }
+                        else {
+                            swal("","Report referred error.","error");
+                        }
+                         setTimeout(function () {
+                                window.location.href = '@Url.Action("MPRForwarder", "GeologyOperation", new { Area = "Geology" })';
+                            }, 5000);
+                    }
+                });
+            }
+        }
+    }
+    function fnApproved() {
+        if (confirm("Are you sure you want to approve ?")) {
+            $.ajax({
+                url: '@Url.Action("UpdateMPR_Status", "MPRCreator", new { Area = "Geology" })',
+                type: "POST",
+                data: { MPR_Id: $("#MPR_Id").val(), Remarks: $("#Remarks").val() },
+                success: function (data) {
+                    if (data == 1) {
+                        swal("","Report approved succeessfully.","success");
+                    }
+                    else {
+                        swal("","Report approval failure.","error");
+                    }
+                    window.location.href = '@Url.Action("MPRApproval", "MPRCreator", new { Area = "Geology" })';
+                }
+            });
+        }
+    }
+    function fnReferBack() {
+        if (!blankFieldValidation("Remarks", "Remarks")) {
+            return false;
+        }
+        else {
+            if (confirm("Are you sure you want to Referred Back?")) {
+                $.ajax({
+                    url: '@Url.Action("UpdateMPR_Referback", "MPRCreator", new { Area = "Geology" })',
+                    type: "POST",
+                    data: { MPR_Id: $("#MPR_Id").val(), Remarks: $("#Remarks").val() },
+                    success: function (data) {
+                        if (data == 1) {
+                            swal("","Referred Back Successfully.","success");
+                        }
+                        else {
+                            swal("","Referred Back failure.","error");
+                        }
+                        window.location.href = '@Url.Action("MPRApproval", "MPRCreator", new { Area = "Geology" })';
+                    }
+                });
+            }
+        }
+    }
+</script>
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        <!-- MAIN CONTENT AREA STARTS -->
+        @Html.Partial("_CMSnavigation")
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="javascript:void(0);">
+                                Monthly Progress Report
+                            </a>
+                        </li>
+                    </ul>
+                    @Html.Partial("_CMSutil")
+                </div>
+                <section class="box form-container" id="printForcefullyData">
+                    <div class="content-body">
+                        @using (Html.BeginForm("Add", "MPRCreator", FormMethod.Post, new { AUTOCOMPLETE = "Off", id = "form1" }))
+                        {
+                            @Html.AntiForgeryToken()
+                            @Html.HiddenFor(m => m.Status)
+                            @Html.HiddenFor(m => m.MPR_Id, new { id = "MPR_Id" })
+                            <div class="row" id="printMPRApprovalForm">
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                    <div>
+
+                                        @if (ViewBag.Type == "Preview")
+                                        {
+                                            <h5 class="text-center mt-0 font-weight-bold">Monthly Progress Report</h5>
+                                        }
+                                        else
+                                        {
+                                            <h5 class="text-center mt-0 font-weight-bold">Monthly Progress Report</h5>
+                                        }
+
+                                        <div>
+                                            <table class="full-width">
+                                                <tr>
+                                                    <th>
+                                                        <p class="center-header-txt">
+                                                            <span>Directorate of Geology & Mining(C.G)</span>,
+                                                        </p>
+                                                    </th>
+                                                </tr>
+                                            </table>
+                                            <table class="full-width">
+                                                <tr>
+                                                    <td class="center-header-txt">MPR Number: <strong>@Model.MPR_Code</strong></td>
+                                                    @* <td class="center-header-txt">Comp.......Dated</td>*@
+                                                </tr>
+                                            </table>
+                                            @*<div class="mb-4">
+                                                    <p class="font-weight-bold">To,</p>
+                                                    <p class="font-weight-bold">
+                                                        The Director / Regional Head,<br />
+                                                        Directorate of Geology & Mining,C.G.,<br />
+                                                        @Model.DistrictName / Regional Head
+                                                    </p>
+                                                </div>*@
+                                            <div>
+                                                <p><span class="font-weight-bold h5">1. Assignment and its object : </span><span>@Model.FPO_Name</span></p>
+                                                <p>
+                                                    <span class="font-weight-bold h5">2. Camp Address : </span>
+                                                    <span>
+                                                        <strong style="margin-left: 15px;">Village : </strong> <span>@Model.VillageName</span>  ,
+                                                        <strong style="margin-left: 15px;">District : </strong> <span>@Model.DistrictName</span>  ,
+                                                    </span>
+                                                    <strong style="margin-left: 15px;">Pin :  </strong> <span>@Model.PinCode</span> ,
+                                                    <strong style="margin-left: 15px;">Telephone No. : </strong> <span class="ptxt-val">@Model.MobileNo</span>
+                                                </p>
+                                                <p>
+                                                    <span class="font-weight-bold h5">3. Name of the Camp incharge : </span>
+                                                    <span>@Model.UserName</span>  ,
+                                                    <strong style="margin-left: 15px;">Designation - </strong>
+                                                    <span>@Model.RoleName</span>
+                                                </p>
+                                                <p>
+                                                    <span class="font-weight-bold h5">4. Date of Commencement of the investigation : </span>
+                                                    <span>@Model.Str_SubmissionDate</span>
+                                                </p>
+                                                <p>
+                                                    <span class="font-weight-bold h5"> 5.  Expenditure Incurred : </span>
+                                                    <span style="margin-left: 18px;">(a) <span class="font-weight-bold">Up to the last month : </span> <span>@Model.Up_To_The_Last_Month</span> </span>
+                                                    <span style="margin-left: 18px;">(b) <span class="font-weight-bold">During the month : </span> <span> @Model.During_The_Month</span> </span>
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <div style="margin-left:17px;">
+                                            <h5 class="font-weight-bold">Details of During the month</h5>
+                                            <table id="DetailsOfB" class="mb-3">
+                                                <tbody>
+                                                    <tr>
+                                                        <td width="150px">
+                                                            <strong class="text-label">Labor in ₹ : </strong>
+                                                            <span class="text-label">
+                                                                @Model.Labor
+                                                            </span>
+                                                        </td>
+
+                                                        <td width="150px">
+                                                            <strong class="text-label">P.O.L in ₹ : </strong>
+                                                            <span class="text-label">
+                                                                @Model.POL
+                                                            </span>
+                                                        </td>
+
+                                                        <td width="300px">
+                                                            <strong class="text-label">Repairs and maintenance in ₹ : </strong>
+                                                            <span class="text-label"> @Model.Repair_And_Maintenance</span>
+                                                        </td>
+
+                                                        <td width="150px">
+                                                            <strong class="text-label">Others in ₹ : </strong>
+                                                            <span class="text-label">
+                                                                @Model.others
+                                                            </span>
+                                                        </td>
+                                                        <td width="150px">
+                                                            <strong class="text-label">Total in ₹ : </strong>
+                                                            <span class="text-label">
+                                                                @Model.Total
+                                                            </span>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                            @*<table id="DetailsOfB" class="table table-bordered">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Labor in ₹</th>
+                                                            <th>P.O.L in ₹</th>
+                                                            <th>Repairs and maintenance in ₹</th>
+                                                            <th>Others in ₹</th>
+                                                            <th>Total in ₹</th>
+                                                        </tr>
+                                                    </thead>
+
+                                                    <tr>
+
+                                                        <td>
+                                                            @Model.Labor
+                                                        <td>
+                                                            @Model.POL
+                                                        </td>
+                                                        <td>
+                                                            @Model.Repair_And_Maintenance
+                                                        </td>
+                                                        <td>
+                                                            @Model.others
+                                                        </td>
+                                                        <td>
+                                                            @Model.Total
+                                                        </td>
+                                                    </tr>
+                                                </table>*@
+                                        </div>
+                                        <h5 class="font-weight-bold">6. Exploration Data <small>(Mt)</small></h5>
+
+                                        <div class="row">
+                                            <div class="col-lg-8">
+                                                <div class="fixTableHead">
+                                                    <table id="AreaDe3tails" class="table table-bordered">
+                                                        <thead>
+                                                            <tr>
+                                                                <th width="400">Progress in respect of</th>
+                                                                <th class="text-right">Target</th>
+                                                                <th class="text-right">Work done up to the last month</th>
+                                                                <th class="text-right">Work done during the month</th>
+                                                                <th class="text-right">Total work done at the end of current month</th>
+
+                                                            </tr>
+                                                        </thead>
+
+                                                        <tr>
+                                                            <td colspan="5"><b class="text-brown font-weight-bold">A. Reconn. Geological Survey (Scale - 1:50,000)</b></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td> Area (sq. km.)</td>
+                                                            <td class="text-right text-number">
+                                                                @Model.Reconn_Area_Target
+                                                            </td>
+                                                            <td class="text-right text-number">
+                                                                @Model.Reconn_Area_Last_Month
+                                                            </td>
+                                                            <td class="text-right text-number">
+                                                                @Model.Reconn_Area_During_Month
+                                                            </td>
+                                                            <td class="text-right text-number">
+                                                                @Model.Reconn_Area_Current_Month
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td colspan="5"><b class="text-brown font-weight-bold">B. Detailed Geological Mapping (Scale - 1:4,000)</b></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td> Area (sq. km.)</td>
+                                                            <td class="text-right text-number">
+                                                                @Model.Detailed_Area_Target
+                                                            </td>
+                                                            <td class="text-right text-number">
+                                                                @Model.Detailed_Area_Last_Month
+                                                            </td>
+                                                            <td class="text-right text-number">
+                                                                @Model.Detailed_Area_During_Month
+                                                            </td>
+                                                            <td class="text-right text-number">
+                                                                @Model.Detailed_Area_Current_Month
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td colspan="5"><b class="text-brown font-weight-bold">C. Pitting</b></td>
+
+                                                        </tr>
+                                                        <tr>
+                                                            <td> Nos.</td>
+                                                            <td class="text-right text-number">
+                                                                @Model.Pitting_Nos_Target
+                                                            </td>
+                                                            <td class="text-right text-number">
+                                                                @Model.Pitting_Nos_Last_Month
+                                                            </td>
+                                                            <td class="text-right text-number">
+                                                                @Model.Pitting_Nos_During_Month
+                                                            </td>
+                                                            <td class="text-right text-number">
+                                                                @Model.Pitting_Nos_Current_Month
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td> Volume (cu. m.)</td>
+                                                            <td class="text-right text-number">
+                                                                @Model.Pitting_Volume_Target
+                                                            </td>
+                                                            <td class="text-right text-number">
+                                                                @Model.Pitting_Volume_Last_Month
+                                                            </td>
+                                                            <td class="text-right text-number">
+                                                                @Model.Pitting_Volume_During_Month
+                                                            </td>
+                                                            <td class="text-right text-number">
+                                                                @Model.Pitting_Volume_Current_Month
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td colspan="5"><b class="text-brown font-weight-bold">D. Trenching</b></td>
+
+                                                        </tr>
+                                                        <tr>
+                                                            <td> Nos.</td>
+                                                            <td class="text-right text-number">
+                                                                @Model.Trenching_Nos_Target
+                                                            </td>
+                                                            <td class="text-right text-number">
+                                                                @Model.Trenching_Nos_Last_Month
+                                                            </td>
+                                                            <td class="text-right text-number">
+                                                                @Model.Trenching_Nos_During_Month
+                                                            </td>
+                                                            <td class="text-right text-number">
+                                                                @Model.Trenching_Nos_Current_Month
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td> Volume (cu. m.)</td>
+                                                            <td class="text-right text-number">
+                                                                @Model.Trenching_Volume_Target
+                                                            </td>
+                                                            <td class="text-right text-number">
+                                                                @Model.Trenching_Volume_Last_Month
+                                                            </td>
+                                                            <td class="text-right text-number">
+                                                                @Model.Trenching_Volume_During_Month
+                                                            </td>
+                                                            <td class="text-right text-number">
+                                                                @Model.Trenching_Volume_Current_Month
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td colspan="5"><b class="text-brown font-weight-bold">E. Drilling</b></td>
+
+                                                        </tr>
+                                                        <tr>
+                                                            <td> B.h. Completed</td>
+                                                            <td class="text-right text-number">
+                                                                @Model.B_H_Cpmpleted_Target
+                                                            </td>
+                                                            <td class="text-right text-number">
+                                                                @Model.B_H_Cpmpleted_Last_Month
+                                                            </td>
+                                                            <td class="text-right text-number">
+                                                                @Model.B_H_Cpmpleted_During_Month
+                                                            </td>
+                                                            <td class="text-right text-number">
+                                                                @Model.B_H_Cpmpleted_Current_Month
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td> Metrage</td>
+                                                            <td class="text-right text-number">
+                                                                @Model.Metrage_Target
+                                                            </td>
+                                                            <td class="text-right text-number">
+                                                                @Model.Metrage_Last_Month
+                                                            </td>
+                                                            <td class="text-right text-number">
+                                                                @Model.Metrage_During_Month
+                                                            </td>
+                                                            <td class="text-right text-number">
+                                                                @Model.Metrage_Current_Month
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td> B.H. Under Progress</td>
+                                                            <td class="text-right text-number">
+                                                                @Model.B_H_Under_Progress_Target
+                                                            </td>
+                                                            <td class="text-right text-number">
+                                                                @Model.B_H_Under_Progress_Last_Month
+                                                            </td>
+                                                            <td class="text-right text-number">
+                                                                @Model.B_H_Under_Progress_During_Month
+                                                            </td>
+                                                            <td class="text-right text-number">
+                                                                @Model.B_H_Under_Progress_Current_Month
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td> Metrage</td>
+                                                            <td class="text-right text-number">
+                                                                @Model.Metrage_2_Target
+                                                            </td>
+                                                            <td class="text-right text-number">
+                                                                @Model.Metrage_2_Last_Month
+                                                            </td>
+                                                            <td class="text-right text-number">
+                                                                @Model.Metrage_2_During_Month
+                                                            </td>
+                                                            <td class="text-right text-number">
+                                                                @Model.Metrage_2_Current_Month
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td> Total Metrage </td>
+                                                            <td class="text-right text-number">
+                                                                @Model.Total_Metrage_Target
+                                                            </td>
+                                                            <td class="text-right text-number">
+                                                                @Model.Total_Metrage_Last_Month
+                                                            </td>
+                                                            <td class="text-right text-number">
+                                                                @Model.Total_Metrage_During_Month
+                                                            </td>
+                                                            <td class="text-right text-number">
+                                                                @Model.Total_Metrage_Current_Month
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td><b> Geochemical Sampling</b></td>
+                                                            <td class="text-right text-number">
+                                                                @Model.Geochemical_Sampling_Target
+                                                            </td>
+                                                            <td class="text-right text-number">
+                                                                @Model.Geochemical_Sampling_Last_Month
+                                                            </td>
+                                                            <td class="text-right text-number">
+                                                                @Model.Geochemical_Samplinge_During_Month
+                                                            </td>
+                                                            <td class="text-right text-number">
+                                                                @Model.Geochemical_Sampling_Current_Month
+                                                            </td>
+                                                        </tr>
+
+                                                        <tr>
+                                                            <td><b> Geophysical Survey</b></td>
+                                                            <td class="text-right text-number">
+                                                                @Model.Geophysical_Survey_Target
+                                                            </td>
+                                                            <td class="text-right text-number">
+                                                                @Model.Geophysical_Survey_Last_Month
+                                                            </td>
+                                                            <td class="text-right text-number">
+                                                                @Model.Geophysical_Survey_During_Month
+                                                            </td>
+                                                            <td class="text-right text-number">
+                                                                @Model.Geophysical_Survey_Current_Month
+                                                            </td>
+                                                        </tr>
+
+                                                        <tr>
+                                                            <td colspan="5"><b class="text-brown font-weight-bold">H. Photogeological Survey</b></td>
+
+                                                        </tr>
+                                                        <tr>
+                                                            <td> Prefield Interpretation (sq. km. on scale)</td>
+                                                            <td class="text-right text-number">
+                                                                @Model.Prefield_Interpretation_Target
+                                                            </td>
+                                                            <td class="text-right text-number">
+                                                                @Model.Prefield_Interpretation_Last_Month
+                                                            </td>
+                                                            <td class="text-right text-number">
+                                                                @Model.Prefield_Interpretation_During_Month
+                                                            </td>
+                                                            <td class="text-right text-number">
+                                                                @Model.Prefield_Interpretation_Current_Month
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td> Post field Interpretation (sq. km. on scale)</td>
+                                                            <td class="text-right text-number">
+                                                                @Model.Postfield_Interpretation_Target
+                                                            </td>
+                                                            <td class="text-right text-number">
+                                                                @Model.Postfield_Interpretation_Last_Month
+                                                            </td>
+                                                            <td class="text-right text-number">
+                                                                @Model.Postfield_Interpretation_During_Month
+                                                            </td>
+                                                            <td class="text-right text-number">
+                                                                @Model.Postfield_Interpretation_Current_Month
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td> Field Check (sq. km. on scale)</td>
+                                                            <td class="text-right text-number">
+                                                                @Model.Field_Check_Target
+                                                            </td>
+                                                            <td class="text-right text-number">
+                                                                @Model.Field_Check_Last_Month
+                                                            </td>
+                                                            <td class="text-right text-number">
+                                                                @Model.Field_Check_During_Month
+                                                            </td>
+                                                            <td class="text-right text-number">
+                                                                @Model.Field_Check_Current_Month
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td colspan="5"><b class="text-brown font-weight-bold">I. Sampling (Surface/Core Sample)</b></td>
+
+                                                        </tr>
+                                                        <tr>
+                                                            <td> Samples Drawn</td>
+                                                            <td class="text-right text-number">
+                                                                @Model.Sample_Drawn_Target
+                                                            </td>
+                                                            <td class="text-right text-number">
+                                                                @Model.Sample_Drawn_Last_Month
+                                                            </td>
+                                                            <td class="text-right text-number">
+                                                                @Model.Sample_Drawn_During_Month
+                                                            </td>
+                                                            <td class="text-right text-number">
+                                                                @Model.Sample_Drawn_Current_Month
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td> Samples Prepared</td>
+                                                            <td class="text-right text-number">
+                                                                @Model.Sample_Prepared_Target
+                                                            </td>
+                                                            <td class="text-right text-number">
+                                                                @Model.Sample_Prepared_Last_Month
+                                                            </td>
+                                                            <td class="text-right text-number">
+                                                                @Model.Sample_Prepared_During_Month
+                                                            </td>
+                                                            <td class="text-right text-number">
+                                                                @Model.Sample_Prepared_Current_Month
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td> Samples Sent For Chemical Analysis</td>
+                                                            <td class="text-right text-number">
+                                                                @Model.Sample_Sent_For_Chemical_Analysis_Target
+                                                            </td>
+                                                            <td class="text-right text-number">
+                                                                @Model.Sample_Sent_For_Chemical_Analysis_Last_Month
+                                                            </td>
+                                                            <td class="text-right text-number">
+                                                                @Model.Sample_Sent_For_Chemical_Analysis_During_Month
+                                                            </td>
+                                                            <td class="text-right text-number">
+                                                                @Model.Sample_Sent_For_Chemical_Analysis_Current_Month
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td> Samples Sent For Petrography</td>
+                                                            <td class="text-right text-number">
+                                                                @Model.Sample_Sent_For_Petrography_Target
+                                                            </td>
+                                                            <td class="text-right text-number">
+                                                                @Model.Sample_Sent_For_Petrography_Last_Month
+                                                            </td>
+                                                            <td class="text-right text-number">
+                                                                @Model.Sample_Sent_For_Petrography_During_Month
+                                                            </td>
+                                                            <td class="text-right text-number">
+                                                                @Model.Sample_Sent_For_Petrography_Current_Month
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td colspan="5"><b class="text-brown font-weight-bold">J. Reserves</b></td>
+
+                                                        </tr>
+                                                        <tr>
+                                                            <td>Inferred (Million Tonnes)</td>
+                                                            <td class="text-right text-number">
+                                                                @Model.Inferred_Target
+                                                            </td>
+                                                            <td class="text-right text-number">
+                                                                @Model.Inferred_Last_Month
+                                                            </td>
+                                                            <td class="text-right text-number">
+                                                                @Model.Inferred_During_Month
+                                                            </td>
+                                                            <td class="text-right text-number">
+                                                                @Model.Inferred_Current_Month
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>Estimated (Million Tonnes)</td>
+                                                            <td class="text-right text-number">
+                                                                @Model.Estimated_Target
+                                                            </td>
+                                                            <td class="text-right text-number">
+                                                                @Model.Estimated_Last_Month
+                                                            </td>
+                                                            <td class="text-right text-number">
+                                                                @Model.Estimated_During_Month
+                                                            </td>
+                                                            <td class="text-right text-number">
+                                                                @Model.Estimated_Current_Month
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td> Proved (Million Tonnes)</td>
+                                                            <td class="text-right text-number">
+                                                                @Model.Proved_Target
+                                                            </td>
+                                                            <td class="text-right text-number">
+                                                                @Model.Proved_Last_Month
+                                                            </td>
+                                                            <td class="text-right text-number">
+                                                                @Model.Proved_During_Month
+                                                            </td>
+                                                            <td class="text-right text-number">
+                                                                @Model.Proved_Current_Month
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td colspan="5"><b class="text-brown font-weight-bold">K. Topographical Survey</b></td>
+
+                                                        </tr>
+                                                        <tr>
+                                                            <td> Laying Of Base Line (km.) 1:10000</td>
+                                                            <td class="text-right text-number">
+                                                                @Model.Laying_Of_Base_Line_Target
+                                                            </td>
+                                                            <td class="text-right text-number">
+                                                                @Model.Laying_Of_Base_Line_Last_Month
+                                                            </td>
+                                                            <td class="text-right text-number">
+                                                                @Model.Laying_Of_Base_Line_During_Month
+                                                            </td>
+                                                            <td class="text-right text-number">
+                                                                @Model.Laying_Of_Base_Line_Current_Month
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td> Laying Of Grids (sq. km.)</td>
+                                                            <td class="text-right text-number">
+                                                                @Model.Laying_Of_Grids_Target
+                                                            </td>
+                                                            <td class="text-right text-number">
+                                                                @Model.Laying_Of_Grids_Last_Month
+                                                            </td>
+                                                            <td class="text-right text-number">
+                                                                @Model.Laying_Of_Grids_During_Month
+                                                            </td>
+                                                            <td class="text-right text-number">
+                                                                @Model.Laying_Of_Grids_Current_Month
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td> No. Of Pits/B.H. Point Located</td>
+                                                            <td class="text-right text-number">
+                                                                @Model.No_of_Pits_Target
+                                                            </td>
+                                                            <td class="text-right text-number">
+                                                                @Model.No_of_Pits_Last_Month
+                                                            </td>
+                                                            <td class="text-right text-number">
+                                                                @Model.No_of_Pits_During_Month
+                                                            </td>
+                                                            <td class="text-right text-number">
+                                                                @Model.No_of_Pits_Current_Month
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td> R.L./Co-ordinates Of Pits/B.H.</td>
+                                                            <td class="text-right text-number">
+                                                                @Model.Co_ordinates_Of_Pits_Target
+                                                            </td>
+                                                            <td class="text-right text-number">
+                                                                @Model.Co_ordinates_Of_Pits_Last_Month
+                                                            </td>
+                                                            <td>
+                                                                @Model.Co_ordinates_Of_Pits_During_Month
+                                                            </td>
+                                                            <td>
+                                                                @Model.Co_ordinates_Of_Pits_Current_Month
+                                                            </td>
+                                                        </tr>
+
+                                                        <tr>
+                                                            <td> Contouring (sq. km.)</td>
+                                                            <td class="text-right text-number">
+                                                                @Model.Contouring_Target
+                                                            </td>
+                                                            <td class="text-right text-number">
+                                                                @Model.Contouring_Last_Month
+                                                            </td>
+                                                            <td class="text-right text-number">
+                                                                @Model.Contouring_During_Month
+                                                            </td>
+                                                            <td class="text-right text-number">
+                                                                @Model.Contouring_Current_Month
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>Plotting Of Permanent Features</td>
+                                                            <td class="text-right text-number">
+                                                                @Model.Plotting_Of_Permanent_Features_Target
+                                                            </td>
+                                                            <td class="text-right text-number">
+                                                                @Model.Plotting_Of_Permanent_Features_Last_Month
+                                                            </td>
+                                                            <td class="text-right text-number">
+                                                                @Model.Plotting_Of_Permanent_Features_During_Month
+                                                            </td>
+                                                            <td class="text-right text-number">
+                                                                @Model.Plotting_Of_Permanent_Features_Current_Month
+                                                            </td>
+                                                        </tr>
+
+                                                        <tr>
+                                                            <td> Plotting Of Road/Nala (k.m.)</td>
+                                                            <td class="text-right text-number">
+                                                                @Model.Plotting_Of_Road_Nala_Target
+                                                            </td>
+                                                            <td class="text-right text-number">
+                                                                @Model.Plotting_Of_Road_Nala_Last_Month
+                                                            </td>
+                                                            <td class="text-right text-number">
+                                                                @Model.Plotting_Of_Road_Nala_During_Month
+                                                            </td>
+                                                            <td class="text-right text-number">
+                                                                @Model.Plotting_Of_Road_Nala_Current_Month
+                                                            </td>
+                                                        </tr>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <h5 class="font-weight-bold d-inline ">7. Other infomation,if any : </h5>
+                                        <p class="d-inline"> @Model.Resources </p>
+
+                                        <h5 class="font-weight-bold mt-3">8. Halt at Camps for Officers <small>(For staffs attach separate leaf)</small> </h5>
+                                        <div class="row">
+                                            <div class="col-lg-8 col-12">
+
+                                                <table id="CampsDetails22" class="table table-bordered">
+                                                    <thead>
+                                                        <tr>
+                                                            <th width="30">Sl#</th>
+                                                            <th>Name</th>
+                                                            <th>Designation</th>
+                                                            <th>From</th>
+                                                            <th>To</th>
+                                                            <th class="text-right">No. of Days at Camps</th>
+                                                            <th>Remarks, If Any</th>
+                                                        </tr>
+                                                    </thead>
+                                                    @if (Model.List_Camps_Name != null && Model.List_Camps_Name != null && Model.List_Camps_Name.Count > 0)
+                                                    {
+                                                        for (int i = 0; i < Model.List_Camps_Name.Count; i++)
+                                                        {
+                                                            var NO = i + 1;
+                                                            <tr id="tr_AreaTable">
+                                                                <td>@NO</td>
+                                                                <td>
+                                                                    @Model.List_Camps_Name[i]
+                                                                </td>
+                                                                <td>
+                                                                    @Model.List_Camps_Designation[i]
+
+                                                                </td>
+                                                                <td>
+                                                                    @Model.List_Camps_From[i]
+
+                                                                </td>
+
+                                                                <td>
+                                                                    @Model.List_Camps_To[i]
+                                                                </td>
+                                                                <td class="text-right text-number">
+                                                                    @Model.List_Camps_No_Of_Days[i]
+                                                                </td>
+
+                                                                <td>
+                                                                    @Model.List_Camps_Remarks[i]
+                                                                </td>
+                                                            </tr>
+                                                        }
+                                                    }
+                                                </table>
+
+
+                                            </div>
+
+                                        </div>
+                                        <h5 class="font-weight-bold">9. Enclosers</h5>
+                                        <table class="mb-3">
+                                            <tbody>
+                                                <tr>
+                                                    <td width="300px">
+                                                        <strong>Maps</strong>
+                                                        <span>
+                                                            <a href='~/Geology/MPRCreator/DowuloadMPRs?filename=@Model.MapName' title="" class="ml-2" data-original-title="Download Maps" target="_blank">
+                                                                <i class="icon-file-pdf-solid h5 text-danger"></i>
+                                                                @(string.IsNullOrEmpty(Model.MapName) ? "N/A" : Model.MapName)
+                                                            </a>
+                                                        </span>
+                                                    </td>
+                                                    <td width="300px">
+                                                        <strong>Borehole Logs</strong>
+                                                        <span>
+                                                            <a href='~/Geology/MPRCreator/DowuloadMPRs?filename=@Model.LogName' title="" class="ml-2" data-original-title="Download Borehole Logs" target="_blank">
+                                                                <i class="icon-file-pdf-solid h5 text-danger"></i>
+                                                                @(string.IsNullOrEmpty(Model.LogName) ? "N/A" : Model.LogName)
+                                                            </a>
+                                                        </span>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td width="300px">
+                                                        <strong class="mt-3 d-inline-block">Geological Description</strong>
+                                                        <span>
+                                                            <a href='~/Geology/MPRCreator/DowuloadMPRs?filename=@Model.SynopsisName' title="" class="ml-2" data-original-title="Download Geological Description" target="_blank">
+                                                                <i class="icon-file-pdf-solid h5 text-danger"></i>
+                                                                @(string.IsNullOrEmpty(Model.SynopsisName) ? "N/A" : Model.SynopsisName)
+                                                            </a>
+                                                        </span>
+                                                    </td>
+                                                    <td width="300px">
+                                                        <strong class="mt-3 d-inline-block">Other Information</strong>
+                                                        <span>
+                                                            <a href='~/Geology/MPRCreator/DowuloadMPRs?filename=@Model.OtherName' title="" class="ml-2" data-original-title="Download Other Information" target="_blank">
+                                                                <i class="icon-file-pdf-solid h5 text-danger"></i>
+                                                                @(string.IsNullOrEmpty(Model.OtherName) ? "N/A" : Model.OtherName)
+                                                            </a>
+                                                        </span>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                        <table class="table table-bordered" style="display:none;">
+                                            <tr>
+                                                <th width="30">@Html.Label("Sl#")</th>
+                                                <th>@Html.Label("Maps")</th>
+                                                <th>@Html.Label("Borehole Logs")</th>
+                                                <th>@Html.Label("Geological Description/Synopsis")</th>
+                                                <th>@Html.Label("Other Information")</th>
+                                            </tr>
+                                            @{ int srno = 1;
+                                            }
+                                            @foreach (var b in ViewBag.ViewList)
+                                            {
+                                                <tr>
+                                                    <td>
+                                                        <label>  @srno</label>
+                                                        @{ srno++; }
+                                                    </td>
+                                                    <td>
+                                                        <a href='~/Geology/MPRCreator/DowuloadMPRs?filename=@b.MapName' height='30' width='30' target="_blank">
+                                                            @(string.IsNullOrEmpty(b.MapName) ? "N/A" : b.MapName)
+                                                        </a>
+                                                    </td>
+                                                    <td>
+                                                        <a href='~/Geology/MPRCreator/DowuloadMPRs?filename=@b.LogName' height='30' width='30' target="_blank">
+                                                            @(string.IsNullOrEmpty(b.LogName) ? "N/A" : b.LogName)
+                                                        </a>
+                                                    </td>
+                                                    <td>
+                                                        <a href='~/Geology/MPRCreator/DowuloadMPRs?filename=@b.SynopsisName' height='30' width='30' target="_blank">
+                                                            @(string.IsNullOrEmpty(b.SynopsisName) ? "N/A" : b.SynopsisName)
+                                                        </a>
+                                                    </td>
+                                                    <td>
+                                                        <a href='~/Geology/MPRCreator/DowuloadMPRs?filename=@b.OtherName' height='30' width='30' target="_blank">
+                                                            @(string.IsNullOrEmpty(b.OtherName) ? "N/A" : b.OtherName)
+                                                        </a>
+                                                    </td>
+                                                    @*<td><a href="@Url.Action("DowuloadMPRs", "MPRCreator", new { fileName = item.MapName, filepath = item.Map })" class="">@(string.IsNullOrEmpty(item.MapName) ? "N/A" : item.MapName)</a></td>
+                                                        <td><a href="@Url.Action("DowuloadMPRs", "MPRCreator", new { fileName = item.LogName, filepath = item.BoreholeLogs })" class="">@(string.IsNullOrEmpty(item.LogName) ? "N/A" : item.LogName)</a></td>
+                                                        <td><a href="@Url.Action("DowuloadMPRs", "MPRCreator", new { fileName = item.SynopsisName, filepath = item.Synopsis })" class="">@(string.IsNullOrEmpty(item.SynopsisName) ? "N/A" : item.SynopsisName)</a></td>
+                                                        <td><a href="@Url.Action("DowuloadMPRs", "MPRCreator", new { fileName = item.OtherName, filepath = item.Other_Info })" class="">@(string.IsNullOrEmpty(item.OtherName) ? "N/A" : item.OtherName)</a></td>*@
+                                                </tr>
+                                            }
+                                        </table>
+                                        @if (ViewBag.Type != "Preview")
+                                        {
+                                            <div class="row form-group">
+                                                <div class="col-lg-4 col-md-6">
+                                                    <label class="col-form-label">Remarks</label>
+                                                    @Html.TextAreaFor(x => x.Remarks, new { @class = "k-textbox, form-control", @rows = "2", id = "Remarks" })
+                                                </div>
+                                            </div>
+                                        }
+
+                                        <div class="row" id="PrintDiv">
+                                            @if (ViewBag.Type == "Preview")
+                                            {
+
+                                                <div class="col-sm-6 col-12">
+                                                    <input type="button" value="Download PDF" class="btn btn-primary btn-md" />
+                                                </div>
+                                            }
+                                            else
+                                            {
+                                                if (Model != null && (!string.IsNullOrEmpty(Model.Status)) && Model.Status.Contains("Approved"))
+                                                {
+
+                                                    <div class="col-sm-6">
+                                                        <input type="button" value="Download PDF" class="btn btn-primary btn-md" />
+                                                    </div>
+                                                }
+                                                else
+                                                {
+                                                    <div class="col-sm-6">
+                                                        @if (profile.UserType == "DGM")
+                                                        {
+                                                            <input type="button" value="Approve" onclick="fnApproved()" class="btn btn-success btn-md" />
+
+                                                            <input type="button" value="Objection" onclick="fnReferBack()" class="btn btn-danger btn-md" />
+                                                        }
+                                                        else if (profile.UserType == "Regional Office")
+                                                        {
+                                                            @*<input type="button" value="Approve" onclick="fnForward();" class="k-button k-button-icontext k-primary" style="width: 100px;" />
+
+                                                                <input type="button" value="Objection" onclick="return fnForward_ReferBack();" class="k-button k-button-icontext k-primary" style="width: 200px;" />*@
+
+                                                            <input type="button" value="Forward to DGM" onclick="fnForward()" class="btn btn-success btn-md" />
+                                                            <input type="button" value="Objection" onclick="fnForward_ReferBack()" class="btn btn-danger btn-md" />
+                                                        }
+                                                        <input type="button" value="Download PDF" onclick="onPrint();" class="btn btn-primary btn-md" />
+                                                    </div>
+                                                }
+                                            }
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+</section>

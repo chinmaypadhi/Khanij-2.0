@@ -1,0 +1,739 @@
+﻿@*// ***********************************************************************
+    //  View Name                : PassReportDesign
+    //  Desciption               : Used to generate print eTransit Pass
+    //  Created By               : Suroj Kumar Pradhan
+    //  Created On               : 16-jul-2021
+    // ************************************************************************@
+
+@model EpassEF.TransitPassModel
+@{
+    ViewData["Title"] = "TransitPassTP";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+@inject EpassApp.KhanijSecurity.KhanijIDataProtection protector;
+
+
+<script>
+    @*$(function () {
+        $.ajax({
+            type: "GET",
+            url: '@Url.Content("~/Epass/eTransitpass/Barcodecheck")',
+
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            success: function (result) {
+                debugger;
+                $("#Barcode").val(result.barcode);
+                $("#BarcodeText").val(result.barcodeText);
+            }
+        });
+    });*@
+</script>
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        @Html.Partial("_CMSnavigation")
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+
+                        <li class="nav-item">
+                            <a class="nav-link active" href="Viewe-TransitPassTP.aspx">
+                                Generate E-Transit Pass
+                            </a>
+                        </li>
+
+                    </ul>
+                    @Html.Partial("_CMSutil")
+                </div>
+
+                <section class="box form-container">
+                    <div class="content-body">
+
+                        <div class="table-responsive" id="viewtable">
+                            <table style="width: 100%;">
+                                <tr style="border: none;">
+                                    <td style="border-top: 1px solid black; border-left: 1px solid black;">
+                                        <img src="~/Images/logo.jpg" class="" width="100" height="100" />
+                                    </td>
+                                    <td style="border-top: 1px solid black; border-right: 1px solid black; text-align: center">
+                                        <span id="lead2" class="lead" style="font-size: 30px; text-align: center; color: red">GOVERNMENT OF CHHATTISGARH</span>
+                                        <br />
+                                        <span id="lead1" class="lead" style="font-size: 25px; text-align: center">MINERAL RESOURCES DEPARTMENT</span>
+                                        <br />
+                                        <span id="lead5" class="lead" style="font-size: 20px; text-align: center;">(@Html.DisplayFor(model => model.DistrictName) District)</span>
+                                        @if (@Model.RePrintCount != null)
+                                        {
+                                            <h5 style="text-align: right; margin-top: 0px; margin-right: 10px;">
+                                                <strong class="text-danger">@Model.RePrintCount </strong>
+                                            </h5>
+                                        }
+                                    <h5 style="text-align: right; margin-top: 15px; margin-right: 10px;">
+                                        @if (@ViewBag.usertype == "Tailing Dam")
+                                        {
+                                            @*<strong>Copy For : Tailing Dam</strong>*@
+                                            <strong id="DynamicTailingDam"></strong>
+                                        }
+                                        else
+                                        {
+                                            <strong>Copy For : Lessee (प्रति : पटटाधारी)</strong>
+                                        }
+                                    </h5>
+                                    </td>
+                                </tr>
+                            </table>
+                            <table class="table table-bordered">
+
+                                <tbody>
+
+                                    <tr>
+
+                                        <td class="font-weight-bold text-center text-brown" colspan="3">FORM-1 See Rule 4 (1) Mineral Transit Pass (for Mineral Concession Holders)</td>
+                                        <td>
+                                            Transit Pass Number
+                                            @if (ViewBag.BarcodeImage != null)
+                                            {
+                                                <img src="@Url.Content(@ViewBag.BarcodeImage)" alt="Alternate Text"
+                                                     width="800"
+                                                     height="100" />
+                                            }
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="font-weight-bold"> District </td>
+                                        <td>@(Html.DisplayFor(model => model.DistrictName))</td>
+
+                                        <td class="font-weight-bold">Issue Date of Mineral</td>
+                                        <td>
+                                            @if (Model != null && Model.RailwayId != null && Model.RailwayId == 1)
+                                            {
+                                                if (Model != null && Model.GrossWeight_Qty != null && Model.GrossWeight_Qty > 0)
+                                                {
+                                                    <br />@(Html.DisplayFor(model => model.IssueDateTime))
+
+                                                }
+                                                else
+                                                {
+
+                                                    <span></span>
+                                                }
+                                            }
+                                            else
+                                            {
+                                                <br />@(Html.DisplayFor(model => model.IssueDateTime))
+
+                                            }
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="font-weight-bold">Issue Time Of Mineral</td>
+                                        <td>
+                                            @if (Model != null && Model.RailwayId != null && Model.RailwayId == 1)
+                                            {
+                                                if (Model != null && Model.GrossWeight_Qty != null && Model.GrossWeight_Qty > 0)
+                                                {
+
+                                                    <br />@(Html.DisplayFor(model => model.IssueTime))
+                                                }
+                                                else
+                                                {
+
+                                                    <span></span>
+                                                }
+                                            }
+                                            else
+                                            {
+
+                                                <br />@(Html.DisplayFor(model => model.IssueTime))
+
+                                            }
+                                        </td>
+                                        <td class="font-weight-bold">E-Permit Number</td>
+                                        <td>@(Html.DisplayFor(model => model.BulkPermitNo))</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="font-weight-bold">D.O.Number/Date (If Applicable)</td>
+                                        <td>
+                                            @(Html.DisplayFor(model => model.DONumber))
+                                            @(Html.DisplayFor(model => model.DODate))
+                                        </td>
+                                        <td class="font-weight-bold">Vehicle Type</td>
+                                        <td>
+                                            @if (@ViewBag.mineraltype == "Major Mineral" || @ViewBag.usertype == "TAILING DAM" || @ViewBag.userrole == "TP")
+                                            {
+                                                @(Html.DisplayFor(model => model.VehicleTypeName))
+
+                                            }
+                                            else
+                                            {
+                                                @(Html.DisplayFor(model => model.Minor_VehicleType))
+
+
+                                            }
+                                        </td>
+                                    </tr>
+
+                                    <tr>
+                                        <td class="font-weight-bold">Vehicle No.</td>
+                                        <td>
+                                            @if (@ViewBag.mineraltype == "Major Mineral" || @ViewBag.usertype == "TAILING DAM" || @ViewBag.userrole == "TP")
+                                            {
+                                                @(Html.DisplayFor(model => model.VehicleNumber))
+
+                                            }
+                                            else
+                                            {
+                                                @(Html.DisplayFor(model => model.Minor_VehicleNumber))
+
+
+                                            }
+                                        </td>
+                                        <td class="font-weight-bold">Portal Registration No. of Vehicle</td>
+                                        <td>
+                                            @if (@ViewBag.mineraltype == "Major Mineral" || @ViewBag.usertype == "TAILING DAM" || @ViewBag.userrole == "TP")
+                                            {
+                                                @(Html.DisplayFor(model => model.VehicleCHiMMSNo))
+
+                                            }
+                                            else
+                                            {
+                                                if (string.IsNullOrEmpty(@Model.VehicleCHiMMSNo))
+                                                {
+                                                    <label>Not Applicable</label>
+                                                }
+                                                else
+                                                {
+                                                    @(Html.DisplayFor(model => model.VehicleCHiMMSNo))
+                                                }
+
+
+                                            }
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="font-weight-bold">Net Weight of the Mineral being transported</td>
+                                        <td>31.52 Metric Tonne</td>
+                                        <td class="font-weight-bold">License/Mining Area Details</td>
+                                        <td>CHHATAUNA / Takhatpur / Bilaspur </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="font-weight-bold">Area in Hectare</td>
+                                        <td> @(Html.DisplayFor(model => model.Area)) </td>
+                                        <td class="font-weight-bold">Lease Validity Period</td>
+                                        <td>
+                                            @if (@ViewBag.userrole != "TAILING DAM")
+                                            {
+                                                @(Html.DisplayFor(model => model.LeaseFromDate)) <label>to</label> @(Html.DisplayFor(model => model.LeaseToDate)) @(Html.DisplayFor(model => model.LeaseValidity))
+                                            }
+                                            else
+                                            {
+                                            <td>Not Applicable</td>
+                                        }
+                                        </tr>
+                                        <tr>
+                                            <td class="font-weight-bold">Mineral Name</td>
+                                            <td> @(Html.DisplayFor(model => model.MineralName)) </td>
+                                            <td class="font-weight-bold">Category of the Mineral being transported (Mineral form viz. lump/fines/steam/slack etc.)</td>
+                                            <td>@(Html.DisplayFor(model => model.MineralNature)) </td>
+                                        </tr>
+
+                                        <tr>
+                                            <td class="font-weight-bold">Grade</td>
+                                            <td> @(Html.DisplayFor(model => model.MineralGradeName)) </td>
+                                            <td class="font-weight-bold">Sale value of the mineral (in Rs per Metric Tonne)</td>
+                                            <td>
+                                                Rs @(Html.DisplayFor(model => model.Mineral_SaleValue)) /
+                                                <label>@Model.UnitName</label>
+                                            </td>
+                                        </tr>
+
+                                        <tr>
+                                            <td class="font-weight-bold">Tare Weight of the Vehicle</td>
+                                            <td>
+                                                @if (Model != null && Model.RailwayId != null && Model.RailwayId == 1)
+                                                {
+                                                    if (Model != null && Model.GrossWeight_Qty != null && Model.GrossWeight_Qty > 0)
+                                                    {
+                                                        @(Html.DisplayFor(model => model.TareWeight_Qty)) <label> @Model.UnitName</label>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span></span>
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    @(Html.DisplayFor(model => model.TareWeight_Qty)) <label> @Model.UnitName</label>
+
+                                                }
+                                            </td>
+                                            <td class="font-weight-bold">Gross Weight of the Vehicle</td>
+                                            <td>
+                                                @if (Model != null && Model.RailwayId != null && Model.RailwayId == 1)
+                                                {
+                                                    if (Model != null && Model.GrossWeight_Qty != null && Model.GrossWeight_Qty > 0)
+                                                    {
+                                                        @(Html.DisplayFor(model => model.GrossWeight_Qty)) <label> @Model.UnitName</label>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span></span>
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    @(Html.DisplayFor(model => model.GrossWeight_Qty)) <label> @Model.UnitName</label>
+                                                }
+                                            </td>
+                                        </tr>
+
+
+                                        <tr>
+                                            <td class="font-weight-bold">Owner (Vehicle) Name & Contact Number</td>
+                                            <td>
+                                                @if (@ViewBag.mineraltype == "Major Mineral" || @ViewBag.usertype == "TAILING DAM" || @ViewBag.userrole == "TP")
+                                                {
+                                                    if (Model != null && Model.RailwayId != null && Model.RailwayId == 1)
+                                                    {
+                                                        if (Model != null && Model.GrossWeight_Qty != null && Model.GrossWeight_Qty > 0)
+                                                        {
+                                                            <span>@(Html.DisplayFor(model => model.TransporterName)) (@Html.DisplayFor(model => model.TransporterMobile))</span>
+                                                        }
+                                                        else
+                                                        {
+                                                            <span></span>
+                                                        }
+                                                    }
+                                                    else
+                                                    {
+                                                        if (Model.TransporterMobile != null && Model.TransporterMobile != "")
+                                                        {
+                                                            <span>@(Html.DisplayFor(model => model.TransporterName)) (@Html.DisplayFor(model => model.TransporterMobile))</span>
+                                                        }
+                                                        else
+                                                        {
+                                                            <span>@(Html.DisplayFor(model => model.TransporterName)) @Html.DisplayFor(model => model.TransporterMobile)</span>
+                                                        }
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    if (string.IsNullOrEmpty(Convert.ToString(Model.Minor_VehicleOwner)))
+                                                    {
+                                                        <span>@(Html.DisplayFor(model => model.TransporterName)) (@Html.DisplayFor(model => model.TransporterMobile))</span>
+
+                                                    }
+                                                    else
+                                                    {
+                                                        <span>@(Html.DisplayFor(model => model.Minor_VehicleOwner))</span>
+                                                    }
+
+                                                }
+                                            </td>
+                                            <td class="font-weight-bold">Driver Name & Contact Number</td>
+                                            <td>
+                                                @if (Model != null && Model.RailwayId != null && Model.RailwayId == 1)
+                                                {
+                                                    if (Model != null && Model.GrossWeight_Qty != null && Model.GrossWeight_Qty > 0)
+                                                    {
+                                                        <span>@(Html.DisplayFor(model => model.DriverName))</span>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span></span>
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    <span>@(Html.DisplayFor(model => model.DriverName))</span>
+                                                }
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="font-weight-bold">Mode of Transportation</td>
+                                            <td>@(Html.DisplayFor(model => model.TransportationMode))</td>
+                                            <td class="font-weight-bold">Route</td>
+                                            <td>@(Html.DisplayFor(model => model.RouteName))</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="font-weight-bold">Destination</td>
+                                            <td>@(Html.DisplayFor(model => model.Mineral_Destination)) </td>
+                                            <td class="font-weight-bold">Other (Remarks)</td>
+                                            <td>
+                                                @if (string.IsNullOrEmpty(Convert.ToString(Model.Minor_VehicleOwner)))
+                                                {
+                                                    <lable>N/A</lable>
+                                                }
+                                                else
+                                                {
+                                                    @(Html.DisplayFor(model => model.Remarks))
+                                                }
+
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="font-weight-bold">License/Lessee's Name</td>
+                                            <td colspan="3">@(Html.DisplayFor(model => model.Lessee_Licensee_Name)) </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="font-weight-bold">Mineral Purchase/Recipient's Name</td>
+                                            <td colspan="3">
+                                                @(Html.DisplayFor(model => model.PurchaserConsigneeName))
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+
+
+
+                            </div>
+                            <div class="table-responsive" id="viewtable">
+                                <table style="width: 100%;">
+                                    <tr style="border: none;">
+                                        <td style="border-top: 1px solid black; border-left: 1px solid black;">
+                                            <img src="~/Images/logo.jpg" class="" width="100" height="100" />
+                                        </td>
+                                        <td style="border-top: 1px solid black; border-right: 1px solid black; text-align: center">
+                                            <span id="lead2" class="lead" style="font-size: 30px; text-align: center; color: red">GOVERNMENT OF CHHATTISGARH</span>
+                                            <br />
+                                            <span id="lead1" class="lead" style="font-size: 25px; text-align: center">MINERAL RESOURCES DEPARTMENT</span>
+                                            <br />
+                                            <span id="lead5" class="lead" style="font-size: 20px; text-align: center;">(@Html.DisplayFor(model => model.DistrictName) District)</span>
+                                            @if (@Model.RePrintCount != null)
+                                            {
+                                                <h5 style="text-align: right; margin-top: 0px; margin-right: 10px;">
+                                                    <strong class="text-danger">@Model.RePrintCount </strong>
+                                                </h5>
+                                            }
+                                            <h5 style="text-align: right; margin-top: 15px; margin-right: 10px;">
+                                                @if (@ViewBag.usertype == "Tailing Dam")
+                                                {
+                                                    @*<strong>Copy For : Tailing Dam</strong>*@
+                                                    <strong id="DynamicTailingDam"></strong>
+                                                }
+                                                else
+                                                {
+                                            <strong>Copy For : Purchaser / Consignee (प्रति : क्रेता / परेषिती(माल पानेवाला))</strong>
+                                                }
+                                            </h5>
+                                        </td>
+                                    </tr>
+                                </table>
+                                <table class="table table-bordered">
+
+                                    <tbody>
+
+                                        <tr>
+
+                                            <td class="font-weight-bold text-center text-brown" colspan="3">FORM-1 See Rule 4 (1) Mineral Transit Pass (for Mineral Concession Holders)</td>
+                                            <td>
+                                                Transit Pass Number
+                                                @if (ViewBag.BarcodeImage != null)
+                                                {
+                                                    <img src="@Url.Content(@ViewBag.BarcodeImage)" alt="Alternate Text"
+                                                         width="800"
+                                                         height="100" />
+                                                }
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="font-weight-bold"> District </td>
+                                            <td>@(Html.DisplayFor(model => model.DistrictName))</td>
+
+                                            <td class="font-weight-bold">Issue Date of Mineral</td>
+                                            <td>
+                                                @if (Model != null && Model.RailwayId != null && Model.RailwayId == 1)
+                                                {
+                                                    if (Model != null && Model.GrossWeight_Qty != null && Model.GrossWeight_Qty > 0)
+                                                    {
+                                                        <br />@(Html.DisplayFor(model => model.IssueDateTime))
+
+                                                    }
+                                                    else
+                                                    {
+
+                                                        <span></span>
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    <br />@(Html.DisplayFor(model => model.IssueDateTime))
+
+                                                }
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="font-weight-bold">Issue Time Of Mineral</td>
+                                            <td>
+                                                @if (Model != null && Model.RailwayId != null && Model.RailwayId == 1)
+                                                {
+                                                    if (Model != null && Model.GrossWeight_Qty != null && Model.GrossWeight_Qty > 0)
+                                                    {
+
+                                                        <br />@(Html.DisplayFor(model => model.IssueTime))
+                                                    }
+                                                    else
+                                                    {
+
+                                                        <span></span>
+                                                    }
+                                                }
+                                                else
+                                                {
+
+                                                    <br />@(Html.DisplayFor(model => model.IssueTime))
+
+                                                }
+                                            </td>
+                                            <td class="font-weight-bold">E-Permit Number</td>
+                                            <td>@(Html.DisplayFor(model => model.BulkPermitNo))</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="font-weight-bold">D.O.Number/Date (If Applicable)</td>
+                                            <td>
+                                                @(Html.DisplayFor(model => model.DONumber))
+                                                @(Html.DisplayFor(model => model.DODate))
+                                            </td>
+                                            <td class="font-weight-bold">Vehicle Type</td>
+                                            <td>
+                                                @if (@ViewBag.mineraltype == "Major Mineral" || @ViewBag.usertype == "TAILING DAM" || @ViewBag.userrole == "TP")
+                                                {
+                                                    @(Html.DisplayFor(model => model.VehicleTypeName))
+
+                                                }
+                                                else
+                                                {
+                                                    @(Html.DisplayFor(model => model.Minor_VehicleType))
+
+
+                                                }
+                                            </td>
+                                        </tr>
+
+                                        <tr>
+                                            <td class="font-weight-bold">Vehicle No.</td>
+                                            <td>
+                                                @if (@ViewBag.mineraltype == "Major Mineral" || @ViewBag.usertype == "TAILING DAM" || @ViewBag.userrole == "TP")
+                                                {
+                                                    @(Html.DisplayFor(model => model.VehicleNumber))
+
+                                                }
+                                                else
+                                                {
+                                                    @(Html.DisplayFor(model => model.Minor_VehicleNumber))
+
+
+                                                }
+                                            </td>
+                                            <td class="font-weight-bold">Portal Registration No. of Vehicle</td>
+                                            <td>
+                                                @if (@ViewBag.mineraltype == "Major Mineral" || @ViewBag.usertype == "TAILING DAM" || @ViewBag.userrole == "TP")
+                                                {
+                                                    @(Html.DisplayFor(model => model.VehicleCHiMMSNo))
+
+                                                }
+                                                else
+                                                {
+                                                    if (string.IsNullOrEmpty(@Model.VehicleCHiMMSNo))
+                                                    {
+                                                        <label>Not Applicable</label>
+                                                    }
+                                                    else
+                                                    {
+                                                        @(Html.DisplayFor(model => model.VehicleCHiMMSNo))
+                                                    }
+
+
+                                                }
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="font-weight-bold">Net Weight of the Mineral being transported</td>
+                                            <td>31.52 Metric Tonne</td>
+                                            <td class="font-weight-bold">License/Mining Area Details</td>
+                                            <td>CHHATAUNA / Takhatpur / Bilaspur </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="font-weight-bold">Area in Hectare</td>
+                                            <td> @(Html.DisplayFor(model => model.Area)) </td>
+                                            <td class="font-weight-bold">Lease Validity Period</td>
+                                            <td>
+                                                @if (@ViewBag.userrole != "TAILING DAM")
+                                                {
+                                                    @(Html.DisplayFor(model => model.LeaseFromDate)) <label>to</label> @(Html.DisplayFor(model => model.LeaseToDate)) @(Html.DisplayFor(model => model.LeaseValidity))
+                                                }
+                                                else
+                                                {
+                                                <td>Not Applicable</td>
+                                            }
+                                            </tr>
+                                            <tr>
+                                                <td class="font-weight-bold">Mineral Name</td>
+                                                <td> @(Html.DisplayFor(model => model.MineralName)) </td>
+                                                <td class="font-weight-bold">Category of the Mineral being transported (Mineral form viz. lump/fines/steam/slack etc.)</td>
+                                                <td>@(Html.DisplayFor(model => model.MineralNature)) </td>
+                                            </tr>
+
+                                            <tr>
+                                                <td class="font-weight-bold">Grade</td>
+                                                <td> @(Html.DisplayFor(model => model.MineralGradeName)) </td>
+                                                <td class="font-weight-bold">Sale value of the mineral (in Rs per Metric Tonne)</td>
+                                                <td>
+                                                    Rs @(Html.DisplayFor(model => model.Mineral_SaleValue)) /
+                                                    <label>@Model.UnitName</label>
+                                                </td>
+                                            </tr>
+
+                                            <tr>
+                                                <td class="font-weight-bold">Tare Weight of the Vehicle</td>
+                                                <td>
+                                                    @if (Model != null && Model.RailwayId != null && Model.RailwayId == 1)
+                                                    {
+                                                        if (Model != null && Model.GrossWeight_Qty != null && Model.GrossWeight_Qty > 0)
+                                                        {
+                                                            @(Html.DisplayFor(model => model.TareWeight_Qty)) <label> @Model.UnitName</label>
+                                                        }
+                                                        else
+                                                        {
+                                                            <span></span>
+                                                        }
+                                                    }
+                                                    else
+                                                    {
+                                                        @(Html.DisplayFor(model => model.TareWeight_Qty)) <label> @Model.UnitName</label>
+
+                                                    }
+                                                </td>
+                                                <td class="font-weight-bold">Gross Weight of the Vehicle</td>
+                                                <td>
+                                                    @if (Model != null && Model.RailwayId != null && Model.RailwayId == 1)
+                                                    {
+                                                        if (Model != null && Model.GrossWeight_Qty != null && Model.GrossWeight_Qty > 0)
+                                                        {
+                                                            @(Html.DisplayFor(model => model.GrossWeight_Qty)) <label> @Model.UnitName</label>
+                                                        }
+                                                        else
+                                                        {
+                                                            <span></span>
+                                                        }
+                                                    }
+                                                    else
+                                                    {
+                                                        @(Html.DisplayFor(model => model.GrossWeight_Qty)) <label> @Model.UnitName</label>
+                                                    }
+                                                </td>
+                                            </tr>
+
+
+                                            <tr>
+                                                <td class="font-weight-bold">Owner (Vehicle) Name & Contact Number</td>
+                                                <td>
+                                                    @if (@ViewBag.mineraltype == "Major Mineral" || @ViewBag.usertype == "TAILING DAM" || @ViewBag.userrole == "TP")
+                                                    {
+                                                        if (Model != null && Model.RailwayId != null && Model.RailwayId == 1)
+                                                        {
+                                                            if (Model != null && Model.GrossWeight_Qty != null && Model.GrossWeight_Qty > 0)
+                                                            {
+                                                                <span>@(Html.DisplayFor(model => model.TransporterName)) (@Html.DisplayFor(model => model.TransporterMobile))</span>
+                                                            }
+                                                            else
+                                                            {
+                                                                <span></span>
+                                                            }
+                                                        }
+                                                        else
+                                                        {
+                                                            if (Model.TransporterMobile != null && Model.TransporterMobile != "")
+                                                            {
+                                                                <span>@(Html.DisplayFor(model => model.TransporterName)) (@Html.DisplayFor(model => model.TransporterMobile))</span>
+                                                            }
+                                                            else
+                                                            {
+                                                                <span>@(Html.DisplayFor(model => model.TransporterName)) @Html.DisplayFor(model => model.TransporterMobile)</span>
+                                                            }
+                                                        }
+                                                    }
+                                                    else
+                                                    {
+                                                        if (string.IsNullOrEmpty(Convert.ToString(Model.Minor_VehicleOwner)))
+                                                        {
+                                                            <span>@(Html.DisplayFor(model => model.TransporterName)) (@Html.DisplayFor(model => model.TransporterMobile))</span>
+
+                                                        }
+                                                        else
+                                                        {
+                                                            <span>@(Html.DisplayFor(model => model.Minor_VehicleOwner))</span>
+                                                        }
+
+                                                    }
+                                                </td>
+                                                <td class="font-weight-bold">Driver Name & Contact Number</td>
+                                                <td>
+                                                    @if (Model != null && Model.RailwayId != null && Model.RailwayId == 1)
+                                                    {
+                                                        if (Model != null && Model.GrossWeight_Qty != null && Model.GrossWeight_Qty > 0)
+                                                        {
+                                                            <span>@(Html.DisplayFor(model => model.DriverName))</span>
+                                                        }
+                                                        else
+                                                        {
+                                                            <span></span>
+                                                        }
+                                                    }
+                                                    else
+                                                    {
+                                                        <span>@(Html.DisplayFor(model => model.DriverName))</span>
+                                                    }
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td class="font-weight-bold">Mode of Transportation</td>
+                                                <td>@(Html.DisplayFor(model => model.TransportationMode))</td>
+                                                <td class="font-weight-bold">Route</td>
+                                                <td>@(Html.DisplayFor(model => model.RouteName))</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="font-weight-bold">Destination</td>
+                                                <td>@(Html.DisplayFor(model => model.Mineral_Destination)) </td>
+                                                <td class="font-weight-bold">Other (Remarks)</td>
+                                                <td>
+                                                    @if (string.IsNullOrEmpty(Convert.ToString(Model.Minor_VehicleOwner)))
+                                                    {
+                                                        <lable>N/A</lable>
+                                                    }
+                                                    else
+                                                    {
+                                                        @(Html.DisplayFor(model => model.Remarks))
+                                                    }
+
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td class="font-weight-bold">License/Lessee's Name</td>
+                                                <td colspan="3">@(Html.DisplayFor(model => model.Lessee_Licensee_Name)) </td>
+                                            </tr>
+                                            <tr>
+                                                <td class="font-weight-bold">Mineral Purchase/Recipient's Name</td>
+                                                <td colspan="3">
+                                                    @(Html.DisplayFor(model => model.PurchaserConsigneeName))
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+
+
+
+
+                                </div>
+
+                            </div>
+                    </section>
+
+                </div>
+            </div>
+        </div>
+        <!-- MAIN CONTENT AREA ENDS -->
+    </section>
+

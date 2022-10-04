@@ -1,0 +1,249 @@
+﻿@*// *********************************************************************************************************
+    //  View Name                : AddLeaveType
+    //  Desciption               : To Save Leave Type Details
+    //  Created By               : Suresh kumar behera
+    //  Created On               : 13-july-2021
+    // ********************************************************************************************************
+*@
+
+@model EstablishmentEf.LeaveTypeMasterEF;
+@{
+    ViewData["Title"] = "Leave Type Master";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+
+@if (TempData["msg"] != null)
+{
+    <script>
+        var vv = '@TempData["msg"]';
+        if (vv == 1) {
+            swal("", "leave type sucessfully.", "success");
+        }
+        else if (vv == 2) {
+            swal("", "leave type allready exists.", "warning");
+        }
+        else if (vv == 3) {
+            swal("", "leave type updated sucessfully", "success");
+        }
+        else if (vv == 4) {
+            swal("", "leave type deleted sucessfully", "success");
+        }
+
+        else {
+            swal("", "Something Errror occured. Please Try After Sometime!!", "error");
+        }
+    </script>
+
+    TempData["msg"] = null;
+
+}
+<script>
+    $(document).ready(function () {
+        loadNavigation('AddLeaveType', 'glempprofile', 'plofficetype', 'tl', 'Leave Management', 'Add Leave Type', ' ');
+
+        $("#Submit").click(function () {
+            if (!DropDownValidation("RuleId", "Leave Rule")) {
+                return false;
+            }
+            if (!blankFieldValidation("LeaveType", "Leave Type")) {
+                return false;
+            }
+            if (!blankFieldValidation("NoOfLeave", "No Of leave")) {
+                return false;
+            }
+            if ($("#NoOfLeave").val() <= 0) {
+                swal("", "NoOf leave should be greter than 0", "warning");
+                return false;
+
+            }
+            if ($("#Rdbtn_Yes4").is(":checked")) {
+                if ($("#intPerMonthLeave").val() <= 0) {
+                    swal("", "Per month No of leave should be greter than 0", "warning");
+                    return false;
+
+                }
+
+            }
+            //if (!isAtleastOneChecked("BitIncludeHoliday", "Select include holiday")) {
+            //    return false;
+            //}
+            //if (!isAtleastOneChecked("BitCarryForward", "Select carry forward")) {
+            //    return false;
+            //}
+            if (!blankFieldValidation("Description", "Description")) {
+                return false;
+            }
+        });
+        $("#Reset").click(function () {
+            window.location = "@Url.Content("~/LeaveManagement/LeaveManagement/AddLeaveType/")"
+        });
+
+        //---use during edit
+        if ($("#Rdbtn_Yes4").is(":checked")) {
+            $("#divPerMonth").show();
+        } else {
+            $("#intPerMonthLeave").val('0');
+            $("#divPerMonth").hide();
+        }
+
+        $("input[name='BitPerMonthLeave']").click(function () {
+            if ($("#Rdbtn_Yes4").is(":checked")) {
+                $("#divPerMonth").show();
+            } else {
+                $("#intPerMonthLeave").val('0');
+                $("#divPerMonth").hide();
+            }
+        });
+    });
+</script>
+
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+
+        @*@Html.Partial("_navigation")*@
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="javascript:void(0);">
+                                Add Leave Type
+                            </a>
+                        </li>
+                        <li class="nav-item">
+
+                            <a class="nav-link " href="@Url.Content("~/LeaveManagement/LeaveManagement/ViewLeaveType")">
+                                View Leave Type
+                            </a>
+                        </li>
+                    </ul>
+
+                    @*@Html.Partial("_util")*@
+                </div>
+
+                <section class="box form-container">
+                    <div class="content-body">
+
+                        @using (Html.BeginForm("AddLeaveType", "LeaveManagement", FormMethod.Post, new { AUTOCOMPLETE = "Off", id = "form1" }))
+                        {
+                            @Html.AntiForgeryToken();
+                        <div class="row">
+
+                            <div class="col-lg-12 col-md-12 col-sm-12">
+                                <div class="form-group row">
+                                    <label class="col-lg-2 col-md-4 col-sm-12 col-form-label font-weight-bolder">Leave Rule<span class="text-danger">*</span></label>
+                                    <div class="col-lg-4 col-md-6 col-sm-12">
+                                        @Html.DropDownListFor(m => m.RuleId, ViewBag.Rule as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control form-control-sm searchableselect" })
+
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-12 col-md-12 col-sm-12">
+                                <div class="form-group row">
+                                    <label class="col-lg-2 col-md-4 col-sm-12 col-form-label font-weight-bolder">Leave Type<span class="text-danger">*</span></label>
+                                    <div class="col-lg-4 col-md-6 col-sm-12">
+                                        @Html.TextBoxFor(m => m.LeaveType, new { @class = "form-control", @maxlength = 200, Onkeypress = "return inputLimiter(event,'NameCharactersAndNumbers')" })
+                                        @Html.HiddenFor(m => m.LeaveTypeId)
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-12 col-md-12 col-sm-12">
+                                <div class="form-group row">
+                                    <label class="col-lg-2 col-md-4 col-sm-12 col-form-label font-weight-bolder">Number of Leave<span class="text-danger">*</span></label>
+                                    <div class="col-lg-4 col-md-6 col-sm-12">
+                                        @Html.TextBoxFor(m => m.NoOfLeave, new { @class = "form-control", @type = "number", @maxlength = 3, Onkeypress = "return inputLimiter(event,'Numbers')" })
+
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-12 col-md-12 col-sm-12">
+                                <div class="form-group row">
+                                    <label class="col-lg-2 col-md-4 col-sm-12 col-form-label font-weight-bolder">Include Holiday<span class="text-danger">*</span></label>
+                                    <div class="col-lg-4 col-md-6 col-sm-12">
+                                        <div class="py-2">
+
+                                            @Html.RadioButtonFor(n => n.BitIncludeHoliday, true, new { @checked = true, @class = "custom-radio", id = "Rdbtn_Yes" }) Yes
+                                            @Html.RadioButtonFor(n => n.BitIncludeHoliday, false, new { @class = "custom-radio", id = "Rdbtn_No" })No
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-12 col-md-12 col-sm-12">
+                                <div class="form-group row">
+                                    <label class="col-lg-2 col-md-4 col-sm-12 col-form-label font-weight-bolder">Carry Forward<span class="text-danger">*</span></label>
+                                    <div class="col-lg-4 col-md-6 col-sm-12">
+                                        <div class="py-2">
+                  
+
+                                            @Html.RadioButtonFor(n => n.BitCarryForward, true, new { @checked = true, @class = "custom-radio", id = "Rdbtn_Yes2" }) Yes
+                                            @Html.RadioButtonFor(n => n.BitCarryForward, false, new { @checked = false, @class = "custom-radio", id = "Rdbtn_No2" })No
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-12 col-md-12 col-sm-12">
+                                <div class="form-group row">
+                                    <label class="col-lg-2 col-md-4 col-sm-12 col-form-label font-weight-bolder">Document Required<span class="text-danger">*</span></label>
+                                    <div class="col-lg-4 col-md-6 col-sm-12">
+                                        <div class="py-2">
+
+                                            @Html.RadioButtonFor(n => n.BitDocRequired, true, new { @checked = true, @class = "custom-radio", id = "Rdbtn_Yes3" })Yes
+                                            @Html.RadioButtonFor(n => n.BitDocRequired, false, new {  @class = "custom-radio", id = "rdbtn_No3" })No
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-12 col-md-12 col-sm-12">
+                                <div class="form-group row">
+                                    <label class="col-lg-2 col-md-4 col-sm-12 col-form-label font-weight-bolder">PerMonth Leave<span class="text-danger">*</span></label>
+                                    <div class="col-lg-4 col-md-6 col-sm-12">
+                                        <div class="py-2">
+                                            @Html.RadioButtonFor(n => n.BitPerMonthLeave, true, new { @checked = true, @class = "custom-radio", id = "Rdbtn_Yes4" })Yes
+                                            @Html.RadioButtonFor(n => n.BitPerMonthLeave, false, new {@class = "custom-radio", id = "Rdbtn-No4" })No
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-12 col-md-12 col-sm-12" id="divPerMonth"  style="display: none">
+                                <div class="form-group row">
+                                    <label class="col-lg-2 col-md-4 col-sm-12 col-form-label font-weight-bolder">PerMonth No of Leave<span class="text-danger">*</span></label>
+                                    <div class="col-lg-4 col-md-6 col-sm-12">
+                                        <div class="py-2">
+                                       @Html.TextBoxFor(n=>n.intPerMonthLeave, new {@class="form-control", @type="number", @maxlength=2, Onkeypress="return inputLimiter(event,'Numbers')" })
+                                        </div>
+                                    </div>
+                                </div>
+                           </div>
+
+                            <div class="col-lg-12 col-md-12 col-sm-12">
+                                <div class="form-group row">
+                                    <label class="col-lg-2 col-md-4 col-sm-12 col-form-label font-weight-bolder">Description<span class="text-danger">*</span></label>
+                                    <div class="col-lg-4 col-md-6 col-sm-12">
+                                        @Html.TextAreaFor(m => m.Description, new { @class = "form-control", @maxlength = 200 })
+                                        <small class="text-danger">Maximum <strong>200</strong> characters</small>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <div class="col-sm-6  offset-lg-2 offset-md-4">
+                                <input type="submit" value='@ViewBag.Button' class="btn btn-primary btn-md ml-0" name="Submit" id="Submit" />
+                                <input type="reset" id="Reset" name="Reset" class="btn btn-danger btn-md" value="Reset" />
+                            </div>
+                        </div>
+                        }
+
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+    <!-- MAIN CONTENT AREA ENDS -->
+</section>

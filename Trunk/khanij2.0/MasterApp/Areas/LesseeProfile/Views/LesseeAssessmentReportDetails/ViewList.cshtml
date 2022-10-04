@@ -1,0 +1,110 @@
+﻿@*// *********************************************************************************************************
+    //  View Name                : ViewList
+    //  Desciption               : To View Lesee Assessment Report Details
+    //  Created By               : Lingaraj Dalai
+    //  Created On               : 29 July 2021
+    // ********************************************************************************************************
+*@
+@model MasterEF.LesseeAssessmentReportViewModel;
+@using MasterEF;
+@using MasterApp.Web;
+@using Microsoft.AspNetCore.Mvc;
+@using  Microsoft.AspNetCore.Http;
+@inject IHttpContextAccessor HttpContextAccessor
+@{
+    ViewData["Title"] = "ViewList";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+    UserLoginSession profile = HttpContextAccessor.HttpContext.Session.Get<UserLoginSession>(KeyHelper.UserKey);
+}
+<script>
+    backMe = "yes"
+    $(document).ready(function () {
+        debugger;
+        loadNavigation('ViewList', 'glUIS', 'pllesseprof', 'tl', 'Lessee Profile', 'Assessment Report', ' ');
+         /*Show hide controls for Minor/Major-Coal,NonCoal*/
+        var mineraltypename = '@profile.MineralTypeName';
+        if (mineraltypename == "Minor Mineral") {
+            $(".divRevRecovery").hide();/*Field*/
+        }
+         if (@profile.UserTypeId!= 7) { /*Other than Lessee Login*/
+            $("#navlinkAdd").hide(); //Hide Add tab
+            $(".ml-3").hide(); //Hide Edit button
+        }
+    });
+</script>
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        <!-- MAIN CONTENT AREA STARTS -->
+        @Html.Partial("_CMSnavigation")
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link" id="navlinkAdd" href="~/LesseeProfile/LesseeAssessmentReportDetails/Create">
+                                Add
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="javascript:void(0);">
+                                View
+                            </a>
+                        </li>
+                    </ul>
+                    @Html.Partial("_CMSutil")
+                </div>
+                <section class="box form-container">
+                    <div class="content-body">
+                        <div class="message-heading">
+                            <h5 class="font-weight-bold text-brown">Assessment Report Details</h5>
+                            <div>
+                                <a href="javascript:void(0);" class="btn-dark btn-sm log-btn" data-val="collapsefillter1">Log Report<i class="icon-angle-down-solid"></i></a>
+                                <a href="@CustomQueryStringHelper.EncryptString("LesseeProfile","Create","LesseeAssessmentReportDetails",new {id=Model.CREATED_BY })" class="btn-success btn-sm ml-3" data-original-title="Edit"><i class="icon-pencil-alt-solid"></i></a>
+                            </div>
+                        </div>
+                        <div class="message-highlighter">
+                            <div class="row">
+                                <label class="col-lg-3 col-md-4 col-sm-12 col-form-label divRevRecovery">Date of Revenue Recovery Assessment</label>
+                                <div class="col-lg-9 col-md-8 col-sm-12 divRevRecovery">
+                                    <label class="form-control-plaintext"><span class="colon">:</span>@Model.Assessmentdate</label>
+                                </div>
+                                <label class="col-lg-3 col-md-4 col-sm-12 col-form-label divRevRecovery">Copy of Revenue Recovery Assessment</label>
+                                <div class="col-lg-9 col-md-8 col-sm-12 divRevRecovery">
+                                    <label class="form-control-plaintext">
+                                        <span class="colon">:</span>@Model.RecoveryReportFileName
+                                        @if (Model.RecoveryReportFileName != null && Model.RecoveryReportFileName != "")
+                                        {
+                                            <a href='~/@Model.RecoveryReportFilePath' title="" class="ml-2" data-original-title="Download Recovery Copy" target="_blank"><i class="icon-file-pdf-solid h5 text-danger"></i></a>
+                                        }
+                                    </label>
+                                </div>
+                                <label class="col-lg-3 col-md-4 col-sm-12 col-form-label">Date of Half Yearly Assessment</label>
+                                <div class="col-lg-9 col-md-8 col-sm-12">
+                                    <label class="form-control-plaintext"><span class="colon">:</span>@Model.HalfYearAssesmentDate</label>
+                                </div>
+                                <label class="col-lg-3 col-md-4 col-sm-12 col-form-label">Copy of Half Yearly Assessment</label>
+                                <div class="col-lg-9 col-md-8 col-sm-12">
+                                    <label class="form-control-plaintext">
+                                        <span class="colon">:</span>@Model.HalfyearassesmentFileName
+                                        @if (Model.HalfyearassesmentFileName != null && Model.HalfyearassesmentFileName != "")
+                                        {
+                                            <a href='~/@Model.HalfyearassesmentFilePath' title="" class="ml-2" data-original-title="Download Half Yearly Copy" target="_blank"><i class="icon-file-pdf-solid h5 text-danger"></i></a>
+                                        }
+                                    </label>
+                                </div>
+                                <label class="col-lg-3 col-md-4 col-sm-12 col-form-label">Remarks</label>
+                                <div class="col-lg-9 col-md-8 col-sm-12">
+                                    <label class="form-control-plaintext"><span class="colon">:</span>@Model.Remarks</label>
+                                </div>
+                            </div>
+                            <ul class='timeline custom-scroll log-box' id='collapsefillter1'>
+                                @Html.Raw((String)ViewBag.tableLA)
+                            </ul>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+</section>
+

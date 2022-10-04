@@ -1,0 +1,131 @@
+﻿@*// *********************************************************************************************************
+    //  View Name                : ViewList
+    //  Desciption               : To View and Delete Website Staff Directory Details
+    //  Created By               : Lingaraj Dalai
+    //  Created On               : 20 Oct 2021
+    // ********************************************************************************************************
+*@
+@model IEnumerable<HomeEF.ViewStaffDirectoryModel>
+@using HomeApp.Web; 
+@{
+    ViewData["Title"] = "ViewList";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+@if (TempData["Message"] != null)
+{
+    <script>
+        var vv = '@TempData["Message"]';
+        if (vv == 1) {
+            swal("", "Staff Directory updated successfully.", "success");
+        }
+        else if (vv == 2) {
+            swal("","Staff Directory already exists.","warning");
+        }
+        else if (vv == 3){
+            swal("", "Something Errror occured. Please Try After Sometime!!", "error");
+        }
+        else if (vv == 4) {
+            swal("", "Staff Directory Deleted Sucessfully!!", "success");
+        }
+    </script>
+}
+<script>
+    $(document).ready(function () {
+        loadNavigation('ViewList', 'glhelpdesk', 'plraiseticket', 'tl', 'CMS', 'Staff Directory', ' ');
+        $('.searchableselect').searchableselect();
+        $('#datatable').DataTable();
+        $('.shorting-lnk').click(function () {
+            $('.shorting-lnk i').toggleClass('fa-sort-amount-up-alt fa-sort-amount-down-alt ');
+        });
+    });
+</script>
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        @Html.Partial("_navigation")
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link" href="~/Website/StaffDirectory/Add">
+                                Add
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="javascript:void(0);">
+                                View
+                            </a>
+                        </li>
+                    </ul>
+                    @Html.Partial("_util")
+                </div>
+                <section class="box form-container">
+                    <div class="content-body">
+                        <div class="legend-box">
+                            <ul class="d-flex mb-1 justify-content-end list-unstyled">
+                                <li><span class="bg-success"></span> Publish</li>
+                                <li><span class="bg-warning"></span> Unpublish</li>
+                            </ul>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div id="viewtable">
+                                    <table id="datatable" class="table table-sm table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th width="20px">Sl#</th>
+                                                <th>Department Type</th>
+                                                <th>Name</th>
+                                                <th>Designation</th>
+                                                <th>Mobile No.</th>
+                                                <th>Email Id</th>
+                                                <th>Location</th>
+                                                <th width="50" class="text-center noprint">Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @{
+                                                var count = 0;
+                                                foreach (var item in Model)
+                                                {
+                                                    count++;
+                                                    var dyclass = @item.BIT_STATUS == "Active" ? "active-row" : "inactive-row";
+                                                    <tr class="@dyclass">
+                                                        <td>@count</td>
+                                                        <td>@item.VCH_OFFICE_TYPE</td>
+                                                        <td>@item.VCH_OFFICER_NAME</td>
+                                                        <td>@item.VCH_OFFICER_DESIG</td>
+                                                        <td>@item.VCH_PHONE_NO</td>
+                                                        <td>@item.VCH_EMAIL</td>
+                                                        <td>@item.VCH_LOCATION</td>
+                                                        <td class="text-center noprint">
+                                                            @*<a href="@CustomQueryStringHelper.EncryptString("Website","Add","StaffDirectory",new {id=item.INT_STAFFDIR_ID })" class="text-success btn-sm" title="Edit">
+            <i class="icon-pencil-alt-solid"></i>
+        </a>
+        <a href="@CustomQueryStringHelper.EncryptString("Website","Delete","StaffDirectory",new {id=item.INT_STAFFDIR_ID })" class="text-danger btn-sm" title="Delete" onclick="return confirm('Are you sure to delete?')">
+            <i class="icon-trash-alt-solid"></i>
+        </a>*@
+                                                            <a href="/Website/StaffDirectory/Add/@item.INT_STAFFDIR_ID" class="text-success btn-sm">
+                                                                <i class="icon-pencil-alt-solid"></i>
+                                                            </a>
+                                                            <a href="/Website/StaffDirectory/Add/@item.INT_STAFFDIR_ID" class="text-danger btn-sm" title="Delete" onclick="return confirm('Are you sure to delete?')">
+                                                                <i class="icon-trash-alt-solid"></i>
+                                                            </a>
+                                                        </td>
+                                                    </tr>
+                                                }
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+    <!-- MAIN CONTENT AREA ENDS -->
+</section>
+

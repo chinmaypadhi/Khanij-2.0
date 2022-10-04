@@ -1,0 +1,600 @@
+﻿@model MasterEF.UserInformationEF
+
+@{
+    ViewData["Title"] = "MiningPlan";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<section class="wrapper main-wrapper row">
+    @{ string MineralTypeName = "Minor Mineral";}
+    @{ string UserType = "Lessee";}
+    <div class="col-12">
+        @Html.Partial("_navigation")
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="javascript:void(0);">
+                                Mining Plan
+                            </a>
+                        </li>
+                    </ul>
+                    @Html.Partial("_util")
+                </div>
+
+                <section class="box form-container">
+                    <div class="content-body">
+
+                        <ul class="nav nav-tabs progressbar border-0" id="myTab" role="tablist">
+                            <li class="startstep activestep1">
+                                <a class="active" id="Mining-tab" data-toggle="tab" href="#Mining" role="tab" aria-controls="Mining" aria-selected="true">Mining Plan</a>
+                            </li>
+                            <li>
+                                <a id="Scheme-tab" data-toggle="tab" href="#Scheme" role="tab" aria-controls="Scheme" aria-selected="false">Scheme of Mine</a>
+                            </li>
+
+                        </ul>
+                        @using (Html.BeginForm("MiningPlan", "UserInformation", FormMethod.Post, new { enctype = "multipart/form-data", AUTOCOMPLETE = "Off", id = "form1" }))
+                        {
+                            <div class="tab-content" id="myTabContent">
+                                <div class="tab-pane fade show active" id="Mining" role="tabpanel" aria-labelledby="Mining-tab">
+                                    <h5 class="text-brown font-weight-bold ">Mining Plan</h5>
+
+                                    <div class="row">
+                                        <div class="col-lg-6 col-md-6 col-sm-12 form-group">
+                                            <label class="col-form-label font-weight-bolder">Mining Plan Approval Date<span class="text-danger">*</span></label>
+                                            <div class="input-group">
+                                                @Html.TextBoxFor(m => m.MP_APPROVE_DATE, new { @class = "form-control datepicker", id = "dt_MP_APPROVE_DATE" })
+                                                <div class="input-group-prepend">
+                                                    <label class="input-group-text" for="dt_MP_APPROVE_DATE"><i class="far fa-calendar"></i></label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-6 col-md-6 col-sm-12 form-group">
+                                            <label class="col-form-label font-weight-bolder">Mining Plan Approval Number<span class="text-danger">*</span></label>
+                                            @Html.TextBoxFor(model => model.MP_APPROVAL_NO, new { @maxlength = "50", @class = "form-control" })
+                                        </div>
+                                        <div class="col-lg-6 col-md-6 col-sm-12 form-group">
+                                            <label class="col-form-label font-weight-bolder">Mining Plan Valid From<span class="text-danger">*</span></label>
+                                            <div class="input-group">
+                                                @Html.TextBoxFor(m => m.MP_VALID_FORM, new { @class = "form-control datepicker", id = "dt_MP_VALID_FORM" })
+                                                <div class="input-group-prepend">
+                                                    <label class="input-group-text" for="dt_MP_VALID_FORM"><i class="far fa-calendar"></i></label>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-lg-6 col-md-6 col-sm-12 form-group">
+                                            <label class="col-form-label font-weight-bolder">Mining Plan Valid To <span class="text-danger">*</span></label>
+                                            <div class="input-group">
+                                                @Html.TextBoxFor(m => m.MP_VALID_TO, new { @class = "form-control datepicker", id = "dt_MP_VALID_TO" })
+                                                <div class="input-group-prepend">
+                                                    <label class="input-group-text" for="dt_MP_VALID_TO"><i class="far fa-calendar"></i></label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-6 col-md-6 col-sm-12 form-group">
+                                            <label for="inputLoginId" class="col-form-label font-weight-bolder">MP/SOM Approval Letter With Approved Table <span class="text-danger">*</span></label>
+                                            <div class="custom-file">
+                                                <input type="file" class="custom-file-input" id="flApproval" name="flApproval">
+                                                <label class="custom-file-label" for="customFile">Choose Files</label>
+                                            </div>
+                                            <a href="@Url.Action("Download", "Application", new { name = Model.MP_SOM_FileName, path = Model.MP_SOM_FilePath })" target="_blank" class="file-download-licensee">@((Model.MP_SOM_FileName != null) ? Model.MP_SOM_FileName : "")</a>
+                                        </div>
+                                        <div class="col-lg-6 col-md-6 col-sm-12 form-group">
+                                            <label for="inputLoginId" class="col-form-label font-weight-bolder">Remarks<span class="text-danger">*</span></label>
+                                            <textarea name="textAddress" rows="1" cols="20" id="Textarea1" class="form-control"></textarea>
+                                        </div>
+                                    </div>
+                                    @*<div class="row mt-3">
+                                            <div class="col-sm-12 text-center">
+                                                <a class="btn btn-danger btn-md ml-0 waves-effect waves-light">Reset</a>
+                                                <a class="btn btn-primary btn-md ml-0 waves-effect waves-light btnNext">Next</a>
+                                            </div>
+                                        </div>*@
+
+
+                                </div>
+                                <div class="tab-pane fade" id="Scheme" role="tabpanel" aria-labelledby="Scheme-tab">
+                                    <h5 class="text-brown font-weight-bold ">Scheme of Mine</h5>
+                                    <input type="button" value="Add Row" onclick="addRow('MiningPlanTable')" class="btn btn-deep-purple btn-md ml-0" />
+                                    <input type="button" name="" value="Remove Row" onclick="RemoveRow('MiningPlanTable');" class="btn btn-blue-grey btn-md ml-0">
+
+
+                                    <div class="form-group row pt-3">
+                                        <div class="col-sm-6">
+                                            <div class="table-responsive">
+                                                <table class="table table-sm table-bordered mb-0" id="MiningPlanTable">
+                                                    <thead>
+                                                        <tr>
+                                                            <th width="40px" class="font-weight-bolder">Sl#</th>
+                                                            <th>Year</th>
+                                                            <th>Approved Quantity</th>
+
+                                                        </tr>
+                                                    </thead>
+
+                                                    @{ int i = 0;
+                                                    }
+                                                    @if (Model != null)
+                                                    {
+
+                                                        @foreach (var b in ViewBag.ViewList)
+                                                        {
+                                                            var NO = i + 1;
+
+                                                            <tr>
+                                                                <td>@NO</td>
+                                                                <td>
+                                                                    @Html.DropDownList("YEARS", new SelectList(ViewBag.ViewYearList, "Value", "Text", @b.FromToYear), "--Select--", new { id = "YEARS" + i, @class = "form-control" })
+                                                                </td>
+                                                                <td>
+                                                                    @* <input type="number" max="7" min="0" name="PRODUCTIONS" value="@Model.miningPlan.Product[i].PRODUCTION"/>*@
+                                                                    <input type="number" name="PRODUCTIONS" step="0.01" value="@b.PRODUCTION">
+                                                                </td>
+
+                                                                <td style="border-color: black; visibility: hidden; display: none">@b.FromToYear </td>
+                                                                <td style="border-color: black; visibility: hidden; display: none">@b.UNIT_ID </td>
+
+                                                            </tr>
+                                                            i++;
+                                                        }
+
+                                                    }
+                                                    else
+                                                    {
+                                                        <tr>
+                                                            <td style="border-color: black;">1</td>
+                                                            <td style="border-color: black;">
+                                                                @Html.DropDownList("YEARS", ViewBag.ViewYearList, "--Select--", new { @class = "form-control", @Name = "YEARS" })
+                                                            </td>
+                                                            <td style="border-color: black;">
+                                                                <input type="number" step="0.01" name="PRODUCTIONS" value="" />
+                                                                @*@Html.TextBoxFor(model => model.miningPlan.MP_APPROVAL_NO, new { @class = "form-control1" })*@
+                                                            </td>
+                                                            <td style="border-color: black; visibility: hidden; display: none"></td>
+                                                        </tr>
+                                                    }
+
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    @*@if (Model.STATUS != 5)
+                                        {*@
+                                    <div class="row" style="position: absolute; bottom: 20px; right: 30px;">
+                                        <div class="col-md-12 col-sm-12">
+                                            @if (UserType.ToUpper() == "LESSEE")
+                                            {
+                                                <input type="submit" id="btmSave" value="Save & Update" class="btn btn-success btn-md ml-0 waves-effect waves-light">
+                                                <input type="button" id="" title="Forward to DD" value="Forward To DD" name="cmd" class="btn btn-warning text-dark btn-md waves-effect waves-light ml-0" onclick="return OnForwarding('Forward To DD');" />
+                                            }
+                                            else
+                                            {
+                                                <input type="button" value="Approve" class="btn btn-dark btn-md ml-0 waves-effect waves-light btnPrevious" id="approve" name="approve" onclick="return OnForwarding('Approve');">
+                                                <input type="button" value="Reject" class="btn btn-danger btn-md ml-0 waves-effect waves-light" id="reject" name="reject" onclick="return OnForwarding('Reject');">
+                                            }
+                                        </div>
+                                    </div>
+                                    @*}*@
+
+                                </div>
+
+                            </div>
+                        }
+
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+    <!-- MAIN CONTENT AREA ENDS -->
+</section>
+<uc1:footer runat="server" ID="footer" />
+<link href="../css/bootstrap-datetimepicker.min.css" rel="stylesheet">
+<script src="../js/moment.min.js"></script>
+<script src="../js/bootstrap-datetimepicker.min.js"></script>
+
+<script>
+    indicateMe = "yes"
+    backMe = "yes"
+    $(document).ready(function () {
+        loadNavigation('MiningplanDetails', 'glRoleRes', 'pllesseprof', 'tl', 'Roles and Responsibity', 'Lessee Profile', ' ');
+    });
+</script>
+
+<script>
+    $(document).ready(function () {
+        $('.datepicker').datetimepicker({
+            format: 'LT',
+            format: 'DD-MM-YYYY',
+
+        });
+    });
+</script>
+<script>
+    var add = '<tr> <td id="t1"><input type="text" readonly class="form-control-plaintext" id="staticEmail" value="1"></td><td id="t2"><select class="form-control"><option value="Select">Select</option></select></td><td id="t3"><input type="text" class="form-control"></td><td><button class="btn btn-danger btn-md remove  m-0 mr-1"><i class="icon-minus-solid" aria-hidden="true" data-toggle="tooltip" data-placement="top" title="Remove Row"></i></button><a href="#" class="btn btn-success btn-md add-btn  m-0 mr-1" data-toggle="tooltip" data-placement="top" title="Add Row"><i class="icon-plus-solid" aria-hidden="true"></i></a></td></tr>;'
+
+    $(document).ready(function () {
+        $(document).on('click', '.add-btn', function () {
+            $("#insert").find('tbody').append(add);
+        });
+
+        $("#insert").on('click', '.remove', function () {
+            $(this).parents('tr').remove();
+        });
+    });
+</script>
+<script type="text/javascript">
+   
+    var YearsList = document.getElementsByName("YEARS")
+    for (var i = 0; i <= YearsList.length; i++) {
+        this.addEventListener("change", function (e) {
+
+            var CurrentSelectedValue = e.target.value;
+
+            var Count = 0;
+
+            for (var i = 0 ; i < YearsList.length; i++) {
+                if (CurrentSelectedValue == YearsList[i].value) {
+                    Count = Count + 1;
+                }
+                else {
+                    $('.btnsave').show();
+                    //$('.DMO-Button').hide();
+
+                }
+                if (Count == 2) {
+                    alert('Same mining year ' + YearsList[i].value + ' already existed');
+                    Count = 1;
+                    YearsList[i].value = '--select--';
+                    $('.btnsave').hide();
+                    break;
+                    e.preventDefault();
+                }
+                else {
+                    $('.btnsave').show();
+                    //$('.DMO-Button').hide();
+
+                }
+            }
+
+        });
+        break;
+    }
+
+    //$('select[name="YEARS"]').change(function () {
+
+    //});
+
+    @*$("input[name='lesseeProfile']").css('pointer-events', 'none')
+    //Profile Percentage
+    var gauge1 = loadLiquidFillGauge("fillgauge1", new Number(@ViewBag.completionCount));
+    var config1 = liquidFillGaugeDefaultSettings();*@
+
+    $('input[name="PRODUCTIONS"]').blur(function () {
+        if ('MineralTypeName' == 'Major Mineral') {
+            var PRODUCTIONS = document.getElementsByName("PRODUCTIONS");
+            for (var i = 0; i < PRODUCTIONS.length; i++) {
+                if (parseFloat(@Model.EC_APPROVED_CAPACITY) < parseFloat(PRODUCTIONS[i].value)) {
+                    alert('You entered Approved Quanity ' + PRODUCTIONS[i].value + ' must be less than your Ec approved quantity @Model.EC_APPROVED_CAPACITY');
+                    PRODUCTIONS[i].value = "0";
+                    PRODUCTIONS.length[i]
+                }
+            }
+        }
+    });
+
+
+
+    function BindProdData() {
+        debugger;
+        var vv = 0;
+        $("#MiningPlanTable").find('tr').each(function (i, el) {
+            debugger;
+            if (i == 0)
+            { }
+            else
+            {
+                var $tds = $(this).find('td');
+                var abcd = "YEARS" + vv;
+                var units = "Units" + vv;
+                vv = vv + 1;
+                var data = $tds.eq(3).text().trim();
+                //var units_data = $tds.eq(5).text().trim();
+                document.getElementById(abcd).value = data;
+                //document.getElementById(units).value = units_data;
+            }
+        });
+    }
+
+
+    $(document).on('ready', function () {
+         
+        BindProdData();
+        //var leftpart = $('#left-part-Lessee').height($('#right-part-Lessee').height()).height();
+        //var sliderHeight = $('#slider-height-page').height();
+        //$('.panel').height(leftpart - sliderHeight - 16);
+        //$(".regular").slick({
+        //    dots: true,
+        //    infinite: true,
+        //    /*autoplay: true,
+        //    autoplaySpeed: 2000,*/
+        //    slidesToShow: 5,
+        //    slidesToScroll: 1
+        //});
+
+
+
+        //$(".slick-next").css('display', 'block');
+        //$(".slick-next").css('right', '0px');
+        //$('.slick-prev').css('display', 'block');
+        //$(".slick-prev").css('left', '0px');
+        //$(".slick-prev").css('width', '44px');
+        //$(".slick-next").css('width', '58px');
+        //$(".slick-next").css('padding-left', '36px');
+
+
+        $("#reject").click(function () {
+            if ($("#Remarks").val() == '') {
+                $("#Remarks").prop('required', true);
+                $("#CO").addClass("tab-pane fade in active");
+                $("#BO").removeClass("active");
+                $("#Remarks").focus();
+            }
+        });
+        $("#approve").click(function () {
+            $('#Remarks').prop('required', false);
+        });
+    });
+    //MEssage
+    @if (TempData["Message"] != null)
+    {
+        <Text>
+    alert('@TempData["Message"]')
+    </Text>
+    }
+
+     @if (Model.MP_VALID_TO_INTIMATION == "Validity Expired")
+     {
+         <Text>
+    $("#miningPlan_MP_VALID_TO").addClass('TodateExpiry')
+    $("#miningPlan_MP_VALID_TO").prop('title', '@Model.MP_VALID_TO_INTIMATION')
+
+         </Text>
+     }
+     else if ((Model.MP_VALID_TO_INTIMATION == "Done"))
+     {
+          <Text>
+    $("#miningPlan_MP_VALID_TO").removeClass('TodateExpiry')
+    $("#miningPlan_MP_VALID_TO").removeClass('TodateIntimation')
+         </Text>
+
+     }
+     else
+     {
+        <Text>
+    $("#miningPlan_MP_VALID_TO").addClass('TodateIntimation')
+    $("#miningPlan_MP_VALID_TO").prop('title', '@Model.MP_VALID_TO_INTIMATION')
+
+    </Text>
+     }
+
+
+    @if (UserType != "District User")
+    {
+        //For Disabling all DOM if  is  Forwarded to DD/DMO and Approval is Pending
+        if (Model.STATUS == 1)
+        {
+                         <Text>
+
+    $('.pointer').css("pointer-events", "none");
+    $('.btnsave').hide();
+    </Text>
+        }
+        else if (Model.STATUS == 2)
+        {
+
+        }
+          <Text>   $('#Remarks').attr('readonly', 'readonly');   </Text>
+    }
+    else  // While Approving or Rejectiong By DG/DMO
+    {
+                               <Text>
+    $("#Remarks").removeAttr("readonly");
+    $('.slider').css("pointer-events", "none");
+    </Text>
+        if (Model.STATUS == 1)
+        {
+
+                    <Text>
+
+    $('.btnsave').hide();
+    $('.DMO-Button').css('display', 'inline-block');
+    $('.pointer').css("pointer-events", "none");
+    </Text>
+        }
+        else
+        {
+                     <Text>$('.pointer').css("pointer-events", "none");
+    $('.btnsave').hide();
+    $('.DMO-Button').hide();   </Text>
+        }
+    }
+
+    $(function () {
+        return { "__RequestVerificationToken": $('input[name=__RequestVerificationToken]').val() }
+    });
+
+
+
+    function myFunction() {
+        var table = document.getElementById("MiningPlanTable");
+        var row = table.insertRow(0);
+        var cell1 = row.insertCell(0);
+        var cell2 = row.insertCell(1);
+        cell1.innerHTML = "NEW CELL1";
+        cell2.innerHTML = "NEW CELL2";
+    }
+
+
+</script>
+
+<script>
+    var totalRowsCount = 1;
+    function addRow(tableID) {
+
+        if (parseInt(totalRowsCount) < parseInt(5)) {
+            var table = document.getElementById(tableID);
+
+            var rowCount = table.rows.length;
+            var row = table.insertRow(rowCount);
+
+            var colCount = table.rows[1].cells.length;
+
+            for (var i = 0; i < colCount; i++) {
+
+                if (i == colCount - 2) { }
+                else {
+                    var newcell = row.insertCell(i);
+
+                    if (i == 0) {
+                        newcell.innerHTML = rowCount;
+                    }
+                    else {
+                        newcell.innerHTML = table.rows[1].cells[i].innerHTML;
+                    }
+
+                    switch (newcell.childNodes[0].type) {
+                        case "text":
+                            newcell.childNodes[0].value = "";
+                            break;
+                        case "checkbox":
+                            newcell.childNodes[0].checked = false;
+                            break;
+                        case "select-one":
+                            newcell.childNodes[0].selectedIndex = 0;
+                            break;
+                    }
+                }
+            }
+            totalRowsCount = totalRowsCount + 1;
+        }
+    }
+
+    //function deleteRow(tableID) {
+    //    try {
+    //        var table = document.getElementById(tableID);
+    //        var rowCount = table.rows.length;
+    //        //table.deleteRow(rowCount - 1);
+
+    //    } catch (e) {
+
+    //    }
+    //}
+
+    var rws;
+    function RemoveRow(obj) {
+        totalRowsCount = totalRowsCount - 1;
+
+        var Rowslength = document.getElementById("MiningPlanTable").getElementsByTagName("tr").length;
+
+        if (Rowslength != 2)
+            document.getElementById("MiningPlanTable").deleteRow(Rowslength - 1);
+    }
+
+    $('MiningPlanTable').on('click', 'input[type="button"]', function (e) {
+        $(this).closest('tr').remove()
+    })
+
+</script>
+
+<script>
+
+    //create By Kavita
+    function OnForwarding(btnAction) {
+        //var checkdata = checkFields();
+        //if (checkdata == 1) {
+
+        var Type;
+        if (btnAction == 'Forward To DD') {
+            Type = 'forward';
+        }
+        else if (btnAction == 'Approve') {
+            Type = 'Approve';
+            $("#Remarks").prop('required', false);
+        }
+        if (btnAction == 'Reject') {
+            Type = 'Reject';
+            $("#Remarks").prop('required', true);
+
+            if ($("#Remarks").val() == "") {
+                $("#Remarks").focus();
+                alert('Remarks is required!')
+                return;
+            }
+        }
+
+        if (confirm("Before " + Type + " you need to apply your Digital Signature. Are you confirmed to " + Type + " Profile??")) {
+
+            var Postdata = 'action=signdoc' + "\n" + 'datatosign=Digital Signature Required' + "\n" + 'signaction=sign' + "\n" + 'filepath=' + "\n" + 'panNumberParam=' + "\n" + 'expirycheck=false' + "\n" + 'issuername=' + "\n" + 'certclass=1|2|3' + "\n" + 'certtype=ALL';
+            connection.send(Postdata);
+
+            connection.onerror = function (error) {
+                alert('Please check the server connection: ' + error);
+                alert(error);
+            };
+
+            connection.onmessage = function (e) { // when DSC is success then following function executed.
+                if (e.data.indexOf("subProtocol") == -1) {
+                    //debugger;
+                    //alert(e.data);
+                    $("#DSCResponse").val(e.data).change();
+                    $.ajax(
+                    {
+
+                        url: '@Url.Action("CheckVerifyResponse", "ForwardingNote", new { Area = "Transit" })',
+                        type: "POST",
+                        data: { contentType: "pkcs7", signDataBase64Encoded: e.data, responseType: "plain" },
+                        success: function (msg) {
+                            if (msg == "SUCCESS") {
+                                //  debugger;
+
+                                if (btnAction == "Forward To DD") {
+                                    $("#SubResion").val("Forward To DD");
+                                }
+                                else if (btnAction == "Approve") {
+                                    $("#SubApprove").val("Approve");
+                                }
+                                else if (btnAction == "Reject") {
+                                    $("#SubReject").val("Reject");
+                                }
+                                $("#frmMiningPlan").submit();
+                            }
+                        }
+                    });
+
+
+
+                }
+                else {
+                    alert(e.data);
+                }
+
+
+            };
+        }
+        else {
+            return false;
+        }
+
+        //}
+        //else {
+        //    return false;
+        //}
+    }
+
+</script>

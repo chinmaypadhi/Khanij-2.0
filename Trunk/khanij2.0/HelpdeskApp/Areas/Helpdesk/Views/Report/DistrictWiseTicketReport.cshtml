@@ -1,0 +1,268 @@
+﻿@model HelpDeskEF.RaiseTicket
+@using HelpdeskApp.Web;
+@{
+    ViewData["Title"] = "DistrictWiseTicketReport";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+<style>
+    .table tr td p a {
+        text-decoration: underline;
+    }
+</style>
+<script>
+    $(document).ready(function () {
+        loadNavigation('IssueLogsummary', 'glTMng', 'plUser', 'tl', 'Helpdesk', ' Location Wise Report', ' ');
+    });
+</script>
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        @Html.Partial("_CMSnavigation")
+        @*<uc1:navigation runat="server" ID="navigation" />*@
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="javascript:void(0);">
+                                View
+                            </a>
+                        </li>
+                    </ul>
+                    @Html.Partial("_CMSutil")
+                    @*<uc1:util runat="server" ID="util" />*@
+                </div>
+                <section class="box form-container">
+                    @*<h2 id="lblReportSubHead"></h2>*@
+                    <div class="search-box">
+                        <div class="searchform px-3 py-3">
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    @using (Html.BeginForm("DistrictWiseTicketReport", "Report", FormMethod.Post, new { AUTOCOMPLETE = "Off", id = "form1", enctype = "multipart/form-data" }))
+                                    {
+                                        <div class="row align-items-lg-center">
+                                            <label class="col-lg-1 col-md-4 col-sm-12 col-form-label">From Date</label>
+                                            <div class="col-lg-3 col-md-6 col-sm-12 mb-lg-0 mb-3">
+                                                <div class="input-group">
+                                                    @Html.TextBoxFor(model => model.fromdate, new { @class = "form-control datepicker", id = "fromdate", value = "@ViewBag.fromdate" })
+                                                    <div class="input-group-prepend">
+                                                        <label class="input-group-text" for="fromdate"><i class="icon-calendar-alt-solid"></i></label>
+                                                    </div>
+                                                </div>
+                                                @*<input type="text" class="form-control datepicker" name="fromdate" id="fromdate" />*@
+                                            </div>
+                                            <label class="col-lg-1 col-md-4 col-sm-12 col-form-label">To Date</label>
+                                            <div class="col-lg-3 col-md-6 col-sm-12 mb-lg-0 mb-3">
+                                                <div class="input-group">
+                                                    @Html.TextBoxFor(model => model.todate, new { @class = "form-control datepicker", id = "todate", value = "@ViewBag.todate" })
+                                                    <div class="input-group-prepend">
+                                                        <label class="input-group-text" for="todate"><i class="icon-calendar-alt-solid"></i></label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-2">
+                                                <button class="btn btn-sm btn-success m-0" id="btnShow" onclick="GetData();">Search</button>
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="content-body">
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <table id="table-exports" class="table table-sm table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th width="30">Sl#</th>
+                                            <th>District Name</th>
+                                            <th class="text-right">Logged</th>
+                                            <th class="text-right">Issue Solved on Same Day</th>
+                                            <th class="text-right">Previous Pending Issue</th>
+                                            <th class="text-right">Previous Pending Issue Solved</th>
+                                            <th class="text-right">Total Issue Resolved</th>
+                                            <th class="text-right">Total Issue Pending</th>
+
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @{ int i = 1;
+                                        }
+                                        @foreach (var b in ViewBag.viewdistrictdata)
+                                        {
+
+                                            <tr>
+                                                <td>
+                                                    @i
+                                                    @{ i++; }
+                                                </td>
+                                                <td>
+                                                    <p class="m-0">
+                                                        @b.DistrictName
+                                                    </p>
+                                                </td>
+                                                <td>
+                                                    <p class="m-0 text-right">
+                                                        @if (Convert.ToInt32(b.Logged) > 0)
+                                                        {
+                                                            @*<a href="@Url.Content("~/Helpdesk/Report/LocationWiseDetailsReport")?Did=@b.DistrictID&type=DistrictWiseLogged&Dname=@b.DistrictName&Fromdate=@b.fromdate&Todate=@b.todate"
+                                                                title="Take Action" id="btntakeaction" class="text-dark">@b.Logged</a>*@
+                                                            <a href="@CustomQueryStringHelper.EncryptString("Helpdesk", "LocationWiseDetailsReport", "Report", new { Did = @b.DistrictID, type = "DistrictWiseLogged", Dname = @b.DistrictName, Fromdate = @b.fromdate, Todate = @b.todate })" title="Take Action" id="btntakeaction" class="text-dark">@b.Logged</a>
+                                                        }
+                                                        else
+                                                        {
+                                                            @b.Logged
+                                                        }
+                                                    </p>
+                                                </td>
+                                                <td>
+                                                    <p class="m-0 text-right">
+
+                                                        @if (Convert.ToInt32(b.Resolved_Issues_On_Same_Day) > 0)
+                                                        {
+                                                            @*<a href="@Url.Content("~/Helpdesk/Report/LocationWiseDetailsReport")?Did=@b.DistrictID&type=DistrictWiseResolved_Issues_On_Same_Day&Dname=@b.DistrictName&Fromdate=@b.fromdate&Todate=@b.todate"
+                                                               title="Take Action" id="btntakeaction" class="text-success ">@b.Resolved_Issues_On_Same_Day</a>*@
+                                                        <a href="@CustomQueryStringHelper.EncryptString("Helpdesk", "LocationWiseDetailsReport", "Report", new { Did = @b.DistrictID, type = "DistrictWiseResolved_Issues_On_Same_Day", Dname = @b.DistrictName, Fromdate = @b.fromdate, Todate = @b.todate })" title="Take Action" id="btntakeaction" class="text-success">@b.Resolved_Issues_On_Same_Day</a>
+                                                        }
+                                                        else
+                                                        {
+                                                            @b.Resolved_Issues_On_Same_Day
+                                                        }
+                                                    </p>
+                                                </td>
+                                                <td>
+                                                    <p class="m-0 text-right">
+                                                        @if (Convert.ToInt32(b.PreviousPendingIssue) > 0)
+                                                        {
+                                                            @*<a href="@Url.Content("~/Helpdesk/Report/LocationWiseDetailsReport")?Did=@b.DistrictID&type=DistrictWisePreviousPendingIssue&Dname=@b.DistrictName&Fromdate=@b.fromdate&Todate=@b.todate"
+                                                               title="Take Action" id="btntakeaction" class="text-danger ">@b.PreviousPendingIssue</a>*@
+                                                        <a href="@CustomQueryStringHelper.EncryptString("Helpdesk", "LocationWiseDetailsReport", "Report", new { Did = @b.DistrictID, type = "DistrictWisePreviousPendingIssue", Dname = @b.DistrictName, Fromdate = @b.fromdate, Todate = @b.todate })" title="Take Action" id="btntakeaction" class="text-danger">@b.PreviousPendingIssue</a>
+                                                        }
+                                                        else
+                                                        {
+                                                            @b.PreviousPendingIssue
+                                                        }
+                                                    </p>
+                                                </td>
+                                                <td>
+                                                    <p class="m-0 text-right">
+                                                        @if (Convert.ToInt32(b.PreviousPendingIssueSolved) > 0)
+                                                        {
+                                                            @*<a href="@Url.Content("~/Helpdesk/Report/LocationWiseDetailsReport")?Did=@b.DistrictID&type=DistrictWisePreviousPendingIssueSolved&Dname=@b.DistrictName&Fromdate=@b.fromdate&Todate=@b.todate"
+            title="Take Action" id="btntakeaction" class="text-success "> @b.PreviousPendingIssueSolved</a>*@
+                                                        <a href="@CustomQueryStringHelper.EncryptString("Helpdesk", "LocationWiseDetailsReport", "Report", new { Did = @b.DistrictID, type = "DistrictWisePreviousPendingIssueSolved", Dname = @b.DistrictName, Fromdate = @b.fromdate, Todate = @b.todate })" title="Take Action" id="btntakeaction" class="text-success">@b.PreviousPendingIssueSolved</a>
+                                                        }
+                                                        else
+                                                        {
+                                                            @b.PreviousPendingIssueSolved
+                                                        }
+                                                    </p>
+                                                </td>
+                                                <td>
+                                                    <p class="m-0 text-right">
+                                                        @if (Convert.ToInt32(b.TotalIssueReSolved) > 0)
+                                                        {
+                                                            @*<a href="@Url.Content("~/Helpdesk/Report/LocationWiseDetailsReport")?Did=@b.DistrictID&type=DistrictWiseTotalIssueReSolved&Dname=@b.DistrictName&Fromdate=@b.fromdate&Todate=@b.todate"
+            title="Take Action" id="btntakeaction" class="text-primary "> @b.TotalIssueReSolved</a>*@
+                                                        <a href="@CustomQueryStringHelper.EncryptString("Helpdesk", "LocationWiseDetailsReport", "Report", new { Did = @b.DistrictID, type = "DistrictWiseTotalIssueReSolved", Dname = @b.DistrictName, Fromdate = @b.fromdate, Todate = @b.todate })" title="Take Action" id="btntakeaction" class="text-primary">@b.TotalIssueReSolved</a>
+                                                        }
+                                                        else
+                                                        {
+                                                            @b.TotalIssueReSolved
+                                                        }
+                                                    </p>
+                                                </td>
+                                                <td>
+                                                    <p class="m-0 text-right">
+                                                        @if (Convert.ToInt32(b.TotalIssuePending) > 0)
+                                                        {
+                                                            @*<a href="@Url.Content("~/Helpdesk/Report/LocationWiseDetailsReport")?Did=@b.DistrictID&type=DistrictWiseTotalIssuePending&Dname=@b.DistrictName&Fromdate=@b.fromdate&Todate=@b.todate"
+            title="Take Action" id="btntakeaction" class="text-danger "> @b.TotalIssuePending</a>*@
+                                                        <a href="@CustomQueryStringHelper.EncryptString("Helpdesk", "LocationWiseDetailsReport", "Report", new { Did = @b.DistrictID, type = "DistrictWiseTotalIssuePending", Dname = @b.DistrictName, Fromdate = @b.fromdate, Todate = @b.todate })" title="Take Action" id="btntakeaction" class="text-danger">@b.TotalIssuePending</a>
+                                                        }
+                                                        else
+                                                        {
+                                                            @b.TotalIssuePending
+                                                        }
+                                                    </p>
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+</section>
+<script>
+    $(document).ready(function () {
+        debugger;
+        $('.datepicker').datetimepicker({
+            format: 'LT',
+            format: "DD/MM/YYYY",
+            daysOfWeekDisabled: [],
+            widgetPositioning: {
+                horizontal: 'auto',
+                vertical: 'bottom'
+            }
+        }).keydown(false);
+
+        GetData();
+
+    });
+    function GetData() {
+        debugger;
+        var FromDate = $('#fromdate').val();
+        var ToDate = $('#todate').val()
+
+        var today = new Date();
+        var dd = today.getDate();
+        var mm = today.getMonth() + 1; //January is 0!
+
+        var yyyy = today.getFullYear();
+        if (dd < 10) {
+            dd = '0' + dd;
+        }
+        if (mm < 10) {
+            mm = '0' + mm;
+        }
+        var today = dd + '/' + mm + '/' + yyyy;
+
+        var FDate = $("#fromdate").val();
+        var TDate = $("#todate").val();
+        if (FDate == '') {
+            //FDate = null;
+            FDate = today;
+        }
+
+        if (TDate == '') {
+            //TDate = null;
+            TDate = today;
+        }
+
+        if (FDate == null || FDate == '') {
+            $("#lblReportSubHead").text("For Today Date");
+        }
+        else if (TDate == null || TDate == '') {
+            $("#lblReportSubHead").text("For Today Date");
+        }
+        else {
+            $("#lblReportSubHead").text("From Date : " + FDate + " and End Date : " + TDate);
+        }
+
+
+        return {
+            FromDate: FDate,
+            ToDate: TDate
+        };
+
+
+
+    }
+</script>
+

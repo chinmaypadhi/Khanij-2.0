@@ -1,0 +1,181 @@
+﻿@model IEnumerable<MasterEF.RoyaltyApprovedEF>
+@*@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer*@
+@{
+    ViewData["Title"] = "RoyaltyInboxView";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+
+<script>
+    $(document).ready(function () {
+        loadNavigation('Royalty Approved View', 'glTMng', 'plRoyaltyForward', 'tl', 'Masters', 'Royalty Inbox View', '');
+
+        $('.searchableselect').searchableselect();
+
+    });
+
+    function ShowHistory(intRoyaltyId) {
+        $.ajax({
+            type: "POST",
+            url: '@Url.Content("~/master/RoyaltyApproved/ViewRoyaltyActionHistory")',
+            data: {
+                "intRoyaltyId": intRoyaltyId
+            },
+            dataType: "Json",
+            success: function (data) {
+                var row = '<thead><tr><th width="30px">Sl#</th><th>Step</th><th>Status</th><th>Remarks</th><th>ActionTakenBy</th><th>ActionTakenOn</th></tr ></thead >'
+                for (var i = 0; i < data.length; i++) {
+                    row += '<tr><th width="30px">' + (parseInt(i) + 1) + '</th><th>' + data[i].intStep + '</th><th>' + data[i].status + '</th><th>' + data[i].remarks + '</th><th>' + data[i].actionTakenBy + '</th><th>' + data[i].actionTakenOn +'</th></tr >'
+                }
+                $("#tblHistory").html(row);
+                $('#Notice_model').modal('show');
+            },
+            error: function () {
+                alert('Error');
+            }
+        })
+    }
+</script>
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link" href="@Url.Content("~/Master/RoyaltyForward/RoyaltyInbox")">
+                                Royalty InBox
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="javascript:void(0);">
+                                View Royalty Inbox
+                            </a>
+                        </li>
+                    </ul>
+
+                </div>
+                <section class="box form-container">
+                    <div class="content-body">
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <table id="table-landscape" class="table table-sm table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th width="30px"> Sl</th>
+                                            <th> Mineral Category</th>
+                                            <th> Mineral Schedule</th>
+                                            <th> Mineral Schedule Part</th>
+                                            <th> Mineral</th>
+                                            <th> Mineral Form</th>
+                                            <th> Mineral Grade</th>
+                                            <th> Mineral Unit</th>
+                                            <th> Royalty Basis</th>
+                                            <th> Average Sale Price</th>
+                                            <th> Rate of Royalty</th>
+                                            <th> Royalty</th>
+                                            <th> Rate Effective From</th>
+                                            <th> IBM Published</th>
+                                            <th> Created Date & Time</th>
+                                            <th> Remarks </th>
+                                            <th> PendingAt</th>
+                                            <th> Status</th>
+                                            <th width="60px" class="noprint"> Action Log</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @{
+                                            var count = 0;
+                                            foreach (var item in Model)
+                                            {
+                                                count++;
+
+                                                <tr class="active-row">
+                                                    <td>
+                                                        @count
+
+                                                    </td>
+                                                    <td>@item.MineralType</td>
+                                                    <td>@item.MineralScheduleName</td>
+                                                    <td>@item.MineralSchedulePart</td>
+                                                    <td>@item.MineralName</td>
+                                                    <td>@item.MineralNature</td>
+                                                    <td>@item.MineralGrade</td>
+                                                    <td>@item.UnitName</td>
+                                                    <td>@item.RoyaltyRateType</td>
+                                                    <td>@item.AverageSalePrice</td>
+                                                    <td>@item.CalculationType</td>
+                                                    <td>@item.RoyaltyRate</td>
+                                                    <td>@item.RateEffectiveFrom</td>
+                                                    <td>
+                                                        <label class="form-control-plaintext">
+                                                            <span class="colon">:</span>@item.IbmFileName
+                                                            @if (item.IbmFileName != null && item.IbmFileName.Trim() != "")
+                                                            {
+                                                                <a href='~/@item.IbmFilePath' title="" class="ml-2" data-original-title="Download CTO Letter" target="_blank"><i class="icon-file-pdf-solid h5 text-danger"></i></a>
+                                                            }
+                                                            else
+                                                            {
+                                                                <span>--</span>
+                                                            }
+                                                        </label>
+
+                                                    </td>
+                                                    @*<td>
+                                                            @if (@item.IsActive == true)
+                                                            {
+                                                                <span>Active</span>
+                                                            }
+                                                            else
+                                                            {
+                                                                <span>InActive</span>
+                                                            }
+
+                                                        </td>*@
+                                                    <td>@item.CreatedOn</td>
+                                                    <td>@item.Remarks</td>
+                                                    <td>@item.PrimaryAuthority</td>
+                                                    <td>@item.Status</td>
+                                                    <td class="noprint">
+                                                        <a class="text-primary btn-sm" id="History"
+                                                           onclick="ShowHistory(@item.RoyaltyId);"
+                                                           title="Action Details">Show Details</a>
+                                                    </td>
+                                                </tr>
+                                            }
+                                        }
+                                    </tbody>
+                                </table>
+
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+        </div>
+
+        <div class="modal fade" id="Notice_model" tabindex="-1" role="dialog" aria-labelledby="basicModal" aria-hidden="true">
+            <div class="modal-dialog  modal-dialog-centered modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Royalty Action History</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="table-responsive">
+                            <table id="tblHistory" class="table table-sm table-bordered">
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <!-- MAIN CONTENT AREA ENDS -->
+</section>

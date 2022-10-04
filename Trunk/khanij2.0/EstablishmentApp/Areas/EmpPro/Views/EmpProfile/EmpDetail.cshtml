@@ -1,0 +1,1060 @@
+﻿@*// *********************************************************************************************************
+    //  View Name                : Add Employee Profile
+    //  Desciption               : To Add Employee Profile
+    //  Created By               : Suresh kumar behera
+    //  Created On               : 13-july-2021
+    // ********************************************************************************************************
+*@
+
+@model EstablishmentEf.EmpProfileEf;
+@{
+    ViewData["Title"] = "EmpDetail";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+
+@if (TempData["msg"] != null)
+{
+<script>
+        var vv = '@TempData["msg"]';
+        if (vv == -1) {
+            swal("", "User allready exists.", "warning");
+        }
+        else if (vv == -2) {
+            swal("", "MobileNo/Email Id allready registered", "warning");
+        }
+        else if (vv == 0) {
+            alert("Employee profile allready applied/ Approved")
+            //swal("", "Employee profile allready applied/ Approved", "warning");
+            window.location.href = "@Url.Content("~/emppro/empprofile/ViewEmp/")"
+        }
+        else if (vv == 1) {
+            swal("", "Employee created successfully.", "success");
+        }
+        else if (vv == 2) {
+            swal("", "Employee allready exists.", "warning");
+        }
+        else if (vv == 3) {
+            swal("", "Employee updated sucessfully", "success");
+        }
+        else if (vv == 4) {
+            swal("", "Employee deleted sucessfully", "success");
+        }
+
+        else {
+            swal("", "Something Errror occured. Please Try After Sometime!!", "error");
+        }
+</script>
+
+    TempData["msg"] = null;
+
+}
+<script>
+    $(document).ready(function () {
+        loadNavigation('EmployeeDetails', 'glempprofile', 'plofficetype', 'tl', 'Employee Profile', 'Employee Details', ' ');
+
+        $('.head-sec .navbar-nav li.dropdown,.top-link li.dropdown').hover(function () {
+            $(this).find('.dropdown-menu').stop(true, true).delay(200).fadeIn(500);
+        }, function () {
+            $(this).find('.dropdown-menu').stop(true, true).delay(200).fadeOut(500);
+        });
+
+        var hdrHeight = $('header').height();
+        $('body').css('padding-top', hdrHeight - 2);
+        var winHeight = $(window).height();
+        if ($('.main-content').height() < winHeight) {
+            $('.main-content').css({
+                "min-height": winHeight - 200
+            })
+            //if ($(window).width() > 1400) {
+            //    $('.main-content').css({
+            //        "min-height": winHeight - 110
+            //    })
+            //}
+        }
+        if ($(window).width() < 992) {
+            $('.main-content').css({
+                "min-height": "100%"
+            })
+            $('.top-link').hide();
+            $('.toplnk-mobile').click(function () {
+                $('.top-link').fadeToggle();
+            });
+        }
+        //$('.selectpicker').selectpicker();
+        $('.searchableselect').searchableselect();
+
+        $('.datepicker').datetimepicker({
+            format: 'LT',
+            format: 'DD-MM-YYYY',
+            daysOfWeekDisabled: [0, 6],
+        });
+
+        if ($("#hidDateDateofbirth").val().trim() != "") {
+            $("#DateDateofbirth").val($("#hidDateDateofbirth").val());
+        }
+
+        if ($("#hidDateOfJoining").val().trim() != "") {
+            $("#DateOfJoining").val($("#hidDateOfJoining").val());
+        }
+
+        if ($("#hidDateOfRetirement").val().trim() != "") {
+            $("#DateOfRetirement").val($("#hidDateOfRetirement").val());
+        }
+
+        //--for getting the current date
+        var today = new Date();
+        var date1 = today.getDate() + '-' + (today.getMonth() + 1) + '-' + today.getFullYear();
+
+        $("#DateDateofbirth").on('focusout', function (e) {
+            var FromDate = date1;
+            var ToDate = $("#DateDateofbirth").val();
+            var b2 = CompareDate(ToDate, FromDate);
+            if (b2 == false) {
+                swal("", "Date of birth should not greater than current date", "warning");
+                //alert("Date of birth should not greater than current date");
+                $("#DateDateofbirth").val(date1);
+            }
+
+
+        });
+
+        $("#DateOfJoining").on('focusout', function (e) {
+            var FromDate = date1;
+            var ToDate = $("#DateOfJoining").val();
+            var b2 = CompareDate(ToDate, FromDate);
+            if (b2 == false) {
+                swal("", "Date of joining should not greater than current date", "warning");
+                //alert("Date of joining should not greater than current date");
+                $("#DateOfJoining").val(date1);
+            }
+
+        });
+
+        $("#DateOfRetirement").on('focusout', function (e) {
+            var FromDate = $("#DateOfJoining").val();
+            var ToDate = $("#DateOfRetirement").val();
+            var b2 = CompareDate2(ToDate, FromDate);
+            if (b2 == false) {
+                swal("", "Date of retirement should not less than Date of joining", "warning");
+                //alert("Date of retirement should not less than Date of joining");
+                $("#DateOfRetirement").val(date1);
+            }
+
+        });
+
+        $("#IntHomeSate").change(function () {
+
+            $.ajax({
+                type: "POST",
+                url: '@Url.Content("~/EmpPro/EmpProfile/District")',
+                data: {
+                    "Stateid": $('#IntHomeSate').val()
+                },
+                dataType: "json",
+                success: function (data) {
+
+                    $("#IntHomeDistrict").empty();
+
+                    var ops = '<option value="">Select</option>';
+                    for (var i = 0; i < data.length; i++) {
+                        ops += '<option value="' + data[i].value + '">' + data[i].text + '</option>';
+                    }
+
+                    $("#IntHomeDistrict").html(ops);
+
+                },
+                error: function () {
+                    alert('Error');
+                }
+            });
+        });
+
+        $("#Personal").click(function () {
+
+            if (!blankFieldValidation("VchEmployeeid", "Employee id")) {
+                return false;
+            }
+            if (!blankFieldValidation("VchName", "Name")) {
+                return false;
+            }
+            if (!blankFieldValidation("VchFatherName", "Father/Mother/Husband Names")) {
+                return false;
+            }
+            if (!DropDownValidation("VchEmployeeType", "Employee Type")) {
+                return false;
+            }
+            if (!blankFieldValidation("VchAadharNumber", "Adhar No")) {
+                return false;
+            }
+            ////------aadhar------------
+            //if (!FileUploadValidation("File5", "Adhar Card")) {
+            //    return false;
+            //}
+            //var ext = $('#File5').val().split('.').pop().toLowerCase();
+            //if ($.inArray(ext, ['png', 'jpg', 'jpeg', 'pdf']) == -1) {
+            //    swal('Please Upload Only Jpg Png Jpeg PDF  !');
+            //    $(".swal-button").click(function () {
+            //        $('#File5').focus();
+            //    });
+            //    return false;
+            //}
+            ////--------end Aadhar-------
+
+            if (!DropDownValidation("Intdesignation", "Current Designation")) {
+                return false;
+            }
+            if (!DropDownValidation("VchCategory", "Category")) {
+                return false;
+            }
+            if (!DropDownValidation("IntClass", "Class")) {
+                return false;
+            }
+
+
+            if (!blankFieldValidation("VchMobileNo", "Mobile No")) {
+                return false;
+            }
+            var validateMobNum = /^\d*(?:\.\d{1,2})?$/;
+            var mobileNum = $("#VchMobileNo").val();
+            if (validateMobNum.test(mobileNum) && mobileNum.length != 10) {
+                swal("", "Please Enter valid Mobile No", "warning");
+                return false;
+            }
+            if (!blankFieldValidation("VchEmailid", "Email Id")) {
+                return false;
+            }
+
+            if (!validateEmail($('#VchEmailid').val())) {
+                swal("", "Please Enter valid Email Id", "warning");
+                return false;
+            }
+
+            if (!blankFieldValidation("DateDateofbirth", "Date of Birth")) {
+                return false;
+            }
+            if (!DropDownValidation("IntHomeSate", "Home State")) {
+                return false;
+            }
+            if (!DropDownValidation("IntHomeDistrict", "Home District")) {
+                return false;
+            }
+            if (!DropDownValidation("VchGender", "Gender")) {
+                return false;
+            }
+            if (!DropDownValidation("VchMaritalStatus", "Marital Status")) {
+                return false;
+            }
+
+
+            //------aadhar------------
+            if ($("#hdnVchAadharCardPath").val() == "") {
+                if (!FileUploadValidation("File5", "Adhar Card")) {
+                    return false;
+                }
+                var ext = $('#File5').val().split('.').pop().toLowerCase();
+                if ($.inArray(ext, ['png', 'jpg', 'jpeg', 'pdf']) == -1) {
+                    swal('Please Upload Only Jpg Png Jpeg PDF  !');
+                    $(".swal-button").click(function () {
+                        $('#File5').focus();
+                    });
+                    return false;
+                }
+            }
+            //--------end Aadhar-------
+
+            //-----signature-----
+            if ($("#hdnVchSignaturePath").val() == "") {
+                if (!FileUploadValidation("File3", "Signature")) {
+                    return false;
+                }
+                var ext = $('#File3').val().split('.').pop().toLowerCase();
+                if ($.inArray(ext, ['png', 'jpg', 'jpeg']) == -1) {
+                    swal('Please Upload Only Jpg Png Jpeg !');
+                    $(".swal-button").click(function () {
+                        $('#File3').focus();
+                    });
+                    return false;
+                }
+            }
+            //----end signature----
+
+            //-----phato------
+            if ($("#hdnVchPhotoPath").val() == "") {
+                if (!FileUploadValidation("File4", "Photo")) {
+                    return false;
+                }
+                var ext = $('#File4').val().split('.').pop().toLowerCase();
+                if ($.inArray(ext, ['png', 'jpg', 'jpeg']) == -1) {
+                    swal('Please Upload Only Jpg Png Jpeg !');
+                    $(".swal-button").click(function () {
+                        $('#File4').focus();
+                    });
+                    return false;
+                }
+            }
+            //---end phato----
+
+
+            var AadharFile = $('#File5')[0].files.length;
+            var PhotoFile = $('#File4')[0].files.length;
+            var SignatureFile = $('#File3')[0].files.length;
+
+            if (($("#hdnVchAadharCardPath").val() == "") || ($("#hdnVchSignaturePath").val() == "") || ($("#hdnVchPhotoPath").val() == "")
+                || (AadharFile > 0) || (PhotoFile > 0) || (SignatureFile > 0)
+
+            ) {
+                var formdata = new FormData(); //FormData object
+                var fileInput = document.getElementById('File5');
+                //Iterating through each files selected in fileInput
+                for (i = 0; i < fileInput.files.length; i++) {
+                    //Appending each file to FormData object
+                    formdata.append("AadharCard", fileInput.files[i]);
+                }
+                fileInput = document.getElementById('File3');
+                for (i = 0; i < fileInput.files.length; i++) {
+                    //Appending each file to FormData object
+                    formdata.append("Signature", fileInput.files[i]);
+                }
+                fileInput = document.getElementById('File4');
+                for (i = 0; i < fileInput.files.length; i++) {
+                    //Appending each file to FormData object
+                    formdata.append("Photo", fileInput.files[i]);
+                }
+                //Creating an XMLHttpRequest and sending
+                var xhr = new XMLHttpRequest();
+                xhr.open('POST', '@Url.Content("~/EmpPro/EmpProfile/UploadPerFIle")', false);
+                xhr.send(formdata);
+                xhr.onreadystatechange = function () {
+
+                    if (xhr.readyState == 4 && xhr.status == 200) {
+
+                        //alert(xhr.responseText);
+                        var data = JSON.parse(xhr.responseText)
+
+                        for (var i = 0; i < data.length; i++) {
+                            if (data[i].Name == 'AadharCard') {
+                                $('#VchAadharCard').text(data[i].Value);
+                            }
+                            if (data[i].Name == 'Signature') {
+                                $('#VchSignature').text(data[i].Value);
+                            }
+                            if (data[i].Name == 'Photo') {
+                                $('#VchPhoto').text(data[i].Value);
+                            }
+                        }
+                    }
+
+                }
+            }
+
+            //if ($("#hidUserId").val().trim() == "") {
+            //    if (!blankFieldValidation("UserName", "User Name")) {
+            //        return false;
+            //    }
+
+            //    if ($("#RdbtnNo").is(":checked")) {
+
+            //        if (!blankFieldValidation("Password", "Password")) {
+            //            return false;
+            //        }
+            //    }
+            //}
+            $.ajax({
+                type: "POST",
+                url: '@Url.Content("~/EmpPro/EmpProfile/EmpPerDetail")',
+
+                data: {
+                    "Satus": "testing"
+                    , "intEmployeeid": $('#intEmployeeid').val()
+                    , "VchEmployeeid": $('#VchEmployeeid').val()
+                    , "VchName": $('#VchName').val()
+                    , "VchFatherName": $('#VchFatherName').val()
+                    , "VchEmployeeType": $('#VchEmployeeType').val()
+                    , "VchAadharNumber": $('#VchAadharNumber').val()
+                    , "VchAadharCard": $('#hdnVchAadharCard').val()
+                    //,"VchAadharCard": $('#VchAadharCard').text()
+                    , "Intdesignation": $('#Intdesignation').val()
+                    , "VchCategory": $('#VchCategory').val()
+                    , "IntClass": $('#IntClass').val()
+                    , "VchMobileNo": $('#VchMobileNo').val()
+                    , "VchEmailid": $('#VchEmailid').val()
+                    , "DateDateofbirth": $('#DateDateofbirth').val()
+                    , "IntHomeSate": $('#IntHomeSate').val()
+                    , "IntHomeDistrict": $('#IntHomeDistrict').val()
+                    , "VchGender": $('#VchGender').val()
+                    , "VchMaritalStatus": $('#VchMaritalStatus').val()
+                    , "VchSignature": $('#hdnVchSignature').val()
+                    //,"VchSignature": $('#VchSignature').text()
+                    , "VchPhoto": $('#hdnVchPhoto').val()
+                    //, "VchPhoto": $('#VchPhoto').text()
+                    , "VchAadharCardPath": $('#hdnVchAadharCardPath').val()
+                    , "VchSignaturePath": $('#hdnVchSignaturePath').val()
+                    , "VchPhotoPath": $('#hdnVchPhotoPath').val()
+
+
+                    //, "IsLoginExists": $('#IsLoginExists').val()
+                    //, "UserId": $('#hidUserId').val()
+                    //, "UserName": $('#UserName').val()
+
+                    //, "Password": $('#Password').val()
+                },
+
+                dataType: "json",
+                success: function (data) {
+                    //var b = data.Satus;
+                    $("#intEmployeeid").val(data.msg);
+                    NextAddress();
+                },
+                error: function () {
+                    alert('Error');
+                }
+            });
+        });
+
+
+        //-----------------end personal------
+        @*   if ($("#hidUserId").val().trim() != "") {
+            $("#divUser *").hide();
+        }
+        else {
+            $("#divUser *").show();
+
+        }
+        $('input[type=radio][name=IsLoginExists]').change(function () {
+            if (this.value == 'True') {
+                $("#divPassword *").hide();
+                $("#Password").val('');
+
+            }
+            else if (this.value == 'False') {
+                $("#divPassword *").show();
+            }
+        });
+
+        $("#UserName").on('focusout', function (e) {
+            var UserName = $('#UserName').val().trim();
+            if (UserName.length > 0) {
+                $.ajax({
+                    type: "POST",
+                    url: '@Url.Content("~/EmpPro/EmpProfile/GetUserId")',
+                    data: {
+                        "UserName": $("#UserName").val()
+                    },
+                    dataType: "Json",
+                    success: function (data) {
+                        $('#hidUserId').val('');
+                        if (data.userId > 0) {
+                            $('#hidUserId').val(data.userId);
+                            $("#spnStatus").text('Old User').css('color', 'blue');
+                            $("#divPassword *").hide();
+                        }
+                        else {
+                            $("#spnStatus").text('New User').css('color', 'red');
+                            $('#hidUserId').val('');
+                            $("#divPassword *").show();
+                        }
+                    },
+                    error: function () {
+                        alert('Error');
+                        $("#spnStatus").text('New User').css('color', 'red');
+                        $('#hidUserId').val('');
+                        $('#UserName').val('');
+                        $("#divPassword *").show();
+                    }
+                });
+            }
+        });*@
+
+
+        $("#Address").click(function () {
+            if (!blankFieldValidation("vchPresentAddress", " Present Address")) {
+                return false;
+            }
+
+            if (!DropDownValidation("intPresentDistrict", "Present District")) {
+                return false;
+            }
+            if (!blankFieldValidation("vchPresentPINCode", "Present Pin")) {
+                return false;
+            }
+            if (!blankFieldValidation("vchPermanentAddress", " Permanent Address")) {
+                return false;
+            }
+
+            if (!DropDownValidation("intPermanentDistrict", "Permanent District")) {
+                return false;
+            }
+            if (!blankFieldValidation("vchPermanentPINCode", "Permanent Pin")) {
+                return false;
+            }
+
+            $.ajax({
+                type: "POST",
+                url: '@Url.Content("~/EmpPro/EmpProfile/EmpAdrDetail")',
+
+                data: {
+                    "intEmployeeid": $('#intEmployeeid').val()
+                    , "vchPresentAddress": $('#vchPresentAddress').val()
+                    , "intPresentDistrict": $('#intPresentDistrict').val()
+                    , "vchPresentPINCode": $('#vchPresentPINCode').val()
+                    , "vchPermanentAddress": $('#vchPermanentAddress').val()
+                    , "intPermanentDistrict": $('#intPermanentDistrict').val()
+                    , "vchPermanentPINCode": $('#vchPermanentPINCode').val()
+
+                },
+                dataType: "json",
+                success: function (data) {
+                    var b = data.satus;
+                    NextPosting();
+                },
+                error: function () {
+                    alert('Error');
+                }
+            });
+
+        });
+
+        $("#Posting").click(function () {
+
+
+            if (!DropDownValidation("intPostingDepartment", "Current Posting Department")) {
+                return false;
+            }
+            if (!DropDownValidation("intPostingDistrict", "Current Posting District")) {
+                return false;
+            }
+
+            if (!DropDownValidation("IntOfficeLevel", "Office Level")) {
+                return false;
+            }
+            if (!blankFieldValidation("DateOfJoining", "Date Of Joining")) {
+                return false;
+            }
+            if (!blankFieldValidation("DateOfRetirement", "Date of Retirement")) {
+                return false;
+            }
+            if (!DropDownValidation("intSection", "Section")) {
+                return false;
+            }
+            if (!DropDownValidation("intEstablishmentoffice", "Establishment office")) {
+                return false;
+            }
+
+
+            if (!DropDownValidation("VchModeofRecruitment", "Mode of Recruitment")) {
+                return false;
+            }
+            if (!blankFieldValidation("DecPayBand", "Pay Band")) {
+                return false;
+            }
+            if (!blankFieldValidation("DecBasicPay", "Current Basic Pay")) {
+                return false;
+            }
+            if (!blankFieldValidation("DecGradePay", "Current Grade Pay")) {
+                return false;
+            }
+
+
+            $.ajax({
+                type: "POST",
+                url: '@Url.Content("~/EmpPro/EmpProfile/EmpPostDetail")',
+
+                data: {
+                    "intEmployeeid": $('#intEmployeeid').val()
+                    , "intPostingDepartment": $('#intPostingDepartment').val()
+                    , "intPostingDistrict": $('#intPostingDistrict').val()
+                    , "IntOfficeLevel": $('#IntOfficeLevel').val()
+                    , "DateOfJoining": $('#DateOfJoining').val()
+                    , "DateOfRetirement": $('#DateOfRetirement').val()
+                    , "intEstablishmentoffice": $('#intEstablishmentoffice').val()
+                    , "VchModeofRecruitment": $('#VchModeofRecruitment').val()
+                    , "DecPayBand": $('#DecPayBand').val()
+                    , "DecBasicPay": $('#DecBasicPay').val()
+                    , "DecGradePay": $('#DecGradePay').val()
+                    , "intSection": $('#intSection').val()
+                },
+                dataType: "json",
+                success: function (data) {
+                    var b = data.satus;
+                    if (b == "1") {
+                        window.location.replace("@Url.Content("~/EmpPro/EmpProfile/ViewEmp")");
+                    }
+                    else {
+                        swal("", "Data Not Save sucessfully", "error");
+                    }
+
+
+                },
+                error: function () {
+                    alert('Error');
+
+                }
+            });
+
+        });
+
+        //if ($("#IsLoginExists").val() == 'True') {
+        //    $("#divUserName *").show();
+        //}
+        //else {
+        //    $("#divUserName *").hide();
+        //}
+
+    });
+
+    $(window).scroll(function () {
+        if ($(this).scrollTop() > 80) {
+            $('.head-sec').addClass('fix-header');
+            if ($(window).width() < 992) {
+                $('.contact-dtls').hide();
+            }
+        } else {
+            $('.head-sec').removeClass('fix-header');
+
+            if ($(window).width() < 992) {
+                $('.contact-dtls').show();
+            }
+        }
+    });
+
+    function CompareDate(FromDate, ToDate) {
+        var b1 = false;
+        var fromdate = toDate(FromDate)
+        var todate = toDate(ToDate)
+
+        if (Date.parse(fromdate) > Date.parse(todate)) {
+            b1 = false;
+        }
+        else {
+            b1 = true;
+
+        }
+        return b1;
+    }
+
+    function CompareDate2(FromDate, ToDate) {
+        var b1 = false;
+        var fromdate = toDate(FromDate)
+        var todate = toDate(ToDate)
+
+        if (Date.parse(fromdate) < Date.parse(todate)) {
+            b1 = false;
+        }
+        else {
+            b1 = true;
+
+        }
+        return b1;
+    }
+
+    function toDate(dateStr) {
+        var parts = dateStr.split("-");
+        return new Date(parts[2], parts[1] - 1, parts[0]);
+    }
+
+    function validateEmail(emailid) {
+        var emailReg = /^([\w-\.]+@@([\w-]+\.)+[\w-]{2,4})?$/;
+        return emailReg.test(emailid);
+    }
+
+    function NextAddress() {
+                                $("#step1").removeClass('active');
+                                $("#step2").addClass('active');
+                                $('#second-tab').trigger('click');
+                            }
+
+    function NextPosting() {
+                                $("#step3").addClass('active');
+                                $("#step2").removeClass('active');
+                                $('#third-tab').trigger('click');
+                            }
+
+    function BackPersonal() {
+                                $("#step2").removeClass('active');
+                                $("#step1").addClass('active');
+                                $('#first-tab').trigger('click');
+                            }
+
+    function BackAddress() {
+                                $("#step3").removeClass('active');
+                                $("#step2").addClass('active');
+                                $('#second-tab').trigger('click');
+                            }
+</script>
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+
+        @*@Html.Partial("_navigation")*@
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="javascript:void(0);">
+                                Employee Personal Details
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link " href="@Url.Content("~/EmpPro/EmpProfile/ViewEmp")">
+                                View Employee Personal Details
+                            </a>
+                        </li>
+                    </ul>
+
+                    @*@Html.Partial("_util")*@
+                </div>
+
+                <section class="box form-container">
+                    <div class="content-body">
+                        <ul class="nav nav-tabs progresstab" id="myTab" role="tablist">
+                            <li class="startstep active" id="step1">
+                                <a class="active" id="first-tab" data-toggle="tab" href="#first" role="tab" aria-controls="first" aria-selected="true">Employee Personal Details</a>
+                            </li>
+                            <li id="step2">
+                                <a id="second-tab" data-toggle="tab" href="#second" role="tab" aria-controls="second" aria-selected="false">Address Information</a>
+                            </li>
+                            <li id="step3">
+                                <a id="third-tab" data-toggle="tab" href="#third" role="tab" aria-controls="third" aria-selected="false">Emp Current Posting Detail</a>
+                            </li>
+                        </ul>
+
+                        @using (Html.BeginForm("Add", "OfficeLevel", FormMethod.Post, new { AUTOCOMPLETE = "Off", id = "form1" }))
+                        {
+                            <div class="tab-content" id="myTabContent">
+                                <div class="tab-pane fade show active" id="first" role="tabpanel" aria-labelledby="first-tab">
+                                    <h5 class="text-brown font-weight-bold">Employee Personal Details</h5>
+                                    <div class="form-group row">
+                                        <div class="col-sm-3">
+                                            <label class="col-form-label font-weight-bolder">Employee Id<span class="text-danger">*</span></label>
+                                            @Html.TextBoxFor(m => m.VchEmployeeid, new { @class = "form-control", @maxlength = 25, Onkeypress = "return inputLimiter(event,'NameCharactersAndNumbers')" })
+                                            @Html.HiddenFor(m => m.intEmployeeid)
+                                        </div>
+                                        <div class="col-sm-3">
+                                            <label class="col-form-label font-weight-bolder">Name<span class="text-danger">*</span></label>
+                                            @Html.TextBoxFor(m => m.VchName, new { @class = "form-control", @maxlength = 100, Onkeypress = "return inputLimiter(event,'NameCharacters')" })
+                                        </div>
+                                        <div class="col-sm-3">
+                                            <label class="col-form-label font-weight-bolder">Father/Mother/Husband Names<span class="text-danger">*</span></label>
+                                            @Html.TextBoxFor(m => m.VchFatherName, new { @class = "form-control", @maxlength = 100, Onkeypress = "return inputLimiter(event,'NameCharacters')" })
+                                        </div>
+                                        <div class="col-sm-3">
+                                            <label class="col-form-label font-weight-bolder">Employee Type<span class="text-danger">*</span></label>
+                                            @Html.DropDownListFor(m => m.VchEmployeeType, ViewBag.EmployeeType as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control form-control-sm searchableselect" })
+
+                                        </div>
+
+                                    </div>
+
+                                    <div class="form-group row">
+                                        <div class="col-sm-3">
+                                            <label class="col-form-label font-weight-bolder">Adhar No.<span class="text-danger">*</span></label>
+                                            @Html.TextBoxFor(m => m.VchAadharNumber, new { @class = "form-control", @maxlength = 12, Onkeypress = "return inputLimiter(event,'Numbers')" })
+                                        </div>
+                                        <div class="col-sm-3">
+                                            <label class="col-form-label font-weight-bolder">Aadhar Card<span class="text-danger">*</span></label>
+                                            <div class="custom-file">
+                                                <input type="file" class="custom-file-input" id="File5" name="filename">
+                                                <label class="custom-file-label" for="customFile" id="VchAadharCard">Choose Files</label>
+                                            </div>
+                                            @if (Model.VchAadharCard != null && Model.VchAadharCard != "")
+                                            {
+                                                <label class="form-control-plaintext">
+                                                    @(Model.VchAadharCard)
+                                                    <a href='~/@Model.VchAadharCardPath' data-original-title="Download Aadhar" target="_blank"><i class="icon-download-solid h5"></i></a>
+                                                </label>
+
+                                            }
+                                            @Html.HiddenFor(m => m.VchAadharCard, new { @id = "hdnVchAadharCard" })
+                                            @Html.HiddenFor(m => m.VchAadharCardPath, new { @id = "hdnVchAadharCardPath" })
+                                        </div>
+                                        <div class="col-sm-3">
+                                            <label class="col-form-label font-weight-bolder">Current Designation<span class="text-danger">*</span></label>
+                                            @Html.DropDownListFor(m => m.Intdesignation, ViewBag.Designation as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control form-control-sm searchableselect" })
+                                        </div>
+                                        <div class="col-sm-3">
+                                            <label class="col-form-label font-weight-bolder">Category<span class="text-danger">*</span></label>
+                                            @Html.DropDownListFor(m => m.VchCategory, ViewBag.Category as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control form-control-sm searchableselect" })
+                                        </div>
+
+                                    </div>
+                                    @*<div id="divUser" class="form-group row">
+                                        <div class="col-sm-3">
+                                            <label class="col-form-label font-weight-bolder">Do you have Login Credential<span class="text-danger">*</span></label><br />
+                                            @Html.RadioButtonFor(m => m.IsLoginExists, true, new { @checked=true,@class="custom-radio",id="RdbtnYes"})Yes
+                                            @Html.RadioButtonFor(m => m.IsLoginExists, false, new { @checked=false,@class="custom-radio",id="RdbtnNo"})No
+                                        </div>
+                                        <div id="divUserName" class="col-sm-3">
+                                            <label class="col-form-label font-weight-bolder">User Name<span class="text-danger">*</span></label>
+                                            @Html.TextBoxFor(m=>m.UserName,new { @class="form-control",@maxlength=12})
+                                            @Html.HiddenFor(m=>m.UserId,new {@id="hidUserId"})
+                                        </div>
+                                        <div class="col-sm-3">
+                                            <label class="col-form-label font-weight-bolder">User Status</label><br />
+                                            <span id="spnStatus">NA</span>
+                                        </div>
+                                        <div  id="divPassword"  class="col-sm-3">
+                                            <label class="col-form-label font-weight-bolder">Password<span class="text-danger">*</span></label>
+                                            @Html.PasswordFor(m=>m.Password,new { @class="form-control",@maxlength=12})
+                                        </div>
+                                    </div>*@
+                                    <div class="form-group row">
+                                        <div class="col-sm-3">
+                                            <label class="col-form-label font-weight-bolder">Class<span class="text-danger">*</span></label>
+                                            @Html.DropDownListFor(m => m.IntClass, ViewBag.Class as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control form-control-sm searchableselect" })
+                                        </div>
+                                        <div class="col-sm-3">
+                                            <label class="col-form-label font-weight-bolder">Mobile No.<span class="text-danger">*</span></label>
+                                            @Html.TextBoxFor(m => m.VchMobileNo, new { @class = "form-control", @maxlength = 10, Onkeypress = "return inputLimiter(event,'Numbers')" })
+
+                                        </div>
+                                        <div class="col-sm-3">
+                                            <label class="col-form-label font-weight-bolder">Email Id<span class="text-danger">*</span></label>
+                                            @Html.TextBoxFor(m => m.VchEmailid, new { @class = "form-control", @maxlength = 25 })
+
+                                        </div>
+                                        <div class="col-sm-3">
+                                            <label class="col-form-label font-weight-bolder">Date of Birth<span class="text-danger">*</span></label>
+                                            <div class="input-group">
+                                                @Html.TextBoxFor(m => m.DateDateofbirth, new { @class = "form-control datepicker", @maxlength = 12 })
+                                                <div class="input-group-prepend">
+                                                    <label class="input-group-text" for="DateDateofbirth"><i class="icon-calendar-alt-solid"></i></label>
+                                                </div>
+                                                <input type="hidden" id="hidDateDateofbirth" value="@Model.DateDateofbirth" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <div class="col-sm-3">
+                                            <label class="col-form-label font-weight-bolder">Home State<span class="text-danger">*</span></label>
+                                            @Html.DropDownListFor(m => m.IntHomeSate, ViewBag.HomeSate as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control form-control-sm searchableselect" })
+
+                                        </div>
+                                        <div class="col-sm-3">
+                                            <label class="col-form-label font-weight-bolder">Home District<span class="text-danger">*</span></label>
+                                            @Html.DropDownListFor(m => m.IntHomeDistrict, ViewBag.HomeDistrict as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control form-control-sm searchableselect" })
+
+                                        </div>
+                                        <div class="col-sm-3">
+                                            <label class="col-form-label font-weight-bolder">Gender<span class="text-danger">*</span></label>
+                                            @Html.DropDownListFor(m => m.VchGender, ViewBag.Gender as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control form-control-sm searchableselect" })
+
+                                        </div>
+                                        <div class="col-sm-3">
+                                            <label class="col-form-label font-weight-bolder">Marital Status<span class="text-danger">*</span></label>
+                                            @Html.DropDownListFor(m => m.VchMaritalStatus, ViewBag.MaritalStatus as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control form-control-sm searchableselect" })
+
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <div class="col-sm-3">
+                                            <label class="col-form-label font-weight-bolder">Signature<span class="text-danger">*</span></label>
+                                            <div class="custom-file">
+                                                <input type="file" class="custom-file-input" id="File3" name="filename">
+                                                <label class="custom-file-label" for="customFile" id="VchSignature">Choose Files</label>
+                                            </div>
+                                            @if (Model.VchSignature != null && Model.VchSignature != "")
+                                            {
+                                                <label class="form-control-plaintext">
+                                                    @(Model.VchSignature)
+                                                    <a href='~/@Model.VchSignaturePath' data-original-title="Download Signature" target="_blank"><i class="icon-download-solid h5"></i></a>
+                                                </label>
+                                            }
+                                            @Html.HiddenFor(m => m.VchSignature, new { @id = "hdnVchSignature" })
+                                            @Html.HiddenFor(m => m.VchSignaturePath, new { @id = "hdnVchSignaturePath" })
+                                        </div>
+                                        <div class="col-sm-3">
+                                            <label class="col-form-label font-weight-bolder">Photo<span class="text-danger">*</span></label>
+                                            <div class="custom-file">
+                                                <input type="file" class="custom-file-input" id="File4" name="filename">
+                                                <label class="custom-file-label" for="customFile" id="VchPhoto">Choose Files</label>
+                                            </div>
+                                            @if (Model.VchPhoto != null && Model.VchPhoto != "")
+                                            {
+                                                <label class="form-control-plaintext">
+                                                    @(Model.VchPhoto)
+                                                    <a href='~/@Model.VchPhotoPath' data-original-title="Download Phato" target="_blank"><i class="icon-download-solid h5"></i></a>
+                                                </label>
+                                            }
+                                            @Html.HiddenFor(m => m.VchPhoto, new { @id = "hdnVchPhoto" })
+                                            @Html.HiddenFor(m => m.VchPhotoPath, new { @id = "hdnVchPhotoPath" })
+                                        </div>
+                                    </div>
+
+                                    <div class="row mt-3">
+                                        <div class="col-sm-12 text-center">
+                                            <a href="javascript:void(0);" class="btn btn-success btn-md ml-0" id="Personal">Submit</a>
+                                            <a href="~/EmpPro/EmpProfile/EmpDetail" class="btn btn-danger btn-md">Reset</a>
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <div class="tab-pane fade" id="second" role="tabpanel" aria-labelledby="second-tab">
+
+                                    <div class="row">
+
+                                        <div class="col-xl-6">
+                                            <h5 class="text-brown font-weight-bold mt-0">Present Address</h5>
+                                            <div class="bg-light p-2 form-group border">
+                                                <div class="row">
+
+                                                    <div class="col-lg-6 col-md-6 col-sm-12">
+                                                        <label class="col-form-label font-weight-bolder pt-0">present Address<span class="text-danger">*</span></label>
+                                                        @Html.TextAreaFor(m => m.vchPresentAddress, new { @class = "form-control", @maxlength = 500, col = 20, row = 1 })
+                                                        @*<textarea name="textAddress" rows="1" cols="20" id="Textarea2" class="form-control" maxlength="500"></textarea>*@
+                                                        <small class="text-danger">Maximum <strong>500</strong> characters</small>
+                                                    </div>
+                                                    <div class="col-lg-6 col-md-6 col-sm-12">
+                                                        <label class="col-form-label font-weight-bolder pt-0">District<span class="text-danger">*</span></label>
+                                                        @*<select class="form-control form-control-sm searchableselect">
+                                                                <option>select</option>
+                                                            </select>*@
+
+                                                        @Html.DropDownListFor(m => m.intPresentDistrict, ViewBag.PresentDistrict as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control form-control-sm searchableselect" })
+                                                    </div>
+                                                    <div class="col-lg-6 col-md-6 col-sm-12">
+                                                        <label class="col-form-label font-weight-bolder pt-0">Pin Code <span class="text-danger">*</span></label>
+                                                        @*<input type="text" class="form-control">*@
+                                                        @Html.TextBoxFor(m => m.vchPresentPINCode, new { @class = "form-control", @maxlength = 6, Onkeypress = "return inputLimiter(event,'Numbers')" })
+                                                    </div>
+
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-xl-6">
+                                            <h5 class="text-brown font-weight-bold mt-0">Permanent  Address</h5>
+                                            <div class="bg-light p-2  border">
+                                                <div class="row">
+
+                                                    <div class="col-lg-6 col-md-6 col-sm-12">
+                                                        <label class="col-form-label font-weight-bolder pt-0">Permanent Address<span class="text-danger">*</span></label>
+                                                        @Html.TextAreaFor(m => m.vchPermanentAddress, new { @class = "form-control", @maxlength = 500, col = 20, row = 1 })
+                                                        <small class="text-danger">Maximum <strong>500</strong> characters</small>
+                                                    </div>
+                                                    <div class="col-lg-6 col-md-6 col-sm-12">
+                                                        <label class="col-form-label font-weight-bolder pt-0">District<span class="text-danger">*</span></label>
+                                                        @Html.DropDownListFor(m => m.intPermanentDistrict, ViewBag.PerDistrict as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control form-control-sm searchableselect" })
+
+                                                    </div>
+                                                    <div class="col-lg-6 col-md-6 col-sm-12">
+                                                        <label class="col-form-label font-weight-bolder pt-0">Pin Code <span class="text-danger">*</span></label>
+
+                                                        @Html.TextBoxFor(m => m.vchPermanentPINCode, new { @class = "form-control", @maxlength = 6, Onkeypress = "return inputLimiter(event,'Numbers')" })
+                                                    </div>
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row mt-3">
+                                        <div class="col-sm-12 text-center">
+                                            <a class="btn btn-dark btn-md ml-0 waves-effect waves-light btnPrevious" onclick="BackPersonal()">Previous</a>
+                                            <a class="btn btn-primary btn-md ml-0 waves-effect waves-light" id="Address">Next</a>
+                                            <a href="~/EmpPro/EmpProfile/EmpDetail" class="btn btn-danger btn-md">Reset</a>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="tab-pane fade" id="third" role="tabpanel" aria-labelledby="third-tab">
+
+                                    <h5 class="text-brown font-weight-bold">Emp Current Posting Details</h5>
+
+                                    <div class="form-group row">
+                                        <div class="col-sm-3">
+                                            <label class="col-form-label font-weight-bolder">Current Posting Department<span class="text-danger">*</span></label>
+                                            @Html.DropDownListFor(m => m.intPostingDepartment, ViewBag.Department as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control form-control-sm searchableselect" })
+                                        </div>
+                                        <div class="col-sm-3">
+                                            <label class="col-form-label font-weight-bolder">Current Posting District<span class="text-danger">*</span></label>
+                                            @Html.DropDownListFor(m => m.intPostingDistrict, ViewBag.PostingDistrict as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control form-control-sm searchableselect" })
+                                        </div>
+                                        <div class="col-sm-3">
+                                            <label class="col-form-label font-weight-bolder">Office Level<span class="text-danger">*</span></label>
+                                            @Html.DropDownListFor(m => m.IntOfficeLevel, ViewBag.Level as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control form-control-sm searchableselect" })
+
+                                        </div>
+
+                                        <div class="col-sm-3">
+                                            <label for="inputLoginId" class="col-form-label font-weight-bolder">Section<span class="text-danger">*</span></label>
+                                            @Html.DropDownListFor(m => m.intSection, ViewBag.Section as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control form-control-sm searchableselect" })
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group row">
+                                        <div class="col-sm-3">
+                                            <label for="inputLoginId" class="col-form-label font-weight-bolder">Date Of Joining<span class="text-danger">*</span></label>
+                                            <div class="input-group">
+                                                @Html.TextBoxFor(m => m.DateOfJoining, new { @class = "form-control datepicker" })
+
+                                                <div class="input-group-prepend">
+                                                    <label class="input-group-text" for="DateOfJoining"><i class="icon-calendar-alt-solid"></i></label>
+                                                </div>
+                                                <input type="hidden" id="hidDateOfJoining" value="@Model.DateOfJoining" />
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-3">
+                                            <label for="inputLoginId" class="col-form-label font-weight-bolder">Date of Retirement<span class="text-danger">*</span></label>
+                                            <div class="input-group">
+                                                @*<input type="text" class="form-control datepicker" id="Date3">*@
+                                                @Html.TextBoxFor(m => m.DateOfRetirement, new { @class = "form-control datepicker" })
+                                                <div class="input-group-prepend">
+                                                    <label class="input-group-text" for="DateOfRetirement"><i class="icon-calendar-alt-solid"></i></label>
+                                                </div>
+                                                <input type="hidden" id="hidDateOfRetirement" value="@Model.DateOfRetirement" />
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-3">
+                                            <label for="inputLoginId" class="col-form-label font-weight-bolder">Establishment office<span class="text-danger">*</span></label>
+                                            @Html.DropDownListFor(m => m.intEstablishmentoffice, ViewBag.Establishmentoffice as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control form-control-sm searchableselect" })
+                                        </div>
+                                        <div class="col-sm-3">
+                                            <label for="inputLoginId" class="col-form-label font-weight-bolder">Mode of Recruitment<span class="text-danger">*</span></label>
+                                            @Html.DropDownListFor(m => m.VchModeofRecruitment, ViewBag.Recruitment as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control form-control-sm searchableselect" })
+
+
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group row">
+                                        <div class="col-sm-3">
+                                            <label for="inputLoginId" class="col-form-label font-weight-bolder">Pay Band<span class="text-danger">*</span></label>
+
+                                            @Html.TextBoxFor(m => m.DecPayBand, new { @class = "form-control", @maxlength = 25 })
+                                        </div>
+                                        <div class="col-sm-3">
+                                            <label for="inputLoginId" class="col-form-label font-weight-bolder">Current Basic Pay<span class="text-danger">*</span></label>
+                                            @Html.TextBoxFor(m => m.DecBasicPay, new { @class = "form-control", @maxlength = 10, Onkeypress = "return inputLimiter(event,'Numbers')" })
+
+                                        </div>
+                                        <div class="col-sm-3">
+                                            <label for="inputLoginId" class="col-form-label font-weight-bolder">Current Grade Pay<span class="text-danger">*</span></label>
+
+
+                                            @Html.TextBoxFor(m => m.DecGradePay, new { @class = "form-control", @maxlength = 10, Onkeypress = "return inputLimiter(event,'Numbers')" })
+
+                                        </div>
+
+                                    </div>
+
+                                    <div class="row mt-3">
+                                        <div class="col-sm-12 text-center">
+
+                                            <a class="btn btn-dark btn-md ml-0 waves-effect waves-light btnPrevious" onclick="BackAddress()">Previous</a>
+                                            <a href="javascript:void(0);" class="btn btn-success btn-md ml-0" id="Posting">Submit</a>
+                                            <a href="~/EmpPro/EmpProfile/EmpDetail" class="btn btn-danger btn-md">Reset</a>
+                                        </div>
+                                    </div>
+
+
+                                </div>
+
+                            </div>
+                        }
+
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+    <!-- MAIN CONTENT AREA ENDS -->
+</section>

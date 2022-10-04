@@ -1,0 +1,166 @@
+﻿@*// *********************************************************************************************************
+    //  View Name                : Add LeaveAssignClassWise
+    //  Desciption               : To Add LeaveAssignClassWise
+    //  Created By               : Suresh kumar behera
+    //  Created On               : 13-july-2021
+    // ********************************************************************************************************
+*@
+@model EstablishmentEf.LeaveAssignClassWise
+@{
+    ViewData["Title"] = "AddLeaveAssignClassWise";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+
+
+@if (TempData["msg"] != null)
+{
+    <script>
+        var vv = '@TempData["msg"]';
+        if (vv == 1) {
+            swal("", "Apply leave assign successfully.", "success");
+        }
+        else if (vv == 2) {
+            swal("", "leave assign allready exists.", "warning");
+        }
+        else if (vv == 3) {
+            swal("", "leave assign updated sucessfully", "success");
+        }
+        else if (vv == 4) {
+            swal("", "leave assign  deleted sucessfully", "success");
+        }
+        else if (vv == 5) {
+            swal("", "leave assign  allredy approved", "warning");
+        }
+        else {
+            swal("", "Something Errror occured. Please Try After Sometime!!", "error");
+        }
+    </script>
+
+    TempData["msg"] = null;
+
+}
+<script>
+    $(document).ready(function () {
+        $("#Submit").click(function () {
+
+            if (!DropDownValidation("intClassId", "Employee Class")) {
+                return false;
+            }
+            if (!DropDownValidation("intLeaveTypeId", "Leave Type")) {
+                return false;
+            }
+            if (!blankFieldValidation("intNoOfDays", "No Of days")) {
+                return false;
+            }
+            if ($("#intNoOfDays").val() <= 0) {
+                swal("", "Enter no of days", "warning");
+                return false;
+            }
+
+        });
+      $("#Reset").click(function () {
+            window.location ="@Url.Content("~/LeaveManagement/LeaveAssignClassWise/AddLeaveAssignClassWise/")"
+        });
+    });
+
+    var specialKeys = new Array();
+    specialKeys.push(8); //Backspace
+    function numericdotOnly(elementRef) {
+        var keyCodeEntered = (event.which) ? event.which : (window.event.keyCode) ? window.event.keyCode : -1;
+        if ((keyCodeEntered >= 48) && (keyCodeEntered <= 57)) {
+            return true;
+        }
+        // '.' decimal point...
+        else if (keyCodeEntered == 46) {
+            // Allow only 1 decimal point ('.')...
+            if ((elementRef.value) && (elementRef.value.indexOf('.') >= 0))
+                return false;
+            else
+                return true;
+        }
+        return false;
+    }
+</script>
+
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+
+        @*@Html.Partial("_navigation")*@
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="javascript:void(0);">
+                                Add leave assign Class wise
+                            </a>
+                        </li>
+                        <li class="nav-item">
+
+                            <a class="nav-link " href="@Url.Content("~/LeaveManagement/LeaveAssignClassWise/ViewLeaveAssignClassWise")">
+                                View leave assign Class wise
+                            </a>
+                        </li>
+                    </ul>
+
+                    @*@Html.Partial("_util")*@
+                </div>
+
+                <section class="box form-container">
+                    <div class="content-body">
+                        @using (Html.BeginForm("AddLeaveAssignClassWise", "LeaveAssignClassWise", FormMethod.Post, new { AUTOCOMPLETE = "Off", id = "form1" }))
+                        {
+                            @Html.AntiForgeryToken();
+                            <div class="row">
+                                <div class="col-lg-6">
+
+                                    <div class="form-group row">
+                                        <label class="col-lg-4 col-md-4 col-sm-12 col-form-label font-weight-bolder">Employee Class<span class="text-danger">*</span></label>
+                                        <div class="col-lg-7 col-md-6 col-sm-12">
+                                            @Html.DropDownListFor(m => m.intClassId, ViewBag.EmployeeClass as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control form-control-sm searchableselect" })
+                                            @Html.HiddenFor(m => m.intId)
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label class="col-lg-4 col-md-4 col-sm-12 col-form-label font-weight-bolder">Leave Type<span class="text-danger">*</span></label>
+                                        <div class="col-lg-7 col-md-6 col-sm-12">
+                                            @Html.DropDownListFor(m => m.intLeaveTypeId, ViewBag.LeaveType as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control form-control-sm searchableselect" })
+
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label class="col-lg-4 col-md-4 col-sm-12 col-form-label font-weight-bolder">No Of Days<span class="text-danger">*</span></label>
+                                        <div class="col-lg-7 col-md-6 col-sm-12">
+                                            <div class="input-group">
+                                                @Html.TextBoxFor(m => m.decNoOfDays, new { @class = "form-control", @maxlength = 5, Onkeypress = "return numericdotOnly(this)" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-12 offset-lg-2 offset-md-4 mb-3">
+                                    <input type="submit" id="Submit" name="Submit" value='@ViewBag.Button' class="btn btn-primary btn-md ml-0" />
+                                    <input type="reset" id="Reset" value="Reset" class="btn btn-danger btn-md" />
+                                </div>
+
+                            </div>
+                        }
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+    <!-- MAIN CONTENT AREA ENDS -->
+</section>
+<script>
+    indicateMe = "yes"
+
+    $(document).ready(function () {
+        loadNavigation('AddLeaveAssignClassWise', 'glholiday', 'plappleav', 'tl', 'Leave', 'AddLeaveAssignClassWise', ' ');
+        //$('.searchableselect').searchableselect();
+
+
+    });
+</script>
+
+

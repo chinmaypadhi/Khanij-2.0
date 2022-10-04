@@ -1,0 +1,246 @@
+﻿@*// ************************************************************************************************************
+    //  View Name                : IBM Details
+    //  Desciption               : To Save and Update, Forward, Approve and Reject Liecensee IBM Details
+    //  Created By               : Prakash Chandra Biswal
+    //  Created On               : 25 July 2021
+    // **********************************************************************************************************
+*@
+
+@model MasterEF.IBMDetails
+@{
+    ViewData["Title"] = "IBMDetails";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+@if (TempData["Message"] != null)
+{
+    <script>
+        swal("",'@TempData["Message"]',"success");
+    </script>
+}
+<script>
+    indicateMe = "yes"
+    backMe = "yes"
+    $(document).ready(function () {
+        loadNavigation('IBMDetails', 'glRoleRes', 'pllesseprof', 'tl', 'Licensee Profile', 'IBMDetails', ' ');
+
+        $('.datepicker').datetimepicker({
+            format: 'LT',
+            format: 'DD-MMM-YYYY',
+            //daysOfWeekDisabled: [0, 6],
+            daysOfWeekDisabled: [],
+            widgetPositioning: {
+                horizontal: 'auto',
+                vertical: 'bottom'
+            }
+        });
+
+        if ($("#hdnIBM_APPLICATON_DATE").val() != "") {
+            $("#dt_IBM_APPLICATON_DATE").val($("#hdnIBM_APPLICATON_DATE").val());
+        }
+
+        $('input[type="file"]').bind('change', function () {
+            $("input[name='Submit']").attr('disabled', false);
+            filesize = this.files[0].size;
+            var val = $(this).val().toLowerCase(),
+                //regex = new RegExp("(.*?)\.(jpeg|jpg|png)$");
+                regex = new RegExp("(.*?)\.(pdf)$");
+            if (!(regex.test(val))) {
+                swal("", "only pdf file type are allowed. ", "warning");
+                this.value = '';
+                $("input[name='Submit']").attr('disabled', true);
+                return false;
+            }
+            else if (filesize > 2048000) {
+                swal("", "File size must be 2 MB !", "warning");
+                $("input[name='Submit']").attr('disabled', true);
+                return false;
+            }
+            else {
+                var fileName = $(this).val().split("\\").pop();
+                $(this).next('.custom-file-label').html(fileName);
+            }
+            return false;
+        });
+        if (@Model.STATUS == 1) {
+            $('.form-control').css("pointer-events", "none");
+            $('#cmd').hide();
+            $('#cmd1').hide();
+        }
+        
+    });
+
+</script>
+<script>
+    function Validate() {
+        var Iss = false;
+        if (!blankFieldValidation("IBM_NUMBER", "IBM NUMBER")) {
+            return false;
+        }
+        if (!blankFieldValidation("dt_IBM_APPLICATON_DATE", "IBM APPLICATION DATE")) {
+            return false;
+        }
+        if (!blankFieldValidation("IBM_APPLICATION_NUMBER", "IBM Registration Number")) {
+            return false;
+        }
+        Iss = true;
+        return Iss;
+    }
+</script>
+<script>
+
+    function OnForwarding(btnAction) {
+        var Type;
+        if (btnAction == 'Forward To DD') {
+            Type = 'forward';
+        }
+        if (confirm("Before " + Type + " you need to apply your Digital Signature. Are you confirmed to " + Type + " Profile??")) {
+                var Postdata = 'action=signdoc' + "\n" + 'datatosign=Digital Signature Required' + "\n" + 'signaction=sign' + "\n" + 'filepath=' + "\n" + 'panNumberParam=' + "\n" + 'expirycheck=false' + "\n" + 'issuername=' + "\n" + 'certclass=1|2|3' + "\n" + 'certtype=ALL';
+                connection.send(Postdata);
+                connection.onerror = function (error) {
+                    swal("",'Please check the server connection: ' + error+'',"warning");
+                    swal("",error,"warning");
+                };
+                connection.onmessage = function (e) { // when DSC is success then following function executed.
+                    if (e.data.indexOf("subProtocol") == -1) {
+                        //alert(e.data);
+                        $("#DSCResponse").val(e.data).change();
+                        $.ajax(
+                            {
+                               url: '@Url.Action("CheckVerifyResponse", "UserInformationLiensee", new { Area = "Licensee" })',
+                                type: "POST",
+                                data: { contentType: "pkcs7", signDataBase64Encoded: e.data, responseType: "plain" },
+                                success: function (msg) {
+                                    if (msg == "SUCCESS") {
+                                        if (btnAction == "Forward To DD") {
+                                            $("#SubResion").val("Forward To DD");
+                                        }
+                                        $("#form1").submit();
+                                    }
+                                }
+                            });
+                    }
+                    else {
+                        alert(e.data);
+                    }
+                };
+            }
+            else {
+                return false;
+            }
+    }
+    try {
+        var connection = new WebSocket('wss://localhost.emudhra.com:8080');
+        connection.onopen = function () {
+            console.log('Connection Opened');
+        };
+        connection.onerror = function (error) {
+        };
+        connection.onmessage = function (e) {
+            if (e.data.indexOf("subProtocol") == -1) {
+            }
+        };
+    }
+    catch (e) {
+        swal("", "No DSC Connection Found", "warning");
+    }
+
+    function ForwordToDdWithoutDS(btnAction) {
+
+        if (btnAction == "Forward To DD") {
+            $("#SubResion").val("Forward To DD");
+        }
+
+        $("#form1").submit();
+
+    }
+</script>
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        @Html.Partial("_CMSnavigation")
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="javascript:void(0);">
+                                Add
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link " href="~/Licensee/UserInformationLiensee/ViewIBMDetails">
+                                View
+                            </a>
+                        </li>
+                    </ul>
+                    @Html.Partial("_CMSutil")
+                </div>
+
+                <section class="box form-container">
+                    <div class="content-body">
+
+                        <h5 class="text-brown font-weight-bold mt-0"> IBM Details</h5>
+                        @Html.HiddenFor(m => m.IBM_APPLICATON_DATE, new { @id = "hdnIBM_APPLICATON_DATE" })
+                        @using (Html.BeginForm("IBMDetails", "UserInformationLiensee", FormMethod.Post, new { enctype = "multipart/form-data", AUTOCOMPLETE = "Off", id = "form1" }))
+                        {
+                            @Html.AntiForgeryToken()
+                            @(Html.HiddenFor(model => model.SubResion))
+                            <input type="hidden" name="LICENSEE_IBM_ID" value="@Model.LICENSEE_IBM_ID" />
+
+                            <div class="row">
+                                <div class="col-lg-6 col-md-6 col-sm-12 form-group">
+                                    <label class="col-form-label pt-0 font-weight-bolder">IBM Mine Code </label> <span class="text-danger">*</span>
+                                    @(Html.TextBoxFor(x => x.IBM_NUMBER, new { @maxlength = "50", @class = "form-control" }))
+                                    @Html.ValidationMessageFor(x => x.IBM_NUMBER, "", new { @Class = "text-danger", @maxlength = "50" })
+                                </div>
+                                <div class="col-lg-6 col-md-6 col-sm-12 form-group">
+                                    <label class="col-form-label pt-0 font-weight-bolder">IBM Registrarion Number </label> <span class="text-danger">*</span>
+                                    @(Html.TextBoxFor(x => x.IBM_APPLICATION_NUMBER, new { @maxlength = "50", @class = "form-control" }))
+                                    @Html.ValidationMessageFor(x => x.IBM_APPLICATION_NUMBER, "", new { @Class = "text-danger", @maxlength = "50" })
+                                </div>
+                                <div class="col-lg-6 col-md-6 col-sm-12 form-group">
+                                    <label class="col-form-label pt-0 font-weight-bolder">IBM Registration Date</label><span class="text-danger">*</span>
+                                    <div class="input-group">
+
+                                        @Html.TextBoxFor(m => m.IBM_APPLICATON_DATE, new { @class = "form-control datepicker", id = "dt_IBM_APPLICATON_DATE" })
+                                        <div class="input-group-prepend">
+                                            <label class="input-group-text" for="dt_IBM_APPLICATON_DATE"><i class="icon-calendar-alt-solid"></i></label>
+                                        </div>
+                                    </div>
+                                    @Html.ValidationMessageFor(m => m.IBM_APPLICATON_DATE, "", new { @class = "text-danger" })
+                                </div>
+                                <div class="col-lg-6 col-md-6 col-sm-12 form-group">
+                                    <label class="col-form-label pt-0 font-weight-bolder">Upload IBM/DGM Registration Form – M</label><span class="text-danger">*</span>
+                                    <div class="custom-file">
+                                        <input type="file" class="custom-file-input" id="selectedFile" name="selectedFile">
+                                        <label class="custom-file-label" for="customFile">Choose Files</label>
+                                    </div>
+                                    @if (Model.IBM_REGISTRATION_FORM_PATH != null)
+                                    {
+                                        <label class="form-control-plaintext">@(Model.FILE_IBM_REGISTRATION_FORM) <a href='~/@Model.IBM_REGISTRATION_FORM_PATH' title="" class="ml-2" data-original-title="Download" target="_blank"><i class="icon-file-pdf-solid h5 text-danger"></i></a></label>
+                                    }
+                                </div>
+
+                            </div>
+
+                            <div class="row mt-4">
+                                <div class="col-sm-12 text-center">
+                                    @if (@Model.STATUS != 5)
+                                    {
+                                        <input type="submit" value="Save & Update" name="cmd" formaction="" class="btn btn-success btn-md ml-0 waves-effect waves-light  btnsave" id="cmd" onclick="return Validate()">
+                                        <input type="submit" value="Delete" name="cmd" class="btn btn-danger btn-md ml-0 waves-effect waves-light btnsave" id="cmd2" onclick="return confirm('Are you sure to delete?')" style="display:none">
+                                        <input type="button" value="Forward To DD" name="cmd" class="btn btn-warning text-dark btn-md waves-effect waves-light btnsave" id="cmd1" onclick="if (Validate()) { return OnForwarding('Forward To DD'); }">
+                                        @*<input type="button" value="Forward To DD" name="cmd" class="btn btn-warning text-dark btn-md waves-effect waves-light btnsave" id="cmd1" onclick="if (Validate()) { return ForwordToDdWithoutDS('Forward To DD'); }">*@
+                                    }
+                                </div>
+                            </div>
+                        }
+
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+    <!-- MAIN CONTENT AREA ENDS -->
+</section>
+

@@ -1,0 +1,198 @@
+﻿
+@{
+    Layout = null;
+}
+
+
+@using IntegrationEF;
+@using Microsoft.Extensions.Options;
+@using IntegrationApp.Helper;
+@inject IOptions<KeyList> objKeyList
+@model IntegrationEF.PaymentTransaction
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>Khanij-online</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        body {
+            font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji";
+        }
+
+        .section {
+            margin: 0 auto;
+            padding: 2rem;
+            width: 100%;
+            max-width: 800px;
+            margin-top: 100px;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        tr th {
+            font-size: 16px;
+            padding: 12px;
+            border: 1px solid #ddd;
+            text-align: left;
+            font-weight: 500;
+        }
+
+        tr td {
+            border: 1px solid #ddd;
+            text-align: left;
+            padding: 10px 10px;
+        }
+
+
+
+        .custom-btn {
+            color: #121111;
+            border-radius: 5px;
+            padding: 10px 25px;
+            font-weight: 500;
+            background: #4caf50;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: inset 2px 2px 2px 0px rgb(255 255 255 / 50%), 7px 7px 20px 0px rgb(0 0 0 / 10%), 4px 4px 5px 0px rgb(0 0 0 / 10%);
+            outline: none;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100px;
+            margin: 0 auto;
+            margin-top: 1rem;
+        }
+
+        .text-danger {
+            color: #e91b1b;
+        }
+
+        .text-orange {
+            color: #ff5722;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .text-success {
+            color: #13db22;
+        }
+
+        table tr td span {
+            font-weight: 500;
+        }
+    </style>
+
+</head>
+<body>
+    <div class="section">
+        <h1 class="text-center">Payment Acknowledgement </h1>
+        <div class="text-center" style="margin-bottom: 1.5rem;">
+            @if (Model.TXN_STATUS == "SUCCESS")
+            {
+                <img src="~/CMSimg/accept.png" alt="status image" height="60px">
+            }
+            else if (Model.TXN_STATUS == "PENDING")
+            {
+                <img src="~/CMSimg/expired.png" alt="status image" height="60px">
+            }
+            else if (Model.TXN_STATUS == "FAILED")
+            {
+                <img src="~/CMSimg/cross.png" alt="status image" height="60px">
+            }
+        </div>
+        <table>
+            <tbody>
+                <tr>
+                    <th width="300px">Applicant Transaction Number</th>
+                    <td> @Model.CLNT_TXN_REF</td>
+                </tr>
+                <tr>
+
+                    <th>Transaction Bank Code</th>
+                    <td> @Model.TPSL_BANK_CD</td>
+                </tr>
+                <tr>
+                    <th>Payment Transaction ID</th>
+                    <td>@Model.TPSL_TXN_ID</td>
+                </tr>
+                <tr>
+                    <th>Payment Transaction DateTime </th>
+                    <td>@Model.TPSL_TXN_TIME</td>
+                </tr>
+                <tr>
+                    <th>Payment Status </th>
+                    <td>
+                        @if (Model.TXN_STATUS == "PENDING")
+                        {
+                        <span class="text-orange">PENDING</span>
+                        }
+                        else if (Model.TXN_STATUS == "SUCCESS")
+                        {
+                        <span class="text-success">SUCCESS</span>
+                        }
+                        else if (Model.TXN_STATUS == "FAILED")
+                        {
+                        <span class="text-danger">FAILED</span>
+                        }
+                        else
+                        {
+                        <span class="text-orange">@Model.TXN_STATUS</span>
+                        }
+                    </td>
+                </tr>
+                <tr>
+                    <th>Total Paid Amount </th>
+                    <td> Rs.  @Model.TXN_AMT</td>
+                </tr>
+            </tbody>
+        </table>
+        @*<a href="http://khanijmineralconcession.khanij.com/MajorMineral/LeaseApplication/PrefferedBidderPaymentView?Id=@Model.UserId">OK</a>*@
+        @if (Model.UserType == "LesseeLOI")
+        {
+            var urlMCView = objKeyList.Value.MineralConcessionURL + "MajorMineral/LeaseApplication/PrefferedBidderPaymentView?Id=" + Model.UserId;
+        <a href='@urlMCView' class="custom-btn">OK</a>
+        }
+        else if (Model.CLNT_TXN_REF.StartsWith("ORDMIN"))
+        {
+            var id = Model.CLNT_TXN_REF.Replace("ORDMIN", "").Trim();
+            var dataString =  CustomQueryStringHelper.
+                               EncryptString("Permit", "ePermitPaymentCheckOut", "Lessee", new { id = id });
+        var final = objKeyList.Value.PermitUrl + dataString;
+        <a class="btn btn-primary btn-md ml-0 waves-effect waves-light" href='@final'>OK</a>
+        }
+        else if (Model.CLNT_TXN_REF.StartsWith("ORDINC"))
+        {
+            var id = Model.CLNT_TXN_REF.Replace("ORDINC", "").Trim();
+            var dataString = CustomQueryStringHelper.
+                               EncryptString("Permit", "ePermitPaymentCheckOut", "Lessee", new { id = id });
+         var final = objKeyList.Value.PermitUrl + dataString;
+        <a class="btn btn-primary btn-md ml-0 waves-effect waves-light" href='@final'>OK</a>
+        }
+        else if (Model.CLNT_TXN_REF.StartsWith("ORDEVS"))
+        {
+            var id = Model.CLNT_TXN_REF.Replace("ORDEVS", "").Trim();
+           var dataString = CustomQueryStringHelper.
+                               EncryptString("Permit", "ePermitPaymentCheckOut", "Lessee", new { id = id });
+          var final = objKeyList.Value.PermitUrl + dataString;
+        <a class="btn btn-primary btn-md ml-0 waves-effect waves-light" href='@final'>OK</a>
+        }
+        else if (Model.UserType == "SecondpayLoI")
+        {
+            var urlMCView = objKeyList.Value.MineralConcessionURL + "MajorMineral/LeaseApplication/SecondInstallmentPaymentView?Id=" + Model.UserId;
+            <a href='@urlMCView' class="custom-btn">OK</a>
+        }
+        else if (Model.UserType == "ThirdLoI")
+        {
+            var urlMCView = objKeyList.Value.MineralConcessionURL + "MajorMineral/LeaseApplication/ThirdInstallmentPaymentView?Id=" + Model.UserId;
+            <a href='@urlMCView' class="custom-btn">OK</a>
+        }
+    </div>
+</body>
+</html>

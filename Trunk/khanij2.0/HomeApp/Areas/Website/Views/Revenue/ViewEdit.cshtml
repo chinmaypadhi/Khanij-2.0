@@ -1,0 +1,103 @@
+﻿
+@{
+    ViewData["Title"] = "ViewEdit";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+@using HomeApp.Web;
+<script>
+    $(document).ready(function () {
+        loadNavigation('ViewList', 'glhelpdesk', 'plraiseticket', 'tl', 'Website', 'Notification', ' ');
+
+    });
+</script>
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        @Html.Partial("_navigation")
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link" href="~/Website/Revenue/Add">
+                                Add
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="javascript:void(0);">
+                                View
+                            </a>
+                        </li>
+                    </ul>
+                    @Html.Partial("_util")
+                </div>
+                <section class="box form-container">
+                    <div class="content-body">
+                        <form method="post" action="/Website/Revenue/ViewByFinancialYear">
+                            <div>
+                                <select id="financialyear" name="financialyear" class="form-group">
+                                    @{
+                                        foreach (var obj in (IEnumerable<string>)ViewData["financialyear"])
+                                        {
+                                            if (obj == (string)ViewBag.selectedfinancialyear)
+                                            {
+                                                <option value="@obj" selected>@obj</option>
+                                            }
+                                            else
+                                            {
+                                                <option value="@obj">@obj</option>
+                                            }
+                                            
+                                        }
+                                    }
+                                </select>
+                                <input type="submit" value="SEARCH" />
+                            </div>
+                        </form>
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div id="viewtable">
+                                    <table id="datatable" class="table table-sm table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th>Financial Year</th>
+                                                <th>MineralName</th>
+                                                <th>DMF</th>
+                                                <th>NMET</th>
+                                                <th>Royalty</th>
+                                                <th class="text-center noprint">Edit</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @{ 
+                                                foreach(var item in (List<HomeEF.ViewRevenueModel>)ViewData["list"])
+                                                {
+                                                    <tr>
+                                                        <td>@item.FinancialYear</td>
+                                                        <td>@item.MineralName</td>
+                                                        <td>@item.DMF</td>
+                                                        <td>@item.NMET</td>
+                                                        <td>@item.Royalty</td>
+                                                        <td>
+                                                            <a href="/Website/Revenue/ViewByID/@item.ID" class="text-success btn-sm">
+                                                                <i class="icon-pencil-alt-solid"></i>
+                                                            </a>
+                                                            @*<a href="@CustomQueryStringHelper.EncryptString("Website","ViewByID","Revenue",new { id=item.ID })">Edit</a>*@
+                                                        </td>
+                                                    </tr>
+                                                }
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+    <!-- MAIN CONTENT AREA ENDS -->
+</section>
+
+

@@ -1,0 +1,992 @@
+﻿
+@{
+    ViewData["Title"] = "VTDVendorReg";
+    Layout = "~/Views/Shared/_WebHeaderLayout.cshtml";
+}
+@using userregistrationEF;
+@inject Microsoft.Extensions.Options.IOptions<userregistrationEF.KeyList> metaOptions
+@{
+    var options = metaOptions.Value;
+}
+
+<style>
+    .refesh-btn {
+        position: absolute;
+        right: 59%;
+        top: 2px;
+        font-size: 25px;
+        border: 1px solid #ddd;
+        padding: 1px 10px;
+        background-color: #dddddd6e;
+        border-radius: 5px;
+    }
+</style>
+<div class="inner-naviagtion">
+    <div class="container">
+        <nav aria-label="breadcrumb mb-0">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="@options.HomeUrl"><span class="fas fa-home"></span></a></li>
+                <li class="breadcrumb-item text-white" aria-current="page">Registrations</li>
+                <li class="breadcrumb-item text-white" aria-current="page">WeighBridge</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+
+<div class="inner-content">
+    <div class="container">
+        <h3 class="heading">WeighBridge Registration</h3>
+        @using (Html.BeginForm("IndependentRegistration", "WBIndependent", FormMethod.Post, new { id = "form1", enctype = "multipart/form-data" }))
+        {
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="row">
+
+                        <div class="mt-4 col-lg-12"><h4 class="text-primary">Personal Information</h4><hr></div>
+
+                        <div class="col-lg-6">
+                            <div class="row">
+                                <label class="col-lg-5 col-md-5 col-12 col-form-label ">Proprietor Name <span class="text-danger">*</span></label>
+                                <div class="col-lg-7 col-md-7 col-12">
+                                    <div class="form-group">
+                                        <input type="text" id="SupervisorName" name="SupervisorName" maxlength="50" onkeypress = "return /^[a-zA-Z ]+$/i.test(event.key)" class="form-control" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="row">
+                                <label class="col-lg-5 col-md-5 col-12 col-form-label ">
+                                    Mobile Number <span class="text-danger">*</span>
+                                    <a href="javascript:void(0)" class="extra-information" data-toggle="tooltip" data-placement="top" title="OTP will be sent on your mobile number">
+                                        <i class="fas fa-info-circle"></i>
+                                    </a>
+                                </label>
+                                <div class="col-lg-7 col-md-7 col-12">
+                                    <div class="form-group">
+                                        <input id="SupervisorContact" name="SupervisorContact" maxlength="10" onkeypress="return onlynumbers(event)" type="text" class="form-control">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="row">
+                                <label class="col-lg-5 col-md-5 col-12 col-form-label ">Email ID <span class="text-danger">*</span></label>
+                                <div class="col-lg-7 col-md-7 col-12">
+                                    <div class="form-group">
+                                        <input type="text" id="Email" name="Email" class="form-control" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="row">
+                                <label class="col-lg-5 col-md-5 col-12 col-form-label ">District <span class="text-danger">*</span></label>
+                                <div class="col-lg-7 col-md-7 col-12">
+                                    <div class="form-group">
+                                        <input type="hidden" value="" id="District" name="District" />
+                                        <select id="DistrictID" name="DistrictID" onchange="getdistrictname()" class="form-control  searchableselect" readonly>
+                                            <option value="">Select</option>
+                                            @{
+                                                List<CommonAddressDetails> lstDistrictDetails = (List<CommonAddressDetails>)ViewData["DistrictDetails"];
+                                                if (lstDistrictDetails != null)
+                                                {
+                                                    foreach (var item in lstDistrictDetails)
+                                                    {
+                                                        <option value="@item.DistrictID">@item.DistrictName</option>
+                                                    }
+                                                }
+
+                                            }
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-6">
+                            <div class="row">
+                                <label class="col-lg-5 col-md-5 col-12 col-form-label ">Address <span class="text-danger">*</span></label>
+                                <div class="col-lg-7 col-md-7 col-12">
+                                    <div class="form-group">
+                                        <textarea id="Address" name="Address" class="form-control" rows="2" maxlength="500"></textarea>
+                                        <small class="text-danger">Maximum <strong>500</strong> characters</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="row">
+                                <label class="col-lg-5 col-md-5 col-12 col-form-label ">Pin Code <span class="text-danger">*</span></label>
+                                <div class="col-lg-7 col-md-7 col-12">
+                                    <div class="form-group">
+                                        <input id="PinCode" name="PinCode" type="text" maxlength="6" class="form-control">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+
+                        <div class="mt-4 col-lg-12"><h4 class="text-primary">WeighBridge Information</h4><hr></div>
+
+                        <div class="col-lg-6">
+                            <div class="row">
+                                <label class="col-lg-5 col-md-5 col-12 col-form-label ">WeighBridge Name <span class="text-danger">*</span></label>
+                                <div class="col-lg-7 col-md-7 col-12">
+                                    <div class="form-group">
+                                        <input id="WeighBridgeName" name="WeighBridgeName" type="text" onkeypress = "return /[0-9a-zA-Z]/i.test(event.key)" class="form-control">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+
+                        <div class="col-lg-6">
+                            <div class="row">
+                                <label class="col-lg-5 col-md-5 col-12 col-form-label ">Capacity(in mt.) <span class="text-danger">*</span></label>
+                                <div class="col-lg-7 col-md-7 col-12">
+                                    <div class="form-group">
+                                        <input id="Capacity" name="Capacity" type="number" onkeypress = "return onlynumbersanddecimals(event)" class="form-control">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="row">
+                                <label class="col-lg-5 col-md-5 col-12 col-form-label ">Area of Land(in hectares.) <span class="text-danger">*</span></label>
+                                <div class="col-lg-7 col-md-7 col-12">
+                                    <div class="form-group">
+                                        <input id="AreaofLand" name="AreaofLand" type="number" class="form-control" onkeypress = "return onlynumbersanddecimals(event)">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="row">
+                                <label class="col-lg-5 col-md-5 col-12 col-form-label ">Area Type <span class="text-danger">*</span></label>
+                                <div class="col-lg-7 col-md-7 col-12">
+                                    <div class="form-group">
+                                        <select id="LandAreaTypeID" name="LandAreaTypeID" class="form-control">
+                                            <option value="0">Select</option>
+                                            @{
+                                                List<userregistrationEF.AreaDetails> listareatype = (List<userregistrationEF.AreaDetails>)ViewData["AreaType"];
+                                                foreach (var item in listareatype)
+                                                {
+                                                    <option value="@item.LAND_ID">@item.LandName</option>
+                                                }
+                                            }
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-6">
+                            <div class="row">
+                                <label class="col-lg-5 col-md-5 col-12 col-form-label ">Electricity Availability</label>
+                                <div class="col-lg-7 col-md-7 col-12">
+                                    <div class="form-group">
+                                        <div class="form-check form-check-inline">
+                                            <input type="radio" name="ElectricityAvailablity" class="custom-radio" />
+                                            <label class="form-check-label" for="ra1">
+                                                Yes
+                                            </label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+
+                                            <input type="radio" name="ElectricityAvailablity" checked class="custom-radio" />
+                                            <label class="form-check-label" for="ra2">
+                                                No
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="row">
+                                <label class="col-lg-5 col-md-5 col-12 col-form-label ">Internet Availability</label>
+                                <div class="col-lg-7 col-md-7 col-12">
+                                    <div class="form-group">
+                                        <div class="form-check form-check-inline">
+                                            <input type="radio" name="InternetAvailability" class="custom-radio" />
+                                            <label class="form-check-label" for="ra1">
+                                                Yes
+                                            </label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+
+                                            <input type="radio" name="InternetAvailability" checked class="custom-radio" />
+                                            <label class="form-check-label" for="ra2">
+                                                No
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="row">
+                                <label class="col-lg-5 col-md-5 col-12 col-form-label ">Upload Stamping Copy<span class="text-danger">*</span></label>
+                                <div class="col-lg-7 col-md-7 col-12">
+                                    <div class="form-group">
+                                        <div class="custom-file">
+                                            <input type="file" class="custom-file-input" id="StampCopy" name="StampCopy">
+                                            <label class="custom-file-label" for="ApprovalLetter">Choose Files</label>
+                                        </div>
+                                        <small class="text-danger">Only <strong> jpg, jpeg, png</strong> file types size Max. <strong>2 MB </strong></small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6"></div>
+                        <div class="col-lg-6">
+                            <div class="row">
+                                <label class="col-lg-5 col-md-5 col-12 col-form-label ">Stamping Valid From </label>
+                                <div class="col-lg-7 col-md-7 col-12">
+                                    <div class="form-group">
+                                        <input id="StampValidFrom" name="StampValidFrom" type="text" class="form-control datepicker">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="row">
+                                <label class="col-lg-5 col-md-5 col-12 col-form-label ">Stamping Valid To </label>
+                                <div class="col-lg-7 col-md-7 col-12">
+                                    <div class="form-group">
+                                        <input id="StampValidTo" name="StampValidTo" type="text" class="form-control datepicker">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-4 col-lg-12"><h4 class="text-primary">Technical Information</h4><hr></div>
+
+                        <div class="col-lg-6">
+                            <div class="row">
+                                <label class="col-lg-5 col-md-5 col-12 col-form-label ">WeighBridge Make <span class="text-danger">*</span></label>
+                                <div class="col-lg-7 col-md-7 col-12">
+                                    <div class="form-group">
+                                        <select id="MakeID" name="MakeID" class="form-control">
+                                            <option value="0">Select</option>
+                                            @{
+                                                List<userregistrationEF.ViewWeighBridgeMakeModel> list = (List<userregistrationEF.ViewWeighBridgeMakeModel>)ViewData["WBMake"];
+                                                if (list != null)
+                                                {
+                                                    foreach (var item in list)
+                                                    {
+                                                        <option value="@item.WeighBridgeMakeID">@item.WeighBridgeMake</option>
+                                                    }
+                                                }
+                                            }
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="row">
+                                <label class="col-lg-5 col-md-5 col-12 col-form-label ">WeighBridge Model <span class="text-danger">*</span></label>
+                                <div class="col-lg-7 col-md-7 col-12">
+                                    <div class="form-group">
+                                        <select id="ModelID" name="ModelID" class="form-control">
+                                            <option value="0">Select</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="row">
+                                <label class="col-lg-5 col-md-5 col-12 col-form-label ">Model Baud Rate </label>
+                                <div class="col-lg-7 col-md-7 col-12">
+                                    <div class="form-group">
+                                        <input id="ModelBaudRate" name="ModelBaudRate" type="text" class="form-control" onkeypress = "return /[0-9a-zA-Z]/i.test(event.key)">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="row">
+                                <label class="col-lg-5 col-md-5 col-12 col-form-label ">Data Bit </label>
+                                <div class="col-lg-7 col-md-7 col-12">
+                                    <div class="form-group">
+                                        <input id="DataBit" name="DataBit" type="text" class="form-control" onkeypress = "return /[0-9a-zA-Z]/i.test(event.key)">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="row">
+                                <label class="col-lg-5 col-md-5 col-12 col-form-label ">Stop Bit</label>
+                                <div class="col-lg-7 col-md-7 col-12">
+                                    <div class="form-group">
+                                        <input id="StopBit" name="StopBit" type="text" class="form-control" onkeypress = "return /[0-9a-zA-Z]/i.test(event.key)">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="row">
+                                <label class="col-lg-5 col-md-5 col-12 col-form-label ">String Read From Hyperterminal</label>
+                                <div class="col-lg-7 col-md-7 col-12">
+                                    <div class="form-group">
+                                        <input id="HyperterminalReading" name="HyperterminalReading" type="text" class="form-control" onkeypress = "return /[0-9a-zA-Z]/i.test(event.key)">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="row">
+                                <label class="col-lg-5 col-md-5 col-12 col-form-label ">Parity</label>
+                                <div class="col-lg-7 col-md-7 col-12">
+                                    <div class="form-group">
+                                        <input id="Parity" name="Parity" type="text" class="form-control" onkeypress = "return /[0-9a-zA-Z]/i.test(event.key)">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-4 col-lg-12"><h4 class="text-primary">Location Information</h4><hr></div>
+                        <div class="col-lg-6">
+                            <div class="row">
+                                <label class="col-lg-5 col-md-5 col-12 col-form-label ">Latitude 1</label>
+                                <div class="col-lg-7 col-md-7 col-12">
+                                    <div class="form-group">
+                                        <input id="Lat1" name="Lat1" type="text" class="form-control" onkeypress = "return onlynumbersanddecimals(event)">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="row">
+                                <label class="col-lg-5 col-md-5 col-12 col-form-label ">Longitude 1</label>
+                                <div class="col-lg-7 col-md-7 col-12">
+                                    <div class="form-group">
+                                        <input id="Lon1" name="Lon1" type="text" class="form-control" onkeypress = "return onlynumbersanddecimals(event)">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="row">
+                                <label class="col-lg-5 col-md-5 col-12 col-form-label ">Latitude 2</label>
+                                <div class="col-lg-7 col-md-7 col-12">
+                                    <div class="form-group">
+                                        <input id="Lat2" name="Lat2" type="text" class="form-control" onkeypress = "return onlynumbersanddecimals(event)">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="row">
+                                <label class="col-lg-5 col-md-5 col-12 col-form-label ">Longitude 2</label>
+                                <div class="col-lg-7 col-md-7 col-12">
+                                    <div class="form-group">
+                                        <input id="Lon2" name="Lon2" type="text" class="form-control" onkeypress = "return onlynumbersanddecimals(event)">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="row">
+                                <label class="col-lg-5 col-md-5 col-12 col-form-label ">Latitude 3</label>
+                                <div class="col-lg-7 col-md-7 col-12">
+                                    <div class="form-group">
+                                        <input id="Lat3" name="Lat3" type="text" class="form-control" onkeypress = "return onlynumbersanddecimals(event)">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="row">
+                                <label class="col-lg-5 col-md-5 col-12 col-form-label ">Longitude 3</label>
+                                <div class="col-lg-7 col-md-7 col-12">
+                                    <div class="form-group">
+                                        <input id="Lon3" name="Lon3" type="text" class="form-control" onkeypress = "return onlynumbersanddecimals(event)">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="row">
+                                <label class="col-lg-5 col-md-5 col-12 col-form-label ">Latitude 4</label>
+                                <div class="col-lg-7 col-md-7 col-12">
+                                    <div class="form-group">
+                                        <input id="Lat4" name="Lat4" type="text" class="form-control" onkeypress = "return onlynumbersanddecimals(event)">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="row">
+                                <label class="col-lg-5 col-md-5 col-12 col-form-label ">Longitude 4</label>
+                                <div class="col-lg-7 col-md-7 col-12">
+                                    <div class="form-group">
+                                        <input id="Lon4" name="Lon4" type="text" class="form-control" onkeypress = "return onlynumbersanddecimals(event)">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="row">
+                                <label class="col-lg-5 col-md-5 col-12 col-form-label ">Enter Captcha <span class="text-danger">*</span></label>
+                                <div class="col-lg-7 col-md-7 col-12">
+                                    <div class="form-group">
+                                        <input id="VTDCaptcha" type="text" class="form-control">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-6">
+                            <div class="form-group row">
+                                <div class="col-sm-4">
+                                    <div class="input-group">
+
+                                        <div id="capt1" class="form-control" ondrag="return false" oncopy="return false" onselectstart="return false" oncut="return false"></div>
+                                        <label class="input-group-text" for="inputDate1"> <a href="javascript:;" onclick="updateCaptcha();"><i class="fas fa-sync-alt"></i></a> </label>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div class="col-lg-6">
+                            <div class="row">
+                                <label class="col-lg-5 col-md-5 col-12 col-form-label ">Enter OTP <span class="text-danger">*</span></label>
+                                <div class="col-lg-7 col-md-7 col-12">
+                                    <div class="form-group">
+                                        <input id="VTDOTP" type="text" class="form-control">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-6">
+                            <div class="row">
+                                <input type="button" class="btn btn-success" id="btnsendOtp" value="Send OTP">
+                            </div>
+                        </div>
+
+                        <div class="col-sm-12">
+                            <div class="form-group row">
+                                <div class="custom-control custom-checkbox ml-2">
+                                    <input type="checkbox" class="custom-control-input" name="chkIagree" id="chkIagree">
+                                    <label class="custom-control-label  text-danger" for="chkIagree">
+                                        Declaration - I declare that all the information given above is true as per my knowledge and belief. I am aware that if any of the above information is found to be false or untrue, there may be penalty / penalty under the appropriate rules.
+                                        The Department of Mineral Resources will not be responsible for authenticating any of the above information.
+                                    </label>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mt-3" id="divButtons">
+                        <div class="col-lg-12">
+                            <button id="btnSaveWB" type="button" class="btn btn-success btn-lg mr-2">Submit</button>
+                            <a href="/WeightBridge/WBIndependent/IndependentRegistration" class="btn btn-danger btn-lg">Reset</a>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        }
+    </div>
+</div>
+@{
+    if (ViewBag.SuccessMessage != null)
+    {
+        <script>
+        swal("", "You have successfully applied for Registration with Khanij Online Portal. @ViewBag.SuccessMessage. Please check your e-mail for details of registration.", "success");
+        </script>
+    }
+}
+<script>
+    $(document).ready(function () {
+        updateCaptcha();
+        //--------------------------
+        if ($('input[name="chkIagree"]:checked').length > 0) {
+            $('#divButtons').show();
+            $(this).attr('checked', true);
+        }
+        else {
+            $('#divButtons').hide();
+            $(this).attr('checked', false);
+        }
+        //--------------------------------
+        //$('#divButtons').show();
+        $("#PinCode").keydown(function (e) {
+            // Allow: backspace, delete, tab, escape, enter and .
+            if ($.inArray(e.keyCode, [46, 8, 9, 27, 13, 110, 190]) !== -1 ||
+                // Allow: Ctrl+A, Command+A
+                (e.keyCode === 65 && (e.ctrlKey === true || e.metaKey === true)) ||
+                // Allow: home, end, left, right, down, up
+                (e.keyCode >= 35 && e.keyCode <= 40)) {
+                // let it happen, don't do anything
+                return;
+            }
+            // Ensure that it is a number and stop the keypress
+            if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) {
+                e.preventDefault();
+            }
+        });
+
+        $("#SupervisorContact").keydown(function (e) {
+            // Allow: backspace, delete, tab, escape, enter and .
+            if ($.inArray(e.keyCode, [46, 8, 9, 27, 13, 110, 190]) !== -1 ||
+                // Allow: Ctrl+A, Command+A
+                (e.keyCode === 65 && (e.ctrlKey === true || e.metaKey === true)) ||
+                // Allow: home, end, left, right, down, up
+                (e.keyCode >= 35 && e.keyCode <= 40)) {
+                // let it happen, don't do anything
+                return;
+            }
+            // Ensure that it is a number and stop the keypress
+            if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) {
+                e.preventDefault();
+            }
+        });
+        $("#Capacity").keydown(function (e) {
+            // Allow: backspace, delete, tab, escape, enter and .
+            if ($.inArray(e.keyCode, [46, 8, 9, 27, 13, 110, 190]) !== -1 ||
+                // Allow: Ctrl+A, Command+A
+                (e.keyCode === 65 && (e.ctrlKey === true || e.metaKey === true)) ||
+                // Allow: home, end, left, right, down, up
+                (e.keyCode >= 35 && e.keyCode <= 40)) {
+                // let it happen, don't do anything
+                return;
+            }
+            // Ensure that it is a number and stop the keypress
+            if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) {
+                e.preventDefault();
+            }
+        });
+        $("#AreaofLand").keydown(function (e) {
+            // Allow: backspace, delete, tab, escape, enter and .
+            if ($.inArray(e.keyCode, [46, 8, 9, 27, 13, 110, 190]) !== -1 ||
+                // Allow: Ctrl+A, Command+A
+                (e.keyCode === 65 && (e.ctrlKey === true || e.metaKey === true)) ||
+                // Allow: home, end, left, right, down, up
+                (e.keyCode >= 35 && e.keyCode <= 40)) {
+                // let it happen, don't do anything
+                return;
+            }
+            // Ensure that it is a number and stop the keypress
+            if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) {
+                e.preventDefault();
+            }
+        });
+        $('#StampCopy').on('change', function () {
+            debugger;
+            var fileExtension = ['jpg', 'jpeg', 'png', 'pdf', 'tif'];
+            if ($.inArray($(this).val().split('.').pop().toLowerCase(), fileExtension) == -1) {
+                swal("", "Only formats are allowed : " + fileExtension.join(', '), "warning");
+                $(this).focus();
+                return false;
+            }
+
+            if (Number(this.files[0].size) > 2097152) {
+                swal("", 'Try to upload file less than 2MB!', "warning");
+                $(this).val('');
+                $(this).focus();
+                return false;
+            }
+            else {
+                var fileName = $(this).val().split("\\").pop();
+                $(this).next('.custom-file-label').html(fileName);
+            }
+
+        });
+        $('.datepicker').datetimepicker({
+            format: 'LT',
+            format: 'DD-MMM-YYYY',
+            daysOfWeekDisabled: [],
+        });
+        
+    });
+    $('#MakeID').change(function () {
+        debugger;
+        if ($('#MakeID').val() != "0") {
+            $('#ModelID').append('<option value=4>AWS</option>');
+            //$.ajax({
+            //    type: "post",
+            //    url: "/WeightBridge/WBIndependent/GetWBModelByMake",
+            //    data: { 'makeid': $('#MakeID').val() },
+            //    datatype: "json",
+            //    traditional: true,
+            //    success: function (data) {
+            //        debugger;
+            //        $('#ModelID').html('');
+            //        $('#ModelID').append('<option value="0">Select Model</option>');
+            //        $.each(data, function (ind, item) {
+            //            debugger
+            //            $('#ModelID').append('<option value="' + item.weighBridgeModelTypeID + '">' + item.weighBridgeModelType + '</option>');
+            //        });
+            //    }
+            //});
+            //$.ajax({
+            //    url: '/WeightBridge/WeightBridge/GetWBModelByMake',
+            //    data: { 'makeid': $('#MakeID').val() },
+            //    dataType: 'json',
+            //    type: 'post',
+            //    success: function (data) {
+            //        var row = "";
+            //        $('#ModelID').html('');
+            //        row += "<option value=''>Select District</option>";
+            //        $.each(data, function (ind, item) {
+            //            row += "<option value='" + item.weighBridgeModelTypeID + "'>" + item.weighBridgeModelType + "</option>";
+            //        });
+            //        $('#ModelID').html(row);
+            //    },
+            //    error: function (err) {
+
+            //    }
+            //});
+        }
+    });
+    function updateCaptcha() {
+        debugger;
+        $.ajax({
+            url: '/VehicleOwner/VehicleOwner/CaptchaImage',
+            data: {},
+            dataType: 'json',
+            type: 'post',
+            success: function (data) {
+                $("#capt1").html(data);
+                $('#VTDCaptcha').val(data);
+            },
+            error: function (err) {
+                swal("", err.responseText, "warning");
+            }
+        });
+    }
+
+    $('#btnSaveWB').click(function () {
+        if (ValidateVTDVendor()) {
+            $('#form1').submit();
+        }
+        else {
+            return false;
+        }
+    });
+
+    function ValidateVTDVendor() {
+
+        if ($('#SupervisorName').val() == "") {
+            swal("", "Please Enter Proprietor Name", "warning");
+            $("#CompanyId").focus();
+            return false;
+        }
+
+        if ($('#SupervisorContact').val() == "") {
+            swal("", "Please Enter Mobile Number", "warning");
+            $("#CompanyName").focus();
+            return false;
+        }
+        if ($('#SupervisorContact').val() != "") {
+            if ($('#SupervisorContact').val().length != 10) {
+                swal("", "Please Enter Valid Mobile Number", "warning");
+                $("#SupervisorContact").focus();
+                return false;
+            };
+        }
+
+        if ($('#Email').val() == "") {
+            swal("", "Please Enter Email", "warning");
+            $("#CompanyName").focus();
+            return false;
+        }
+
+        if ($('#DistrictID').val() == "") {
+            swal("", "Please Select District", "warning");
+            $("#DistrictID").focus();
+            return false;
+        }
+
+        if ($('#Address').val() == "") {
+            swal("", "Please Select Address", "warning");
+            $("#Address").focus();
+            return false;
+        }
+
+        if ($('#PinCode').val() == "") {
+            swal("", "Please Enter PinCode", "warning");
+            $("#PinCode").focus();
+            return false;
+        }
+        if ($('#PinCode').val() != "") {
+            if ($('#PinCode').val().length != 6) {
+                swal("", "Please Enter Valid Pincode", "warning");
+                $("#PinCode").focus();
+                return false;
+            };
+        }
+
+        if ($('#WeighBridgeName').val() == "") {
+            swal("", "Please Enter WeighBridgeName", "warning");
+            $("#WeighBridgeName").focus();
+            return false;
+        }
+
+        if ($('#Capacity').val() == "") {
+            swal("", "Please Enter Capacity", "warning");
+            $("#Capacity").focus();
+            return false;
+        }
+
+        if ($('#AreaofLand').val() == "") {
+            swal("", "Please Enter Area of Land", "warning");
+            $("#AreaofLand").focus();
+            return false;
+        }
+
+        if ($('#LandAreaTypeID').val() == "") {
+            swal("", "Please Land Area Type", "warning");
+            $("#LandAreaTypeID").focus();
+            return false;
+        }
+
+        if ($('#StampValidFrom').val() == "") {
+            swal("", "Please Select Stamp Valid From", "warning");
+            $("#StampValidFrom").focus();
+            return false;
+        }
+
+        if ($('#StampValidTo').val() == "") {
+            swal("", "Please Select Stamp Valid To", "warning");
+            $("#StampValidTo").focus();
+            return false;
+        }
+
+        if ($('#MakeID').val() == "0") {
+            swal("", "Please Select WeighBridge Make", "warning");
+            $("#MakeID").focus();
+            return false;
+        }
+
+        if ($('#ModelID').val() == "0") {
+            swal("", "Please Select WeighBridge Model", "warning");
+            $("#ModelID").focus();
+            return false;
+        }
+
+        if ($('#ModelBaudRate').val() == "") {
+            swal("", "Please Enter ModelBaudRate", "warning");
+            $("#ModelBaudRate").focus();
+            return false;
+        }
+
+        if ($("#DataBit").val() == "") {
+            swal("", "Please Enter EmailId", "warning");
+            $("#DataBit").focus();
+            return false;
+        }
+
+        
+
+        if ($('#StopBit').val() == "") {
+            swal("", "Please Enter StopBit", "warning");
+            $("#StopBit").focus();
+            return false;
+        }
+
+        if ($('#HyperterminalReading').val() == "") {
+            swal("", "Please Enter HyperterminalReading", "warning");
+            $("#HyperterminalReading").focus();
+            return false;
+        }
+
+        if ($('#Parity').val() == "") {
+            swal("", "Please Enter Parity", "warning");
+            $("#Parity").focus();
+            return false;
+        }
+        if ($('#Lat1').val() == "") {
+            swal("", "Please Enter Point 1 Latitude", "warning");
+            $("#Lat1").focus();
+            return false;
+        }
+        if ($('#Lon1').val() == "") {
+            swal("", "Please Enter Point 1 Longitude", "warning");
+            $("#Lon1").focus();
+            return false;
+        }
+        if ($('#Lat2').val() == "") {
+            swal("", "Please Enter Point 2 Latitude", "warning");
+            $("#Lat2").focus();
+            return false;
+        }
+        if ($('#Lon2').val() == "") {
+            swal("", "Please Enter Point 3 Longitude", "warning");
+            $("#Lon2").focus();
+            return false;
+        }
+        if ($('#Lat3').val() == "") {
+            swal("", "Please Enter Point 3 Latitude", "warning");
+            $("#Lat3").focus();
+            return false;
+        }
+        if ($('#Lon3').val() == "") {
+            swal("", "Please Enter Point 3 Longitude", "warning");
+            $("#Lon3").focus();
+            return false;
+        }
+        if ($('#Lat4').val() == "") {
+            swal("", "Please Enter Point 4 Latitude", "warning");
+            $("#Lat4").focus();
+            return false;
+        }
+        if ($('#Lon4').val() == "") {
+            swal("", "Please Enter Point 4 Longitude", "warning");
+            $("#Lon4").focus();
+            return false;
+        }
+        if ($('#VTDCaptcha').val() == "") {
+            swal("", "Please Enter Captcha", "warning");
+            $("#VTDCaptcha").focus();
+            return false;
+        }
+
+        if ($("#capt1").html() != $('#VTDCaptcha').val()) {
+            swal("", "Please Enter Valid Captcha", "warning");
+            $("#VTDCaptcha").focus();
+            return false;
+        }
+
+        //if ($('#VTDOTP').val() == "") {
+        //    swal("", "Please Enter OTP", "warning");
+        //    $("#VTDOTP").focus();
+        //    return false;
+        //}
+
+        return true;
+    }
+
+    $("#btnsendOtp").click(function () {
+        debugger;
+        if (ValidateVTDVendor()) {
+            var mobileNumber = $("#SupervisorContact").val();
+            var EmailID = $("#Email").val();
+
+            if (mobileNumber == "") {
+                swal("", "Please enter mobile number", "warning");
+                $('#SupervisorContact').focus();
+                return false;
+            }
+            else {
+                $('#btnsendOtp').attr('readonly', 'readonly');
+
+                $.ajax({
+                    url: '/VehicleOwner/VehicleOwner/SendOTP',
+                    dataType: "",
+                    type: "POST",
+                    data: {
+                        MobileNumber: mobileNumber,
+                        EmailID: EmailID
+                    },
+                    success: function (data) {
+                        debugger;
+                        console.log(data);
+                        if (data != null) {
+                            $('#btnsendOtp').removeAttr('readonly');
+                            if (data == "SUCCESS") {
+                                swal("", "Enter Verification Code received on submitted Mobile/Email Id", "success");
+                            }
+                            else {
+                                swal("", data, "warning");
+                            }
+                        }
+                    }
+                })
+            }
+        }
+    });
+
+    $('#chkIagree').click(function () {
+        if (ValidateVTDVendor()) {
+            if ($('#VTDOTP').val() != "") {
+                $.ajax({
+                    url: '/VehicleOwner/VehicleOwner/VerifyOTP',
+                    data: {
+                        OTP: $('#VTDOTP').val(),
+                        MobileNumber: $("#SupervisorContact").val(),
+                        EmailID: $("#Email").val()
+                    },
+                    success: function (result) {
+                        if (result == "SUCCESS") {
+                            if ($('input[name="chkIagree"]:checked').length > 0) {
+                                $('#divButtons').show();
+                                $(this).attr('checked', 'checked');
+
+                            }
+
+                            else {
+                                $('#divButtons').hide();
+                                ChangeCheckBoxStatus();
+                            }
+                        }
+                        else if (result == "REQUIRED") {
+                            swal("", "Please enter mobile number and e-mail and OTP !", "warning");
+                            $('#divButtons').hide();
+                            ChangeCheckBoxStatus();
+                        }
+                        else {
+                            swal("", "This OTP is already used.Please send another OTP and try again !", "warning");
+                            $('#divButtons').hide();
+                            ChangeCheckBoxStatus();
+                        }
+                    },
+                    error: function (result) {
+                        swal("", "OTP Verification failed.Please try again !", "warning");
+                        $('#divButtons').hide();
+                        ChangeCheckBoxStatus();
+                    }
+                });
+            }
+            else {
+                $('#chkIagree').prop('checked', false);
+                swal("", "Please Enter OTP", "warning");
+                $("#VTDOTP").focus();
+                return false;
+            }
+        }
+        else {
+
+            $('#chkIagree').prop('checked', false);
+        }
+
+    });
+
+    function ChangeCheckBoxStatus() {
+        if ($('input[type="checkbox"]').is(':checked') == true) {
+            $('input[type="checkbox"]').prop('checked', false);
+        }
+    }
+    function getdistrictname() {
+        $('#District').val($('DistrictID option:selected').text());
+    }
+    function onlynumbers(evt) {
+        var charCode = (evt.which) ? evt.which : event.keyCode
+        if (charCode > 31 && (charCode < 48 || charCode > 57))
+            return false;
+
+        return true;
+    }
+    function onlynumbersanddecimals(evt) {
+        var charCode = (evt.which) ? evt.which : evt.keyCode;
+        if (charCode != 46 && charCode > 31
+            && (charCode < 48 || charCode > 57))
+            return false;
+
+        return true;
+    }
+</script>
+
+
+
+

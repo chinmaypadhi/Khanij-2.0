@@ -1,0 +1,530 @@
+﻿@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@model EpassEF.ePassConfigurationEF
+
+@{
+    ViewData["Title"] = "EPassTPConfiguration";
+
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+@inject EpassApp.KhanijSecurity.KhanijIDataProtection protector;
+
+<input type="hidden" id="hdnButton" value=@ViewBag.Button/>
+
+<input type="hidden" id="hdnid" value="@Model.id" />
+<input type="hidden" id="hdnidView" value="@ViewBag.radioStatus" />
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        @Html.Partial("_CMSnavigation")
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <ul class="nav nav-tabs">
+                            <li class="nav-item"><a class="nav-link active" href="/epass/epassconfiguration/passconfiguration">Add</a></li>
+                            <li class="nav-item"><a class="nav-link" href="/epass/epassconfiguration/passconfigurationView">View</a></li>
+                        </ul>
+
+                        @*<li class="nav-item">
+                                <a class="nav-link" href="@Url.Content("~/EPass/eTransitPass/ListUserWiseTPConfiguration")">
+                                    View
+                                </a>
+                            </li>*@
+
+                    </ul>
+                    @Html.Partial("_CMSutil")
+                </div>
+
+                <section class="box form-container">
+                    <div class="content-body">
+                        @using (Html.BeginForm("PassConfiguration", "ePassConfiguration", FormMethod.Post, new { @id = "formePassConfiguration" }))
+                        {
+                            @Html.AntiForgeryToken();
+                            @*@Html.HiddenFor(m => m.MineralID)*@
+                            <div class="row">
+                                <div class="col">
+                                    <div class="form-group row">
+                                        <label class="col-lg-4  col-form-label font-weight-bolder">Pass Configuration Type<span class="text-danger">*</span></label>
+                                        <div class="col-lg-8">
+                                            <div class="py-2">
+                                                @Html.RadioButtonFor(model => model.PassConfigTypeID, "1", new {  id = "1", onchange = "PassChange(this)" }) Globally
+                                                @Html.RadioButtonFor(model => model.PassConfigTypeID, "2", new { id = "2", onchange = "PassChange(this)" }) User Wise
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                            <div class="row">
+                                <div class="col">
+                                    <div class="form-group row">
+                                        <label class="col-lg-4  col-form-label font-weight-bolder">District <span class="text-danger">*</span></label>
+                                        <div class="col-lg-8 ">
+                                            <div class="py-2">
+
+                                                @Html.DropDownListFor(m => m.DistrictID
+                                , ViewBag.District as IEnumerable<SelectListItem>, "Select District", new { @class = "form-control form-control-sm searchableselect" })
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                                <div class="col">
+                                    <div class="form-group row">
+                                        <label class="col-lg-4  col-form-label font-weight-bolder">Mineral Type <span class="text-danger">*</span></label>
+                                        <div class="col-lg-8 ">
+                                            <div class="py-2">
+
+                                                @Html.DropDownListFor(m => m.MineralTypeID
+                                , ViewBag.MineralType as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control form-control-sm searchableselect", name= "MineralTypeID" })
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                              
+                            </div>
+                            <div class="row">
+
+
+
+                                <div class="col">
+                                    <div class="form-group row">
+                                        <label class="col-lg-4  col-form-label font-weight-bolder">Mineral <span class="text-danger">*</span></label>
+                                        <div class="col-lg-8 ">
+                                            <div class="py-2">
+
+                                                @Html.DropDownListFor(m => m.MineralID, ViewBag.MineralName as IEnumerable<SelectListItem>, "Select Mineral Name", new { @class = "form-control form-control-sm searchableselect" })
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col">
+                                    <div class="form-group row">
+                                        <label class="col-lg-4  col-form-label font-weight-bolder">User Type <span class="text-danger">*</span></label>
+                                        <div class="col-lg-8 ">
+                                            <div class="py-2">
+                                                @Html.DropDownListFor(m => m.UserTypeID
+                                , ViewBag.UserType as IEnumerable<SelectListItem>, "Select User Type", new { @class = "form-control form-control-sm searchableselect" })
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                            </div>
+                            <div class="row">
+                               
+                                <div class="col">
+                                    <div class="form-group row" id="UserName">
+                                        <label class="col-lg-4  col-form-label font-weight-bolder">User Name <span class="text-danger">*</span></label>
+                                        <div class="col-lg-8 ">
+                                            <div class="py-2">
+                                                @Html.DropDownListFor(m => m.Userid, ViewBag.UserName as IEnumerable<SelectListItem>, "Select User Name", new { @class = "form-control form-control-sm searchableselect", style = "width:100%" })
+
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col">
+                                    <div class="form-group row">
+                                        <label class="col-lg-4 col-form-label font-weight-bolder">Transportation Mode<span class="text-danger">*</span></label>
+                                        <div class="col-lg-8">
+                                            <div class="py-2">
+
+                                                @if (ViewBag.Button == "" || ViewBag.Button == null)
+                                                {
+                                                    @Html.DropDownListFor(m => m.TransportationModeId
+                                                   , ViewBag.TransportationMode as IEnumerable<SelectListItem>, "Select Transportation Mode", new { @class = "form-control form-control-sm searchableselect", multiple = "true", id = "Transport" })
+                                                }
+                                                else
+                                                {
+                                                    <select multiple="multiple" class="form-control searchableselect" asp-items="@(new MultiSelectList(ViewBag.TransportationMode,"Value","Text", Model.DocumentList.Select(x => x.id)))"
+                                                            id="Transport1"
+                                                            autofocus="autofocus"
+                                                            data-val="true"
+                                                            name="ddlIdentification">
+                                                    </select>
+
+                                                 }
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                            </div>
+
+
+
+
+                            <div class="row">
+                                <div class="col">
+                                    <div class="form-group row">
+                                        <label class="col-lg-4  col-form-label font-weight-bolder">Allow Consignee<span class="text-danger">*</span></label>
+                                        <div class="col-lg-8">
+                                            @Html.DropDownListFor(m => m.AllowConsigneeTypeid
+                               , ViewBag.GetAllowConsignee as IEnumerable<SelectListItem>, "Select Consignee", new { @class = "form-control form-control-sm searchableselect chk", })
+
+                                            @*@Html.TextBoxFor(m => m.MineralID, new { @class = "form-control", @maxlength = 200, Onkeypress = "return inputLimiter(event,'NameCharactersAndNumbers')" }) *@
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col">
+                                    <div class="form-group row">
+                                        <label class="col-lg-4 col-form-label font-weight-bolder">Route Fetch From VTS<span class="text-danger">*</span></label>
+                                        <div class="col-lg-8">
+                                            <div class="py-2">
+                                                @Html.RadioButtonFor(model => model.RouteFetchID, "1", new { @checked = "checked"}) Yes
+                                                @Html.RadioButtonFor(model => model.RouteFetchID, "2", new { id = "2" }) No
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col">
+                                    <div class="form-group row"  id="showHide">
+                                        <label class="col-lg-4  col-form-label font-weight-bolder">Trip Close By<span class="text-danger">*</span></label>
+                                        <div class="col-lg-8" id="tpb">
+                                            @Html.RadioButtonFor(model => model.TripCloseID, "1", new { @class = "custom-radio", onchange = "TripChange(this)", id = "lk" , @checked = true }) User
+                                            @Html.RadioButtonFor(model => model.TripCloseID, "2", new { id = "ab", onchange = "TripChange(this)" }) System
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col">
+                                    <div class="form-group row" id="Time" style="display: none">
+                                        <label class="col-lg-4 col-form-label font-weight-bolder">Time in hrs<span class="text-danger">*</span></label>
+                                        <div class="col-lg-8">
+                                            <div class="py-2">
+                                                @*<input type="text" name="Time" class = "form-control"  maxlength = "2" id= "Time1" onkeypress = "return numericOnly(this)"  />*@
+                                                @Html.TextBoxFor(model => model.Time, new { @class = "form-control", @onkeypress = "return numericOnly(this)", @maxlength = "2" ,id= "Time1" })
+                                                @*@Html.DropDownListFor(m => m.TransportMode, ViewBag.TransportationModeList as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control form-control-sm searchableselect" }) *@
+                                                @Html.Hidden("hdnmi")
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+
+
+
+                            <div class="row">
+
+                                <div class="col-sm-6  offset-lg-2 offset-md-4">
+                                    <input type="submit" value='@ViewBag.Button' class="btn btn-primary btn-md ml-0" name="Submit" id="Submit" />
+                                    <input type="reset" name="Reset" class="btn btn-danger btn-md" value="Reset" href="~/epass/epassconfiguration/epassconfiguration" />
+                                </div>
+                            </div>
+
+                        }
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN CONTENT AREA ENDS -->
+</section>
+
+<script>
+    $(document).ready(function () {
+        if ($('#hdnButton').val() != "" || $('#hdnButton').val() != null) {
+            $('.chk').trigger('change');
+
+        }
+
+
+
+        if ('@TempData["SuccMessage"]' != '' && '@TempData["SuccMessage"]' != null) {
+
+    swal("",'@TempData["SuccMessage"]',"success");
+        }
+        $('#DistrictID').change(function () {
+            GetUserName();
+        });
+        $('#UserTypeID').change(function () {
+            GetUserName();
+           //MineralTypeChange();
+        });
+        //$('#Userid').change(function () {
+        //    MineralTypeChange();
+        //});
+        $('#MineralTypeID').change(function () {
+            MineralTypeChange();
+        });
+        if ($('#hdnButton').val() != "" || $('#hdnButton').val() != null) {
+            if ($('#hdnidView').val() == '1') {
+                $("#1").prop("checked", true);
+                $('#1').trigger('change');
+            }
+            else {
+                $("#2").prop("checked", true);
+                /*$('#2').trigger('change');*/
+            }
+        }
+
+        else {
+            $("#2").prop("checked", true);
+        }
+
+        
+
+
+        $("#Submit").click(function () {
+            debugger;
+            if (!DropDownValidation("DistrictID", "District Name")) {
+
+                return false;
+            }
+            if (!DropDownValidation("MineralTypeID", "Mineral Type")) {
+
+                return false;
+            }
+            if (!DropDownValidation("MineralID", "Mineral Name")) {
+
+                return false;
+            }
+            if (!DropDownValidation("UserTypeID", "User Type")) {
+
+                return false;
+            }
+            if ($("#2").is(":checked")) {
+
+                if (!DropDownValidation("Userid", "User Name")) {
+
+                    return false;
+                }
+            }
+            if ($('#hdnButton').val() == "" || $('#hdnButton').val() == null) {
+
+                if (!DropDownValidation("Transport", "Transportation Mode")) {
+
+                    return false;
+                }
+            }
+            else {
+                if (!DropDownValidation("Transport1", "Transportation Mode")) {
+
+                    return false;
+                }
+            }
+            if (!DropDownValidation("AllowConsigneeTypeid", "Allow Consignee")) {
+
+                return false;
+            }
+            var check = $("input[name='TripCloseID']:checked").val();
+            
+            if (check == "2") {
+                if ($('#Time1').val().trim() == "") {
+                    swal("", "Please Enter Time1", "warning");
+                    $("#Time1").focus();
+                    return false;
+                }
+            }
+            var selected = '';
+            if ($('#hdnButton').val() == "" || $('#hdnButton').val() == null) {
+                $('.chk').trigger('change');
+                 selected = $("#Transport :selected").map((_, e) => e.value).get();
+            }
+            else {
+                 selected = $("#Transport1 :selected").map((_, e) => e.value).get();
+            }
+          
+                //alert(selected);
+            $("input[name='hdnmi']").val(selected);
+
+                  
+              });
+        loadNavigation('EpassConfiguration', 'glempprofile', 'plofficetype', 'tl', 'eTransitPass', 'EpassConfiguration', ' ');
+        $('.searchableselect').searchableselect();
+
+        $('.shorting-lnk').click(function () {
+            $('.shorting-lnk i').toggleClass('fa-sort-amount-up-alt fa-sort-amount-down-alt ');
+        });
+
+    });
+
+</script>
+<script>
+    function GetUserName() {
+        var PassConfigType = $("input[name='PassConfigTypeID']:checked").val();
+        var DistrictID = $('#DistrictID').val();
+        var UserTypeID = $('#UserTypeID').val();
+        if (DistrictID == "") {
+            DistrictID = 0;
+        }
+        if (UserTypeID == "") {
+            UserTypeID = 0;
+        }
+
+        //alert(RoleTypeId.toString());
+        $('#Userid').empty();
+       // $('#MineralID').empty();
+        var v = "";
+        if (DistrictID != 0 && UserTypeID != 0 && PassConfigType != 1) {
+            debugger;
+            $.ajax({
+                type: "POST",
+                url: "/epass/ePassConfiguration/GetUserName",
+                data: { 'Districtid': DistrictID, 'UserTypeID': UserTypeID },
+                cache: false,
+                //contentType: "application/json",
+                datatype: "JSON",
+                success: function (SList) {
+                    var opt = new Option('Select User Name', 0);
+                    $('#Userid').append(opt).selectpicker('refresh');
+                    $.each(SList, function (i, item) {
+                        console.log(item);
+                        var opt = new Option(item.userName, item.userid);
+                        $('#Userid').append(opt).selectpicker('refresh');
+
+                    });
+                    //var opt = new Option('Select Mineral Name', 0);
+                    //$('#MineralID').append(opt).selectpicker('refresh');
+
+                }
+            });
+        }
+        else {
+            var opt = new Option('Select User Name', 0);
+            $('#Userid').append(opt).selectpicker('refresh');
+          /*  $('#MineralTypeID').val(0);*/
+            opt = new Option('Select Mineral Name', 0);
+            $('#MineralID').append(opt).selectpicker('refresh');
+
+        }
+    }
+
+    function MineralTypeChange() {
+        debugger;
+        var MineralTypeID = $('#MineralTypeID').val();
+        var UserTypeID = $('#UserTypeID').val();
+        var Userid = $('#Userid').val();
+        if (MineralTypeID == "") {
+            MineralTypeID = 0;
+        }
+        if (UserTypeID == "") {
+            UserTypeID = 0;
+        }
+        if (Userid == "") {
+            Userid = 0;
+        }
+
+        //alert(RoleTypeId.toString());
+        $('#MineralID').empty();
+        var v = "";
+        //  if (MineralTypeID != 0 && UserTypeID != 0 && Userid != 0  ) {
+        debugger;
+        $.ajax({
+            type: "POST",
+            url: "/epass/ePassConfiguration/GetMineralName",
+            data: { 'MineralTypeID': MineralTypeID, 'UserTypeID': UserTypeID, 'Userid': Userid },
+            cache: false,
+            //contentType: "application/json",
+            datatype: "JSON",
+            success: function (SList) {
+                var opt = new Option('Select Mineral Name', 0);
+                debugger;
+                $('#MineralID').append(opt).selectpicker('refresh');
+                $.each(SList, function (i, item) {
+
+                    var opt = new Option(item.mineralName, item.mineralID);
+                    $('#MineralID').append(opt).selectpicker('refresh');
+
+                });
+
+            }
+        });
+        //  }
+        //else {
+        //    var opt = new Option('Select Mineral Name', 0);
+        //    $('#MineralID').append(opt).selectpicker('refresh');
+        //}
+
+
+    }
+    function TripChange(e) {
+        $("#Time").val('');
+
+        if ($("input[name='TripCloseID']:checked").val() == "2") {
+            $("#Time").show();
+        }
+        else {
+            $("#Time").hide();
+        }
+    }
+    function numericOnly() {         
+        var keycode = event.which;
+        if (!(event.shiftKey == false && (keycode == 8 || keycode == 37 || keycode == 39 || (keycode >= 48 && keycode <= 57)))) {
+            event.preventDefault();
+            return false;            
+        }
+    }
+    function PassChange(e) {
+        $('#Userid').empty();
+
+        if ($("input[name='PassConfigTypeID']:checked").val() == "2") {
+            $('#UserName').show();
+            var opt = new Option('Select User Name', 0);
+            $('#Userid').append(opt).selectpicker('refresh');
+        }
+        else {
+            debugger;
+            $('#UserName').hide();
+          /*  GetUserName();*/
+        }
+    }
+
+
+    $('.chk').change(function () {
+
+        //if ($('.chk').val() == '2') {
+        //    var status = '1';
+        //    var status2 = '2';
+        //    $("input[type=radio][value=" + status + "]").attr("disabled", true);
+        //    $("input[type=radio][value=" + status2 + "]").prop('checked', true);
+        //}
+        //else {
+        //    var status = '1';
+        //    $("input[type=radio][value=" + status + "]").attr("disabled", false);
+        //    $("input[type=radio][value=" + status + "]").prop('checked', true);
+        //}
+        if ($('.chk').val() == '2') {
+
+            $('#lk').attr("disabled", true);
+            $("#ab").prop('checked', true);
+            $('#ab').trigger('change');
+            $('#showHide').show();
+        }
+        else if ($('.chk').val() == '3') {
+            //$("#1").prop("checked", true);
+            //$('#1').trigger('change');
+            $('#showHide').hide();
+            $("#Time").show();
+        }
+        else {
+            $('#lk').attr("disabled", false);
+            $('#lk').prop('checked', true);
+            $('#lk').trigger('change');
+            $('#showHide').show();
+        }
+        
+    });
+
+
+
+</script>

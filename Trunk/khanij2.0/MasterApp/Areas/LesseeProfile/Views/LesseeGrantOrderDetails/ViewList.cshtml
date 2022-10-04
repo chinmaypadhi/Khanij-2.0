@@ -1,0 +1,300 @@
+﻿@*// *********************************************************************************************************
+    //  View Name                : ViewList
+    //  Desciption               : To View Lesee Grant Order Details
+    //  Created By               : Lingaraj Dalai
+    //  Created On               : 16 July 2021
+    // ********************************************************************************************************
+*@
+@model MasterEF.GrantOrderViewModel;
+@using MasterEF;
+@using MasterApp.Web;
+@using  Microsoft.AspNetCore.Http;
+@inject IHttpContextAccessor HttpContextAccessor
+@{
+    ViewData["Title"] = "ViewList";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+     UserLoginSession profile = HttpContextAccessor.HttpContext.Session.Get<UserLoginSession>(KeyHelper.UserKey);
+    //profile.MineralTypeName = "Major Mineral";
+    //profile.MineralName = "NON COAL";
+}
+<script>
+    backMe = "yes"
+    $(document).ready(function () {
+        loadNavigation('ViewList', 'glUIS', 'pllesseprof', 'tl', 'Lessee Profile', 'Grant Order & Lease Deed details', ' ');
+         /*Show hide controls for Minor/Major-Coal,NonCoal*/
+        var mineraltypename = '@profile.MineralTypeName';
+        var mineralname = '@profile.MineralName';
+        if (mineraltypename == "Minor Mineral") {
+            $(".MDPA-tab").hide();/*Tab*/
+            $(".LeaseExtension-tab").hide();/*Tab*/
+            $(".NonCaptive-tab").hide();/*Tab*/
+        }
+        else {
+            if (mineralname == "COAL") {
+                $("#hMDPA").text('CMDPA/CBDPA Details'); /*Header Text*/
+            }
+            else {
+                $(".NonCaptive-tab").hide();/*Tab*/
+            }
+        }
+        if (@profile.UserTypeId!= 7) { /*Other than Lessee Login*/
+            $("#navlinkAdd").hide(); //Hide Add tab
+            $(".ml-3").hide(); //Hide Edit button
+        }
+    });
+</script>
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        <!-- MAIN CONTENT AREA STARTS -->
+        @Html.Partial("_CMSnavigation")
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link" id="navlinkAdd" href="~/LesseeProfile/LesseeGrantOrderDetails/Grant">
+                                Add
+                            </a>
+                        </li>
+                        <li class="nav-item active">
+                            <a class="nav-link" href="javascript:void(0);">
+                                View
+                            </a>
+                        </li>
+                    </ul>
+                    @Html.Partial("_CMSutil")
+                </div>
+                <section class="box form-container">
+                    <div class="content-body">
+                        <div class="message-heading">
+                            <h5 class="font-weight-bold text-brown">Grant Order & Lease Deed Details</h5>
+                            <div>
+                                <a href="javascript:void(0);" class="btn-dark btn-sm log-btn" data-val="collapsefillter1">Log Report<i class="icon-angle-down-solid"></i></a>
+                                <a href="@CustomQueryStringHelper.EncryptString("LesseeProfile","Grant","LesseeGrantOrderDetails",new {id=Model.CREATED_BY })" class="btn-success btn-sm ml-3" data-original-title="Edit"><i class="icon-pencil-alt-solid"></i></a>
+                            </div>
+                        </div>
+                        <div class="message-highlighter">
+                            <div class="row">
+                                <label class="col-lg-3 col-md-4 col-sm-12 col-form-label">Order Number</label>
+                                <div class="col-lg-9 col-md-8 col-sm-12">
+                                    <label class="form-control-plaintext">
+                                        <span class="colon">:</span>@Model.GRANT_ORDER_NUMBER
+                                        @if (Model.FILE_GRANT_ORDER_COPY != null && Model.FILE_GRANT_ORDER_COPY != "")
+                                        {
+                                        <a href='~/@Model.PATH_GRANT_ORDER_COPY' title="" class="ml-2" data-original-title="Download Grant Order" target="_blank"><i class="icon-file-pdf-solid h5 text-danger"></i></a>
+                                        }
+                                    </label>
+                                </div>
+                                <label class="col-lg-3 col-md-4 col-sm-12 col-form-label">Order Date</label>
+                                <div class="col-lg-9 col-md-8 col-sm-12">
+                                    <label class="form-control-plaintext"><span class="colon">:</span>@Model.GRANT_ORDER_DATE</label>
+                                </div>
+                                <label class="col-lg-3 col-md-4 col-sm-12 col-form-label">Lease Validity From</label>
+                                <div class="col-lg-9 col-md-8 col-sm-12">
+                                    <label class="form-control-plaintext"><span class="colon">:</span>@Model.FROM_VALIDITY</label>
+                                </div>
+                                <label class="col-lg-3 col-md-4 col-sm-12 col-form-label">Lease Validity Upto</label>
+                                <div class="col-lg-9 col-md-8 col-sm-12">
+                                    <label class="form-control-plaintext"><span class="colon">:</span>@Model.TO_VALIDITY</label>
+                                </div>
+                                <label class="col-lg-3 col-md-4 col-sm-12 col-form-label">Lease Deed No.</label>
+                                <div class="col-lg-9 col-md-8 col-sm-12">
+                                    <label class="form-control-plaintext">
+                                        <span class="colon">:</span>@Model.EXECUTION_OF_DEED_NUMBER
+                                        @if (Model.FILE_EXECUTION_OF_DEED_COPY != null && Model.FILE_EXECUTION_OF_DEED_COPY != "")
+                                        {
+                                        <a href='~/@Model.PATH_EXECUTION_OF_DEED_COPY' title="" class="ml-2" data-original-title="Download Execution Deed" target="_blank"><i class="icon-file-pdf-solid h5 text-danger"></i></a>
+                                        }
+                                    </label>
+                                </div>
+                                <label class="col-lg-3 col-md-4 col-sm-12 col-form-label">Lease Deed Date</label>
+                                <div class="col-lg-9 col-md-8 col-sm-12">
+                                    <label class="form-control-plaintext"><span class="colon">:</span>@Model.EXECUTION_OF_DEED_DATE</label>
+                                </div>
+                                @if(profile.MineralTypeName=="Minor Mineral")
+                                {
+                                <label class="col-lg-3 col-md-4 col-sm-12 col-form-label">Demarcation Copy</label>
+                                <div class="col-lg-9 col-md-8 col-sm-12">
+                                    <label class="form-control-plaintext">
+                                        <span class="colon">:</span>@Model.FILE_DEMARCATION_COPY
+                                        @if (Model.FILE_DEMARCATION_COPY != null && Model.FILE_DEMARCATION_COPY != "")
+                                        {
+                                        <a href='~/@Model.PATH_DEMARCATION_COPY' title="" class="ml-2" data-original-title="Download Demarcation Copy" target="_blank"><i class="icon-file-pdf-solid h5 text-danger"></i></a>
+                                        }
+                                    </label>
+                                </div>
+                                }
+                                <label class="col-lg-3 col-md-4 col-sm-12 col-form-label">Lease Period (In Years)</label>
+                                <div class="col-lg-9 col-md-8 col-sm-12">
+                                    <label class="form-control-plaintext"><span class="colon">:</span>@Model.LEASE_PERIOD</label>
+                                </div>
+                                <label class="col-lg-3 col-md-4 col-sm-12 col-form-label">Remarks</label>
+                                <div class="col-lg-9 col-md-8 col-sm-12">
+                                    <label class="form-control-plaintext"><span class="colon">:</span>@Model.Remarks</label>
+                                </div>
+                                @if(profile.MineralTypeName!="Minor Mineral")
+                                {
+                                <label class="col-lg-3 col-md-4 col-sm-12 col-form-label">Mines Allotted As Per Act</label>
+                                <div class="col-lg-9 col-md-8 col-sm-12">
+                                    <label class="form-control-plaintext"><span class="colon">:</span>@Model.MinesAlloted</label>
+                                </div>
+                                @if(Model.MinesAlloted=="MMDR")
+                                {
+                                <label class="col-lg-3 col-md-4 col-sm-12 col-form-label">Mines Under Section(17A) ?</label>
+                                <div class="col-lg-9 col-md-8 col-sm-12">
+                                    <label class="form-control-plaintext"><span class="colon">:</span>@Model.Mines_Section</label>
+                                </div>
+                                @if(Model.Mines_Section=="Yes")
+                                {
+                                <label class="col-lg-3 col-md-4 col-sm-12 col-form-label">Mines Section</label>
+                                <div class="col-lg-9 col-md-8 col-sm-12">
+                                    <label class="form-control-plaintext"><span class="colon">:</span>@Model.MinesSection</label>
+                                </div>
+                                }
+                                }
+                                @if(profile.MineralName=="COAL")
+                                {
+                                <label class="col-lg-3 col-md-4 col-sm-12 col-form-label">Type of Mines</label>
+                                <div class="col-lg-9 col-md-8 col-sm-12">
+                                    <label class="form-control-plaintext"><span class="colon">:</span>@Model.MinesType</label>
+                                </div>
+                                }
+                                }
+                            </div>
+                            <ul class='timeline custom-scroll log-box' id='collapsefillter1'>
+                                @Html.Raw((String)ViewBag.tableLA)
+                            </ul>
+                        </div>
+                        <div class="message-heading MDPA-tab">
+                            <h5 class="font-weight-bold text-brown" id="hMDPA">MDPA Details</h5>
+                            <div>
+                                <a href="javascript:void(0);" class="btn-dark btn-sm log-btn" data-val="collapsefillter2">Log Report<i class="icon-angle-down-solid"></i></a>
+                                <a href="@CustomQueryStringHelper.EncryptString("LesseeProfile","Grant","LesseeGrantOrderDetails",new {id=Model.CREATED_BY })" class="btn-success btn-sm ml-3" data-original-title="Edit"><i class="icon-pencil-alt-solid"></i></a>
+                            </div>
+                        </div>
+                        <div class="message-highlighter MDPA-tab">
+                            <div class="row">
+                                <label class="col-lg-3 col-md-4 col-sm-12 col-form-label">Order Number</label>
+                                <div class="col-lg-9 col-md-8 col-sm-12">
+                                    <label class="form-control-plaintext">
+                                        <span class="colon">:</span>@Model.MDPA_GRANT_ORDER_NUMBER
+                                        @if (Model.FILE_MDPA_COPY != null && Model.FILE_MDPA_COPY != "")
+                                        {
+                                        <a href='~/@Model.PATH_MDPA_COPY' title="" class="ml-2" data-original-title="Download MDPA Order" target="_blank"><i class="icon-file-pdf-solid h5 text-danger"></i></a>
+                                        }
+                                    </label>
+                                </div>
+                                <label class="col-lg-3 col-md-4 col-sm-12 col-form-label">Order Date</label>
+                                <div class="col-lg-9 col-md-8 col-sm-12">
+                                    <label class="form-control-plaintext"><span class="colon">:</span>@Model.MDPA_GRANT_ORDER_DATE</label>
+                                </div>
+                                <label class="col-lg-3 col-md-4 col-sm-12 col-form-label">Agreement Date</label>
+                                <div class="col-lg-9 col-md-8 col-sm-12">
+                                    <label class="form-control-plaintext"><span class="colon">:</span>@Model.MDPA_GRANT_AGREEMENT_DATE</label>
+                                </div>
+                                @if (profile.MineralName == "COAL")
+                                {
+                                <label class="col-lg-3 col-md-4 col-sm-12 col-form-label">Final Offer</label>
+                                <div class="col-lg-9 col-md-8 col-sm-12">
+                                    <label class="form-control-plaintext"><span class="colon">:</span>@Model.FINAL_OFFER</label>
+                                </div>
+                                }
+                            </div>
+                            <ul class='timeline custom-scroll log-box' id='collapsefillter2'>
+                                @Html.Raw((String)ViewBag.tableLB)
+                            </ul>
+                        </div>
+                        <div class="message-heading LeaseExtension-tab">
+                            <h5 class="font-weight-bold text-brown">Lease Extension Details</h5>
+                            <div>
+                                <a href="javascript:void(0);" class="btn-dark btn-sm log-btn" data-val="collapsefillter3">Log Report<i class="icon-angle-down-solid"></i></a>
+                                <a href="@CustomQueryStringHelper.EncryptString("LesseeProfile","Grant","LesseeGrantOrderDetails",new {id=Model.CREATED_BY })" class="btn-success btn-sm ml-3" data-original-title="Edit"><i class="icon-pencil-alt-solid"></i></a>
+                            </div>
+                        </div>
+                        <div class="message-highlighter LeaseExtension-tab">
+                            <div class="row">
+                                <label class="col-lg-3 col-md-4 col-sm-12 col-form-label">Application Type</label>
+                                <div class="col-lg-9 col-md-8 col-sm-12">
+                                    <label class="form-control-plaintext"><span class="colon">:</span>@Model.AuctionName</label>
+                                </div>
+                                <label class="col-lg-3 col-md-4 col-sm-12 col-form-label">Lease Extended as per MMDR Amendment 2021</label>
+                                <div class="col-lg-9 col-md-8 col-sm-12">
+                                    <label class="form-control-plaintext"><span class="colon">:</span>@Model.LeaseExtender</label>
+                                </div>
+                                @if(Model.LeaseExtender=="Yes")
+                                {
+                                <label class="col-lg-3 col-md-4 col-sm-12 col-form-label">Lease Extension validity From</label>
+                                <div class="col-lg-9 col-md-8 col-sm-12">
+                                    <label class="form-control-plaintext"><span class="colon">:</span>@Model.LEASEEXTENSION_FROM_VALIDITY</label>
+                                </div>
+                                <label class="col-lg-3 col-md-4 col-sm-12 col-form-label">Lease Extension validity Upto</label>
+                                <div class="col-lg-9 col-md-8 col-sm-12">
+                                    <label class="form-control-plaintext"><span class="colon">:</span>@Model.LEASEEXTENSION_TO_VALIDITY</label>
+                                </div>
+                                <label class="col-lg-3 col-md-4 col-sm-12 col-form-label">Lease Extension Document</label>
+                                <div class="col-lg-9 col-md-8 col-sm-12">
+                                    <label class="form-control-plaintext">
+                                        <span class="colon">:</span>@Model.FILE_LEASEEXTENSION
+                                        @if (Model.FILE_LEASEEXTENSION != null && Model.FILE_LEASEEXTENSION != "")
+                                        {
+                                        <a href='~/@Model.PATH_LEASEEXTENSION' title="" class="ml-2" data-original-title="Download Lease extension Order" target="_blank"><i class="icon-file-pdf-solid h5 text-danger"></i></a>
+                                        }
+                                    </label>
+                                </div>
+                                }
+                            </div>
+                            <ul class='timeline custom-scroll log-box' id='collapsefillter3'>
+                                @Html.Raw((String)ViewBag.tableLC)
+                            </ul>
+                        </div>
+                        <div class="message-heading NonCaptive-tab">
+                            <h5 class="font-weight-bold text-brown">Request for Non Captive Sale</h5>
+                            <div>
+                                <a href="javascript:void(0);" class="btn-dark btn-sm log-btn" data-val="collapsefillter4">Log Report<i class="icon-angle-down-solid"></i></a>
+                                <a href="@CustomQueryStringHelper.EncryptString("LesseeProfile","Grant","LesseeGrantOrderDetails",new {id=Model.CREATED_BY })" class="btn-success btn-sm ml-3" data-original-title="Edit"><i class="icon-pencil-alt-solid"></i></a>
+                            </div>
+                        </div>
+                        <div class="message-highlighter NonCaptive-tab">
+                            <div class="row">
+                                <label class="col-lg-3 col-md-4 col-sm-12 col-form-label">Mineral Sale Percentage</label>
+                                <div class="col-lg-9 col-md-8 col-sm-12">
+                                    <label class="form-control-plaintext"><span class="colon">:</span>@Model.MineralSalePercentage</label>
+                                </div>
+                                <label class="col-lg-3 col-md-4 col-sm-12 col-form-label">Tender/Allottment Document</label>
+                                <div class="col-lg-9 col-md-8 col-sm-12">
+                                    <label class="form-control-plaintext">
+                                        <span class="colon">:</span>@Model.FILE_ALLOTTMENT
+                                        @if (Model.FILE_ALLOTTMENT != null && Model.FILE_ALLOTTMENT != "")
+                                        {
+                                        <a href='~/@Model.PATH_ALLOTTMENT' title="" class="ml-2" data-original-title="Download Allottment Order" target="_blank"><i class="icon-file-pdf-solid h5 text-danger"></i></a>
+                                        }
+                                    </label>
+                                </div>
+                                <label class="col-lg-3 col-md-4 col-sm-12 col-form-label">Amount/Percentage</label>
+                                <div class="col-lg-9 col-md-8 col-sm-12">
+                                    <label class="form-control-plaintext"><span class="colon">:</span>@Model.AllotmentAmount</label>
+                                </div>
+                            </div>
+                            <ul class='timeline custom-scroll log-box' id='collapsefillter4'>
+                                @Html.Raw((String)ViewBag.tableLD)
+                            </ul>
+                        </div>
+                        <div class="message-heading">
+                            <h5 class="font-weight-bold text-brown">Approved Quantity Details</h5>
+                            <div>
+                                <a href="javascript:void(0);" class="btn-dark btn-sm log-btn" data-val="collapsefillter5">Log Report<i class="icon-angle-down-solid"></i></a>
+                                <a href="@CustomQueryStringHelper.EncryptString("LesseeProfile","Grant","LesseeGrantOrderDetails",new {id=Model.CREATED_BY })" class="btn-success btn-sm ml-3" data-original-title="Edit"><i class="icon-pencil-alt-solid"></i></a>
+                            </div>
+                        </div>
+                        <div class="message-highlighter">
+                            @Html.Raw((String)ViewBag.tableLE)
+                            <ul class='timeline custom-scroll log-box' id='collapsefillter5'>
+                                @Html.Raw((String)ViewBag.tableLF)
+                            </ul>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+</section>

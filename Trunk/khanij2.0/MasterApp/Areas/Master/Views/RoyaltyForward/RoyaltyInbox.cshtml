@@ -1,0 +1,543 @@
+﻿@model MasterEF.RoyaltyForwardmaster
+@*@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer*@
+@{
+    ViewData["Title"] = "RoyaltyInbox";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+@if (TempData["msg"] != null)
+{
+    <script>
+        swal("",'@ViewBag.msg',"success");
+    </script>
+}
+@if (ViewBag.msg != null)
+{
+    <script>
+            var msg='@ViewBag.msg'
+            if (msg == "1") {
+                swal("","Requests sent successfully.","success");
+                 var url = '@Url.Action("RoyaltyInbox", "RoyaltyForward", new { Area = "master" })';
+                window.location.href = url;
+            }
+    </script>
+}
+<script>
+    $(document).ready(function () {
+        loadNavigation('ViewList', 'glTMng', 'plRoyaltyForward', 'tl', 'Masters', 'Royalty Inbox', '');
+
+        $('.searchableselect').searchableselect();
+
+        $("#btnSubmit2").click(function () {
+            var idsToSend = new Array();
+            $('table [type="checkbox"]').each(function () {
+                if ($(this).is(':checked')) {
+                    idsToSend.push($(this).val());
+                }
+            });
+
+            if (idsToSend.length <= 0) {
+                alert("Please select list to forward royalty.");
+                return false;
+            }
+            //------------------------
+            else {
+                var btnAction = 'forward';// $('#IntActionId  option:selected').text();
+                if (confirm("Before " + btnAction + " you need to apply your Digital Signature. Are you confirmed to " + btnAction + " royalty ??")) {
+                    var Postdata = 'action=signdoc' + "\n" + 'datatosign=Digital Signature Required' + "\n" + 'signaction=sign' + "\n" + 'filepath=' + "\n" + 'panNumberParam=' + "\n" + 'expirycheck=false' + "\n" + 'issuername=' + "\n" + 'certclass=1|2|3' + "\n" + 'certtype=ALL';
+                    connection.send(Postdata);
+                    connection.onerror = function (error) {
+                        swal("", 'Please check the server connection: ' + error + '', "warning");
+                        swal("", error, "warning");
+                    };
+                    connection.onmessage = function (e) { // when DSC is success then following function executed.
+                        debugger;
+                        if (e.data.indexOf("subProtocol") == -1) {
+                            $("#DSCResponse").val(e.data).change();
+                            $.ajax(
+                                {
+                                    url: '@Url.Action("CheckVerifyResponse", "RoyaltyForward", new { Area = "master" })',
+                                    type: "POST",
+                                    data: { contentType: "pkcs7", signDataBase64Encoded: e.data, responseType: "plain" },
+                                    success: function (msg) {
+                                        if (msg == "SUCCESS") {
+                                            debugger;
+                                            //$("#form1").submit();
+                                            //----------------------
+                                            $.ajax({
+                                                type: "POST",
+                                                url: '@Url.Action("Submit", "RoyaltyForward")',
+                                                data: {
+                                                    arr: JSON.stringify(idsToSend)
+                                                },
+                                                dataType: "json",
+                                                success: function (result) {
+                                                    alert("Requests sent successfully.");
+                                                    var url = '@Url.Action("ViewList", "RoyaltyForward", new { Area = "master" })';
+                                                    window.location.href = url;
+                                                    var i;
+                                                    for (i = 0; i < idsToSend.length; ++i) {
+
+                                                        var URLLoad = '@Url.Action("Download_Royalty", "RoyaltyForward")?id=' + idsToSend[i];
+                                                        var win = window.open(URLLoad, '_blank');
+                                                        if (win) {
+                                                            //Browser has allowed it to be opened
+                                                            win.focus();
+                                                        } else {
+                                                            //Browser has blocked it
+                                                            alert('Please allow popups for this website');
+                                                        }
+                                                    }
+
+                                                }
+
+                                            });
+
+                                            //----------------------
+                                        }
+                                    }
+                                });
+                        }
+                        else {
+                            alert(e.data);
+                        }
+                    };
+                }
+                else {
+                    return false;
+                }
+            }
+
+        });
+
+        //-----approved-----
+         $("#btnSubmit").click(function () {
+            if (!DropDownValidation("IntActionId", "Action Type")) {
+                return false;
+            }
+            var TRemarks = $("#txtRemarks").val();
+            if (TRemarks == '') {
+                swal("", "Enter the remarks", "warning");
+                return;
+            }
+            var TRoyaltyId = $("#hidRoyaltyId").text();
+            var TStatus = $("#IntActionId option:selected").val();
+
+
+            var rdValue = $('#IntActionId :selected').text();
+
+            var btnAction = rdValue;
+            if (confirm("Before " + btnAction + " you need to apply your Digital Signature. Are you confirmed to " + btnAction + " royalty ??")) {
+                var Postdata = 'action=signdoc' + "\n" + 'datatosign=Digital Signature Required' + "\n" + 'signaction=sign' + "\n" + 'filepath=' + "\n" + 'panNumberParam=' + "\n" + 'expirycheck=false' + "\n" + 'issuername=' + "\n" + 'certclass=1|2|3' + "\n" + 'certtype=ALL';
+                connection.send(Postdata);
+                connection.onerror = function (error) {
+                    swal("", 'Please check the server connection: ' + error + '', "warning");
+                    swal("", error, "warning");
+                };
+                connection.onmessage = function (e) { // when DSC is success then following function executed.
+                    if (e.data.indexOf("subProtocol") == -1) {
+                        $("#DSCResponse").val(e.data).change();
+                        $.ajax(
+                            {
+                                url: '@Url.Action("CheckVerifyResponse", "RoyaltyForward", new { Area = "master" })',
+                                type: "POST",
+                                data: { contentType: "pkcs7", signDataBase64Encoded: e.data, responseType: "plain" },
+                                success: function (msg) {
+                                    if (msg == "SUCCESS") {
+                                        $.ajax({
+                                            type: "POST",
+                                            url: '@Url.Action("TakeAction", "RoyaltyForward")',
+                                            data: {
+                                                "RoyaltyId": TRoyaltyId,
+                                                "IsApproved": TStatus,
+                                                "Remarks": TRemarks
+                                            },
+                                            dataType: "json",
+                                            success: function (result) {
+                                                alert('Royalty:' + btnAction + ' sucessfully');
+                                                var url = '@Url.Action("RoyaltyInbox","RoyaltyForward",new {Area="master" })';
+                                                window.location.href = url;
+                                            }
+                                        });
+
+                                    }
+                                }
+                            });
+                    }
+                    else {
+                        alert(e.data);
+                    }
+                };
+            }
+            else {
+                return false;
+            }
+
+        });
+    });
+
+    @*function OnForwarding() {
+        debugger;
+        var btnAction = 'forward';// $('#IntActionId  option:selected').text();
+        if (confirm("Before " + btnAction + " you need to apply your Digital Signature. Are you confirmed to " + btnAction + " royalty ??")) {
+            var Postdata = 'action=signdoc' + "\n" + 'datatosign=Digital Signature Required' + "\n" + 'signaction=sign' + "\n" + 'filepath=' + "\n" + 'panNumberParam=' + "\n" + 'expirycheck=false' + "\n" + 'issuername=' + "\n" + 'certclass=1|2|3' + "\n" + 'certtype=ALL';
+            connection.send(Postdata);
+            connection.onerror = function (error) {
+                swal("", 'Please check the server connection: ' + error + '', "warning");
+                swal("", error, "warning");
+            };
+            connection.onmessage = function (e) { // when DSC is success then following function executed.
+                debugger;
+                if (e.data.indexOf("subProtocol") == -1) {
+                    //alert(e.data);
+                    $("#DSCResponse").val(e.data).change();
+                    $.ajax(
+                        {
+                            url: '@Url.Action("CheckVerifyResponse", "RoyaltyForward", new { Area = "master" })',
+                            type: "POST",
+                            data: { contentType: "pkcs7", signDataBase64Encoded: e.data, responseType: "plain" },
+                            success: function (msg) {
+                                if (msg == "SUCCESS") {
+                                    debugger;
+                                    //$("#form1").submit();
+                                    //----------------------
+                                    $.ajax({
+                                        type: "POST",
+                                        url: '@Url.Action("Submit", "RoyaltyForward")',
+                                        data: {
+                                            arr: JSON.stringify(idsToSend)
+                                        },
+                                        dataType: "json",
+                                        success: function (result) {
+                                            alert("Requests sent successfully.");
+                                            var url = '@Url.Action("ViewList", "RoyaltyForward", new { Area = "master" })';
+                                            window.location.href = url;
+                                            var i;
+                                            for (i = 0; i < idsToSend.length; ++i) {
+
+                                                var URLLoad = '@Url.Action("Download_Royalty", "RoyaltyForward")?id=' + idsToSend[i];
+                                                var win = window.open(URLLoad, '_blank');
+                                                if (win) {
+                                                    //Browser has allowed it to be opened
+                                                    win.focus();
+                                                } else {
+                                                    //Browser has blocked it
+                                                    alert('Please allow popups for this website');
+                                                }
+                                            }
+
+                                        }
+
+                                    });
+
+                                    //----------------------
+                                }
+                            }
+                        });
+                }
+                else {
+                    alert(e.data);
+                }
+            };
+        }
+        else {
+            return false;
+        }
+    }*@
+
+    try {
+        var connection = new WebSocket('wss://localhost.emudhra.com:8080');
+        connection.onopen = function () {
+            console.log('Connection Opened');
+        };
+        connection.onerror = function (error) {
+        };
+        connection.onmessage = function (e) {
+            if (e.data.indexOf("subProtocol") == -1) {
+            }
+        };
+    }
+    catch (e) {
+        swal("", "No DSC Connection Found", "warning");
+    }
+
+     function ShowHistory(intRoyaltyId) {
+        $.ajax({
+            type: "POST",
+            url: '@Url.Content("~/master/RoyaltyApproved/ViewRoyaltyActionHistory")',
+            data: {
+                "intRoyaltyId": intRoyaltyId
+            },
+            dataType: "Json",
+            success: function (data) {
+                var row = '<thead><tr><th width="30px">Sl#</th><th>Step</th><th>Status</th><th>Remarks</th><th>ActionTakenBy</th><th>ActionTakenOn</th></tr ></thead >'
+                for (var i = 0; i < data.length; i++) {
+                    row += '<tr><th width="30px">' + (parseInt(i) + 1) + '</th><th>' + data[i].intStep + '</th><th>' + data[i].status + '</th><th>' + data[i].remarks + '</th><th>' + data[i].actionTakenBy + '</th><th>' + data[i].actionTakenOn +'</th></tr >'
+                }
+                $("#tblHistory2").html(row);
+                $('#Notice_model2').modal('show');
+            },
+            error: function () {
+                alert('Error');
+            }
+        })
+    }
+     function TakeAction(id) {
+        $('#divModal').modal('show');
+        $("#hidRoyaltyId").text(id);
+
+         $.ajax({
+                type: "POST",
+                url: '@Url.Content("~/master/RoyaltyApproved/BindActionType")',
+                data: {
+                    "RoyaltyId": id
+                },
+                dataType: "json",
+                success: function (data) {
+
+                    $("#IntActionId").empty();
+
+                    var ops = '<option value="">Select</option>';
+                    for (var i = 0; i < data.length; i++) {
+                        ops += '<option value="' + data[i].value + '">' + data[i].text + '</option>';
+                    }
+
+                    $("#IntActionId").html(ops);
+
+                },
+                error: function () {
+                    alert('Error');
+                }
+            });
+    }
+</script>
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="javascript:void(0);">
+                                Royalty InBox
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="@Url.Content("~/Master/RoyaltyForward/RoyaltyInboxView")">
+                                View Royalty Inbox
+                            </a>
+                        </li>
+                    </ul>
+
+
+                </div>
+                <section class="box form-container">
+                    <div class="content-body">
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <table id="table-exports" class="table table-sm table-bordered">
+                                    <thead>
+                                        <tr>
+                                            
+                                             <th width="30">Sl</th>
+                                            @*<th>
+                                                    Select
+                                                </th>*@
+                                        <th>
+                                            Mineral Category
+                                        </th>
+                                        <th>
+                                            Mineral Schedule
+                                        </th>
+                                        <th>
+                                            Mineral Schedule Part 
+                                        </th>
+                                        <th>
+                                            Mineral
+                                        </th>
+                                        <th>
+                                            Mineral Form 
+                                        </th>
+                                        <th>Mineral Grade</th>
+                                        <th>
+                                            Mineral Unit 
+                                        </th>
+                                        <th>
+                                            Royalty Basis 
+                                        </th>
+                                        <th>
+                                            Average Sale Price   
+                                        </th>
+                                        <th>
+                                            Rate of Royalty    
+                                        </th>
+                                        <th>
+                                            Royalty
+                                        </th>
+                                        <th>
+                                            Rate Effective From 
+                                        </th>
+                                        <th>
+                                            IBM published 
+                                        </th>
+                                        <th>
+                                            Created Date & Time   
+                                        </th>
+
+                                        <th>
+                                            Remarks   
+                                        </th>
+                                        <th>PendingAt</th>
+                                        <th>
+                                            Status 
+                                        </th>
+                                        <th width="100" class="noprint text-center">DownLoad</th>
+                                        <th width="100" class="noprint text-center">Action Log</th>
+                                        <th width="100" class="noprint text-center">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+
+                                        @{
+                                            int i = 1;
+                                        }
+                                        @foreach (var b in ViewBag.ViewList)
+                                        {
+                                            <tr>
+                                                <td>
+                                                    <label>  @i</label>
+                                                    @{ i++; }
+
+                                                    <span style="display:none;">
+                                                        @b.RoyaltyId
+                                                    </span>
+                                                </td>
+                                                @*<td><input id='chkData' type="checkbox" value="@b.RoyaltyId" /> </td>*@
+                                                <td>@b.MineralType </td>
+                                                <td>@b.MineralScheduleName </td>
+                                                <td>@b.MineralSchedulePart </td>
+                                                <td>@b.MineralName </td>
+                                                <td>@b.MineralNature </td>
+                                                <td>@b.MineralGrade </td>
+                                                <td>@b.UnitName </td>
+                                                <td>@b.RoyaltyRateType </td>
+                                                <td>@b.AverageSalePrice </td>
+                                                <td>@b.CalculationType </td>
+                                                <td>@b.RoyaltyRate </td>
+                                                <td>@b.RateEffectiveFrom </td>
+                                                <td>
+                                                    <label class="form-control-plaintext">
+                                                        <span class="colon">:</span>@b.IbmFileName
+                                                        @if (b.IbmFileName != null && b.IbmFileName.Trim() != "")
+                                                        {
+                                                            <a href='~/@b.IbmFilePath' title="" class="ml-2" data-original-title="Download CTO Letter" target="_blank"><i class="icon-file-pdf-solid h5 text-danger"></i></a>
+                                                        }
+                                                        else
+                                                        {
+                                                            <span>--</span>
+                                                        }
+                                                    </label>
+
+                                                </td>
+                                                <td>@b.CreatedOn</td>
+
+                                                <td>@b.Remarks</td>
+
+                                                <td>@b.PrimaryAuthority</td>
+                                                <td>@b.Status</td>
+                                                <td class="noprint text-center">
+                                                    <a href="@Url.Content("~/Master/RoyaltyForward/Download_Royalty/")@b.RoyaltyId"
+                                                       class="btn-floating btn-outline-danger btn-sm"
+                                                       title="Download" target="_blank"><i class="icon-download-solid"></i></a>
+                                                </td>
+
+                                                <td class="noprint">
+                                                    <a class="btn-floating btn-outline-primary btn-sm" id="History"
+                                                       onclick="ShowHistory(@b.RoyaltyId);"
+                                                       title="Action Details">Show Details</a>
+                                                </td>
+                                                <td class="noprint">
+                                                    <a class="btn btn-danger btn-md" id="TakeAction"
+                                                       onclick="TakeAction(@b.RoyaltyId);"
+                                                       title="Action Details">Take Action</a>
+                                                </td>
+                                            </tr>
+                                        }
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <div class="modal fade" id="divModal" tabindex="-1" role="dialog" aria-labelledby="basicModal" aria-hidden="true">
+                <div class="modal-dialog  modal-dialog-centered modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Take Action</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="table-responsive">
+                                <table id="tblHistory" class="table table-sm table-bordered">
+                                    <tr>
+
+                                        <td>
+                                            Status
+                                            <input type="hidden" id="hidRoyaltyId" />
+                                        </td>
+
+                                        <td>
+
+                                            <select class="form-control" data-show-subtext="true" data-live-search="true" id="IntActionId" name="IntActionId">
+                                            </select>
+
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Remarks</td>
+
+                                        <td>
+                                            <textarea class="form-control" id="txtRemarks" maxlength="200"></textarea>
+                                        </td>
+                                    </tr>
+
+                                    <tr>
+                                        <td colspan="2">
+                                            <a class="btn btn-primary btn-md ml-0 waves-effect waves-light" id="btnSubmit">Submit</a>
+                                            @*<a href="~/master/RoyaltyApproved/RoyaltyApproved" class="btn btn-danger btn-md">Cancel</a>*@
+                                        </td>
+
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal fade" id="Notice_model2" tabindex="-1" role="dialog" aria-labelledby="basicModal" aria-hidden="true">
+            <div class="modal-dialog  modal-dialog-centered modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Royalty Action History</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="table-responsive">
+                            <table id="tblHistory2" class="table table-sm table-bordered">
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</section>
+

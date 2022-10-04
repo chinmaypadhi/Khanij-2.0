@@ -1,0 +1,674 @@
+﻿@*// *********************************************************************************************************
+    //  View Name                : Add Apply Leave
+    //  Desciption               : To apply leave Details
+    //  Created By               : Suresh kumar behera
+    //  Created On               : 13-july-2021
+    // ********************************************************************************************************
+*@
+@model EstablishmentEf.ApplyLeave
+@{
+    ViewData["Title"] = "AddApplyLeave";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+
+@if (TempData["msg"] != null)
+{
+    <script>
+        var vv = '@TempData["msg"]';
+        if (vv == 1) {
+            swal("", "Apply leave successfully.", "success");
+        }
+        else if (vv == 2) {
+            swal("", "leave allready exists.", "warning");
+        }
+        else if (vv == 3) {
+            swal("", "leave updated sucessfully", "success");
+        }
+        else if (vv == 4) {
+            swal("", "leave  cancelled sucessfully", "success");
+        }
+        else if (vv == 5) {
+            swal("", "leave  allredy approved", "warning");
+        }
+        else {
+            swal("", "Something Errror occured. Please Try After Sometime!!", "error");
+        }
+    </script>
+
+    TempData["msg"] = null;
+}
+
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+
+        @*@Html.Partial("_navigation")*@
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="javascript:void(0);">
+                                Add Apply leave
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="@Url.Content("~/LeaveManagement/LeaveManagement/ViewApplyLeave")">
+                                View Apply Leave
+                            </a>
+                        </li>
+                    </ul>
+
+                    @*@Html.Partial("_util")*@
+                </div>
+
+                <section class="box form-container">
+                    <div class="content-body">
+                        @using (Html.BeginForm("AddApplyLeave", "LeaveManagement", FormMethod.Post, new { AUTOCOMPLETE = "Off", id = "form1" }))
+                        {
+                            @Html.AntiForgeryToken();
+                            <div class="row">
+                                <div class="col-lg-6">
+
+                                    <div class="form-group row">
+                                        <label class="col-lg-4 col-md-4 col-sm-12 col-form-label font-weight-bolder">Employee Name<span class="text-danger">*</span></label>
+                                        <div class="col-lg-7 col-md-6 col-sm-12">
+                                            @Html.DropDownListFor(m => m.intEmployeeId, ViewBag.Employee as IEnumerable<SelectListItem>, new { @class = "form-control form-control-sm searchableselect" })
+                                            @Html.HiddenFor(m => m.intLeaveId)
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label class="col-lg-4 col-md-4 col-sm-12 col-form-label font-weight-bolder">Leave Type<span class="text-danger">*</span></label>
+                                        <div class="col-lg-7 col-md-6 col-sm-12">
+                                            @Html.DropDownListFor(m => m.intLeaveTypeId, ViewBag.LeaveType as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control form-control-sm searchableselect" })
+
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label class="col-lg-4 col-md-4 col-sm-12 col-form-label font-weight-bolder">From Date<span class="text-danger">*</span></label>
+                                        <div class="col-lg-7 col-md-6 col-sm-12">
+                                            <div class="input-group">
+
+                                                @Html.TextBoxFor(m => m.dtFromDate, new { @class = "form-control datepicker", @maxlength = 12 })
+                                                <input type="hidden" id="hiddtFromDate" value="@Model.dtFromDate" />
+                                                <div class="input-group-prepend">
+                                                    <label class="input-group-text" for="dtFromDate"><i class="icon-calendar-alt-solid"></i></label>
+                                                </div>
+                                                <div id="divFrom" style="display: none">
+                                                    @Html.DropDownListFor(m => m.intFromHalfDay, ViewBag.FromHalfDay as IEnumerable<SelectListItem>, new { @class = "form-control form-control-sm searchableselect" })
+                                                    @Html.HiddenFor(m => m.intFromHalfDay, new { @id = "hidFromHalfDay" })
+                                                </div>
+                                                <span>Half Day</span> @Html.CheckBoxFor(m => m.bitFromHalfDay, false)
+                                                @Html.HiddenFor(m => m.bitFromHalfDay, new { @id = "hidbitFromHalfDay" })
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group row">
+                                        <label class="col-lg-4 col-md-4 col-sm-12 col-form-label font-weight-bolder">To Date<span class="text-danger">*</span></label>
+                                        <div class="col-lg-7 col-md-6 col-sm-12">
+                                            <div class="input-group">
+                                                @Html.TextBoxFor(m => m.dtToDate, new { @class = "form-control datepicker", @maxlength = 12 })
+                                                <input type="hidden" id="hiddtToDate" value="@Model.dtToDate" />
+                                                <div class="input-group-prepend">
+                                                    <label class="input-group-text" for="dtToDate"><i class="icon-calendar-alt-solid"></i></label>
+                                                </div>
+                                                <div id="divTo" style="display: none">
+                                                    @Html.DropDownListFor(m => m.intToHalfDay, ViewBag.ToHalfDay as IEnumerable<SelectListItem>, new { @class = "form-control form-control-sm searchableselect" })
+                                                    @Html.HiddenFor(m => m.intToHalfDay, new { @id = "hidToHalfDay" })
+                                                </div>
+                                                <span>Half Day</span> @Html.CheckBoxFor(m => m.bitToHalfDay, false)
+                                                @Html.HiddenFor(m => m.bitToHalfDay, new { @id = "hidbitToHalfDay" })
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group row">
+                                        <label class="col-lg-4 col-md-4 col-sm-12 col-form-label font-weight-bolder">No. of Days<span class="text-danger">*</span></label>
+                                        <div class="col-lg-7 col-md-6 col-sm-12">
+                                            <span id="intNoOfDaysApply"></span>
+                                            @Html.HiddenFor(m => m.NoOfDays, new { @id = "hidNoOfDays" })
+                                            @Html.HiddenFor(m => m.NoOfDays, new { @id = "hidNoOfDaysEdit" })
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group row">
+                                        <label class="col-lg-4 col-md-4 col-sm-12 col-form-label font-weight-bolder">Reason<span class="text-danger">*</span></label>
+                                        <div class="col-lg-7 col-md-6 col-sm-12">
+                                            @Html.TextAreaFor(m => m.varReason, new { @class = "form-control", @maxlength = 500 })
+                                            <small class="text-danger">Maximum <strong>500</strong> characters</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6">
+
+                                    <table class="table table-bordered">
+                                        <tbody>
+                                            <tr class="leave_count_details text-center">
+                                                <th class="leave_count_header">
+                                                    ENTITLED
+                                                </th>
+                                                <th class="leave_count_header">
+                                                    APPLIED
+
+                                                </th>
+                                                <th class="leave_count_header">
+                                                    GRANTED
+
+                                                </th>
+                                                <th class="leave_count_header">
+                                                    BALANCE
+                                                </th>
+                                            </tr>
+                                            <tr>
+                                                <td><span id="leaves_total">0.00</span></td>
+                                                <td><span id="leaves_waiting_for_approval">0.00</span></td>
+                                                <td><span id="leaves_taken">0.00</span></td>
+                                                <td><span id="leaves_remaining">0.00</span></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div class="col-lg-12">
+
+                                    <div id="divEarned" class="row">
+
+                                        <div class="col-lg-6 col-md-12 col-sm-12">
+                                            <div class="form-group row">
+                                                <label class="col-lg-4 col-md-4 col-sm-12 col-form-label font-weight-bolder">Office<span class="text-danger">*</span></label>
+                                                <div class="col-lg-7 col-md-6 col-sm-12">
+                                                    @Html.TextBoxFor(m => m.varOffice, new { @class = "form-control", @maxlength = 200 })
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-lg-6 col-md-12 col-sm-12">
+                                            <div class="form-group row">
+                                                <label class="col-lg-4 col-md-4 col-sm-12 col-form-label font-weight-bolder">Section<span class="text-danger">*</span></label>
+                                                <div class="col-lg-7 col-md-6 col-sm-12">
+                                                    @Html.TextBoxFor(m => m.varSection, new { @class = "form-control", @maxlength = 200 })
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-lg-6 col-md-12 col-sm-12">
+                                            <div class="form-group row">
+                                                <label class="col-lg-4 col-md-4 col-sm-12 col-form-label font-weight-bolder">Pay<span class="text-danger">*</span></label>
+                                                <div class="col-lg-7 col-md-6 col-sm-12">
+                                                    @Html.TextBoxFor(m => m.varPay, new { @class = "form-control", @maxlength = 200 })
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-6 col-md-12 col-sm-12">
+                                            <div class="form-group row">
+                                                <label class="col-lg-4 col-md-4 col-sm-12 col-form-label font-weight-bolder">House and Rent Allowance<span class="text-danger">*</span></label>
+                                                <div class="col-lg-7 col-md-6 col-sm-12">
+                                                    @Html.TextBoxFor(m => m.varHouseAndRentAllowance, new { @class = "form-control", @maxlength = 200 })
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-lg-6 col-md-12 col-sm-12">
+                                            <div class="form-group row">
+                                                <label class="col-lg-4 col-md-4 col-sm-12 col-form-label font-weight-bolder">Sunday and holiday if any purposes<span class="text-danger">*</span></label>
+                                                <div class="col-lg-7 col-md-6 col-sm-12">
+                                                    @Html.TextBoxFor(m => m.varSundayHoliday, new { @class = "form-control", @maxlength = 200 })
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-lg-6 col-md-12 col-sm-12">
+                                            <div class="form-group row">
+                                                <label class="col-lg-4 col-md-4 col-sm-12 col-form-label font-weight-bolder">I proposes to avail my self of leave travel concession for the bock year<span class="text-danger">*</span></label>
+                                                <div class="col-lg-7 col-md-6 col-sm-12">
+                                                    @Html.TextAreaFor(m => m.varProposedToAvail, new { @class = "form-control", @maxlength = 500 })
+                                                    <small class="text-danger">Maximum <strong>500</strong> characters</small>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-lg-6 col-md-12 col-sm-12">
+                                            <div class="form-group row">
+                                                <label class="col-lg-4 col-md-4 col-sm-12 col-form-label font-weight-bolder">Child Name<span class="text-danger">*</span></label>
+                                                <div class="col-lg-7 col-md-6 col-sm-12">
+                                                    @Html.TextBoxFor(m => m.varChildName, new { @class = "form-control", @maxlength = 200 })
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-lg-6 col-md-12 col-sm-12">
+                                            <div class="form-group row">
+                                                <label class="col-lg-4 col-md-4 col-sm-12 col-form-label font-weight-bolder">Child Date of Birth<span class="text-danger">*</span></label>
+                                                <div class="col-lg-7 col-md-6 col-sm-12">
+                                                    <div class="input-group">
+                                                        @Html.TextBoxFor(m => m.dtChildDOB, new { @class = "form-control datepicker", @maxlength = 12 })
+
+                                                        <div class="input-group-prepend">
+                                                            <label class="input-group-text" for="dtChildDOB"><i class="icon-calendar-alt-solid"></i></label>
+                                                        </div>
+                                                        <input type="hidden" id="hiddtChildDOB" value="@Model.dtChildDOB" />
+
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-6 col-md-12 col-sm-12">
+                                            <div class="form-group row">
+                                                <label class="col-lg-4 col-md-4 col-sm-12 col-form-label font-weight-bolder">Whether Permission required to head Quater<span class="text-danger">*</span></label>
+                                                <div class="col-lg-7 col-md-6 col-sm-12">
+                                                    <div class="py-2">
+                                                        @Html.RadioButtonFor(n => n.bitPermissionRequired, true, new { @checked = true, @class = "custom-radio", id = "Rdbtn_Required" }) Yes
+                                                        @Html.RadioButtonFor(n => n.bitPermissionRequired, false, new { @class = "custom-radio", id = "Rdbtn_NotRequired" })No
+
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+
+                                </div>
+                                <div class="col-lg-12 offset-lg-2 offset-md-4 mb-3">
+                                    <input type="submit" id="Submit" name="Submit" value='@ViewBag.Button' class="btn btn-primary btn-md ml-0" />
+                                    <input type="reset" id="Reset" value="Reset" class="btn btn-danger btn-md" />
+                                </div>
+
+                            </div>
+                        }
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+    <!-- MAIN CONTENT AREA ENDS -->
+</section>
+
+<script>
+    $(document).ready(function () {
+
+        loadNavigation('AddApplyLeave', 'glholiday', 'plappleav', 'tl', 'Leave', 'Add Apply Leave', ' ');
+        $('.searchableselect').searchableselect();
+
+        $('.datepicker').datetimepicker({
+            format: 'LT',
+            format: 'DD-MM-YYYY',
+            daysOfWeekDisabled: [],
+            //daysOfWeekDisabled: [0, 6],
+        });
+
+        var HalfDayLeave = 0.00;
+
+        //--for getting the current date
+        var today = new Date();
+        var date1 = today.getDate() + '-' + (today.getMonth() + 1) + '-' + today.getFullYear();
+
+
+
+        //-----edit--------
+        if ($("#hidNoOfDays").val().trim() != "") {
+            $("#intNoOfDaysApply").text($("#hidNoOfDays").val());
+
+        }
+        else {
+            $("#intNoOfDaysApply").text(HalfDayLeave);
+            $("#hidNoOfDays").val(HalfDayLeave);
+        }
+
+        if ($("#hiddtFromDate").val().trim() != "") {
+            $("#dtFromDate").val($("#hiddtFromDate").val());
+        }
+
+        if ($("#hiddtToDate").val().trim() != "") {
+            $("#dtToDate").val($("#hiddtToDate").val());
+            $("#intNoOfDaysApply").text($("#hidNoOfDays").val());
+        }
+
+        if ($("#hidbitFromHalfDay").val().trim() != "") {
+            $("#bitFromHalfDay").val($("#hidbitFromHalfDay").val());
+            //alert($("#bitFromHalfDay").val())
+            if ($("#bitFromHalfDay").val().trim() == "True") {
+                $("#divFrom").show();
+                Calculation();
+            } else {
+                $("#divFrom").hide();
+            }
+        }
+
+        if ($("#hidbitToHalfDay").val().trim() != "") {
+            $("#bitToHalfDay").val($("#hidbitToHalfDay").val());
+            //alert($("#bitToHalfDay").val())
+            if ($("#bitToHalfDay").val().trim() == "True") {
+                $("#divTo").show();
+                Calculation();
+            }
+            else {
+                $("#divTo").hide();
+            }
+        }
+
+        if ($("#hiddtChildDOB").val().trim() != "") {
+            $("#dtChildDOB").val($("#hiddtChildDOB").val());
+        }
+        else {
+            $("#dtChildDOB").val('');
+        }
+
+        //-------end edit------
+
+        Calculation();
+        $("#divEarned *").hide();
+
+        $("#dtFromDate").on('focusout', function (e) {
+            var FromDate = $("#dtFromDate").val();
+            var ToDate = $("#dtToDate").val();
+
+            var b2 = CompareDate(FromDate, ToDate);
+            if (b2 == false) {
+                $("#dtFromDate").val(FromDate);
+                $("#dtToDate").val(FromDate);
+            }
+            Calculation();
+
+
+        });
+
+        $("#dtToDate").on('focusout', function (e) {
+            var FromDate = $("#dtFromDate").val();
+            var ToDate = $("#dtToDate").val();
+
+            var b2 = CompareDate(FromDate, ToDate);
+            if (b2 == false) {
+                alert("From date should not greater than To date");
+                $("#dtToDate").val(date1);
+            }
+            Calculation();
+
+        });
+
+        $("#dtChildDOB").on('focusout', function (e) {
+            var FromDate = date1;
+            var ToDate = $("#dtChildDOB").val();
+            var b2 = CompareDate(ToDate, FromDate);
+            if (b2 == false) {
+                alert("Child date of birth should not greater than current date");
+                $("#dtChildDOB").val(date1);
+            }
+
+
+        });
+
+        //---bind details leave count
+        $("#intLeaveTypeId").change(function () {
+            var LeaveType = $('#intLeaveTypeId').val();
+
+            //----bind leave total------
+            $.ajax({
+                type: "POST",
+                url: '@Url.Content("~/LeaveManagement/LeaveManagement/BindLeaveCount")',
+
+                data: {
+                    "EmployeeId": $('#intEmployeeId').val(),
+                    "LeaveTypeId": $('#intLeaveTypeId').val()
+                },
+                dataType: "json",
+                success: function (data) {
+                    $("#leaves_total").text(data.leaves_total);
+                    $("#leaves_waiting_for_approval").text(data.leaves_waiting_for_approval);
+                    $("#leaves_taken").text(data.leaves_taken);
+                    $("#leaves_remaining").text(data.leaves_remaining);
+
+                },
+                error: function () {
+                    alert('Error');
+                    $("#leaves_total").text(0);
+                    $("#leaves_waiting_for_approval").text(0);
+                    $("#leaves_taken").text(0);
+                    $("#leaves_remaining").text(0);
+                }
+            });
+
+            //----end  total-----
+            $("#divEarned *").hide();
+            //1:Casual Leave,2:optional Leave,3:Medical Leave,4:Earned Leave
+            if (LeaveType == 4) {
+
+                $("#divEarned *").show();
+
+            }
+            else {
+
+                $("#divEarned *").hide();
+                $("#varOffice").val('');
+                $("#varSection").val('');
+                $("#varPay").val('');
+                $("#varHouseAndRentAllowance").val('');
+                $("#varSundayHoliday").val('');
+                $("#varProposedToAvail").val('');
+                $("#varChildName").val('');
+                $("#dtChildDOB").val('');
+            }
+        });
+
+        if ($("#intLeaveId").val() > 0) {
+
+            $("#intLeaveTypeId").change();
+        }
+
+        $("#bitFromHalfDay").click(function () {
+            if ($("#bitFromHalfDay").is(":checked")) {
+                $("#divFrom").show();
+                Calculation();
+            } else {
+                $("#divFrom").hide();
+            }
+        });
+
+        $("#bitToHalfDay").click(function () {
+            if ($("#bitToHalfDay").is(":checked")) {
+                $("#divTo").show();
+                Calculation();
+                //alert($("#bitToHalfDay").val())
+            }
+            else {
+                $("#divTo").hide();
+            }
+        });
+
+        //---From halfday check----
+
+        $("#intFromHalfDay").change(function () {
+
+            //HalfDayLeave=HalfDayCalculation();
+            Calculation();
+        });
+
+        //---To halfday check----
+        $("#intToHalfDay").change(function () {
+
+            //HalfDayLeave = HalfDayCalculation();
+            Calculation();
+        });
+
+        //-----submit----
+        $("#Submit").click(function () {
+            var LeaveType = $("#intLeaveTypeId").val();
+
+            if (!DropDownValidation("intEmployeeId", "Employee")) {
+                return false;
+            }
+            if (!DropDownValidation("intLeaveTypeId", "Leave Type")) {
+                return false;
+            }
+            if (!blankFieldValidation("dtFromDate", "From Date")) {
+                return false;
+            }
+            if (!blankFieldValidation("dtToDate", "To Date")) {
+                return false;
+            }
+            if (!blankFieldValidation("varReason", "Reason")) {
+                return false;
+            }
+            //---1:Casual Leave,2:optional Leave,3:Medical Leave,4:Earned Leave
+            if (LeaveType == 4) {
+
+                if (!blankFieldValidation("varOffice", "Office")) {
+                    return false;
+                }
+                if (!blankFieldValidation("varSection", "Section")) {
+                    return false;
+                }
+                if (!blankFieldValidation("varPay", "Pay")) {
+                    return false;
+                }
+                if (!blankFieldValidation("varHouseAndRentAllowance", "House Rent Allowance")) {
+                    return false;
+                }
+                if (!blankFieldValidation("varSundayHoliday", "Sunday Holiday")) {
+                    return false;
+                }
+                if (!blankFieldValidation("varProposedToAvail", "Proposed to avail")) {
+                    return false;
+                }
+                if (!blankFieldValidation("varChildName", "Child Name")) {
+                    return false;
+                }
+                if (!blankFieldValidation("dtChildDOB", "Child date of birth")) {
+                    return false;
+                }
+            }
+
+
+           
+
+            var NoLeaveRemaining = $("#leaves_remaining").text();
+            var NoLeaveApply = $("#intNoOfDaysApply").text();
+
+            ////----when edit applied leave
+            if ($("#hidNoOfDaysEdit").val().trim() != "") {
+                var appliedLeave = $("#hidNoOfDaysEdit").val();
+                NoLeaveRemaining = parseFloat(NoLeaveRemaining) + parseFloat(appliedLeave)
+            }
+
+            if (parseFloat(NoLeaveApply) > parseFloat(NoLeaveRemaining)) {
+                alert('You are try to apply leave more than balance leave')
+                return false;
+            }
+
+
+        });
+
+        //----Reset----
+        $("#Reset").click(function () {
+            window.location = "@Url.Content("~/LeaveManagement/LeaveManagement/AddApplyLeave/")"
+        });
+
+    });
+
+    function Calculation() {
+        var FromDate1 = $("#dtFromDate").val();
+        var ToDate1 = $("#dtToDate").val();
+
+        if ($("#bitFromHalfDay").prop('checked') == true || $("#bitToHalfDay").prop('checked') == true) {
+            HalfDayLeave = HalfDayCalculation();
+        }
+        else {
+            HalfDayLeave = 1.00;
+        }
+
+        //if (($("bitFromHalfDay").is(":checked")) || ($("#bitToHalfDay").is(":checked"))) {
+        //    HalfDayLeave = HalfDayCalculation();
+        //}
+        //else {
+        //    HalfDayLeave = 1.00;
+        //}
+        var days = daysdifference(FromDate1, ToDate1);
+        var days1 = parseFloat(days) + HalfDayLeave
+        $("#intNoOfDaysApply").text(days1);
+        $("#hidNoOfDays").val(days1);
+
+    }
+
+    function HalfDayCalculation() {
+
+        var FromDate2 = $("#dtFromDate").val();
+        var ToDate2 = $("#dtToDate").val();
+
+        var TintFromHalfDay = $("#intFromHalfDay").val();
+        var TintToHalfDay = $("#intToHalfDay").val();
+
+        if ($("#bitFromHalfDay").prop('checked') == false) {
+            TintFromHalfDay = 1;//---first half
+        }
+
+        if ($("#bitToHalfDay").prop('checked') == false) {
+            TintToHalfDay = 2;//--2nd half
+        }
+
+        if ((FromDate2 == ToDate2) && (TintFromHalfDay == TintToHalfDay) ) {//----if from date and todate same and from (1st half and todate 1st half )or 2nd half of both
+            HalfDayLeave = 0.50;
+        }
+        else if ((FromDate2 == ToDate2) && (TintFromHalfDay == 2 && TintToHalfDay ==1 )) {//----if from date and todate same fromday 2nd half to todate 1st half
+            HalfDayLeave = 0.50;
+        }
+        else if ((FromDate2 == ToDate2) && (TintFromHalfDay == 1 && TintToHalfDay == 2)) {//----if from date and todate same fromday 1st half to todate 2nd half
+            HalfDayLeave = 1.00;
+        }
+        else if ((FromDate2 != ToDate2) && (TintFromHalfDay == 2 && TintToHalfDay == 1)) {//----if from date and todate not same fromday 2nd half to todate 1st half
+            HalfDayLeave = 0.00;
+        }
+        else if ((FromDate2 != ToDate2) && (TintFromHalfDay == 1 && TintToHalfDay == 2)) {//----if from date and todate not same fromday 1st half to todate 2nd half
+            HalfDayLeave = 1.00;
+        }
+        else if (TintFromHalfDay == TintToHalfDay) {
+            HalfDayLeave = 0.50;
+        }
+
+        else {
+            HalfDayLeave = 1.00;
+        }
+        return HalfDayLeave;
+
+    }
+
+    function CompareDate(FromDate, ToDate) {
+        var b1 = false;
+        var fromdate = toDate(FromDate)
+        var todate = toDate(ToDate)
+
+        if (Date.parse(fromdate) > Date.parse(todate)) {
+            b1 = false;
+        }
+        else {
+            b1 = true;
+
+        }
+        return b1;
+    }
+
+    function toDate(dateStr) {
+        var parts = dateStr.split("-");
+        return new Date(parts[2], parts[1] - 1, parts[0]);
+    }
+
+    function daysdifference(firstDate, secondDate) {
+        firstDate = toDate(firstDate);
+        secondDate = toDate(secondDate);
+
+        var startDay = new Date(firstDate);
+        var endDay = new Date(secondDate);
+
+        // Determine the time difference between two dates
+        var millisBetween = endDay.getTime() - startDay.getTime();
+        //var millisBetween = startDay.getTime() - endDay.getTime();
+
+        // Determine the number of days between two dates
+        var days = millisBetween / (1000 * 3600 * 24);
+
+
+        // Show the final number of days between dates
+        //return Math.round(days).toFixed(2);
+        return Math.round(Math.abs(days));
+    }
+</script>
+
+

@@ -1,0 +1,210 @@
+﻿@*// *********************************************************************************************************
+    //  View Name                : VehiclesPayment
+    //  Desciption               : Vehicles Payment
+    //  Created By               : Akshaya Dalei
+    //  Created On               : 25 July 2021
+    // ********************************************************************************************************
+*@
+@{
+    ViewBag.Title = "Vehicles Payment";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+@model IEnumerable<userregistrationEF.Vehicle>
+
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        @Html.Partial("_CMSnavigation")
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="javascript:void(0);">
+                                Vehicles Payment
+                            </a>
+                        </li>
+
+                    </ul>
+                    @Html.Partial("_CMSutil")
+                </div>
+
+                <section class="box form-container">
+                    <div class="content-body">
+
+                        <div class="row form-group">
+                            <div class="col-lg-4 col-md-9 col-sm-12">
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend border-left">
+                                        <span class="input-group-text" id="basic-addon1"><i class="icon-rupee-sign-solid"></i></span>
+                                    </div>
+                                    <input type="text" class="form-control" name="txtTotalPayment" id="txtTotalPayment" readonly="readonly" aria-describedby="basic-addon1">
+                                </div>
+                            </div>
+                            <div class="col-lg-2 col-md-9 col-sm-12">
+                                <button type="button" id="btnPaymnet" class="btn btn-success">Pay</button>
+                            </div>
+                        </div>
+
+
+
+
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <table id="table-exports" class="table table-sm table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th width="30px">
+                                                <input type='checkbox' id='chkSelectAll' />CheckAll
+                                            </th>
+                                            <th width="30px">Sl#</th>
+                                            <th>Vehicle Number</th>
+                                            <th>Payable</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+
+                                        @{
+
+                                            foreach (var item in Model)
+                                            {
+
+                                                <tr>
+                                                    <td><input class='comp' id='chkData' onclick='total(this)' type="checkbox" /></td>
+                                                    <td>
+                                                        <input type="hidden" name="VehicleID" id="VehicleID" value="@item.VehicleID" />
+                                                        <p class="m-0">@item.SrNo</p>
+                                                    </td>
+                                                    <td><p class="m-0">@item.VehicleNumber</p></td>
+                                                    <td>@ViewBag.RegistrationFees</td>
+                                                </tr>
+                                            }
+
+                                        }
+                                    </tbody>
+                                </table>
+
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+
+    $(document).ready(function () {
+        loadNavigation('Vehicles Payment', 'ql', 'pl', 'tl', 'Vehicle', 'Vehicles Payment', ' ');
+        //--------------------
+        if ($("#txtTotalPayment").val() > 0) {
+            $("#btnPaymnet").show();
+        }
+        else {
+            $("#btnPaymnet").hide();
+        }
+        //-----------------------------
+        $("#chkSelectAll").change(function () {
+            $("input:checkbox").prop('checked', $(this).prop("checked"));
+            $('#txtTotalPayment').val('');
+            totalAmt = 0;
+            //----------------------------
+            if ($("#chkSelectAll").is(":checked")) {
+                $("#table-exports tbody input[type=checkbox]:checked").each(function () {
+                    var row = $(this).closest("tr")[0];
+                    totalAmt += Number(row.cells[3].innerHTML);
+                });
+                $('#txtTotalPayment').val(totalAmt);
+                if ($("#txtTotalPayment").val() > 0) {
+                    $("#btnPaymnet").show();
+                }
+                else {
+
+                    $("#btnPaymnet").hide();
+                    totalAmt = 0;
+                    $('#txtTotalPayment').val(totalAmt);
+                }
+            }
+            else {
+                $("#btnPaymnet").hide();
+                totalAmt = 0;
+                $('#txtTotalPayment').val(totalAmt);
+            }
+            //--------------------------------
+
+
+        });
+
+    });
+    var totalAmt = 0;
+    function total(ele) {
+        debugger;
+        var total2 = $(ele).closest('tr').find('td:last').text();
+        if ($(ele).prop('checked') == true) {
+            totalAmt += Number(total2);
+            $('#txtTotalPayment').val(totalAmt);
+        }
+        else {
+            var total2 = $(ele).closest('tr').find('td:last').text();
+            totalAmt -= Number(total2);
+            $('#txtTotalPayment').val(totalAmt);
+        }
+        if ($("#txtTotalPayment").val() > 0) {
+            $("#btnPaymnet").show();
+        }
+        else {
+            $("#btnPaymnet").hide();
+        }
+
+        return false;
+    };
+
+    $("#btnPaymnet").click(function () {
+        debugger;
+        if ($("#table-exports tbody tr").length == 0) {
+            swal("", "Select Vehicle For Payment", "warning");
+            return false;
+        }
+        var idsToSend = [];
+        var FeesToSend = [];
+
+
+        //------------------
+        $("table tbody tr").each(function () {
+            debugger;
+            if ($(this).find("input.comp").is(":checked")) {
+
+                idsToSend.push($(this).closest('tr').find('td:eq(1) input[type="hidden"]').val());
+                FeesToSend.push($(this).closest('tr').find('td:eq(3)').text());
+            }
+
+        });
+        if (idsToSend == null || idsToSend.length == 0) {
+            swal("", "Select Vehicle For Payment", "warning");
+            return false;
+        }
+
+        if (confirm("Are you sure you want to pay ?")) {
+
+            var total = $("#txtTotalPayment").val();
+            $.ajax({
+                url: '/VehicleOwner/Vehicle/Payment',
+                data: { "arr": JSON.stringify(idsToSend), "Fees": JSON.stringify(FeesToSend), "total": total },
+                dataType: "json",
+                type: "post",
+                success: function (data) {
+                    debugger;
+                    if (data.result == 'Redirect') {
+                        window.location = data.url;
+
+                    }
+
+                },
+                error: function (data) {
+                }
+            });
+            idsToSend = [];
+        }
+    });
+</script>

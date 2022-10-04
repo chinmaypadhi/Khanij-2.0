@@ -1,0 +1,757 @@
+﻿@*// *********************************************************************************************************
+    //  View Name                : ViewReport
+    //  Desciption               : View Inspection Report details
+    //  Created By               : Lingaraj Dalai
+    //  Created On               : 14 April 2022
+    // ********************************************************************************************************
+*@
+@model GeologyEF.SelectQueryMultiple
+@{
+    ViewData["Title"] = "ViewReport";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+@{ 
+    int iCount = 1;
+}
+<script>
+    indicateMe = "yes";
+    $(document).ready(function () {
+        loadNavigation('InspectionReport', 'gl', 'pl', 'tl', 'Inspection Report', 'Inspection Report', ' ');
+        $('.datepicker').datetimepicker({
+            format: 'LT',
+            format: 'DD-MMM-YYYY',
+            daysOfWeekDisabled: [],
+        });
+        backMe = "yes";
+    });
+</script>
+
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        @Html.Partial("_CMSnavigation")
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link" href="~/Geology/InspectionReport/Create">
+                                Add
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="#">
+                                View
+                            </a>
+                        </li>
+                    </ul>
+                    @Html.Partial("_CMSutil")
+                </div>
+
+                <section class="box form-container">
+                    @using (Html.BeginForm("ViewReport", "InspectionReport", FormMethod.Post, new { AUTOCOMPLETE = "Off", id = "form1" }))
+                    {
+
+                        <div class="searchform px-3 py-3">
+                            <div class="row align-items-lg-center form-group">
+                                <label class="col-lg-1 col-md-4 col-sm-12 col-form-label">From Date</label>
+                                <div class="col-lg-2 col-md-6 col-sm-12 mb-lg-0 mb-3">
+                                    <div class="input-group">
+                                        <input id="txtTenderDate1" name="Frodate" type="text" class="form-control datepicker">
+                                        <div class="input-group-prepend">
+                                            <label class="input-group-text" for="txtTenderDate1"><i class="icon-calendar-alt-solid"></i></label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <label class="col-lg-1 col-md-4 col-sm-12 col-form-label">To Date</label>
+                                <div class="col-lg-2 col-md-6 col-sm-12 mb-lg-0 mb-3">
+                                    <div class="input-group">
+                                        <input id="txtTenderDate2" type="text" name="Todate" class="form-control datepicker">
+                                        <div class="input-group-prepend">
+                                            <label class="input-group-text" for="txtTenderDate2"><i class="icon-calendar-alt-solid"></i></label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-2">
+                                    <input class="btn btn-md btn-success m-0" id="btnShow" type="submit" value="Search" />
+                                    @*<button class="btn btn-md btn-success m-0" id="btnShow">Search</button>*@
+                                </div>
+                            </div>
+                        </div>
+                    }
+                        <div class="content-body">
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <table id="table-exports" class="table table-sm table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th width="20px">Sl#</th>
+                                                <th>Name </th>
+                                                <th>Designation</th>
+                                                <th>Village</th>
+                                                <th>Camp Inspection Date</th>
+                                                <th>Post</th>
+                                                <th>District</th>
+                                                <th>Name ofRegional Work</th>
+                                                <th>Tehsil</th>
+                                                <th>Status of BV</th>
+                                                <th>Bore Hole Point Position</th>
+                                                <th>Catering work and RLinformation</th>
+                                                <th>Brief Note on work in the camp</th>
+                                                <th>Total TopoGraphical Survey work till inspection Date</th>
+                                                <th>Work Area Status</th>
+                                                <th>vehicle regrecorded or not</th>
+                                                <th>Total advanced emanded by the campofficer</th>
+                                                <th>Advanceamount received</th>
+                                                <th>Amount Spent POL</th>
+                                                <th>Amount Spent Improvement Work</th>
+                                                <th>Amount Spent Expenditure on other items</th>
+                                                <th>Last Expenditure sheet submitted by camp officer</th>
+                                                <th>Status of registration maintained in the camp</th>
+                                                <th>Water Supply Pump Status</th>
+                                                <th width="100px">Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach (var x in Model.GeologyMainData)
+                                            {
+                                                <tr>
+                                                    <td>@iCount</td>
+                                                    <td><a data-original-title="Click Here to view" onclick="FunctionDetails('@x.GeologyInspectionReportId')" class="btn btn-success">@x.Name</a></td>
+                                                    <td>@x.Designation</td>
+                                                    <td>@x.VillageName</td>
+                                                    <td>@x.CampInspectionDate</td>
+                                                    <td>@x.Post</td>
+                                                    <td>@x.DistrictName</td>
+                                                    <td>@x.NameofRegionalWork</td>
+                                                    <td>@x.TehsilName</td>
+                                                    <td>@x.StatusofBV</td>
+                                                    <td>@x.BoreHolePointPosition</td>
+                                                    <td>@x.CateringworkandRLinformation</td>
+                                                    <td>@x.BriefNoteonallheworkinthecamp</td>
+                                                    <td>@x.TotalTopoGraphicalSurveyworktillinspectionDate</td>
+                                                    <td>@x.WorkAreaStatus</td>
+                                                    <td>@x.vehicleregrecordedornot</td>
+                                                    <td>@x.Totaladvancedemandedbythecampofficer</td>
+                                                    <td>@x.Advanceamountreceived</td>
+                                                    <td>@x.AmountSpentPOL</td>
+                                                    <td>@x.AmountSpentImprovementWork</td>
+                                                    <td>@x.AmountSpentExpenditureonotheritems</td>
+                                                    <td>@x.LastExpendituresheetsubmittedbycampofficer</td>
+                                                    <td>@x.Statusofregistrationmaintainedinthecamp</td>
+                                                    <td>@x.WaterSupplyPumpStatus</td>
+                                                    <td class="text-center noprint">
+                                                        <a onclick="FunctionEdit(@x.GeologyInspectionReportId);" class="text-success btn-sm" title="Edit"> <i class="icon-pencil-alt-solid"></i></a>
+                                                        <a onclick="FunctionDelete(@x.GeologyInspectionReportId);" class="text-danger btn-sm" title="Delete"> <i class="icon-trash-alt-solid"></i></a>
+                                                    </td>
+                                                </tr>
+                                                iCount = iCount + 1;
+                                            }
+
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+            </div>
+        </div>
+
+        <!-- MAIN CONTENT AREA ENDS -->
+    </div>
+</section>
+
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">
+                    View Details | Application001
+                </h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body mineral-concesion-details">
+
+                <div class="row">
+                    <label class="col-lg-3 col-12 col-form-label">Name</label>
+                    <div class="col-lg-3 col-12">
+                        <label class="form-control-plaintext"><span class="colon">:</span>Lorem Ipsum dollar sit</label>
+                    </div>
+
+                    <label class="col-lg-3 col-12 col-form-label">Designation</label>
+                    <div class="col-lg-3 col-12">
+                        <label class="form-control-plaintext"><span class="colon">:</span>J.S Pratwi</label>
+                    </div>
+
+                    <label class="col-lg-3 col-12 col-form-label"> Camp Inspection Date</label>
+                    <div class="col-lg-3 col-12">
+                        <label class="form-control-plaintext"><span class="colon">:</span>22-jan-2022</label>
+                    </div>
+
+                    <label class="col-lg-3 col-12 col-form-label">Village</label>
+                    <div class="col-lg-3 col-12">
+                        <label class="form-control-plaintext"><span class="colon">:</span>Bijapur</label>
+                    </div>
+
+                    <label class="col-lg-3 col-12 col-form-label">Post</label>
+                    <div class="col-lg-3 col-12">
+                        <label class="form-control-plaintext"><span class="colon">:</span>Bijapur</label>
+                    </div>
+
+
+
+                    <label class="col-lg-3 col-12 col-form-label">Tehsil</label>
+                    <div class="col-lg-3 col-12">
+                        <label class="form-control-plaintext"><span class="colon">:</span>Bijapur</label>
+                    </div>
+
+                    <label class="col-lg-3 col-12 col-form-label">District</label>
+                    <div class="col-lg-3 col-12">
+                        <label class="form-control-plaintext"><span class="colon">:</span>Lorem ipsum</label>
+                    </div>
+
+                    <label class="col-lg-3 col-12 col-form-label">Name of Regional Work  </label>
+                    <div class="col-lg-3 col-12">
+                        <label class="form-control-plaintext"><span class="colon">:</span>Lorem ipsum</label>
+                    </div>
+
+
+                </div>
+
+                <h6 class="mt-4">Camp Office / Staff Details</h6>
+
+                <div class="table-responsive mt-3">
+                    <table class="table table-bordered table-sm">
+                        <thead>
+                            <tr>
+                                <th width="30px">Sl#</th>
+                                <th>Camp Office / Staff</th>
+                                <th>Name</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>1</td>
+                                <td>Class I</td>
+                                <td>Lorem Ipsum</td>
+                            </tr>
+                            <tr>
+                                <td>2</td>
+                                <td>Class II</td>
+                                <td>Lorem Ipsum</td>
+                            </tr>
+                            <tr>
+                                <td>3</td>
+                                <td>Survey</td>
+                                <td>Lorem Ipsum</td>
+
+                            </tr>
+                            <tr>
+                                <td>4</td>
+                                <td>Drilling</td>
+                                <td>Lorem Ipsum</td>
+
+                            </tr>
+                            <tr>
+                                <td>5</td>
+                                <td>Water Supply Pump</td>
+                                <td>Lorem Ipsum</td>
+
+                            </tr>
+                            <tr>
+                                <td>6</td>
+                                <td>Driver</td>
+                                <td>Lorem Ipsum</td>
+
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h6 class="mt-4">Information about drilling machines/Vehicles and survey equipment working in the camp</h6>
+
+                <div class="table-responsive mt-3">
+                    <table class="table table-bordered table-sm">
+                        <thead>
+                            <tr>
+                                <th width="30px">Sl#</th>
+                                <th>Drilling Machine Name</th>
+                                <th>Drilling No.</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>1</td>
+                                <td>Lorem Ipsum</td>
+                                <td>2</td>
+                            </tr>
+                            <tr>
+                                <td>2</td>
+                                <td>Lorem Ipsum</td>
+                                <td>5</td>
+                            </tr>
+                            <tr>
+                                <td>3</td>
+                                <td>Lorem Ipsum</td>
+                                <td>4</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <h6 class="mt-4">Status and Progress of drilling machines in the camp</h6>
+                <div class="table-responsive mt-3">
+                    <table class="table table-bordered table-sm">
+                        <thead>
+                            <tr>
+                                <th rowspan="2">Description</th>
+                                <th colspan="2">Progress</th>
+                                <th rowspan="2">Accusation</th>
+                            </tr>
+                            <tr>
+                                <th>Till Last Month</th>
+                                <th>Updates</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Drilling Progress till the date of drilling machine-wise inspection</td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+
+                            <tr>
+                                <td>Registers of drilling machines maintenance condition</td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+
+                            <tr>
+                                <td>Status of maintenance of drilling material</td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td>Justification for status of water supply pump and distance from drilling site</td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td>Sampling (Number of Sample Obtained by drilling)</td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <h6 class="mt-4">Number and Type of Vehicles</h6>
+                <div class="table-responsive mt-3">
+                    <table class="table table-bordered table-sm">
+                        <thead>
+                            <tr>
+                                <th width="30px">Sl#</th>
+                                <th>Vehicle No.</th>
+                                <th>Type of Vehicle</th>
+
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>1</td>
+                                <td>56754</td>
+                                <td>Lorem Ipsum</td>
+
+                            </tr>
+                            <tr>
+                                <td>2</td>
+                                <td>7546</td>
+                                <td>Lorem Ipsum</td>
+
+                            </tr>
+                            <tr>
+                                <td>3</td>
+                                <td>7534</td>
+                                <td>Lorem Ipsum</td>
+
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+
+                <div class="row">
+                    <label class="col-12 col-form-label">Water Supply Pump Status</label>
+                    <div class="col-12">
+                        <label class="form-control-plaintext">Lorem Ipsum dollar sit</label>
+                    </div>
+                </div>
+
+                <h6 class="mt-4">Survey Equipment</h6>
+
+                <div class="table-responsive mt-3">
+                    <table class="table table-bordered table-sm">
+                        <thead>
+                            <tr>
+                                <th width="30px">Sl#</th>
+                                <th>Survey Equipment</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>1</td>
+                                <td>Lorem Ipsum</td>
+                            </tr>
+                            <tr>
+                                <td>2</td>
+                                <td>Lorem Ipsum</td>
+                            </tr>
+                            <tr>
+                                <td>3</td>
+                                <td>Lorem Ipsum</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h6 class="mt-4">Advance status for Regional Work</h6>
+                <div class="row">
+                    <label class="col-lg-6 col-12 col-form-label">Total advance demanded by the camp officer</label>
+                    <div class="col-lg-6 col-12">
+                        <label class="form-control-plaintext"><span class="colon">:</span>Lorem Ipsum dollar sit</label>
+                    </div>
+
+                    <label class="col-lg-6 col-12 col-form-label">Advance amount received</label>
+                    <div class="col-lg-6 col-12">
+                        <label class="form-control-plaintext"><span class="colon">:</span>J.S Pratwi</label>
+                    </div>
+
+                    <label class="col-lg-6 col-12 col-form-label">Amount Spent (Labour)</label>
+                    <div class="col-lg-6 col-12">
+                        <label class="form-control-plaintext"><span class="colon">:</span>22-jan-2022</label>
+                    </div>
+
+                    <label class="col-lg-6 col-12 col-form-label">Amount Spent (P.O.L)</label>
+                    <div class="col-lg-6 col-12">
+                        <label class="form-control-plaintext"><span class="colon">:</span>Bijapur</label>
+                    </div>
+
+                    <label class="col-lg-6 col-12 col-form-label">Amount Spent (Improvement Work)</label>
+                    <div class="col-lg-6 col-12">
+                        <label class="form-control-plaintext"><span class="colon">:</span>Bijapur</label>
+                    </div>
+
+
+
+                    <label class="col-lg-6 col-12 col-form-label">Amount Spent (Expenditure on other items)</label>
+                    <div class="col-lg-6 col-12">
+                        <label class="form-control-plaintext"><span class="colon">:</span>Bijapur</label>
+                    </div>
+
+                    <label class="col-lg-6 col-12 col-form-label">Last Expenditure sheet submitted by camp officer</label>
+                    <div class="col-lg-6 col-12">
+                        <label class="form-control-plaintext"><span class="colon">:</span>Lorem ipsum</label>
+                    </div>
+
+                    <label class="col-lg-6 col-12 col-form-label">Status of registration maintained in the camp </label>
+                    <div class="col-lg-6 col-12">
+                        <label class="form-control-plaintext"><span class="colon">:</span>Lorem ipsum</label>
+                    </div>
+
+
+                </div>
+                <h6 class="mt-4">Information on progress of regional Work</h6>
+
+                <div class="table-responsive mt-3">
+                    <table class="table table-bordered table-sm">
+                        <thead>
+                            <tr>
+                                <th rowspan="2">Description</th>
+                                <th rowspan="2">Target</th>
+                                <th colspan="2">Progress</th>
+                            </tr>
+                            <tr>
+                                <th>Till Last Month</th>
+                                <th>Updates</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Geological survey measure (1:50,000)</td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+
+                            <tr>
+                                <td>Detailed Map Measure (1:4000)</td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+
+                            <tr>
+                                <td>Drilling</td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td>Sampling (Number of Surface Sample)</td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td>Sampling (Number of Sample Obtained by drilling)</td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td>Other Samples</td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h6 class="mt-4">Total Supply Vehicles and their types in the camp</h6>
+
+                <div class="table-responsive mt-3">
+                    <table class="table table-bordered table-sm">
+                        <thead>
+                            <tr>
+                                <th width="30px">Sl#</th>
+                                <th>Total Supply Vehicles</th>
+                                <th>Camp Type </th>
+
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>1</td>
+                                <td>Lorem Ipsum</td>
+                                <td>Lorem Ipsum</td>
+                            </tr>
+                            <tr>
+                                <td>2</td>
+                                <td>Lorem Ipsum</td>
+                                <td>Lorem Ipsum</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="row">
+                    <label class="col-12 col-form-label">
+                        <strong>
+                            Status/Monthly Certificate of maintenance of vehicle logbook
+                            and vehicle registration is being recorded or not
+                        </strong>
+                        </label>
+                    <div class="col-12">
+                        <label class="form-control-plaintext">Lorem Ipsum dollar sit</label>
+                    </div>
+                </div>
+
+                <h6 class="mt-4">Total Expediture after 1st expediture on vehicle improvement</h6>
+                <div class="table-responsive mt-3">
+                    <table class="table table-bordered table-sm">
+                        <thead>
+                            <tr>
+                                <th width="30px">Sl#</th>
+                                <th>Vehicles Type</th>
+                                <th>Total Expediture</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>1</td>
+                                <td>Lorem Ipsum</td>
+                                <td>Lorem Ipsum</td>
+                            </tr>
+                            <tr>
+                                <td>2</td>
+                                <td>Lorem Ipsum</td>
+                                <td>Lorem Ipsum</td>
+                            </tr>
+
+                        </tbody>
+                    </table>
+                </div>
+
+                <h6 class="mt-4">Fuel Consumption average of the vehicle</h6>
+
+                <div class="table-responsive mt-3">
+                    <table class="table table-bordered table-sm">
+                        <thead>
+                            <tr>
+                                <th width="30px">Sl#</th>
+                                <th>Vehicles Type</th>
+                                <th>Fuel used  </th>
+                                <th>Month </th>
+                                <th>Year  </th>
+
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>1</td>
+                                <td>Lorem Ipsum</td>
+                                <td>Lorem Ipsum</td>
+                                <td>Lorem Ipsum</td>
+                                <td>Lorem Ipsum</td>
+
+                            </tr>
+                            <tr>
+                                <td>2</td>
+                                <td>Lorem Ipsum</td>
+                                <td>Lorem Ipsum</td>
+                                <td>Lorem Ipsum</td>
+                                <td>Lorem Ipsum</td>
+
+                            </tr>
+
+                        </tbody>
+                    </table>
+                </div>
+                <h6 class="mt-4"> Status of Topo Graphical Survey in the camp</h6>
+
+                <div class="row">
+                    <label class="col-lg-6 col-12 col-form-label">Total Topo Graphical Survey work till inspection Date</label>
+                    <div class="col-lg-6 col-12">
+                        
+                        <label class="form-control-plaintext">
+                            <span class="colon">:</span>
+                            Lorem Ipsum dollar sit
+                        </label>
+                    </div>
+                    <label class="col-lg-6 col-12 col-form-label">Work Area Status</label>
+                    <div class="col-lg-6 col-12">
+                        <label class="form-control-plaintext">
+                        <span class="colon">:</span>
+                        Lorem Ipsum dollar sit</label>
+                    </div>
+                </div>
+
+                <h6 class="mt-4">Number of Grid Lines and Sq. Km/Line Km</h6>
+                <div class="row">
+                    <label class="col-lg-6 col-12 col-form-label">Bore Hole Point Position</label>
+                    <div class="col-lg-6 col-12">
+                        <label class="form-control-plaintext">
+                            <span class="colon">:</span>
+                            Lorem Ipsum dollar sit
+                        </label>
+                    </div>
+                    <label class="col-lg-6 col-12 col-form-label">Catering work and R.L. information</label>
+                    <div class="col-lg-6 col-12">
+                        <label class="form-control-plaintext">
+                            <span class="colon">:</span>
+                            Lorem Ipsum dollar sit
+                        </label>
+                    </div>
+
+                    <label class="col-lg-6 col-12 col-form-label">Status of B.V</label>
+                    <div class="col-lg-6 col-12">
+                        <label class="form-control-plaintext">
+                            <span class="colon">:</span>
+                            Lorem Ipsum dollar sit
+                        </label>
+                    </div>
+                    <label class="col-lg-6 col-12 col-form-label">Brief Note on all the work in the camp</label>
+                    <div class="col-lg-6 col-12">
+                        <label class="form-control-plaintext">
+                            <span class="colon">:</span>
+                            Lorem Ipsum dollar sit
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    function FunctionDelete(InspectionReportId) {
+
+        swal({
+            title: "Are you confirmed to delete this record?",
+            //text: 'Hello',
+            icon: "warning",
+            //buttons: true,
+            buttons: ["No", "Yes"],
+            //dangerMode: true,
+        })
+            .then((willDelete) => {
+                if (willDelete) {
+                    $.ajax({
+            url: '@Url.Content("~/")' + 'Geology/InspectionReport/DeleteInspection',
+            method: "POST",
+            data: { GeologyInspectionReportId: InspectionReportId },
+                        success: function (data) {
+                            swal({
+                                title: data.data,
+                                icon: "success",
+                            }).then(function () {
+                                location.reload();
+                            }
+                            );
+                           
+            }
+            });
+                }
+            });
+
+    }
+
+    function FunctionEdit(InspectionReportId) {
+        window.location.href ='Create?Inspectionid='+ InspectionReportId;
+        @*$.ajax({
+            url: '@Url.Content("~/")' + 'Geology/InspectionReport/Create',
+            method: "GET",
+            data: { Inspectionid: InspectionReportId },
+            success: function (data) {
+                swal("", data.data, "success");
+            }
+            });*@
+    }
+    function FunctionDetails(InspectionReportId) {
+        window.location.href = 'Create?Inspectionid=' + InspectionReportId +'&DetailStatus="DetailStatus"';
+        @* $.ajax({
+            url: '@Url.Content("~/")' + 'Geology/InspectionReport/Create',
+            method: "GET",
+            data: { Inspectionid: InspectionReportId },
+            success: function (data) {
+                swal("", data.data, "success");
+            }
+        });*@
+    }
+
+</script>
+
+
+
+
+
+
+
+

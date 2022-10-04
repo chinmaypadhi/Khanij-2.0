@@ -1,0 +1,203 @@
+﻿@model IEnumerable<EpassEF.ViewModel.PurchaserConsigneeViewModel>
+@{
+    ViewData["Title"] = "GetOpenEpermitDetails";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+@inject EpassApp.KhanijSecurity.KhanijIDataProtection protector;
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        @*<uc1:navigation runat="server" ID="navigation" />*@
+        @Html.Partial("_CMSnavigation")
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+
+                        <li class="nav-item">
+                            <a class="nav-link active" href="javascript:void(0);">
+                                Purchaser Consignee
+                            </a>
+                        </li>
+                    </ul>
+                    @*<uc1:util runat="server" ID="util" />*@
+                    @Html.Partial("_CMSutil")
+                </div>
+
+                <section class="box form-container">
+                    <div class="search-box">
+                        <div class="searchform px-3 pt-3">
+                            <div class="row">
+
+
+                                <div class="col-sm-4">
+                                    <div class="form-group row">
+                                        <label for="inputText" class="col-sm-3 col-form-label">
+                                            From Date
+                                        </label>
+                                        <div class="col-sm-8">
+                                            <div class="input-group">
+                                                <input type="text" class="form-control datepicker" id="inputDate1">
+                                                <div class="input-group-prepend">
+                                                    <label class="input-group-text" for="inputDate1"><i class="far fa-calendar"></i></label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-4">
+                                    <div class="form-group row">
+                                        <label for="inputText" class="col-sm-3 col-form-label">
+                                            To Date
+                                        </label>
+                                        <div class="col-sm-8">
+                                            <div class="input-group">
+                                                <input type="text" class="form-control datepicker" id="inputDate2">
+                                                <div class="input-group-prepend">
+                                                    <label class="input-group-text" for="inputDate2"><i class="far fa-calendar"></i></label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+
+                                <div class="col-sm-2">
+                                    <a href="#" class="btn btn-sm btn-success m-0 waves-effect waves-light"> Show </a>
+                                </div>
+
+
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="content-body pt-0">
+                        <div class="legend-box">
+                            <ul class="d-flex mb-1 justify-content-end list-unstyled">
+                                <li><span class="bg-success"></span> Active</li>
+                                <li><span class="bg-warning"></span> Inactive</li>
+                            </ul>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-12">
+                                    <table id="table-exports" class="table table-sm table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th>Sl#</th>
+                                                <th>E-Permit No.</th>
+                                                <th>Mineral Name</th>
+                                                <th>Unit</th>
+                                                <th>Mineral Form</th>
+                                                <th>Mineral Grade</th>
+                                                <th>Paid Royality</th>
+                                                <th>Payment Mode</th>
+                                                <th>Total Qty</th>
+                                                <th>Dispatched Qty</th>
+                                                <th>Balance Qty</th>
+                                                <th width="100" class="noprint">Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @{ int i = 1;
+                                            }
+                                            @*@foreach (var Permit in ViewBag.Purchaser)*@
+                                            @if (Model != null)
+                                            {
+                                                @foreach (var Permit in Model)
+                                                {
+                                                    <tr class="active-row">
+                                                        <td>@i</td>
+                                                        <td>@Permit.BULKPERMITNO</td>
+                                                        <td>@Permit.MINERALNAME</td>
+                                                        <td>@Permit.UNIT</td>
+                                                        <td>@Permit.MINERALNATURE</td>
+                                                        <td>@Permit.MINERALGRADE</td>
+                                                        <td>@Permit.PAYABLEROYALTY</td>
+                                                        <td>@Permit.PAYMENTMODE</td>
+                                                        <td>@Permit.TOTALQTY</td>
+                                                        @{if (Convert.ToDecimal(@Permit.BlockedQty) > 0)
+                                                            {
+                                                                <td>
+                                                                    <text>Dispatched Qty: </text> @Permit.DISPATCHEDQTY <br /> <text>Blocked Qty: </text>
+                                                                    <a href="@Url.Action("ViewPermit", "PurchaserConsignee", new { id = @Permit.BULKPERMITNO })">@Permit.BlockedQty</a>
+                                                                </td>
+                                                            }
+                                                            else
+                                                            {
+                                                                <td><text> Dispatched Qty:</text> @Permit.DISPATCHEDQTY</td>
+                                                            }
+                                                        }
+                                                        <td>
+                                                            @{ if (Convert.ToDecimal(@Permit.PENDINGQTY) != Convert.ToDecimal(@Permit.PermitAdjustedQty))
+                                                                {
+                                                                    <a href="@Url.Action("ePermitRoyaltyHistory", "Lessee", new { Area = "Report", id = @Permit.BULKPERMITNO }) ">@Permit.PermitAdjustedQty</a>
+                                                                }
+                                                                else
+                                                                {
+                                                                    @Permit.PermitAdjustedQty
+                                                                }
+                                                            }
+                                                        </td>
+                                                        <td>
+                                                            @{
+                                                                string UserRoleInfo = "TP"; int TPOffline = 0;
+                                                                if (UserRoleInfo == "TP")
+                                                                {
+                                                                    <a class="btn btn-success" href="@Url.Action("PurchaserConsigneeByPermitId", "PurchaserConsignee", new { BULKPERMITID = @Permit.BULKPERMITID })">Add Purchaser</a>
+                                                                    @*<a href="@Url.Action("PurchaserConsigneeByPermitId", "PurchaserConsignee", new { BULKPERMITID = @Permit.BULKPERMITID })">Add Purchaser1</a>*@
+                                                                }
+                                                                else
+                                                                {
+                                                                    if (TPOffline == 0)
+                                                                    {
+                                                                        if (@Permit.MINERALNATURE != "LOW GRADE" && @Permit.MineralType == "Major Mineral")
+                                                                        {
+                                                                            <a class='link' href="@Url.Action("PurchaserConsigneeByPermitId", "PurchaserConsignee", new { BULKPERMITID = @Permit.BULKPERMITID })">Add Purchaser</a>
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            <text>No Need to Assign Purchase Consignee</text>
+                                                                        }
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        if (Convert.ToInt32(@Permit.UserWiseId) == 0)
+                                                                        {
+                                                                            <a class='link' href="@Url.Action("PurchaserConsigneeByPermitId", "PurchaserConsignee", new { BULKPERMITID = @Permit.BULKPERMITID })">Add Purchaser</a>
+                                                                        }
+                                                                        else if (Convert.ToInt32(@Permit.UserWiseId) > 0)
+                                                                        {
+                                                                            <text>Your Purchaser is fixed</text>
+                                                                            <a class='link' href="@Url.Action("PurchaserConsigneeByPermitId", "PurchaserConsignee", new { BULKPERMITID = @Permit.BULKPERMITID, Type = "ThroughLicensee " })">Click Here</a><br /> <text>to select transportation mode</text>
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            <text>No Need to Assign Purchase Consignee</text>
+                                                                        }
+                                                                    }
+                                                                }
+                                                            }
+                                                        </td>
+                                                        @*<td>
+                                                                <a href="AddPurchaser.aspx"
+                                                                   class="btn-floating btn-outline-success btn-sm"
+                                                                   title="Delete">Add Purchaser</a>
+                                                            </td>*@
+                                                    </tr>
+                                                    i++;
+                                                }
+                                            }
+                                        </tbody>
+                                    </table>
+                               
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+    <!-- MAIN CONTENT AREA ENDS -->
+</section>

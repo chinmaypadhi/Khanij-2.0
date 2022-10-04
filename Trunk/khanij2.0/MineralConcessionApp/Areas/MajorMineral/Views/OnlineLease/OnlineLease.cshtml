@@ -1,0 +1,3215 @@
+﻿@*// *********************************************************************************************************
+    //  View Name                : OnlineLease
+    //  Desciption               : To Save and Update Bidder Information
+    //  Created By               : Suroj Kumar Pradhan
+    //  Created On               : 02-may-2021
+    // ********************************************************************************************************
+*@
+
+@model MineralConcessionEF.LeaseApplicationModel
+@{
+    ViewData["Title"] = "Add";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<style type="text/css">
+    .container2 {
+        border: 2px solid #dedede;
+        background-color: #f1f1f1;
+        border-radius: 5px;
+        /*padding: 10px;
+    margin: 10px 0;*/
+    }
+
+    .conversation-wrap {
+        box-shadow: -2px 0 3px #ddd;
+        padding: 0;
+        max-height: 550px;
+        overflow: auto;
+        margin-right: 10px;
+    }
+
+    .conversation {
+        padding: 5px;
+        border: 1px solid #ddd;
+        /*border-right: 1px solid #ddd;*/
+        margin: 0;
+    }
+
+    .message-wrap {
+        box-shadow: 0 0 3px #ddd;
+        padding: 0;
+    }
+
+    .msg {
+        padding: 5px;
+        /*border-bottom:1px solid #ddd;*/
+        margin: 0;
+        margin-bottom: 10px;
+    }
+
+    .msg-wrap {
+        padding: 10px;
+        max-height: 550px;
+        overflow: auto;
+    }
+
+    .time {
+        color: #bfbfbf;
+    }
+
+    .send-wrap {
+        border-top: 1px solid #eee;
+        border-bottom: 1px solid #eee;
+        padding: 10px;
+        /*background: #f8f8f8;*/
+    }
+
+    .send-message {
+        resize: none;
+    }
+
+    .highlight {
+        background-color: #f7f7f9;
+        border: 1px solid #e1e1e8;
+    }
+
+    .send-message-btn {
+        border-top-left-radius: 0;
+        border-top-right-radius: 0;
+        border-bottom-left-radius: 0;
+        border-bottom-right-radius: 0;
+    }
+
+    .btn-panel {
+        background: #f7f7f9;
+    }
+
+        .btn-panel .btn {
+            color: #b8b8b8;
+            transition: 0.2s all ease-in-out;
+        }
+
+            .btn-panel .btn:hover {
+                color: #666;
+                background: #f8f8f8;
+            }
+
+            .btn-panel .btn:active {
+                background: #f8f8f8;
+                box-shadow: 0 0 1px #ddd;
+            }
+
+    .btn-panel-conversation .btn, .btn-panel-msg .btn {
+        background: #f8f8f8;
+    }
+
+        .btn-panel-conversation .btn:first-child {
+            border-right: 1px solid #ddd;
+        }
+
+    .msg-wrap .media-heading {
+        color: #003bb3;
+        font-weight: 700;
+    }
+
+
+    .msg-date {
+        background: none;
+        text-align: center;
+        color: #aaa;
+        border: none;
+        box-shadow: none;
+        border-bottom: 1px solid #ddd;
+    }
+
+    body::-webkit-scrollbar {
+        width: 12px;
+    }
+
+
+    /* Let's get this party started */
+    ::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    /* Track */
+    ::-webkit-scrollbar-track {
+        -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+        /*        -webkit-border-radius: 10px;
+        border-radius: 10px;*/
+    }
+
+    /* Handle */
+    ::-webkit-scrollbar-thumb {
+        /*        -webkit-border-radius: 10px;
+        border-radius: 10px;*/
+        background: #ddd;
+        -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.5);
+    }
+
+        ::-webkit-scrollbar-thumb:window-inactive {
+            background: #ddd;
+        }
+
+    .font {
+        font-size: x-large;
+    }
+
+    img {
+        vertical-align: middle;
+    }
+
+    .img-responsive {
+        display: block;
+        height: auto;
+        max-width: 100%;
+    }
+
+    .img-rounded {
+        border-radius: 3px;
+    }
+
+    .img-thumbnail {
+        background-color: #fff;
+        border: 1px solid #ededf0;
+        border-radius: 3px;
+        display: inline-block;
+        height: auto;
+        line-height: 1.428571429;
+        max-width: 100%;
+        moz-transition: all .2s ease-in-out;
+        o-transition: all .2s ease-in-out;
+        padding: 2px;
+        transition: all .2s ease-in-out;
+        webkit-transition: all .2s ease-in-out;
+    }
+
+    .img-circle {
+        border-radius: 50%;
+    }
+
+    .timeline-centered {
+        position: relative;
+        margin-bottom: 30px;
+    }
+
+        .timeline-centered:before, .timeline-centered:after {
+            content: " ";
+            display: table;
+        }
+
+        .timeline-centered:after {
+            clear: both;
+        }
+
+        .timeline-centered:before, .timeline-centered:after {
+            content: " ";
+            display: table;
+        }
+
+        .timeline-centered:after {
+            clear: both;
+        }
+
+        .timeline-centered:before {
+            content: '';
+            position: absolute;
+            display: block;
+            width: 4px;
+            background: #f5f5f6;
+            /*left: 50%;*/
+            top: 20px;
+            bottom: 20px;
+            margin-left: 30px;
+        }
+
+        .timeline-centered .timeline-entry {
+            position: relative;
+            /*width: 50%;
+        float: right;*/
+            margin-top: 5px;
+            margin-left: 30px;
+            margin-bottom: 10px;
+            clear: both;
+        }
+
+            .timeline-centered .timeline-entry:before, .timeline-centered .timeline-entry:after {
+                content: " ";
+                display: table;
+            }
+
+            .timeline-centered .timeline-entry:after {
+                clear: both;
+            }
+
+            .timeline-centered .timeline-entry:before, .timeline-centered .timeline-entry:after {
+                content: " ";
+                display: table;
+            }
+
+            .timeline-centered .timeline-entry:after {
+                clear: both;
+            }
+
+            .timeline-centered .timeline-entry.begin {
+                margin-bottom: 0;
+            }
+
+            .timeline-centered .timeline-entry.left-aligned {
+                float: left;
+            }
+
+                .timeline-centered .timeline-entry.left-aligned .timeline-entry-inner {
+                    margin-left: 0;
+                    margin-right: -18px;
+                }
+
+                    .timeline-centered .timeline-entry.left-aligned .timeline-entry-inner .timeline-time {
+                        left: auto;
+                        right: -100px;
+                        text-align: left;
+                    }
+
+                    .timeline-centered .timeline-entry.left-aligned .timeline-entry-inner .timeline-icon {
+                        float: right;
+                    }
+
+                    .timeline-centered .timeline-entry.left-aligned .timeline-entry-inner .timeline-label {
+                        margin-left: 0;
+                        margin-right: 70px;
+                    }
+
+                        .timeline-centered .timeline-entry.left-aligned .timeline-entry-inner .timeline-label:after {
+                            left: auto;
+                            right: 0;
+                            margin-left: 0;
+                            margin-right: -9px;
+                            -moz-transform: rotate(180deg);
+                            -o-transform: rotate(180deg);
+                            -webkit-transform: rotate(180deg);
+                            -ms-transform: rotate(180deg);
+                            transform: rotate(180deg);
+                        }
+
+            .timeline-centered .timeline-entry .timeline-entry-inner {
+                position: relative;
+                margin-left: -20px;
+            }
+
+                .timeline-centered .timeline-entry .timeline-entry-inner:before, .timeline-centered .timeline-entry .timeline-entry-inner:after {
+                    content: " ";
+                    display: table;
+                }
+
+                .timeline-centered .timeline-entry .timeline-entry-inner:after {
+                    clear: both;
+                }
+
+                .timeline-centered .timeline-entry .timeline-entry-inner:before, .timeline-centered .timeline-entry .timeline-entry-inner:after {
+                    content: " ";
+                    display: table;
+                }
+
+                .timeline-centered .timeline-entry .timeline-entry-inner:after {
+                    clear: both;
+                }
+
+                .timeline-centered .timeline-entry .timeline-entry-inner .timeline-time {
+                    position: absolute;
+                    left: -100px;
+                    text-align: right;
+                    padding: 10px;
+                    -webkit-box-sizing: border-box;
+                    -moz-box-sizing: border-box;
+                    box-sizing: border-box;
+                }
+
+                    .timeline-centered .timeline-entry .timeline-entry-inner .timeline-time > span {
+                        display: block;
+                    }
+
+                        .timeline-centered .timeline-entry .timeline-entry-inner .timeline-time > span:first-child {
+                            font-size: 15px;
+                            font-weight: bold;
+                        }
+
+                        .timeline-centered .timeline-entry .timeline-entry-inner .timeline-time > span:last-child {
+                            font-size: 12px;
+                        }
+
+                .timeline-centered .timeline-entry .timeline-entry-inner .timeline-icon {
+                    background: #fff;
+                    color: #737881;
+                    display: block;
+                    width: 40px;
+                    height: 40px;
+                    -webkit-background-clip: padding-box;
+                    -moz-background-clip: padding;
+                    background-clip: padding-box;
+                    -webkit-border-radius: 20px;
+                    -moz-border-radius: 20px;
+                    border-radius: 20px;
+                    text-align: center;
+                    -moz-box-shadow: 0 0 0 5px #f5f5f6;
+                    -webkit-box-shadow: 0 0 0 5px #f5f5f6;
+                    box-shadow: 0 0 0 5px #f5f5f6;
+                    line-height: 40px;
+                    font-size: 15px;
+                    float: left;
+                }
+
+                    .timeline-centered .timeline-entry .timeline-entry-inner .timeline-icon.bg-primary {
+                        background-color: #303641;
+                        color: #fff;
+                    }
+
+                    .timeline-centered .timeline-entry .timeline-entry-inner .timeline-icon.bg-secondary {
+                        background-color: #ee4749;
+                        color: #fff;
+                    }
+
+                    .timeline-centered .timeline-entry .timeline-entry-inner .timeline-icon.bg-success {
+                        background-color: #00a651;
+                        color: #fff;
+                    }
+
+                    .timeline-centered .timeline-entry .timeline-entry-inner .timeline-icon.bg-info {
+                        background-color: #21a9e1;
+                        color: #fff;
+                    }
+
+                    .timeline-centered .timeline-entry .timeline-entry-inner .timeline-icon.bg-warning {
+                        background-color: #fad839;
+                        color: #fff;
+                    }
+
+                    .timeline-centered .timeline-entry .timeline-entry-inner .timeline-icon.bg-danger {
+                        background-color: #cc2424;
+                        color: #fff;
+                    }
+
+                .timeline-centered .timeline-entry .timeline-entry-inner .timeline-label {
+                    position: relative;
+                    background: #f5f5f6;
+                    padding: 1em;
+                    margin-left: 60px;
+                    -webkit-background-clip: padding-box;
+                    -moz-background-clip: padding;
+                    background-clip: padding-box;
+                    -webkit-border-radius: 3px;
+                    -moz-border-radius: 3px;
+                    border-radius: 3px;
+                }
+
+                    .timeline-centered .timeline-entry .timeline-entry-inner .timeline-label:after {
+                        content: '';
+                        display: block;
+                        position: absolute;
+                        width: 0;
+                        height: 0;
+                        border-style: solid;
+                        border-width: 9px 9px 9px 0;
+                        border-color: transparent #f5f5f6 transparent transparent;
+                        left: 0;
+                        top: 10px;
+                        margin-left: -9px;
+                    }
+
+                    .timeline-centered .timeline-entry .timeline-entry-inner .timeline-label h2, .timeline-centered .timeline-entry .timeline-entry-inner .timeline-label p {
+                        color: #737881;
+                        font-family: "Noto Sans",sans-serif;
+                        font-size: 12px;
+                        margin: 0;
+                        line-height: 1.428571429;
+                    }
+
+                        .timeline-centered .timeline-entry .timeline-entry-inner .timeline-label p + p {
+                            margin-top: 15px;
+                        }
+
+                    .timeline-centered .timeline-entry .timeline-entry-inner .timeline-label h2 {
+                        font-size: 16px;
+                        margin-bottom: 10px;
+                    }
+
+                        .timeline-centered .timeline-entry .timeline-entry-inner .timeline-label h2 a {
+                            color: #303641;
+                        }
+
+                        .timeline-centered .timeline-entry .timeline-entry-inner .timeline-label h2 span {
+                            -webkit-opacity: .6;
+                            -moz-opacity: .6;
+                            opacity: .6;
+                            -ms-filter: alpha(opacity=60);
+                            filter: alpha(opacity=60);
+                        }
+</style>
+<script>
+    $(document).ready(function () {
+        loadNavigation('OnlineLease', 'glRoleRes', 'plUser', 'tl', 'MajorMineral', 'Online Lease', ' ');
+        $('.datetime').datetimepicker({
+            format: 'LT',
+            format: "DD/MM/YYYY",
+        }).keydown(false);
+        $('.searchableselect').searchableselect();
+    });
+</script>
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        @Html.Partial("_CMSnavigation")
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="javascript:void(0);">
+                                Online Lease Application
+                            </a>
+                        </li>
+                    </ul>
+                    @Html.Partial("_CMSutil")
+                </div>
+                <section class="box form-container">
+                    <div class="content-body">
+                        @*<div class="col-sm-6">
+                                <div class="form-group row">
+                                    <label for="Submission_of_Clearances" style="color: #089c4c;font-size: 1rem;font-weight:bold">Submission of Clearances</label>
+                                </div>
+                            </div>*@
+                        @using (Html.BeginForm("OnlineLease", "OnlineLease", FormMethod.Post, new { AUTOCOMPLETE = "Off", id = "form1", enctype = "multipart/form-data" }))
+                        {
+                        @Html.HiddenFor(x => x.FOR)
+                        @Html.HiddenFor(x => x.LeaseType)
+                        @Html.HiddenFor(x => x.MineralType)
+                        @Html.HiddenFor(x => x.LesseeLOI)
+                        @Html.HiddenFor(x => x.StateID)
+                        @Html.HiddenFor(x => x.DistrictID)
+                        @Html.HiddenFor(x => x.TehsilID)
+                        @Html.HiddenFor(x => x.VillageID)
+                        @Html.HiddenFor(x => x.AreaInHect)
+                        @Html.HiddenFor(x => x.MineralTypeID)
+                        @Html.HiddenFor(x => x.LeaseTypeId)
+                        @Html.HiddenFor(x => x.TypeOfLand)
+                        @Html.HiddenFor(x => x.Status)
+
+
+                        <h6>Create Profile</h6>
+                        <div class="row">
+                            <div class="col-lg-12 col-md-12">
+                                <div class="form-group row">
+                                    <label class="col-sm-3 col-form-label">Status of Preferred Bidder<span class="text-danger">*</span></label>
+                                    <div class="col-sm-9">
+                                        <div class="py-1">
+                                            @Html.RadioButtonFor(x => x.CategoryOfLicensee, "Individual", new { onchange = "onRadioChange()",@class = "custom-radio", id = "Individual", @checked = "checked" })
+                                            <label class="radio-label">Individual/Proprietor</label>
+                                            @Html.RadioButtonFor(x => x.CategoryOfLicensee, "Firm", new { onchange = "onRadioChange()",@class = "custom-radio", id = "Firm" })
+                                            <label class="radio-label">Firm</label>
+                                            @Html.RadioButtonFor(x => x.CategoryOfLicensee, "Association", new { onchange = "onRadioChange()",@class = "custom-radio", id = "Association" })
+                                            <label class="radio-label">Association</label>
+                                            @Html.RadioButtonFor(x => x.CategoryOfLicensee, "Company", new { onchange = "onRadioChange()",@class = "custom-radio", id = "Company" })
+                                            <label class="radio-label">Company</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-6 col-md-12" style="display: none;" id="firm_toggle">
+                                <div class="form-group row">
+                                    <label class="col-sm-4 col-form-label">Firm as<span class="text-danger">*</span></label>
+                                    <div class="col-sm-7">
+                                        <div class="py-1">
+                                            @Html.RadioButtonFor(x => x.FirmAs, "Partnership", new { @checked = "checked",@class = "custom-radio", id = "Partnership" })
+                                            <label class="radio-label">Partnership</label>
+                                            @Html.RadioButtonFor(x => x.FirmAs, "Proprietary", new { @class = "custom-radio",id = "Proprietary" })
+                                            <label class="radio-label">Proprietary</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-6 col-md-12" style="display: none;" id="company_toggle pointer">
+                                <div class="form-group row">
+                                    <label class="col-sm-4 col-form-label">Company as<span class="text-danger">*</span></label>
+                                    <div class="col-sm-7">
+                                        <div class="py-1">
+                                            @Html.RadioButtonFor(x => x.CompanyAs, "Private", new { @checked = "checked",@class = "custom-radio", id = "Private" })
+                                            <label class="radio-label">Private</label>
+                                            @Html.RadioButtonFor(x => x.CompanyAs, "Public Limited", new { @class = "custom-radio",id = "PublicLimited" })
+                                            <label class="radio-label">Public Limited</label>
+                                            @Html.RadioButtonFor(x => x.CompanyAs, "PSU", new { @class = "custom-radio", id = "PSU" })
+                                            <label class="radio-label">PSU</label>
+                                            @Html.RadioButtonFor(x => x.CompanyAs, "Joint Venture", new { @class = "custom-radio",id = "Joint_Venture" })
+                                            <label class="radio-label">Joint Venture</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="form-group row">
+                                    <label class="col-sm-4 col-form-label">Company<span class="text-danger">*</span></label>
+                                    <div class="col-sm-7">
+                                        @Html.DropDownListFor(model => model.CompanyId, ViewBag.Companylist as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control searchableselect pointer", autofocus = "autofocus" })
+                                        @Html.ValidationMessageFor(x => x.CompanyId, "", new { @class = "text-danger", @maxlength = 50 })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group row">
+                                    <label for="inputName" class="col-sm-4 col-form-label">Name of Authorized Person<span class="text-danger">*</span></label>
+                                    <div class="col-sm-7">
+                                        @Html.TextBoxFor(x => x.NameOfApplicant, new { @class = "form-control" })
+                                        @Html.ValidationMessageFor(x => x.NameOfApplicant, "", new { @class = "text-danger", @maxlength = 50 })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group row">
+                                    <label for="inputName" class="col-sm-4 col-form-label">Designation<span class="text-danger">*</span></label>
+                                    <div class="col-sm-7">
+                                        @Html.TextBoxFor(x => x.Designation, new { @class = "form-control"})
+                                        @Html.ValidationMessageFor(x => x.Designation, "", new { @class = "text-danger", @maxlength = 50 })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group row">
+                                    <label for="inputName" class="col-sm-4 col-form-label">Contact No<span class="text-danger">*</span></label>
+                                    <div class="col-sm-7">
+                                        @Html.TextBoxFor(x => x.ApplicantMobileNo, new { @maxlength = "10", @class = "form-control" })
+                                        @Html.ValidationMessageFor(x => x.ApplicantMobileNo, "", new { @class = "text-danger", @maxlength = 50 })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group row">
+                                    <label for="inputName" class="col-sm-4 col-form-label">Email-Id<span class="text-danger">*</span></label>
+                                    <div class="col-sm-7">
+                                        @Html.TextBoxFor(x => x.ApplicantEmailId, new { @class = "form-control" })
+                                        @Html.ValidationMessageFor(x => x.ApplicantEmailId, "", new { @class = "text-danger", @maxlength = 50 })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group row">
+                                    <label for="inputPassword" class="col-sm-4 col-form-label">Address<span class="text-danger">*</span></label>
+                                    <div class="col-sm-7">
+                                        @Html.TextAreaFor(x => x.AddressOfApplicant, new { @class = "form-control", @rows = "2", @maxlength = 500 })
+                                        @Html.ValidationMessageFor(x => x.AddressOfApplicant, "", new { @class = "text-danger", @maxlength = 50 })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group row">
+                                    <label for="inputPassword" class="col-sm-4 col-form-label">PAN Card<span class="text-danger">*</span></label>
+                                    <div class="col-sm-7">
+                                        <div class="custom-file">
+                                            <input type="file" class="custom-file-input pansize" id="filesupport" name="@Html.NameFor(Model => Model.PAN_Card_File)">
+                                            <label class="custom-file-label" for="customFile">Choose Files</label>
+
+                                        </div>
+                                        @if (!string.IsNullOrEmpty(Model.File_PAN_Card))
+                                            {
+                                        <a href="@Url.Action("DownloadFiles", "OnlineLease", new { filename = @Model.File_PAN_Card, foldername = "PAN" })">
+                                            Download
+                                        </a>
+                                            }
+                                        @Html.ValidationMessageFor(x => x.File_PAN_Card, "", new { @class = "text-danger", @maxlength = 50 })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group row">
+                                    <label for="inputPassword" class="col-sm-4 col-form-label">TIN Card / GST<span class="text-danger">*</span></label>
+                                    <div class="col-sm-7">
+                                        <div class="custom-file">
+                                            <input type="file" class="custom-file-input tinsize" id="filesupport" name="@Html.NameFor(Model => Model.TIN_Card_File)">
+                                            <label class="custom-file-label" for="customFile">Choose Files</label>
+
+                                        </div>
+                                        @if (!string.IsNullOrEmpty(Model.File_TIN_Card))
+                                            {
+                                        <a href="@Url.Action("DownloadFiles", "OnlineLease", new { filename = @Model.File_TIN_Card, foldername = "TIN" })">
+                                            Download
+                                        </a>
+                                            }
+                                        @Html.ValidationMessageFor(x => x.File_TIN_Card, "", new { @class = "text-danger", @maxlength = 50 })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <h6>Lease / License Area Information</h6>
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="form-group row">
+                                    <label for="inputPassword" class="col-sm-4 col-form-label">State</label>
+                                    <div class="col-sm-7">
+                                        @Html.TextBoxFor(x => x.StateName, new { @maxlength = "100", @class = "form-control", @style = "width:100%;overflow:both;resize:none;" })
+                                        @Html.ValidationMessageFor(x => x.StateName, "", new { @class = "text-danger", @maxlength = 50 })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group row">
+                                    <label for="inputPassword" class="col-sm-4 col-form-label">Disrict</label>
+                                    <div class="col-sm-7">
+                                        @Html.TextBoxFor(x => x.DistrictName, new { @maxlength = "100", @class = "form-control", @style = "width:100%;overflow:both;resize:none;" })
+                                        @Html.ValidationMessageFor(x => x.DistrictName, "", new { @class = "text-danger", @maxlength = 50 })
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-sm-6">
+                                <div class="form-group row">
+                                    <label for="inputPassword" class="col-sm-4 col-form-label">Tehsil</label>
+                                    <div class="col-sm-7">
+                                        @Html.TextBoxFor(x => x.TehsilName, new { @maxlength = "100", @class = "form-control", @style = "width:100%;overflow:both;resize:none;" })
+                                        @Html.ValidationMessageFor(x => x.TehsilName, "", new { @class = "text-danger", @maxlength = 50 })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group row">
+                                    <label for="inputPassword" class="col-sm-4 col-form-label">Village</label>
+                                    <div class="col-sm-7">
+                                        @Html.TextBoxFor(x => x.VillageName, new { @maxlength = "100", @class = "form-control", @style = "width:100%;overflow:both;resize:none;" })
+                                        @Html.ValidationMessageFor(x => x.VillageName, "", new { @class = "text-danger", @maxlength = 50 })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group row">
+                                    <label for="inputPassword" class="col-sm-4 col-form-label">Block/Forest Range</label>
+                                    <div class="col-sm-7">
+                                        @Html.TextBoxFor(x => x.BlockForestRange, new { @maxlength = "100", @class = "form-control", @style = "width:100%;overflow:both;resize:none;" })
+                                        @Html.ValidationMessageFor(x => x.BlockForestRange, "", new { @class = "text-danger", @maxlength = 50 })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group row">
+                                    <label for="inputPassword" class="col-sm-4 col-form-label">Pin Code</label>
+                                    <div class="col-sm-7">
+                                        @Html.TextBoxFor(x => x.Pincode, new { @maxlength = "100", @class = "form-control", @style = "width:100%;overflow:both;resize:none;" })
+                                        @Html.ValidationMessageFor(x => x.Pincode, "", new { @class = "text-danger", @maxlength = 50 })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group row">
+                                    <label for="inputPassword" class="col-sm-4 col-form-label">Area in Hect.*</label>
+                                    <div class="col-sm-7">
+                                        @Html.TextBoxFor(x => x.AreaInHect, new { @maxlength = "100", @class = "form-control", @style = "width:100%;overflow:both;resize:none;" })
+                                        @Html.ValidationMessageFor(x => x.AreaInHect, "", new { @class = "text-danger", @maxlength = 50 })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group row">
+                                    <label for="inputPassword" class="col-sm-4 col-form-label">Type of Land</label>
+
+                                    @if (Model.TypeOfLand != null)
+                                        {
+                                            foreach (var i in @Model.TypeOfLand)
+                                            {
+                                    <div class="col-sm-3 ">
+                                        <input type="checkbox" id="@i.id" name="TypeOfLands" checked="@i.IsSelected" value="@i.Value" onchange="onTOIChange()" />
+                                        @i.Text
+
+                                    </div>
+                                            }
+                                    <div class="row">
+                                    </div>
+                                        }
+
+
+                                </div>
+                            </div>
+
+                            <div class="col-sm-6">
+                                <div class="form-group row" style="display: none; margin-left: 45px;" id="Government_toggle">
+                                    <label for="inputPassword" class="col-sm-4 col-form-label">Government As</label>
+                                    <div class="col-sm-2">
+                                        @Html.CheckBoxFor(x => x.Revenue, new { @onchange = "onTOIChange()" })
+                                        Revenue
+                                        @Html.TextBoxFor(x => x.txtRevenue, new { @class = "form-control txtArea", @placeholder = "Revenue Area" })
+                                    </div>
+                                    <div class="col-sm-2">
+                                        @Html.CheckBoxFor(x => x.RevenueForest, new { @onchange = "onTOIChange()" })
+                                        Revenue Forest
+                                        @Html.TextBoxFor(x => x.txtRevenueForest, new { @class = "form-control txtArea", @placeholder = "Revenue Forest Area" })
+                                    </div>
+
+                                    <div class="col-sm-2">
+                                        @Html.CheckBoxFor(x => x.Nistar, new { @onchange = "onTOIChange()" })
+                                        Nistar
+                                        @Html.TextBoxFor(x => x.txtNistar, new { @class = "form-control txtArea", @placeholder = "Nistar Area" })
+                                    </div>
+
+                                    <div class="col-sm-2">
+                                        @Html.CheckBoxFor(x => x.Forest, new { @onchange = "onTOIChange()" })
+                                        Forest
+                                        @Html.TextBoxFor(x => x.txtForest, new { @class = "form-control txtArea", @placeholder = "Forest Area" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group row" style="display: none; margin-left: 35px;" id="Private_toggle">
+                                    <label for="inputPassword" class="col-sm-4 col-form-label">Private As</label>
+                                    <div class="col-sm-2">
+                                        @Html.CheckBoxFor(x => x.Tribal, new { @onchange = "onTOIChange()" })
+                                        Tribal<br />
+                                        @Html.TextBoxFor(x => x.txtTribal, new { @class = "form-control txtArea", @placeholder = "Tribal Area" })
+                                    </div>
+                                    <div class="col-sm-5">
+                                        @Html.CheckBoxFor(x => x.NonTribal, new { @onchange = "onTOIChange()" })
+                                        Non-Tribal
+                                        @Html.TextBoxFor(x => x.txtNonTribal, new { @class = "form-control txtArea", @placeholder = "Non Tribal Area" })
+                                    </div>
+
+                                </div>
+                            </div>
+
+                            <div class="col-sm-6">
+                                <div class="form-group row">
+                                    <label for="inputPassword" class="col-sm-4 col-form-label">Toposheet No.<span class="text-danger">*</span></label>
+                                    <div class="col-sm-7">
+                                        <div class="custom-file">
+                                            <input type="file" class="custom-file-input TopoSheetNo" id="filesupport" onchange="onUploadSelect(this);" name="@Html.NameFor(Model => Model.TopoSheetNo_File)">
+                                            <label class="custom-file-label" for="customFile">Choose Files</label>
+                                            <label><span class="text-danger text-sm">Only jpg, jpeg, png, pdf, tif file types are allowed.</span></label>
+                                        </div>
+                                        @if (!string.IsNullOrEmpty(Model.TopoSheetNo))
+                                            {
+                                        <a href="@Url.Action("DownloadFiles", "OnlineLease", new { filename = @Model.TopoSheetNo, foldername = "TopoSheetNo" })">
+                                            Download
+                                        </a>
+                                            }
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group row">
+                                    <label for="inputPassword" class="col-sm-4 col-form-label">Kharsa No./Compartment No.<span class="text-danger">*</span></label>
+                                    <div class="col-sm-7">
+                                        <div class="custom-file">
+                                            <input type="file" class="custom-file-input KhasraNo" id="filesupport" name="@Html.NameFor(Model => Model.KhasraNo_File)">
+                                            <label class="custom-file-label" for="customFile">Choose Files</label>
+                                            <label><span class="text-danger text-sm">Only jpg, jpeg, png, pdf, tif file types are allowed.</span></label>
+                                        </div>
+                                        @if (!string.IsNullOrEmpty(Model.KhasraNo))
+                                            {
+                                        <a href="@Url.Action("DownloadFiles", "OnlineLease", new { filename = @Model.KhasraNo, foldername = "KHASARA_PANCHASALA" })">
+                                            Download
+                                        </a>
+                                            }
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group row">
+                                    <label for="inputPassword" class="col-sm-4 col-form-label">Coordinates<span class="text-danger">*</span></label>
+                                    <div class="col-sm-7">
+                                        <div class="custom-file">
+                                            <input type="file" class="custom-file-input" id="filesupport" name="@Html.NameFor(Model => Model.Coordinates_File)">
+                                            <label class="custom-file-label" for="customFile">Choose Files</label>
+                                            <label><span class="text-danger text-sm">Only jpg, jpeg, png, pdf, tif file types are allowed.</span></label>
+                                        </div>
+                                        @if (!string.IsNullOrEmpty(Model.Coordinates))
+                                            {
+                                        <a href="@Url.Action("DownloadFiles", "OnlineLease", new { filename = @Model.Coordinates, foldername = "Coordinates" })">
+                                            Download
+                                        </a>
+                                            }
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group row">
+                                    <label for="inputPassword" class="col-sm-4 col-form-label">Demarcation Report<span class="text-danger">*</span></label>
+                                    <div class="col-sm-7">
+                                        <div class="custom-file">
+                                            <input type="file" class="custom-file-input" id="filesupport" name="@Html.NameFor(Model => Model.DemarcationReport_File)">
+                                            <label class="custom-file-label" for="customFile">Choose Files</label>
+                                            <label><span class="text-danger text-sm">Only jpg, jpeg, png, pdf, tif file types are allowed.</span></label>
+                                        </div>
+                                        @if (!string.IsNullOrEmpty(Model.File_DemarcationReport))
+                                            {
+                                        <a href="@Url.Action("DownloadFiles", "OnlineLease", new { filename = @Model.Coordinates, foldername = "Demarcation" })">
+                                            Download
+                                        </a>
+                                            }
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group row">
+                                    <label for="inputPassword" class="col-sm-4 col-form-label"></label>
+                                    <div class="col-sm-7">
+                                        <input id="responsable" name="checkResp" value="true" checked="checked" type="checkbox" class="k-valid">
+                                        Import to DB
+                                        <div class="custom-file">
+                                            <input type="file" class="custom-file-input" id="ExcelKharsa" name="@Html.NameFor(Model=>Model.ExcelKharsa)">
+                                            <label class="custom-file-label" for="customFile">Choose Files</label>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group row">
+                                    <label for="inputPassword" class="col-sm-4 col-form-label"></label>
+                                    <div class="col-sm-7">
+                                        <input id="responsable" name="checkResp" value="true" checked="checked" type="checkbox" class="k-valid">
+                                        Import to DB
+                                        <div class="custom-file">
+                                            <input type="file" class="custom-file-input" id="filesupport" name="@Html.NameFor(Model => Model.ExcelCoordinates)">
+                                            <label class="custom-file-label" for="customFile">Choose Files</label>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <h6>Basic Information</h6>
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="form-group row">
+                                    <label for="inputName" class="col-sm-4 col-form-label">Mineral Category<span class="text-danger">*</span></label>
+                                    <div class="col-sm-7">
+                                        @Html.TextBoxFor(x => x.MineralType, new { @maxlength = "100", @class = "form-control", @style = "width:100%;overflow:both;resize:none;" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group row">
+                                    <label for="inputName" class="col-sm-4 col-form-label">Mineral Name<span class="text-danger">*</span></label>
+                                    <div class="col-sm-7">
+                                        @Html.TextBoxFor(x => x.MineralName, new { @maxlength = "100", @class = "form-control", @style = "width:100%;overflow:both;resize:none;" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group row">
+                                    <label for="inputName" class="col-sm-4 col-form-label">Lease Type<span class="text-danger">*</span></label>
+                                    <div class="col-sm-7">
+                                        @Html.TextBoxFor(x => x.LeaseType, new { @maxlength = "100", @class = "form-control", @style = "width:100%;overflow:both;resize:none;" })
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="row">
+
+                            <div class="col-sm-6">
+                                <div class="form-group row">
+                                    <label for="inputName" class="col-sm-4 col-form-label">Reserve(Metric Tonne)<span class="text-danger">*</span></label>
+                                    <div class="col-sm-3">
+                                        @Html.TextBoxFor(x => x.Reserve, new { @class = "form-control", @style = "width:100%;" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group row">
+                                    <label for="inputName" class="col-sm-4 col-form-label">ASP (Average Sale Price)</label>
+                                    <div class="col-sm-7">
+                                        @Html.TextBoxFor(x => x.PerformanceSecurity, new { @class = "form-control", @style = "width:100%;", @onBlur = "CalculateVER()" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group row">
+                                    <label for="inputName" class="col-sm-4 col-form-label">Value of Estimated Reserve (VER) (In Rs.)<span class="text-danger">*</span></label>
+                                    <div class="col-sm-7">
+                                        @Html.TextBoxFor(x => x.EVR, new { @class = "form-control", @style = "width:100%;", @onBlur = "CalculateEstimatedValueOfResouce()" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group row">
+                                    <label for="inputName" class="col-sm-4 col-form-label">Final Price Offer (In %)<span class="text-danger">*</span></label>
+                                    <div class="col-sm-7">
+                                        @Html.TextBoxFor(x => x.FinalPriceOffer, new { @class = "form-control", @style = "width:100%;" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group row">
+                                    <label for="inputName" class="col-sm-4 col-form-label">Total Upfront Payment (0.5% of VER)<span class="text-danger">*</span></label>
+                                    <div class="col-sm-7">
+                                        @Html.TextBoxFor(x => x.TotalUpfrontPayment, new { @class = "form-control", @style = "width:100%;", @onBlur = "CalculateTotalUpfrontPayment()" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <h6>Payment Schedule</h6>
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div class="table-responsive" id="viewtable">
+                                    <table class="table table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th>
+                                                    1. Upfront Payment
+                                                </th>
+                                                <th>
+                                                    Amount
+                                                </th>
+                                                <th>
+                                                    Due Date
+                                                </th>
+
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <th>
+                                                    1st Installment [10% of Upfront Payment]
+                                                </th>
+                                                <td>
+                                                    @Html.TextBoxFor(x => x.First_Installment_Amount, new { @class = "form-control", @maxlength = 10, @style = "width:100%;overflow:both;resize:none;" })
+
+                                                </td>
+                                                <td>
+                                                    @Html.TextBoxFor(x => x.First_Installment_ScheduleDate, new { @class = "form-control datetime pointer", DataFormatString = "{0:yyyy-MM-dd}", @style = "width:100%;", onkeydown = "return false;" })
+
+
+                                                </td>
+
+
+                                            </tr>
+                                            <tr>
+                                                <th>
+                                                    2nd Installment [10% of Upfront Payment]
+                                                </th>
+                                                <td>
+                                                    @Html.TextBoxFor(x => x.Second_Installment_Amount, new { @class = "form-control", @maxlength = 10, @style = "width:100%;overflow:both;resize:none;" })
+
+                                                </td>
+                                                <td>
+                                                    @Html.TextBoxFor(x => x.Second_Installment_ScheduleDate, new { @class = "form-control datetime pointer", DataFormatString = "{0:yyyy-MM-dd}", @style = "width:100%;", onkeydown = "return false;" })
+
+
+                                                </td>
+
+
+                                            </tr>
+                                            <tr>
+                                                <th>
+                                                    3rd Installment [80% of Upfront Payment]
+                                                </th>
+                                                <td>
+                                                    @Html.TextBoxFor(x => x.Third_Installment_Amount, new { @class = "form-control", @maxlength = 10, @style = "width:100%;overflow:both;resize:none;" })
+
+                                                </td>
+                                                <td>
+                                                    @Html.TextBoxFor(x => x.Third_Installment_ScheduleDate, new { @class = "form-control datetime pointer", DataFormatString = "{0:yyyy-MM-dd}", @style = "width:100%;", onkeydown = "return false;" })
+
+
+                                                </td>
+
+
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+
+
+                            </div>
+
+
+                            <div class="col-sm-12">
+                                <div class="table-responsive" id="viewtable">
+                                    <table class="table table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th>
+                                                    2. Performance Security
+                                                </th>
+                                                <th>
+                                                    Amount
+                                                </th>
+                                                <th>
+                                                    Due Date
+                                                </th>
+
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <th>
+                                                  Performance Security Amount (0.5% of VER)
+                                                </th>
+                                                <td>
+                                                    @Html.TextBoxFor(x => x.PerformanceSecurity_Installment_Amount, new { @class = "form-control", @maxlength = 10, @style = "width:100%;overflow:both;resize:none;" })
+
+                                                </td>
+                                                <td>
+                                                    @Html.TextBoxFor(x => x.PerformanceSecurity_Installment_ScheduleDate, new { @class = "form-control datetime pointer", DataFormatString = "{0:yyyy-MM-dd}", @style = "width:100%;", onkeydown = "return false;" })
+
+
+                                                </td>
+
+
+                                            </tr>
+
+                                        </tbody>
+                                    </table>
+                                </div>
+
+
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="form-group row">
+                                    <label for="inputName" class="col-sm-6 col-form-label">Draft Mining Plan Due Date <span class="text-danger">*</span></label>
+                                    <div class="col-sm-6">
+                                        @Html.TextBoxFor(x => x.MiningPlanDueDate, new { @class = "form-control datetime pointer", DataFormatString = "{0:yyyy-MM-dd}", @style = "width:100%;", onkeydown = "return false;" })
+
+                                    </div>
+                                </div>
+                            </div>
+                            
+                                <div class="col-sm-12">
+                                    <div class="table-responsive" id="Div1">
+                                        <table  class="table table-bordered">
+                                            <thead>
+
+                                                <tr>
+                                                    <th width="30px"></th>
+                                                    <th></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @if (Model.LOI_StatutoryDocuments != null)
+                                                    {
+                                                        foreach (var i in (IEnumerable<System.Web.Mvc.SelectListItem>)Model.LOI_StatutoryDocuments)
+                                                        {
+
+                                                <tr>
+                                                    <td>
+                                                        @if (i.Text == "Documents as specified by state government")
+                                                                    {
+                                                                        if (Model.FOR == "View")
+                                                                        {
+                                                        <input type="checkbox" disabled="disabled" id="Otherdoc" onchange="changeOtherdoc(this)" name="StatutoryDocuments" checked="@i.Selected" Value="@i.Value" />
+                                                                        }
+                                                                        else
+                                                                        {
+                                                        <input type="checkbox" id="Otherdoc" name="StatutoryDocuments" onchange="changeOtherdoc(this)" checked="@i.Selected" Value="@i.Value" />
+                                                                        }
+
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        if (Model.FOR == "View")
+                                                                        {
+                                                        <input type="checkbox" disabled="disabled" name="StatutoryDocuments" checked="@i.Selected" Value="@i.Value" />
+                                                                        }
+                                                                        else
+                                                                        {
+                                                        <input type="checkbox" id="Otherdoc" name="StatutoryDocuments" checked="@i.Selected" Value="@i.Value" />
+                                                                        }
+                                                                    }
+
+                                                    </td>
+                                                    <td>
+
+                                                        @if (i.Text == "Documents as specified by state government")
+                                                                    {
+                                                        <div class="row">
+                                                        </div>
+                                                        <label>@i.Text</label>
+
+                                                        <div id="OtherDocumentName">
+                                                            @if (Model.FOR != "View")
+                                                                            {
+                                                            <div class="col-lg-5">
+
+                                                                <input type="text" id="DocumentName" class="k-textbox" maxlength="100" style="width: 448px;" />
+                                                            </div>
+                                                            <div class="col-lg-1">
+                                                                <input class="btn btn-info btn-sm" type="button" value="Add Row" onclick="addRow('dynamicTable')" />
+                                                            </div>
+                                                            <div class="col-lg-2">
+                                                                <input class="btn btn-info btn-sm" type="button" name="" value="Remove Row" onclick="RemoveRow('dynamicTable');">
+                                                            </div>
+
+                                                            <br />
+                                                            <br />
+
+                                                            <table border="1" id="dynamicTable" class="table" style="margin-top: 15px; width: 449px; margin-left: 16px;">
+                                                                <thead>
+
+                                                                    <tr>
+                                                                        <th style="border-color: black;">SrNo.</th>
+                                                                        <th style="border-color: black; width: 1200px">Document Name</th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                    <tr style="display: none">
+                                                                        <td class="tdSrNo" style="border-color: black;">1</td>
+                                                                        <td id="tdParticipantsName" style="border-color: black;">
+                                                                            <label></label>
+                                                                        </td>
+
+
+                                                                    </tr>
+                                                                </tbody>
+                                                            </table>
+                                                                            }
+                                                                            else
+                                                                            {
+                                                            <table border="1" class="table" style="margin-top: 15px; width: 449px; margin-left: 16px;">
+                                                                <thead>
+
+                                                                    <tr>
+                                                                        <th style="border-color: black;">SrNo.</th>
+                                                                        <th style="border-color: black; width: 1200px">Document Name</th>
+                                                                        @*<th style="border-color: black; width: 1200px">Downlaod</th>*@
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                    @if (Model != null && Model.OtherDocHistory != null && Model.OtherDocHistory.Rows.Count > 0)
+                                                                                        {
+                                                                                            for (int j = 0; j < Model.OtherDocHistory.Rows.Count; j++)
+                                                                                            {
+                                                                    <tr>
+                                                                        <td class="tdSrNo" style="border-color: black;">@(j + 1)</td>
+                                                                        <td style="border-color: black;">
+                                                                            @if (!string.IsNullOrEmpty(Convert.ToString(Model.OtherDocHistory.Rows[j]["DocName"])))
+                                                                                                        {
+                                                                            <label>@Convert.ToString(Model.OtherDocHistory.Rows[j]["DocName"])</label>
+                                                                                                        }
+                                                                        </td>
+                                                                        @*<td style="border-color: black;">
+                                                                                @if (!string.IsNullOrEmpty(Convert.ToString(Model.OtherDocHistory.Rows[j]["DocPath"])))
+                                                                                {
+                                                                                    <label><a href='@Url.Content(Convert.ToString(Model.OtherDocHistory.Rows[j]["DocPath"]))' target='_blank'>Download</a></label>
+                                                                                }
+                                                                            </td>*@
+
+                                                                    </tr>
+
+                                                                                            }
+                                                                                        }
+
+                                                                </tbody>
+                                                            </table>
+                                                                            }
+                                                        </div>
+                                                        @Html.TextBoxFor(x => x.OtherDocumentName, new { @class = "k-textbox", @style = "display:none;width: 100%;" })
+
+                                                                    }
+                                                                    else
+                                                                    {
+                                                        <label>@i.Text</label>
+                                                                    }
+                                                    </td>
+                                                </tr>
+
+                                                        }
+                                                    }
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                          
+
+
+                        </div>
+
+                        @if (Convert.ToInt16(@Model.Status) >= 4)
+                            {
+                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                            <div class="panel panel-primary">
+                                <div class="panel-heading">
+
+                                    <h4 class="panel-title"><label for="Submission_of_Clearances" style="color: #089c4c;font-size: 1rem;font-weight:bold">Payment of first installment (10%) of Upfront Payment</label></h4>
+
+                                </div>
+
+                                <div class="panel-body">
+
+                                    <div>
+
+                                        <hr style="margin: 0px; margin-bottom: 15px;" />
+
+                                        <div id="divMakePayment" style="height: 150px;">
+
+
+
+                                            <div class="row">
+                                                <div class="col-sm-12">
+
+                                                    <span class="lead">
+                                                        Payment Information
+                                                    </span>
+
+                                                </div>
+                                            </div>
+
+                                            <div class="row">
+                                                <div class="col-sm-6"> @(Html.Label("Amount"))</div>
+                                                <div class="col-sm-6">Rs .@Model.First_Installment_Amount</div>
+
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-sm-6">  @(Html.Label("Payment Date"))</div>
+                                                <div class="col-sm-6">@Model.First_Installment_DateOfDiposite</div>
+
+                                            </div>
+
+
+
+
+
+
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                            }
+
+                        @if (Convert.ToInt16(@Model.Status) >= 9)
+                            {
+                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                            <div class="panel panel-primary">
+                                <div class="panel-heading">
+
+                                    <h4 class="panel-title">
+                                        <label for="Submission_of_Clearances" style="color: #089c4c;font-size: 1rem;font-weight:bold">Payment of second installment (10%) of Upfront Payment</label>
+                                    </h4>
+
+                                </div>
+
+                                <div class="panel-body">
+
+                                    <div>
+
+                                        <hr style="margin: 0px; margin-bottom: 15px;" />
+                                        <div id="divMakePayment" style="height: 150px;">
+
+
+
+                                            <div class="row">
+                                                <div class="col-sm-12">
+
+                                                    <span class="lead">
+                                                        Payment Information
+                                                    </span>
+
+                                                </div>
+                                            </div>
+
+                                            <div class="row">
+                                                <div class="col-sm-6"> @(Html.Label("Amount"))</div>
+                                                <div class="col-sm-6">Rs .@Model.Second_Installment_Amount</div>
+
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-sm-6">  @(Html.Label("Payment Date"))</div>
+                                                <div class="col-sm-6">@Model.Second_Installment_ScheduleDate</div>
+
+                                            </div>
+
+
+
+
+
+
+
+                                        </div>
+
+
+
+                                    </div>
+
+
+
+
+
+                                </div>
+                            </div>
+                        </div>
+                            }
+                        @if (Convert.ToInt16(@Model.Status) >= 13)
+                            {
+                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                            <div class="panel panel-primary">
+                                <div class="panel-heading">
+
+                                    <h4 class="panel-title">
+                                        <span class="glyphicon"></span>
+                                        <label for="Submission_of_Clearances" style="color: #089c4c;font-size: 1rem;font-weight:bold">Payment of third installment (80%) of Upfront Payment</label>
+                                    </h4>
+                                </div>
+
+                                <div class="panel-body">
+
+                                    <div>
+
+                                        <hr style="margin: 0px; margin-bottom: 15px;" />
+
+
+                                        <div id="divMakePayment" style="height: 150px;">
+
+
+
+                                            <div class="row">
+                                                <div class="col-sm-12">
+
+                                                    <span class="lead">
+                                                        Payment Information
+                                                    </span>
+
+                                                </div>
+                                            </div>
+
+                                            <div class="row">
+                                                <div class="col-sm-6"> @(Html.Label("Amount"))</div>
+                                                <div class="col-sm-6">Rs .@Model.Third_Installment_Amount</div>
+
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-sm-6">  @(Html.Label("Payment Date"))</div>
+                                                <div class="col-sm-6">@Model.ThirdPaymentDate</div>
+
+                                            </div>
+
+
+
+
+
+
+
+                                        </div>
+
+                                    </div>
+
+
+
+
+
+                                </div>
+                            </div>
+                        </div>
+                            }
+                        @if (Convert.ToInt16(@Model.Status) >= 10)
+                            {
+
+                        <div class="panel panel-primary">
+                            <div class="panel-heading">
+
+                                <h3 class="panel-title"><span class="glyphicon"></span>Submitted Clearances Details</h3>
+
+                            </div>
+
+                            <div class="panel-body">
+
+                                <div>
+
+                                    <hr style="margin: 0px; margin-bottom: 15px;" />
+                                    @*<div class="row">*@
+                                    <div id="divMakePayment" style="height: 150px;">
+                                        @*<div class="row">*@
+                                        <div class="col-md-3"></div>
+                                        <div class="col-md-9">
+                                            <div class="row">
+                                                <div class="col-xs-12">
+                                                    <div class="col-md-offset-3 col-md-5 default-form-control-style">
+                                                        <span class="lead">
+                                                            Submitted Clearances
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            @*<div class="col-lg-9 col-md-4 col-xs-12">*@
+
+                                            <hr style="margin-top: 0px;" />
+
+                                            <div class="row">
+                                                <div class="col-sm-12">
+                                                    <div class="">
+                                                        <div class="col-sm-12">
+                                                            @(Html.Label("1) Draft Mining Plan", "1) Draft Mining Plan",new { style = "color: #089c4c;font-size: 1.2rem; " }))
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <hr style="margin: 0px;" />
+                                            <br />
+                                            <div class="row">
+
+                                                <div class="col-sm-6 ">
+                                                    @(Html.Label("IBM Receiving Copy"))
+                                                </div>
+                                                <div class="col-sm-6 default-form-control-style">
+                                                    @if (!string.IsNullOrEmpty(Model.IBM_ReceivingCopy))
+                                                            {
+                                                    <a href='@Url.Content(Model.IBM_ReceivingCopy)' target='_blank'>Download</a>
+                                                            }
+                                                            else
+                                                            {
+                                                    <b>Not Available</b>
+                                                            }
+                                                </div>
+
+                                            </div>
+
+                                            <div class="row">
+                                                <div class="col-sm-12">
+                                                    <div class="">
+                                                        <div class="col-sm-12">
+                                                            @(Html.Label("2) Performance security", "2) Performance security", new { style = "color: #089c4c;font-size: 1.8rem; " }))
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="row">
+                                                <div class="col-sm-12">
+                                                    <div class="col-sm-6">
+                                                        @(Html.Label("Amount"))
+                                                    </div>
+                                                    <div class="col-sm-6e">
+                                                        @if (!string.IsNullOrEmpty(Model.PerformanceSecurity_Installment_Amount))
+                                                                {
+                                                        <label>Rs .@Model.PerformanceSecurity_Installment_Amount </label>
+                                                                }
+                                                                else
+                                                                {
+                                                        <b>Not Available</b>
+                                                                }
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-xs-12">
+                                                    <div class="col-md-7 default-form-control-style">
+                                                        @(Html.Label("Bank Name"))
+                                                    </div>
+                                                    <div class="col-md-5 default-form-control-style">
+                                                        @if (!string.IsNullOrEmpty(Model.PS_BankName))
+                                                                {
+                                                        <label>@Model.PS_BankName </label>
+                                                                }
+                                                                else
+                                                                {
+                                                        <b>Not Available</b>
+                                                                }
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-xs-12">
+                                                    <div class="col-md-7 default-form-control-style">
+                                                        @(Html.Label("Bank Gaurranty No"))
+                                                    </div>
+                                                    <div class="col-md-5 default-form-control-style">
+                                                        @if (!string.IsNullOrEmpty(Model.PS_BankGaurrantyNo))
+                                                                {
+                                                        <label>@Model.PS_BankGaurrantyNo </label>
+                                                                }
+                                                                else
+                                                                {
+                                                        <b>Not Available</b>
+                                                                }
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="row">
+                                                <div class="col-xs-12">
+                                                    <div class="col-md-7 default-form-control-style">
+                                                        @(Html.Label("Bank Gaurranty (Upload)"))
+                                                    </div>
+                                                    <div class="col-md-5 default-form-control-style">
+                                                        @if (!string.IsNullOrEmpty(Model.BankGaurrantyLetter))
+                                                                {
+                                                        <a href='@Url.Content(Model.BankGaurrantyLetter)' target='_blank'>Download</a>
+                                                                }
+                                                                else
+                                                                {
+                                                        <b>Not Available</b>
+                                                                }
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="row">
+                                                <div class="col-xs-12">
+                                                    <div class="col-md-7 default-form-control-style">
+                                                        @(Html.Label("Bank Guaranty Date"))
+                                                    </div>
+                                                    <div class="col-md-5 default-form-control-style">
+                                                        @if (!string.IsNullOrEmpty(Model.PS_BankGuarantyDate))
+                                                                {
+                                                        <label>@Model.PS_BankGuarantyDate </label>
+                                                                }
+                                                                else
+                                                                {
+                                                        <b>Not Available</b>
+                                                                }
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-xs-12">
+                                                    <div class="col-md-7 default-form-control-style">
+                                                        @(Html.Label("Validity Upto"))
+                                                    </div>
+                                                    <div class="col-md-5 default-form-control-style">
+                                                        @if (!string.IsNullOrEmpty(Model.PS_ValidityUpto))
+                                                                {
+                                                        <label>@Model.PS_ValidityUpto </label>
+                                                                }
+                                                                else
+                                                                {
+                                                        <b>Not Available</b>
+                                                                }
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            @if (((List<string>)Model.otherdocs).Contains("Mining Plan Approval Letter"))
+                                                    {
+                                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 padding_left_right_0">
+                                                @(Html.Label("3) Mining Plan", "3) Mining Plan", new { style = "color: #089c4c;font-size: 1.8rem;" }))
+                                            </div>
+
+                                            <hr class="border_hr_line" />
+
+                                            <div class="row">
+                                                <div class="col-xs-12">
+                                                    <div class="col-md-7 default-form-control-style">
+                                                        @(Html.Label("Approval Order No"))
+                                                    </div>
+                                                    <div class="col-md-5 default-form-control-style">
+                                                        @if (!string.IsNullOrEmpty(Model.MP_ApprovalOrderNo))
+                                                                    {
+                                                        <label>@Model.MP_ApprovalOrderNo</label>
+                                                                    }
+                                                                    else
+                                                                    {
+                                                        <b>Not Available</b>
+                                                                    }
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="row">
+                                                <div class="col-xs-12">
+                                                    <div class="col-md-7 default-form-control-style">
+                                                        @(Html.Label("Approval Order Date"))
+                                                    </div>
+                                                    <div class="col-md-5 default-form-control-style">
+                                                        @if (!string.IsNullOrEmpty(Model.ApprovaDateMiningPlan))
+                                                                    {
+                                                        <label>@Model.ApprovaDateMiningPlan</label>
+                                                                    }
+                                                                    else
+                                                                    {
+                                                        <b>Not Available</b>
+                                                                    }
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="row">
+                                                <div class="col-xs-12">
+                                                    <div class="col-md-7 default-form-control-style">
+                                                        @(Html.Label("Mining Plan Approval Letter"))
+                                                    </div>
+                                                    <div class="col-md-5 default-form-control-style">
+                                                        @if (!string.IsNullOrEmpty(Model.MPSOMLetter))
+                                                                    {
+                                                        <a href='@Url.Content(Model.MPSOMLetter)' target='_blank'>Download</a>
+                                                                    }
+                                                                    else
+                                                                    {
+                                                        <b>Not Available</b>
+                                                                    }
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="row">
+                                                <div class="col-xs-12">
+                                                    <div class="col-md-7 default-form-control-style">
+                                                        @(Html.Label("Valid From"))
+                                                    </div>
+                                                    <div class="col-md-5 default-form-control-style">
+                                                        @if (!string.IsNullOrEmpty(Model.MP_ValidFrom))
+                                                                    {
+                                                        <label>@Model.MP_ValidFrom</label>
+                                                                    }
+                                                                    else
+                                                                    {
+                                                        <b>Not Available</b>
+                                                                    }
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="row">
+                                                <div class="col-xs-12">
+                                                    <div class="col-md-7 default-form-control-style">
+                                                        @(Html.Label("Valid Upto"))
+                                                    </div>
+                                                    <div class="col-md-5 default-form-control-style">
+                                                        @if (!string.IsNullOrEmpty(Model.MP_ValidUpto))
+                                                                    {
+                                                        <label>@Model.MP_ValidUpto</label>
+                                                                    }
+                                                                    else
+                                                                    {
+                                                        <b>Not Available</b>
+                                                                    }
+                                                    </div>
+                                                </div>
+                                            </div>
+                                                    }
+                                            @if (((List<string>)Model.otherdocs).Contains("Approved Table for Proposed Production"))
+                                                    {
+                                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 padding_left_right_0">
+                                                @(Html.Label("4) Proposed Production", "4) Proposed Production", new { style = "color: #089c4c;font-size: 1.8rem;" }))
+                                            </div>
+
+                                            <hr class="border_hr_line" />
+
+                                            <div class="row">
+                                                <div class="col-xs-12">
+                                                    <div class="col-md-7 default-form-control-style">
+                                                        @(Html.Label("Approved Table for Proposed Production"))
+                                                    </div>
+                                                    <div class="col-md-5 default-form-control-style">
+                                                        @if (!string.IsNullOrEmpty(Model.ProposedProductionLetter))
+                                                                    {
+                                                        <a href='@Url.Content(Model.ProposedProductionLetter)' target='_blank'>Download</a>
+                                                                    }
+                                                                    else
+                                                                    {
+                                                        <b>Not Available</b>
+                                                                    }
+                                                    </div>
+                                                </div>
+                                            </div>
+
+
+                                            <div class="row" id="BOArea">
+                                                <div class="col-lg-11 col-md-11 col-sm-11 col-xs-12 pointer" style="margin: 15px 0; max-height: 400px; overflow: auto;">
+                                                    <label>Year Wise Proposed Production</label>
+                                                    <table border="1" id="AreaTable" class="table" style="margin-top: 15px;">
+                                                        <thead>
+                                                            <tr>
+                                                                <th style="border-color: black;">Year</th>
+                                                                <th style="border-color: black;">Production (MT)</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <tr>
+                                                                <td>@(Html.LabelFor(model => model.First_Year_PQty, "1st"))</td>
+                                                                <td>
+                                                                    @(Html.DisplayFor(model => model.First_Year_PQty, new { @type = "number", style = "width:220px;", min = "0", maxlength = "15" }))
+                                                                </td>
+                                                            </tr>
+
+                                                            <tr>
+                                                                <td>@(Html.LabelFor(model => model.Second_Year_PQty, "2nd"))</td>
+                                                                <td>
+                                                                    @(Html.DisplayFor(model => model.Second_Year_PQty, new { @type = "number", style = "width:220px;", min = "0", maxlength = "15" }))
+                                                                </td>
+                                                            </tr>
+
+                                                            <tr>
+                                                                <td>@(Html.LabelFor(model => model.Third_Year_PQty, "3rd"))</td>
+                                                                <td>
+                                                                    @(Html.DisplayFor(model => model.Third_Year_PQty, new { @type = "number", style = "width:220px;", min = "0", maxlength = "15" }))
+                                                                </td>
+                                                            </tr>
+
+                                                            <tr>
+                                                                <td>@(Html.LabelFor(model => model.Fourth_Year_PQty, "4th"))</td>
+                                                                <td>
+                                                                    @(Html.DisplayFor(model => model.Fourth_Year_PQty, new { @type = "number", style = "width:220px;", min = "0", maxlength = "15" }))
+                                                                </td>
+                                                            </tr>
+
+                                                            <tr>
+                                                                <td>@(Html.LabelFor(model => model.Fifth_Year_PQty, "5th"))</td>
+                                                                <td>
+                                                                    @(Html.DisplayFor(model => model.Fifth_Year_PQty, new { @type = "number", style = "width:220px;", min = "0", maxlength = "15" }))
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+
+
+
+
+                                                    }
+                                            @if (((List<string>)Model.otherdocs).Contains("Environmental Clearances Letter"))
+                                                    {
+                                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 padding_left_right_0">
+                                                @(Html.Label("5) Environmental Clearances", "5) Environmental Clearances", new { style = "color: #089c4c;font-size: 1.8rem;" }))
+                                            </div>
+
+                                            <hr class="border_hr_line" />
+
+                                            <div class="row">
+                                                <div class="col-xs-12">
+                                                    <div class="col-md-7 default-form-control-style">
+                                                        @(Html.Label("Environmental Clearances Letter"))
+                                                    </div>
+                                                    <div class="col-md-5 default-form-control-style">
+                                                        @if (!string.IsNullOrEmpty(Model.ECLetter))
+                                                                    {
+                                                        <a href='@Url.Content(Model.ECLetter)' target='_blank'>Download</a>
+                                                                    }
+                                                                    else
+                                                                    {
+                                                        <b>Not Available</b>
+                                                                    }
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="row">
+                                                <div class="col-xs-12">
+                                                    <div class="col-md-7 default-form-control-style">
+                                                        @(Html.Label("EC Order Date"))
+                                                    </div>
+                                                    <div class="col-md-5 default-form-control-style">
+                                                        @if (!string.IsNullOrEmpty(Model.EC_OrderDate))
+                                                                    {
+                                                        <label>@Model.EC_OrderDate</label>
+                                                                    }
+                                                                    else
+                                                                    {
+                                                        <b>Not Available</b>
+                                                                    }
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="row">
+                                                <div class="col-xs-12">
+                                                    <div class="col-md-7 default-form-control-style">
+                                                        @(Html.Label("EC Order No"))
+                                                    </div>
+                                                    <div class="col-md-5 default-form-control-style">
+                                                        @if (!string.IsNullOrEmpty(Model.EC_OrderNo))
+                                                                    {
+                                                        <label>@Model.EC_OrderNo</label>
+                                                                    }
+                                                                    else
+                                                                    {
+                                                        <b>Not Available</b>
+                                                                    }
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="row">
+                                                <div class="col-xs-12">
+                                                    <div class="col-md-7 default-form-control-style">
+                                                        @(Html.Label("Annual Capacity"))
+                                                    </div>
+                                                    <div class="col-md-5 default-form-control-style">
+                                                        <label>@Model.EC_AnnualCapacity</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="row">
+                                                <div class="col-xs-12">
+                                                    <div class="col-md-7 default-form-control-style">
+                                                        @(Html.Label("EC Valid Upto"))
+                                                    </div>
+                                                    <div class="col-md-5 default-form-control-style">
+                                                        @if (!string.IsNullOrEmpty(Model.EC_ValidUpto))
+                                                                    {
+                                                        <label>@Model.EC_ValidUpto</label>
+                                                                    }
+                                                                    else
+                                                                    {
+                                                        <b>Not Available</b>
+                                                                    }
+                                                    </div>
+                                                </div>
+                                            </div>
+                                                    }
+                                            @if (((List<string>)Model.otherdocs).Contains("Consent to Establish Approval Letter"))
+                                                    {
+                                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 padding_left_right_0">
+                                                @(Html.Label("6) Consent to Establish", "6) Consent to Establish", new { style = "color: #089c4c;font-size: 1.8rem;" }))
+                                            </div>
+
+                                            <hr class="border_hr_line" />
+
+                                            <div class="row">
+                                                <div class="col-xs-12">
+                                                    <div class="col-md-7 default-form-control-style">
+                                                        @(Html.Label("Consent to Establish Approval Letter"))
+                                                    </div>
+                                                    <div class="col-md-5 default-form-control-style">
+                                                        @if (!string.IsNullOrEmpty(Model.CTELetter))
+                                                                    {
+                                                        <a href='@Url.Content(Model.CTELetter)' target='_blank'>Download</a>
+                                                                    }
+                                                                    else
+                                                                    {
+                                                        <b>Not Available</b>
+                                                                    }
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="row">
+                                                <div class="col-xs-12">
+                                                    <div class="col-md-7 default-form-control-style">
+                                                        @(Html.Label("Order Date"))
+                                                    </div>
+                                                    <div class="col-md-5 default-form-control-style">
+                                                        @if (!string.IsNullOrEmpty(Model.CTE_OrderDate))
+                                                                    {
+                                                        <label>@Model.CTE_OrderDate</label>
+                                                                    }
+                                                                    else
+                                                                    {
+                                                        <b>Not Available</b>
+                                                                    }
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="row">
+                                                <div class="col-xs-12">
+                                                    <div class="col-md-7 default-form-control-style">
+                                                        @(Html.Label("Order No"))
+                                                    </div>
+                                                    <div class="col-md-5 default-form-control-style">
+                                                        @if (!string.IsNullOrEmpty(Model.CTE_OrderNo))
+                                                                    {
+                                                        <label>@Model.CTE_OrderNo</label>
+                                                                    }
+                                                                    else
+                                                                    {
+                                                        <b>Not Available</b>
+                                                                    }
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="row">
+                                                <div class="col-xs-12">
+                                                    <div class="col-md-7 default-form-control-style">
+                                                        @(Html.Label("Valid Upto"))
+                                                    </div>
+                                                    <div class="col-md-5 default-form-control-style">
+                                                        @if (!string.IsNullOrEmpty(Model.CTE_ValidUpto))
+                                                                    {
+                                                        <label>@Model.CTE_ValidUpto</label>
+                                                                    }
+                                                                    else
+                                                                    {
+                                                        <b>Not Available</b>
+                                                                    }
+                                                    </div>
+                                                </div>
+                                            </div>
+                                                    }
+                                            @if (((List<string>)Model.otherdocs).Contains("Consent to Operate Approval Letter"))
+                                                    {
+                                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 padding_left_right_0">
+                                                @(Html.Label("7) Consent to Operate", "7) Consent to Operate", new { style = "color: #089c4c;font-size: 1.8rem;" }))
+                                            </div>
+
+                                            <hr class="border_hr_line" />
+
+                                            <div class="row">
+                                                <div class="col-xs-12">
+                                                    <div class="col-md-7 default-form-control-style">
+                                                        @(Html.Label("Consent to Operate Approval Letter"))
+                                                    </div>
+                                                    <div class="col-md-5 default-form-control-style">
+                                                        @if (!string.IsNullOrEmpty(Model.CTOLetter))
+                                                                    {
+                                                        <a href='@Url.Content(Model.CTOLetter)' target='_blank'>Download</a>
+                                                                    }
+                                                                    else
+                                                                    {
+                                                        <b>Not Available</b>
+                                                                    }
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="row">
+                                                <div class="col-xs-12">
+                                                    <div class="col-md-7 default-form-control-style">
+                                                        @(Html.Label("Order Date"))
+                                                    </div>
+                                                    <div class="col-md-5 default-form-control-style">
+                                                        @if (!string.IsNullOrEmpty(Model.CTO_OrderDate))
+                                                                    {
+                                                        <label>@Model.CTO_OrderDate</label>
+                                                                    }
+                                                                    else
+                                                                    {
+                                                        <b>Not Available</b>
+                                                                    }
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="row">
+                                                <div class="col-xs-12">
+                                                    <div class="col-md-7 default-form-control-style">
+                                                        @(Html.Label("Order No"))
+                                                    </div>
+                                                    <div class="col-md-5 default-form-control-style">
+                                                        @if (!string.IsNullOrEmpty(Model.CTO_OrderNo))
+                                                                    {
+                                                        <label>@Model.CTO_OrderNo</label>
+                                                                    }
+                                                                    else
+                                                                    {
+                                                        <b>Not Available</b>
+                                                                    }
+                                                    </div>
+                                                </div>
+                                            </div>
+                                                    }
+                                            @if (((List<string>)Model.otherdocs).Contains("Forest Clearances (In case of Forest Land)"))
+                                                    {
+                                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 padding_left_right_0">
+                                                @(Html.Label("8) Forest Clearances (In case of Forest Land)", "8) Forest Clearances (In case of Forest Land)", new { style = "color: #089c4c;font-size: 1.8rem;" }))
+                                            </div>
+
+                                            <hr class="border_hr_line" />
+
+                                            <div class="row">
+                                                <div class="col-xs-12">
+                                                    <div class="col-md-7 default-form-control-style">
+                                                        @(Html.Label("Forest Clearances (In case of Forest Land)"))
+                                                    </div>
+                                                    <div class="col-md-5 default-form-control-style">
+                                                        @if (!string.IsNullOrEmpty(Model.FCLetter))
+                                                                    {
+                                                        <a href='@Url.Content(Model.FCLetter)' target='_blank'>Download</a>
+                                                                    }
+                                                                    else
+                                                                    {
+                                                        <b>Not Available</b>
+                                                                    }
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="row">
+                                                <div class="col-xs-12">
+                                                    <div class="col-md-7 default-form-control-style">
+                                                        @(Html.Label("FC Order Date"))
+                                                    </div>
+                                                    <div class="col-md-5 default-form-control-style">
+                                                        @if (!string.IsNullOrEmpty(Model.FC_OrderDate))
+                                                                    {
+                                                        <label>@Model.FC_OrderDate</label>
+                                                                    }
+                                                                    else
+                                                                    {
+                                                        <b>Not Available</b>
+                                                                    }
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="row">
+                                                <div class="col-xs-12">
+                                                    <div class="col-md-7 default-form-control-style">
+                                                        @(Html.Label("FC Order No"))
+                                                    </div>
+                                                    <div class="col-md-5 default-form-control-style">
+                                                        @if (!string.IsNullOrEmpty(Model.FC_OrderNo))
+                                                                    {
+                                                        <label>@Model.FC_OrderNo</label>
+                                                                    }
+                                                                    else
+                                                                    {
+                                                        <b>Not Available</b>
+                                                                    }
+                                                    </div>
+                                                </div>
+                                            </div>
+                                                    }
+                                            @if (((List<string>)Model.otherdocs).Contains("DGPS Survey Report"))
+                                                    {
+                                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 padding_left_right_0">
+                                                @(Html.Label("Other Consents","Other Consents", new { style = "color: #000000;font-size: 1.8rem;" }))
+                                            </div>
+                                            <hr class="border_hr_line" />
+
+                                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 padding_left_right_0">
+                                                @(Html.Label("9) DGPS Survey Report", "9) DGPS Survey Report", new { style = "color: #089c4c;font-size: 1.8rem;" }))
+                                            </div>
+                                            <hr class="border_hr_line" />
+
+                                            <div class="row">
+                                                <div class="col-xs-12">
+                                                    <div class="col-md-7 default-form-control-style">
+                                                        @(Html.Label("DGPS Survey Report"))
+                                                    </div>
+                                                    <div class="col-md-5 default-form-control-style">
+                                                        @if (!string.IsNullOrEmpty(Model.DGPSLetter))
+                                                                    {
+                                                        <a href='@Url.Content(Model.DGPSLetter)' target='_blank'>Download</a>
+                                                                    }
+                                                                    else
+                                                                    {
+                                                        <b>Not Available</b>
+                                                                    }
+                                                    </div>
+                                                </div>
+                                            </div>
+                                                    }
+                                            @if (((List<string>)Model.otherdocs).Contains("Private Land Acquisition"))
+                                                    {
+                                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 padding_left_right_0">
+                                                @(Html.Label("10) Private Land Acquisition", "10) Private Land Acquisition", new { style = "color: #089c4c;font-size: 1.8rem;" }))
+                                            </div>
+                                            <hr class="border_hr_line" />
+
+                                            <div class="row">
+                                                <div class="col-xs-12">
+                                                    <div class="col-md-7 default-form-control-style">
+                                                        @(Html.Label("Private Land Acquisition"))
+                                                    </div>
+                                                    <div class="col-md-5 default-form-control-style">
+                                                        @if (!string.IsNullOrEmpty(Model.LandLetter))
+                                                                    {
+                                                        <a href='@Url.Content(Model.LandLetter)' target='_blank'>Download</a>
+                                                                    }
+                                                                    else
+                                                                    {
+                                                        <b>Not Available</b>
+                                                                    }
+                                                    </div>
+                                                </div>
+                                            </div>
+                                                    }
+                                            @if (((List<string>)Model.otherdocs).Contains("Revenue Officer Report"))
+                                                    {
+                                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 padding_left_right_0">
+                                                @(Html.Label("11) Revenue Officer Report", "11) Revenue Officer Report", new { style = "color: #089c4c;font-size: 1.8rem;" }))
+                                            </div>
+                                            <hr class="border_hr_line" />
+
+                                            <div class="row">
+                                                <div class="col-xs-12">
+                                                    <div class="col-md-7 default-form-control-style">
+                                                        @(Html.Label("Revenue Officer Report"))
+                                                    </div>
+                                                    <div class="col-md-5 default-form-control-style">
+                                                        @if (!string.IsNullOrEmpty(Model.RevenueLetter))
+                                                                    {
+                                                        <a href='@Url.Content(Model.RevenueLetter)' target='_blank'>Download</a>
+                                                                    }
+                                                                    else
+                                                                    {
+                                                        <b>Not Available</b>
+                                                                    }
+                                                    </div>
+                                                </div>
+                                            </div>
+                                                    }
+                                            @if (((List<string>)Model.otherdocs).Contains("Gram Panchyat Proposal"))
+                                                    {
+                                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 padding_left_right_0">
+                                                @(Html.Label("12) Gram Panchyat Proposal", "12) Gram Panchyat Proposal", new { style = "color: #089c4c;font-size: 1.8rem;" }))
+                                            </div>
+                                            <hr class="border_hr_line" />
+
+                                            <div class="row">
+                                                <div class="col-xs-12">
+                                                    <div class="col-md-7 default-form-control-style">
+                                                        @(Html.Label("Gram Panchyat Proposal"))
+                                                    </div>
+                                                    <div class="col-md-5 default-form-control-style">
+                                                        @if (!string.IsNullOrEmpty(Model.GramPanchayatLetter))
+                                                                    {
+                                                        <a href='@Url.Content(Model.GramPanchayatLetter)' target='_blank'>Download</a>
+                                                                    }
+                                                                    else
+                                                                    {
+                                                        <b>Not Available</b>
+                                                                    }
+                                                    </div>
+                                                </div>
+                                            </div>
+                                                    }
+                                            @* @if (((List<string>)ViewBag.DocList).Contains("Documents as specified by state government"))
+                                                {
+                                                    <div class="row">
+                                                        <div class="col-xs-12">
+                                                            <div class="col-md-7 default-form-control-style">
+                                                                @(Html.Label("Documents as specified by state government"))
+                                                            </div>
+                                                            <div class="col-md-5 default-form-control-style">
+                                                                @if (!string.IsNullOrEmpty(Model.DocumentofProspectingOperation))
+                                                                {
+                                                                    <a href='@Url.Content(Model.DocumentofProspectingOperation)' target='_blank'>Download</a>
+                                                                }
+                                                                else
+                                                                {
+                                                                    <b>Not Available</b>
+                                                                }
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                }*@
+                                            @*</div>*@
+
+
+                                        </div>
+                                        @*</div>*@
+
+                                    </div>
+                                    @*</div>*@
+                                </div>
+
+
+
+
+
+                            </div>
+                        </div>
+
+
+
+
+                            }
+
+                        <div class="col-sm-6">
+                            @if (@Model.FOR != "View Details")
+                                {
+                                    if (@Model.FOR != "View")
+                                    {
+                            <input type="submit" value='Submit' class="btn btn-primary" name="Submit" id="btnNext" onclick="return ValidateForm();" />
+
+                                    }
+                                    else
+                                    {
+                            @if (ViewBag.usertype == "DGM")
+                                        {
+                                            if (@Model.Status == 1)
+                                            {
+                            <input type="button" value="Submit" id="btnNext" class="btn btn-primary" style="margin-right: 10px; width: 100px;" onclick="return ValidateForm();" />
+
+                                            }
+                            <input type="Submit" value="Submit" id="btnSubmit" style="display: none" />
+                                        }
+                                    }
+                                }
+                            @*<a href="#" class="btn btn-danger btn-md">Reset</a>*@
+                        </div>
+
+                            }
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+</section>
+<script>
+    var CoordinatesFileSize = 0;
+    var KhasraNoSize = 0;
+    var ExcelKharsaFileSize = 0;
+    var ExcelCoordinatesFileSize = 0;
+    var TopoSheetNoFileSize = 0;
+    var Pansize = 0;
+    var Tansize = 0;
+    $(document).ready(function () {
+
+        $('#Otherdoc').trigger('change');
+        onRadioChange();
+        $('input[name="PAN_Card_File"]').bind('change', function () { Pansize = this.files[0].size; return false; });
+        $('input[name="TIN_Card_File"]').bind('change', function () { Tansize = this.files[0].size; return false; });
+        $('input[name="KhasraNo_File"]').bind('change', function () { KhasraNoSize = this.files[0].size; return false; });
+        $('input[name="Coordinates_File"]').bind('change', function () { CoordinatesFileSize = this.files[0].size; return false; });
+        $('input[name="TopoSheetNo_File"]').bind('change', function () { TopoSheetNoFileSize = this.files[0].size; return false; });
+        $('input[name="ExcelCoordinates"]').bind('change', function () { ExcelCoordinatesFileSize = this.files[0].size; return false; });
+        $('input[name="ExcelKharsa"]').bind('change', function () { ExcelKharsaFileSize = this.files[0].size; return false; });
+
+
+        $('#StateName').prop("disabled", "disabled");
+        $('#DistrictName').prop("disabled", "disabled");
+        $('#TehsilName').prop("disabled", "disabled");
+        $('#VillageName').prop("disabled", "disabled");
+        $('#MineralType').prop("disabled", "disabled");
+        $('#MineralName').prop("disabled", "disabled");
+        $('#LeaseType').prop("disabled", "disabled");
+        onTOIChange();
+        if ($('#FOR').val() == 'View') {
+            $(".pointer").css('pointer-events', 'none')
+        }
+        else {
+            $(".pointer").css('pointer-events', 'initial')
+        }
+    });
+    var totalRowsCount = 1;
+    function addRow(tableID) {
+
+        if ($('#DocumentName').val() == '') {
+            swal("", 'Please Enter Document Name', "warning");
+            $('#DocumentName').focus();
+            return false;
+        }
+        var DocumentName = document.getElementsByName('DocumentName');
+        for (var i = 0; i < DocumentName.length; i++) {
+            if (DocumentName[i].value == $('#DocumentName').val()) {
+                swal("", 'Document Name ' + $('#DocumentName').val() + ' is already entered.Please enter different name.', "warning");
+                $('#DocumentName').focus();
+                return false
+            }
+        }
+
+        var table = document.getElementById(tableID);
+
+        var rowCount = table.rows.length;
+        var row = table.insertRow(rowCount);
+
+        var colCount = table.rows[1].cells.length;
+
+        for (var i = 0; i < colCount; i++) {
+
+            if (i == -2) { }
+
+            else {
+                var newcell = row.insertCell(i);
+
+                if (i == 0) {
+                    newcell.innerHTML = totalRowsCount;
+                }
+                else {
+                    if (i == 1) {
+
+                        newcell.style.cssText = 'width:1200px';
+                        $(newcell).append("<input type='hidden' name='DocumentName' value='" + $('#DocumentName').val() + "'>" + $('#DocumentName').val())
+                        //newcell.innerHTML = $('#DocumentName').val();
+                        //$(newcell).attr('name', 'DocumentName')
+                    }
+                    else {
+                        //newcell.innerHTML = table.rows[1].cells[i].innerHTML;
+                        newcell.innerHTML = '<input type="radio" value="' + $('#DocumentName').val() + '" name="ParticipantRadio" id="ParticipantRadio" />';
+                    }
+
+                }
+
+                switch (newcell.childNodes[0].type) {
+                    case "text":
+                        newcell.childNodes[0].value = "";
+                        break;
+                    case "checkbox":
+                        newcell.childNodes[0].checked = false;
+                        break;
+                    case "select-one":
+                        newcell.childNodes[0].selectedIndex = 0;
+                        break;
+                }
+            }
+        }
+        totalRowsCount = totalRowsCount + 1;
+        $('#DocumentName').val('');
+    }
+    var rws;
+    function RemoveRow(obj) {
+        totalRowsCount = totalRowsCount - 1;
+        if (totalRowsCount <= 0) {
+            totalRowsCount = 1;
+        }
+
+        var Rowslength = document.getElementById("dynamicTable").getElementsByTagName("tr").length;
+
+        if (Rowslength != 2)
+            document.getElementById("dynamicTable").deleteRow(Rowslength - 1);
+    }
+    function changeOtherdoc(data) {
+
+        if ($(data).is(':checked')) {
+
+            $('#OtherDocumentName').css("display", "block");
+
+        }
+        else {
+            $('#OtherDocumentName').css("display", "none");
+        }
+    }
+    $('#Otherdoc').change(function () {
+
+        changeOtherdoc();
+    });
+
+    function onRadioChange() {
+        if ($("#Firm").is(":checked")) {
+            $("#company_toggle").hide();
+            $("#firm_toggle").show();
+        }
+        else if ($("#Company").is(":checked")) {
+            $("#firm_toggle").hide();
+            $("#company_toggle").show();
+        }
+        else if ($("#Association").is(":checked")) {
+            $("#firm_toggle").hide();
+            $("#company_toggle").hide();
+        }
+        else {
+
+            $("#firm_toggle").hide();
+            $("#company_toggle").hide();
+        }
+    }
+
+    function onTOIChange() {
+
+
+        if ($("#GovernmentLand ").is(":checked")) {
+            $('#Government_toggle').show();
+        }
+        else {
+            $('#Government_toggle').hide();
+
+        }
+
+        if ($("#PrivateLand ").is(":checked")) {
+            $('#Private_toggle').show();
+        }
+        else {
+            $('#Private_toggle').hide();
+        }
+
+
+        if ($("#Revenue ").is(":checked")) {
+            $('#txtRevenue').show();
+        }
+        else {
+
+            $('#txtRevenue').hide();
+        }
+
+        if ($("#RevenueForest ").is(":checked")) {
+            $('#txtRevenueForest').show();
+        }
+        else {
+            $('#txtRevenueForest').hide();
+        }
+
+        if ($("#Nistar ").is(":checked")) {
+            $('#txtNistar').show();
+        }
+        else {
+            $('#txtNistar').hide();
+        }
+
+        if ($("#Forest ").is(":checked")) {
+            $('#txtForest').show();
+        }
+        else {
+            $('#txtForest').hide();
+        }
+
+        if ($("#Tribal ").is(":checked")) {
+            $('#txtTribal').show();
+        }
+        else {
+            $('#txtTribal').hide();
+        }
+
+
+        if ($("#NonTribal ").is(":checked")) {
+            $('#txtNonTribal').show();
+        }
+        else {
+            $('#txtNonTribal').hide();
+        }
+
+        calculateArea();
+    }
+    $('.txtArea').focusout(function () {
+        calculateArea();
+    });
+
+    function calculateArea() {
+        var totalArea = 0;
+        var AreaInHect = $('#AreaInHect').val();
+        var txtRevenue = $('#txtRevenue').val();
+        var txtRevenueForest = $('#txtRevenueForest').val();
+        var txtNistar = $('#txtNistar').val();
+        var txtForest = $('#txtForest').val();
+        var txtTribal = $('#txtTribal').val();
+        var txtNonTribal = $('#txtNonTribal').val();
+
+        txtRevenue = txtRevenue || 0;
+        txtRevenueForest = txtRevenueForest || 0;
+        txtNistar = txtNistar || 0;
+        txtForest = txtForest || 0;
+        txtTribal = txtTribal || 0;
+        txtNonTribal = txtNonTribal || 0;
+
+        if ($("#Revenue ").is(":checked")) {
+            totalArea = parseFloat(totalArea) + parseFloat(txtRevenue);
+        }
+
+
+        if ($("#RevenueForest ").is(":checked")) {
+            totalArea = parseFloat(totalArea) + parseFloat(txtRevenueForest);
+        }
+
+
+        if ($("#Nistar ").is(":checked")) {
+            totalArea = parseFloat(totalArea) + parseFloat(txtNistar);
+
+        }
+
+
+        if ($("#Forest ").is(":checked")) {
+            totalArea = parseFloat(totalArea) + parseFloat(txtForest);
+        }
+
+
+        if ($("#Tribal ").is(":checked")) {
+            totalArea = parseFloat(totalArea) + parseFloat(txtTribal);
+        }
+
+        if ($("#NonTribal ").is(":checked")) {
+            totalArea = parseFloat(totalArea) + parseFloat(txtNonTribal);
+        }
+
+        if (parseFloat(AreaInHect) < parseFloat(totalArea)) {
+            swal("", 'Sum of area of type of land must less then Area in hect.Please try again!', "warning");
+            $('#AreaInHect').focus();
+            return false;
+            $('#btnNext').hide();
+        }
+        else {
+            return true;
+            $('#btnNext').show();
+        }
+    }
+
+
+    $('input[name="TopoSheetNo_File"]').bind('change', function () {
+        debugger;
+        filesize = this.files[0].size;
+        var filess = this.files;
+
+        var val = $(this).val().toLowerCase(),
+            regex = new RegExp("(.*?)\.(pdf|jpeg|jpg|png|tif)$");
+        var extension = val.substr((val.lastIndexOf('.') + 1));
+        if (!(regex.test(val))) {
+            debugger;
+            swal("", " " + extension + "  type is not an allowed file type. You can use only jpg, jpeg, png, pdf, tif types of file(s). ", "warning");
+            this.value = '';
+            // $("input[name='Submit']").attr('disabled', true);
+            return false;
+        }
+        return false;
+
+    });
+    $('input[name="KhasraNo_File"]').bind('change', function () {
+        debugger;
+        filesize = this.files[0].size;
+        var filess = this.files;
+
+        var val = $(this).val().toLowerCase(),
+            regex = new RegExp("(.*?)\.(pdf|jpeg|jpg|png|tif)$");
+        var extension = val.substr((val.lastIndexOf('.') + 1));
+        if (!(regex.test(val))) {
+            debugger;
+            swal("", " " + extension + "  type is not an allowed file type. You can use only jpg, jpeg, png, pdf, tif types of file(s). ", "warning");
+            this.value = '';
+            // $("input[name='Submit']").attr('disabled', true);
+            return false;
+        }
+        return false;
+
+    });
+    $('input[name="Coordinates_File"]').bind('change', function () {
+        debugger;
+        filesize = this.files[0].size;
+        var filess = this.files;
+
+        var val = $(this).val().toLowerCase(),
+            regex = new RegExp("(.*?)\.(pdf|jpeg|jpg|png|tif)$");
+        var extension = val.substr((val.lastIndexOf('.') + 1));
+        if (!(regex.test(val))) {
+            debugger;
+            swal("", " " + extension + "  type is not an allowed file type. You can use only jpg, jpeg, png, pdf, tif types of file(s). ", "warning");
+            this.value = '';
+            // $("input[name='Submit']").attr('disabled', true);
+            return false;
+        }
+        return false;
+
+    });
+    $('input[name="DemarcationReport_File"]').bind('change', function () {
+        debugger;
+        filesize = this.files[0].size;
+        var filess = this.files;
+
+        var val = $(this).val().toLowerCase(),
+            regex = new RegExp("(.*?)\.(pdf|jpeg|jpg|png|tif)$");
+        var extension = val.substr((val.lastIndexOf('.') + 1));
+        if (!(regex.test(val))) {
+            debugger;
+            swal("", " " + extension + "  type is not an allowed file type. You can use only jpg, jpeg, png, pdf, tif types of file(s). ", "warning");
+            this.value = '';
+
+            return false;
+        }
+        return false;
+
+    });
+    function CalculateVER() {
+
+        var LeaseType = $("#LeaseType").val();
+        var MineralTypeID = $("#MineralType").val();
+
+        var EVR = "";
+        var validateEvr = "";
+
+        if (MineralTypeID == 'Major Mineral') {
+
+            if (LeaseType == 'ML') {
+
+                Reserve = $('#Reserve').val();
+                Reserve = Reserve || 0;
+
+                ASP = $('#PerformanceSecurity').val();
+                ASP = ASP || 0;
+
+                EVR = $('#EVR').val();
+                EVR = EVR || 0;
+
+                EVR = parseFloat(Reserve * ASP);
+                $('#EVR').val(EVR);
+
+                CalculateEstimatedValueOfResouce();
+            }
+        }
+
+    }
+    function CalculateEstimatedValueOfResouce() {
+
+        var LeaseType = $("#LeaseType").val();
+        var MineralTypeID = $("#MineralType").val()
+
+        var EVR = "";
+        var validateEvr = "";
+        var validateFirstSecondPayment = "";
+        var validateThirdSecondPayment = "";
+
+
+        $('#MineralType').val(MineralTypeID);
+
+        if (MineralTypeID == 'Major Mineral') {
+
+            if (LeaseType == 'ML') {
+                EVR = $('#EVR').val();
+
+                EVR = EVR || 0;
+                var validateEvr = parseFloat(EVR) * 0.5 / 100;
+
+                $('#TotalUpfrontPayment').val(validateEvr)
+                //$('#PerformanceSecurity').val(validateEvr);
+                $('#PerformanceSecurity_Installment_Amount').val(validateEvr);
+
+                var validateFirstSecondPayment = parseFloat($('#TotalUpfrontPayment').val()) * 10 / 100;
+                var validateThirdSecondPayment = parseFloat($('#TotalUpfrontPayment').val()) * 80 / 100;
+
+
+
+                $('#First_Installment_Amount').val(validateFirstSecondPayment).trigger("change");
+                $('#Second_Installment_Amount').val(validateFirstSecondPayment);
+                $('#Third_Installment_Amount').val(validateThirdSecondPayment);
+
+
+                var TotalValue = parseFloat(EVR) * 0.5 / 100
+
+            }
+            else if (LeaseType == 'CL') {
+                EVR = $('#MajorMineral_CL_EVR').val();
+
+                EVR = EVR || 0;
+                var validateEvr = parseFloat(EVR) * 0.25 / 100;
+                $('#MajorMineral_CL_PerformanceSecurity_Installment_Amount').val(validateEvr);
+            }
+        }
+
+
+    }
+    function CalculateTotalUpfrontPayment() {
+        debugger;
+        var LeaseType = $("#LeaseType").val();
+        var MineralTypeID = $("#MineralType").val();
+
+        if (MineralTypeID == 'Major Mineral') {
+
+            if (LeaseType == 'ML') {
+                var validateFirstSecondPayment = parseFloat($('#TotalUpfrontPayment').val()) * 10 / 100;
+                var validateThirdSecondPayment = parseFloat($('#TotalUpfrontPayment').val()) * 80 / 100;
+
+                $('#First_Installment_Amount').val(validateFirstSecondPayment).trigger("change");
+                $('#Second_Installment_Amount').val(validateFirstSecondPayment);
+                $('#Third_Installment_Amount').val(validateThirdSecondPayment);
+                var TotalValue = parseFloat(EVR) * 0.5 / 100
+            }
+        }
+    }
+
+    function ValidateForm() {
+        debugger;
+
+        var LeaseType = $("#LeaseTypeId").val();
+        var LeaseTypename = $("#LeaseType").val();
+        var MineralTypeID = $("#MineralTypeID").val();
+        var mineraltypename = $("#MineralType").val();
+        var TypeOfLand = document.getElementsByName('TypeOfLands');
+        var IsCheckted = false;
+        var Governmenttxt = $("#Governmenttxt").val();
+        var Privatetxt = $("#Privatetxt").val();
+        var Foresttxt = $("#Foresttxt").val();
+        var AreaInHect = $("#AreaInHect").val();
+        var MiningPlanDueDate = $("#MiningPlanDueDate").val();
+
+        Governmenttxt = Governmenttxt || 0;
+        Foresttxt = Foresttxt || 0;
+        Privatetxt = Privatetxt || 0;
+        AreaInHect = AreaInHect || 0;
+        debugger;
+        if ($('#Firm').is(':checked')) {
+            if (!($('#Partnership').is(':checked') || $('#Proprietary').is(':checked'))) {
+                swal("", 'Please Select One!', "warning");
+                $("#Partnership").focus();
+                return false;
+            }
+        }
+        if ($('#CompanyId').val() == '') {
+            swal("", 'Please select Company');
+            $('#CompanyId').focus();
+            return false;
+        }
+        if ($('#NameOfApplicant').val() == '') {
+            swal("", 'Please Enter NameOfApplicant', "warning");
+            $('#NameOfApplicant').focus();
+            return false;
+        }
+        if ($('#Designation').val() == '') {
+            swal("", 'Please Enter Designation', "warning");
+            $('#Designation').focus();
+            return false;
+        }
+        if ($('#ApplicantMobileNo').val() == '') {
+            swal("", 'Please Enter Contact No.', "warning");
+            $('#ApplicantMobileNo').focus();
+            return false;
+        }
+        if ($('#ApplicantEmailId').val() == '') {
+            swal("", 'Please Enter Email Id', "warning");
+            $('#ApplicantEmailId').focus();
+            return false;
+        }
+        if ($('#AddressOfApplicant').val() == '') {
+            swal("", 'Please Enter Address', "warning");
+            $('#AddressOfApplicant').focus();
+            return false;
+        }
+
+        if ($('#GovernmentLand').is(':checked')) {
+            if (!($('#Revenue').is(':checked')) || ($('#RevenueForest').is(':checked')) || ($('#Nistar').is(':checked')) || ($('#Forest').is(':checked'))) {
+                swal("", 'Please provide one!', "warning");
+
+                return false;
+            }
+            else {
+                if ($('#Revenue').is(':checked')) {
+                    if ($('#txtRevenue').val() == '') {
+                        swal("", 'Please provide Revenue', "warning");
+                        $('#txtRevenue').focus();
+                        return false;
+                    }
+
+                }
+                if ($('#RevenueForest').is(':checked')) {
+                    if ($('#txtRevenueForest').val() == '') {
+                        swal("", 'Please provide Revenue Forest', "warning");
+                        $('#txtRevenueForest').focus();
+                        return false;
+                    }
+
+                }
+                if ($('#Nistar').is(':checked')) {
+                    if ($('#txtNistar').val() == '') {
+                        swal("", 'Please provide Nistar', "warning");
+                        $('#txtNistar').focus();
+                        return false;
+                    }
+
+                }
+                if ($('#Forest').is(':checked')) {
+                    if ($('#txtForest').val() == '') {
+                        swal("", 'Please provide Forest', "warning");
+                        $('#txtForest').focus();
+                        return false;
+                    }
+
+                }
+            }
+        }
+
+
+        if (Pansize == 0) {
+            swal("", "Please Upload PAN No.", "warning");
+            $(".pansize").focus();
+            return false;
+        }
+        if (Tansize == 0) {
+            swal("", "Please Upload TIN No.", "warning");
+            $(".tinsize").focus();
+            return false;
+        }
+
+        if (KhasraNoSize == 0) {
+            swal("", "Please Upload Kharsa No.", "warning");
+            $(".KhasraNo").focus();
+            return false;
+        }
+        if (TopoSheetNoFileSize == 0) {
+            swal("", "Please Upload TopoSheetNo.", "warning");
+            $(".TopoSheetNo").focus();
+            return false;
+        }
+
+        for (var i = 0; i < TypeOfLand.length; i++) {
+            if (TypeOfLand[i].checked) {
+                IsCheckted = true;
+                break;
+            }
+        }
+        if (IsCheckted == false) {
+            //swal("","Please select at least one document to upload..!");
+            swal("", "Please select Type of Land..!", "warning");
+            $('#GovernmentLand').focus()
+            return false;
+        }
+        if (parseFloat(AreaInHect) < parseFloat(Governmenttxt) + parseFloat(Privatetxt) + parseFloat(Foresttxt)) {
+            swal("", "Area in Hect(" + AreaInHect + ") must be less then sum of Government area(" + Governmenttxt + ")+ Private area(" + Privatetxt + ") + Forest area(" + Foresttxt + ")", "warning");
+            $("#AreaInHect").focus();
+            return false;
+        }
+        if ($("#Status").val() == '1') {
+            var count = 0;
+            if ($("#MiningPlanDueDate").val() == '') {
+                swal("", 'Please enter Draft Mining Plan Due Date !', "warning");
+                $("#MiningPlanDueDate").focus();
+                return false;
+            }
+            var StatutoryDocuments = document.getElementsByName('StatutoryDocuments');
+            for (var i = 0; i < StatutoryDocuments.length; i++) {
+                if (StatutoryDocuments[i].checked) {
+                    count = count + 1;
+                }
+            }
+            if (count == 0) {
+                swal("", 'Please select at least one document to upload !', "warning");
+                $('input[name="StatutoryDocuments"]').focus();
+                return false;
+            }
+
+        }
+        if (mineraltypename == 'Major Mineral') {
+            if (LeaseTypename == 'ML') {
+                if (validate_PartialMajorMineralNonCoalML() != true) {
+                    return false;
+                }
+
+            }
+            else if (LeaseTypename == 'CL') {
+                if (validate_PartialMajorMineralNonCoalCL() != true) {
+                    return false;
+                }
+
+            }
+
+        }
+        else if (mineraltypename == 'Minor Mineral') {
+
+            if (validate_PartialMinorMineral() != true) {
+                return false;
+            }
+            if (validate_PartialMinorMineral() != true) {
+                return false;
+            }
+        }
+        if (calculateArea() != true) {
+            return false;
+        }
+        if (confirm("Are you sure want to Submit?")) {
+            return true;
+        }
+        else {
+
+            return false;
+        }
+        return true;
+    }
+    function validate_PartialMajorMineralNonCoalML() {
+
+        var Reserve = $('#Reserve ').val();
+        var FinalPriceOffer = $('#FinalPriceOffer ').val();
+        var First_Installment_Amount = $('#First_Installment_Amount').val();
+        var First_Installment_ScheduleDate = $('#First_Installment_ScheduleDate ').val();
+        var First_Installment_DateOfDiposite = $('#First_Installment_DateOfDiposite ').val();
+
+        var TotalUpfrontPayment = $('#TotalUpfrontPayment').val();
+        var PerformanceSecurity_Installment_Amount = $('#PerformanceSecurity_Installment_Amount').val();
+        var PerformanceSecurity = $('#PerformanceSecurity').val();
+        var PerformanceSecurity_Installment_ScheduleDate = $('#PerformanceSecurity_Installment_ScheduleDate').val();
+        var PerformanceSecurity_Installment_SubmissionDate = $('#PerformanceSecurity_Installment_SubmissionDate').val();
+
+        var Second_Installment_Amount = $('#Second_Installment_Amount ').val();
+        var Second_Installment_ScheduleDate = $('#Second_Installment_ScheduleDate ').val();
+        //var Second_Installment_DateOfDiposite = $('#Second_Installment_DateOfDiposite ').val();
+        var Third_Installment_Amount = $('#Third_Installment_Amount ').val();
+        var Third_Installment_ScheduleDate = $('#Third_Installment_ScheduleDate ').val();
+        var PerformanceSecurity = $('#PerformanceSecurity').val();
+
+        if (Reserve == "") {
+            swal("", "Reserve is required.");
+            $('#Reserve').focus();
+            return false;
+        }
+        var EVR = $('#EVR').val();
+        var Percentage = 0.5;
+        var value = "";
+        if (EVR == "") {
+            swal("", "Value of Estimated Reserve (VER)(In Rs) is required.", "warning");
+            $('#EVR').focus();
+            return false;
+        }
+        if (FinalPriceOffer == "") {
+            swal("", "Final Price Offer is required.");
+            $('#FinalPriceOffer').focus();
+            return false;
+        }
+        EVR = EVR || 0;
+        //Total Upfront Payment (5% of EVR)
+        value = TotalUpfrontPayment;
+        value = value || 0;
+        var TotalValue = parseFloat(EVR) * 0.5 / 100
+
+        value = $('#PerformanceSecurity').val();
+        value = value || 0;
+        var TotalValue = parseFloat(EVR) * 0.5 / 100
+
+        //1st Installment [10% of Upfront Payment]
+        value = First_Installment_Amount;
+        value = value || 0;
+        var TotalValue = parseFloat(TotalUpfrontPayment) * 10 / 100
+
+
+        if (First_Installment_ScheduleDate == "") {
+            swal("", 'Please Select First Installment ScheduleDate.', "warning");
+            $('#First_Installment_ScheduleDate').val('')
+            $('#First_Installment_ScheduleDate').focus();
+            return false;
+        }
+        //if (First_Installment_DateOfDiposite == "") {
+        //    swal("",'Please Select First Installment Date Of Diposite.');
+        //    $('#First_Installment_DateOfDiposite').val('')
+        //    $('#First_Installment_DateOfDiposite').focus();
+        //    return false;
+        //}
+        if ($('#FOR').val() == "ApplyForML") { }
+        else {
+            if ($('input[name="First_Installment_Upload"]').val() == "") {
+                swal("", 'Please upload 1st Installment Attachment.', "warning");
+                $('#Third_Installment_Upload').focus();
+                return false;
+            }
+        }
+
+
+        //2nd Installment [10% of Upfront Payment]
+
+        value = Second_Installment_Amount;
+        value = value || 0;
+        var TotalValue = parseFloat(TotalUpfrontPayment) * 10 / 100
+
+        //if (parseFloat(TotalValue) != parseFloat(value)) {
+        //    swal("",'Value of Second Installment Amount must be ' + TotalValue)
+        //    $('#Second_Installment_Amount').val('')
+        //    $('#Second_Installment_Amount').focus();
+        //    return false;
+        //}
+
+        if (Second_Installment_ScheduleDate == "") {
+            swal("", 'Please Select Second Installment ScheduleDate.', "warning");
+            $('#Second_Installment_ScheduleDate').val('')
+            $('#Second_Installment_ScheduleDate').focus();
+            return false;
+        }
+
+
+
+        value = Third_Installment_Amount;
+        value = value || 0;
+        var TotalValue = parseFloat(TotalUpfrontPayment) * 80 / 100
+
+        if (Third_Installment_ScheduleDate == "") {
+            swal("", 'Please Select Third Installment ScheduleDate.', "warning");
+            $('#Third_Installment_ScheduleDate').val('')
+            $('#Third_Installment_ScheduleDate').focus();
+            return false;
+        }
+        if (Third_Installment_ScheduleDate == "") {
+            swal("", 'Please Select Third Installment ScheduleDate.', "warning");
+            $('#Third_Installment_ScheduleDate').val('')
+            $('#Third_Installment_ScheduleDate').focus();
+            return false;
+        }
+
+
+        //Perormance Security Amount (.5% of EVR)
+        value = PerformanceSecurity_Installment_Amount;
+        value = value || 0;
+        var TotalValue = parseFloat(EVR) * 0.5 / 100
+
+        if (PerformanceSecurity_Installment_ScheduleDate == "") {
+            swal("", 'Please Enter Performance Security Schedule Date.', "warning");
+            $('#PerformanceSecurity_Installment_ScheduleDate').val('')
+            $('#PerformanceSecurity_Installment_ScheduleDate').focus();
+            return false;
+        }
+
+        if (PerformanceSecurity == "") {
+            swal("", 'Please enter ASP (Average Sale Price).', "warning");
+            $('#PerformanceSecurity').val('')
+            $('#PerformanceSecurity').focus();
+            return false;
+        }
+        return true;
+    }
+    function validate_PartialMinorMineral() {
+
+        //var AuctionMoney = document.getElementById('AuctionMoney').value;
+        var list_PerformanceSecurity_Installment_ScheduleDate = document.getElementsByName('PerformanceSecurity_Installment_ScheduleDate')
+        var PerformanceSecurity_Installment_ScheduleDate = ""
+        for (var i = 0; i < list_PerformanceSecurity_Installment_ScheduleDate.length; i++) {
+            if (list_PerformanceSecurity_Installment_ScheduleDate[i].value != "") {
+                PerformanceSecurity_Installment_ScheduleDate = list_PerformanceSecurity_Installment_ScheduleDate[i].value;
+            }
+        }
+        var list_PerformanceSecurity_Installment_Amount = document.getElementsByName('PerformanceSecurity_Installment_Amount')
+        var PerformanceSecurity_Installment_Amount = ""
+        for (var i = 0; i < list_PerformanceSecurity_Installment_Amount.length; i++) {
+            if (list_PerformanceSecurity_Installment_Amount[i].value != "") {
+                PerformanceSecurity_Installment_Amount = list_PerformanceSecurity_Installment_Amount[i].value;
+            }
+        }
+        if (PerformanceSecurity_Installment_ScheduleDate == "") {
+            swal("", 'Please enter Perormance Security Schedule Date.', "warning");
+            $('.MinorMineralPerformanceSecuritDate').focus();
+            return false;
+        }
+        if (PerformanceSecurity_Installment_Amount == "") {
+            swal("", 'Please enter Perormance Security Amount.', "warning");
+            $('.MinorMineralPerformanceSecuritAmount').focus();
+            return false;
+        }
+
+        return true;
+    }
+
+    $(".FinalPriceOffer").keydown(function (e) {
+        // Ensure that it is a number and stop the keypress
+        if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105) && (e.keyCode != 8) && (e.keyCode != 190) && (e.keyCode != 110)) {
+            e.preventDefault();
+        }
+        // Allow: backspace, delete, tab, escape, enter and .
+        if ($.inArray(e.keyCode, [46, 8, 9, 27, 13, 110, 190]) !== -1 ||
+            // Allow: Ctrl+A, Command+A
+            (e.keyCode === 65 && (e.ctrlKey === true || e.metaKey === true)) ||
+            // Allow: home, end, left, right, down, up
+            (e.keyCode >= 35 && e.keyCode <= 40)) {
+            // let it happen, don't do anything
+            return;
+        }
+
+    });
+    $(".TotalUpfrontPayment").keydown(function (e) {
+        // Ensure that it is a number and stop the keypress
+        if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105) && (e.keyCode != 8) && (e.keyCode != 190) && (e.keyCode != 110)) {
+
+            e.preventDefault();
+
+        }
+        // Allow: backspace, delete, tab, escape, enter and .
+        if ($.inArray(e.keyCode, [46, 8, 9, 27, 13, 110, 190]) !== -1 ||
+            // Allow: Ctrl+A, Command+A
+            (e.keyCode === 65 && (e.ctrlKey === true || e.metaKey === true)) ||
+            // Allow: home, end, left, right, down, up
+            (e.keyCode >= 35 && e.keyCode <= 40)) {
+            // let it happen, don't do anything
+            return;
+        }
+
+    });
+    $(".PerformanceSecurity").keydown(function (e) {
+        console.log(e.keyCode)
+        // Ensure that it is a number and stop the keypress
+        if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105) && (e.keyCode != 8) && (e.keyCode != 190) && (e.keyCode != 110)) {
+
+            e.preventDefault();
+
+        }
+        // Allow: backspace, delete, tab, escape, enter and .
+        if ($.inArray(e.keyCode, [46, 8, 9, 27, 13, 110, 190]) !== -1 ||
+            // Allow: Ctrl+A, Command+A
+            (e.keyCode === 65 && (e.ctrlKey === true || e.metaKey === true)) ||
+            // Allow: home, end, left, right, down, up
+            (e.keyCode >= 35 && e.keyCode <= 40)) {
+            // let it happen, don't do anything
+            return;
+        }
+
+    });
+
+    $(".First_Installment_Amount").keydown(function (e) {
+        // Ensure that it is a number and stop the keypress
+        if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105) && (e.keyCode != 8) && (e.keyCode != 190) && (e.keyCode != 110)) {
+
+            e.preventDefault();
+
+        }
+        // Allow: backspace, delete, tab, escape, enter and .
+        if ($.inArray(e.keyCode, [46, 8, 9, 27, 13, 110, 190]) !== -1 ||
+            // Allow: Ctrl+A, Command+A
+            (e.keyCode === 65 && (e.ctrlKey === true || e.metaKey === true)) ||
+            // Allow: home, end, left, right, down, up
+            (e.keyCode >= 35 && e.keyCode <= 40)) {
+            // let it happen, don't do anything
+            return;
+        }
+
+    });
+    $(".Second_Installment_Amount").keydown(function (e) {
+        // Ensure that it is a number and stop the keypress
+        if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105) && (e.keyCode != 8) && (e.keyCode != 190) && (e.keyCode != 110)) {
+
+            e.preventDefault();
+
+        }
+        // Allow: backspace, delete, tab, escape, enter and .
+        if ($.inArray(e.keyCode, [46, 8, 9, 27, 13, 110, 190]) !== -1 ||
+            // Allow: Ctrl+A, Command+A
+            (e.keyCode === 65 && (e.ctrlKey === true || e.metaKey === true)) ||
+            // Allow: home, end, left, right, down, up
+            (e.keyCode >= 35 && e.keyCode <= 40)) {
+            // let it happen, don't do anything
+            return;
+        }
+
+    });
+    $(".Third_Installment_Amount").keydown(function (e) {
+        // Ensure that it is a number and stop the keypress
+        if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105) && (e.keyCode != 8) && (e.keyCode != 190) && (e.keyCode != 110)) {
+
+            e.preventDefault();
+
+        }
+        // Allow: backspace, delete, tab, escape, enter and .
+        if ($.inArray(e.keyCode, [46, 8, 9, 27, 13, 110, 190]) !== -1 ||
+            // Allow: Ctrl+A, Command+A
+            (e.keyCode === 65 && (e.ctrlKey === true || e.metaKey === true)) ||
+            // Allow: home, end, left, right, down, up
+            (e.keyCode >= 35 && e.keyCode <= 40)) {
+            // let it happen, don't do anything
+            return;
+        }
+
+    });
+    $(".PerformanceSecurity_Installment_Amount").keydown(function (e) {
+        // Ensure that it is a number and stop the keypress
+        if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105) && (e.keyCode != 8) && (e.keyCode != 190) && (e.keyCode != 110)) {
+
+            e.preventDefault();
+
+        }
+        // Allow: backspace, delete, tab, escape, enter and .
+        if ($.inArray(e.keyCode, [46, 8, 9, 27, 13, 110, 190]) !== -1 ||
+            // Allow: Ctrl+A, Command+A
+            (e.keyCode === 65 && (e.ctrlKey === true || e.metaKey === true)) ||
+            // Allow: home, end, left, right, down, up
+            (e.keyCode >= 35 && e.keyCode <= 40)) {
+            // let it happen, don't do anything
+            return;
+        }
+
+    });
+
+    $("#Pincode").keydown(function (e) {
+        // Allow: backspace, delete, tab, escape, enter and .
+        if ($.inArray(e.keyCode, [46, 8, 9, 27, 13, 110, 190]) !== -1 ||
+            // Allow: Ctrl+A, Command+A
+            (e.keyCode === 65 && (e.ctrlKey === true || e.metaKey === true)) ||
+            // Allow: home, end, left, right, down, up
+            (e.keyCode >= 35 && e.keyCode <= 40)) {
+            // let it happen, don't do anything
+            return;
+        }
+        // Ensure that it is a number and stop the keypress
+        if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) {
+            e.preventDefault();
+        }
+    });
+    $(".txtArea").keydown(function (e) {
+        // Allow: backspace, delete, tab, escape, enter and .
+        if ($.inArray(e.keyCode, [46, 8, 9, 27, 13, 110, 190]) !== -1 ||
+            // Allow: Ctrl+A, Command+A
+            (e.keyCode === 65 && (e.ctrlKey === true || e.metaKey === true)) ||
+            // Allow: home, end, left, right, down, up
+            (e.keyCode >= 35 && e.keyCode <= 40)) {
+            // let it happen, don't do anything
+            return;
+        }
+        // Ensure that it is a number and stop the keypress
+        if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) {
+            e.preventDefault();
+        }
+    });
+
+    $("#ApplicantMobileNo").keydown(function (e) {
+        // Allow: backspace, delete, tab, escape, enter and .
+        if ($.inArray(e.keyCode, [46, 8, 9, 27, 13, 110, 190]) !== -1 ||
+            // Allow: Ctrl+A, Command+A
+            (e.keyCode === 65 && (e.ctrlKey === true || e.metaKey === true)) ||
+            // Allow: home, end, left, right, down, up
+            (e.keyCode >= 35 && e.keyCode <= 40)) {
+            // let it happen, don't do anything
+            return;
+        }
+        // Ensure that it is a number and stop the keypress
+        if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) {
+            e.preventDefault();
+        }
+    });
+</script>
+
+

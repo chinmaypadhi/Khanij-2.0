@@ -1,0 +1,165 @@
+﻿@model IntegrationEF.BankRemittanceModel;
+
+@{
+    ViewData["Title"] = "EPermit List";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<section class="wrapper main-wrapper row">
+    <div class="col-12" id="mainDiv">
+        @Html.Partial("_navigation")
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+
+                        <li class="nav-item">
+                            <a class="nav-link active" href="#">
+                                SBI Payment Status Checker
+                            </a>
+                        </li>
+
+                    </ul>
+                    @Html.Partial("_util")
+                </div>
+
+                <section class="box form-container">
+                    @*@using (Html.BeginForm("MergeEPermit", "ePermit", FormMethod.Post, new { AUTOCOMPLETE = "Off", id = "form1" }))
+                    {*@
+                       
+
+                        <div class="content-body">
+
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="table-responsive">
+                                        <table id="SBI_Payment_Status" class="table table-sm table-bordered">
+                                            <thead>
+                                                <tr>
+                                                    <th width="100">SR. NO.</th>
+                                                    <th>Client Transaction Reference Number</th>
+                                                    <th>Amount</th>
+                                                    <th>Transaction Status</th>
+                                                    <th>Transaction Time</th>
+                                                    <th>Action</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @{ int i = 1;
+                                                }
+                                                @foreach (var b in ViewBag.ViewList)
+                                                {
+                                                    <tr class="active-row">
+                                                        <td>@i</td>
+                                                        <td>@b.ClientTxnRefNumber</td>
+                                                        <td><p >@b.Amount</p> </td>
+                                                        <td><p>@b.TXN_STATUS</p> </td>
+                                                        <td><p>@b.TPSL_TXN_TIME</p> </td>
+                                                        <td class="noprint">
+                                                            <button class='btn btn-primary' onclick="onStatusClick('@b.ClientTxnRefNumber', @b.Amount)">Check Status</button>
+                                                            @*<a href="@Url.Content("~/Permit/Lessee/ePermitApplication/?BulkpermitId=")@b.BulkPermitId">Download Draft Application</a>*@
+                                                        </td>
+                                                    </tr>
+                                                    i++;
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </div>
+
+
+                                </div>
+                            </div>
+                        </div>
+                    @*}*@
+                </section>
+            </div>
+        </div>
+    </div>
+    <!-- MAIN CONTENT AREA ENDS -->
+</section>
+<uc1:footer runat="server" ID="footer" />
+<script>
+    excelMe = "yes"
+    pdfMe = "yes"
+    //backMe = "yes"
+    $(document).ready(function () {
+        loadNavigation('balancequantitye-permit', 'glepermit', 'Payment', 'tl', 'Payment', 'Check Payment Status', ' ');
+        $('.searchableselect').searchableselect();
+
+        $('#ePermitList').DataTable();
+
+
+        $('.shorting-lnk').click(function () {
+            $('.shorting-lnk i').toggleClass('fa-sort-amount-up-alt fa-sort-amount-down-alt ');
+        });
+
+    });
+
+
+</script>
+<script>
+    $(document).ready(function () {
+        $('.datepicker').datetimepicker({
+            format: 'LT',
+            format: 'DD-MM-YYYY',
+
+        });
+    });
+</script>
+<style type="text/css">
+    .dataTables_filter {
+        display: none;
+    }
+
+    .legend-box ul {
+        position: relative;
+        top: 34px;
+    }
+</style>
+<script type="text/javascript" language="javascript">
+    function onStatusClick(args, args1) {
+
+        $.ajax({
+            type: 'POST',
+            url: '@Url.Action("SBICheckStatus", "SBIPayment", new { Area = "payment" })',
+            //data: { TxnId: args, MerchntId: args1, id: args2 },
+            data: { TxnId: args, Amount: args1},
+            success: function (result) {
+                if (result != null) {
+                    //console.log(result);
+                    if (result == 'SUCCESS') {
+                        alert("Your payment has been credited successfully.");
+                        //$("#SBI_Payment_Status").data("kendoGrid").dataSource.read();
+                        window.location.href = '@Url.Action("OnlinePaymentStatus_SBI", "SBIPayment")';
+                        return true;
+                    }
+                    else if (result == 'AWAITED' || result == 'FAILED') {
+                        alert("Your payment is still pending please check after some time for update.");
+                        window.location.href = '@Url.Action("OnlinePaymentStatus_SBI", "SBIPayment")';
+                        //$("#SBI_Payment_Status").data("kendoGrid").dataSource.read();
+                        return false;
+                    }
+                    else if (result == 'PENDING') {
+                        alert("Your payment has been credited but not updated in system. Please contact your District officer.");
+                        window.location.href = '@Url.Action("OnlinePaymentStatus_SBI", "SBIPayment")';
+                        //$("#SBI_Payment_Status").data("kendoGrid").dataSource.read();
+                        //window.location.href = result;
+                        return false;
+                    }
+                    else {
+                        alert("Your payment status is not getting. Please contact your District officer.");
+                        //$("#SBI_Payment_Status").data("kendoGrid").dataSource.read();
+                        window.location.href = '@Url.Action("OnlinePaymentStatus_SBI", "SBIPayment")';
+                        //window.location.href = result;
+                        return false;
+                    }
+                }
+            },
+            failure: function (response) {
+            }
+        });
+    }
+</script>
+
+

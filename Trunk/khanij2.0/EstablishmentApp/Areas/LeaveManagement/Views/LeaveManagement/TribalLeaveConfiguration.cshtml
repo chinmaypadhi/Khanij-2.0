@@ -1,0 +1,154 @@
+﻿@*// *********************************************************************************************************
+    //  View Name                : TribalDistLeave
+    //  Desciption               : To TribalDistLeave
+    //  Created By               : Suresh kumar behera
+    //  Created On               : 13-july-2021
+    // ********************************************************************************************************
+*@
+@model EstablishmentEf.TribalDistLeave
+@{
+    ViewData["Title"] = "TribalLeaveConfiguration";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+
+@if (TempData["msg"] != null)
+{
+    <script>
+        var vv = '@TempData["msg"]';
+        if (vv == 1) {
+            swal("", "Tribal Dist leave saved successfully.", "success");
+        }
+        else if (vv == 2) {
+            swal("", "Tribal Dist leave allready exists.", "warning");
+        }
+        else if (vv == 3) {
+            swal("", "Tribal Dist leave updated sucessfully", "success");
+        }
+        else if (vv == 4) {
+            swal("", "Tribal Dist leave  deleted sucessfully", "success");
+        }
+        else {
+            swal("", "Something Errror occured. Please Try After Sometime!!", "error");
+        }
+    </script>
+
+    TempData["msg"] = null;
+
+}
+<script>
+    excelMe = "yes"
+    pdfMe = "yes"
+
+    $(document).ready(function () {
+
+        loadNavigation('TribalDistrictLeaveConfiguration', 'glempprofile', 'plofficetype', 'tl', 'Leave Management', 'Tribal Dist Leave Configuration', ' ');
+
+        $('.searchableselect').searchableselect();
+
+        $('#datatable').DataTable();
+
+        $('.shorting-lnk').click(function () {
+            $('.shorting-lnk i').toggleClass('fa-sort-amount-up-alt fa-sort-amount-down-alt ');
+        });
+
+        $("#Submit").click(function () {
+            if (!DropDownValidation("intLeaveTypeId", "Leave Type")) {
+                return false;
+            }
+            if (!DropDownValidation("IntDistrictId", "Tribal District")) {
+                return false;
+            }
+            if (!blankFieldValidation("intNoOfLeave", "No Of leave")) {
+                return false;
+            }
+            if ($("#intNoOfLeave").val() <= 0) {
+                swal("", "Enter no of leave", "warning");
+                return false;
+            }
+
+
+        });
+         $("#Reset").click(function () {
+            window.location ="@Url.Content("~/LeaveManagement/LeaveManagement/TribalLeaveConfiguration/")"
+        });
+    });
+</script>
+
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+
+        @*@Html.Partial("_navigation")*@
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="javascript:void(0);">
+                                Add Tribal Leave Configuration
+                            </a>
+                        </li>
+                        <li class="nav-item">
+
+                            <a class="nav-link " href="@Url.Content("~/LeaveManagement/LeaveManagement/ViewTribalDistrictLeave")">
+                                View Tribal Leave Configuration
+                            </a>
+                        </li>
+                    </ul>
+
+                    @*@Html.Partial("_util")*@
+                </div>
+
+                <section class="box form-container">
+                    <div class="content-body">
+
+                        @using (Html.BeginForm("TribalLeaveConfiguration", "LeaveManagement", FormMethod.Post, new { AUTOCOMPLETE = "Off", id = "form1" }))
+                        {
+                            @Html.AntiForgeryToken();
+                            <div class="row">
+
+                                <div class="col-lg-12 col-md-12 col-sm-12">
+                                    <div class="form-group row">
+                                        <label class="col-lg-2 col-md-4 col-sm-12 col-form-label font-weight-bolder">Leave Type<span class="text-danger">*</span></label>
+                                        <div class="col-lg-4 col-md-6 col-sm-12">
+                                            @Html.DropDownListFor(m => m.intLeaveTypeId, ViewBag.LeaveType as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control form-control-sm searchableselect" })
+                                            @Html.HiddenFor(m => m.intTribalLeaveid)
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-12 col-md-12 col-sm-12">
+                                    <div class="form-group row">
+                                        <label class="col-lg-2 col-md-4 col-sm-12 col-form-label font-weight-bolder">Tribal District<span class="text-danger">*</span></label>
+                                        <div class="col-lg-4 col-md-6 col-sm-12">
+                                            @Html.DropDownListFor(m => m.IntDistrictId, ViewBag.District as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control form-control-sm searchableselect" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-12 col-md-12 col-sm-12">
+                                    <div class="form-group row">
+                                        <label class="col-lg-2 col-md-4 col-sm-12 col-form-label font-weight-bolder">Number of Leave<span class="text-danger">*</span></label>
+                                        <div class="col-lg-4 col-md-6 col-sm-12">
+                                            @Html.TextBoxFor(m => m.intNoOfLeave, new { @class = "form-control", @type = "number", @maxlength = 3, Onkeypress = "return inputLimiter(event,'Numbers')" })
+
+                                        </div>
+                                    </div>
+                                </div>
+
+
+
+
+                                <div class="col-sm-6  offset-lg-2 offset-md-4">
+                                    <input type="submit" value='@ViewBag.Button' class="btn btn-primary btn-md ml-0" name="Submit" id="Submit" />
+                                    <input type="reset" id="Reset" name="Reset" class="btn btn-danger btn-md" value="Reset" />
+                                </div>
+                            </div>
+                        }
+
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+    <!-- MAIN CONTENT AREA ENDS -->
+</section>
+

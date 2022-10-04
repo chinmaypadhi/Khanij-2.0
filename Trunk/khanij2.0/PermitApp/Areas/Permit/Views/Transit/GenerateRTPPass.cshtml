@@ -1,0 +1,339 @@
+﻿@model PermitEF.ForwardingNoteModel
+@{
+    ViewData["Title"] = "MergeEPermit";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+<script src=" https://cdn.datatables.net/1.10.24/js/jquery.dataTables.min.js"></script>
+
+
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        @Html.Partial("_CMSnavigation")
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="#">
+                                e-Transit Pass - Rail
+                            </a>
+                        </li>
+                    </ul>
+                    @Html.Partial("_CMSutil")
+                </div>
+
+                <section class="box form-container">
+                    @using (Html.BeginForm("GenerateRTPPass", "Transit", FormMethod.Post, new { AUTOCOMPLETE = "Off", id = "frmEPermit" }))
+                    {
+                        @(Html.HiddenFor(model => model.TotalPass))
+                        @(Html.HiddenFor(model => model.StockQty))
+                        @(Html.HiddenFor(model => model.NoofRTP))
+                        @(Html.HiddenFor(model => model.ForwardingNoteId))
+                        @(Html.HiddenFor(model => model.RTP_ApprovedQty))
+                        <div class="content-body">
+                          
+                                <div class="row">
+                                    <label class="col-lg-3 col-md-4 col-sm-12 col-form-label font-weight-bold">e-Permit No</label>
+                                    <div class="col-lg-9 col-md-8 col-sm-12">
+                                        <label class="form-control-plaintext">
+                                            <span class="colon">:</span>
+                                            @Html.DisplayFor(model => model.BulkPermitNumber, new { @class = "plaintext", @readonly = "readonly" })
+                                        </label>
+                                    </div>
+                                    <label class="col-lg-3 col-md-4 col-sm-12 col-form-label font-weight-bold">Railway Application Number</label>
+                                    <div class="col-lg-9 col-md-8 col-sm-12">
+                                        <label class="form-control-plaintext">
+                                            <span class="colon">:</span>
+                                            @Html.DisplayFor(model => model.ForwardingNoteNumber, new { @class = "plaintext", @readonly = "readonly" })
+                                        </label>
+
+                                    </div>
+                                    <label class="col-lg-3 col-md-4 col-sm-12 col-form-label font-weight-bold">Sender's Name</label>
+                                    <div class="col-lg-9 col-md-8 col-sm-12">
+                                        <label class="form-control-plaintext">
+                                            <span class="colon">:</span>
+                                            @Html.DisplayFor(model => model.Consigner, new { @class = "plaintext", @readonly = "readonly" })
+                                        </label>
+                                    </div>
+
+                                    <label class="col-lg-3 col-md-4 col-sm-12 col-form-label font-weight-bold">Name of the Mineral</label>
+                                    <div class="col-lg-9 col-md-8 col-sm-12">
+                                        <label class="form-control-plaintext">
+                                            <span class="colon">:</span>
+                                            @Html.DisplayFor(model => model.MineralName, new { @class = "plaintext", @readonly = "readonly" })
+                                        </label>
+                                    </div>
+                                    <label class="col-lg-3 col-md-4 col-sm-12 col-form-label font-weight-bold">Mineral Form</label>
+                                    <div class="col-lg-9 col-md-8 col-sm-12">
+                                        <label class="form-control-plaintext">
+                                            <span class="colon">:</span>
+                                            @Html.DisplayFor(model => model.MineralNature, new { @class = "plaintext", @readonly = "readonly" })
+                                        </label>
+                                    </div>
+                                    <label class="col-lg-3 col-md-4 col-sm-12 col-form-label font-weight-bold">Mineral Grade</label>
+                                    <div class="col-lg-9 col-md-8 col-sm-12">
+                                        <label class="form-control-plaintext">
+                                            <span class="colon">:</span>
+                                            @Html.DisplayFor(model => model.MineralGrade, new { @class = "plaintext", @readonly = "readonly" })
+                                        </label>
+                                    </div>
+                                    <label class="col-lg-3 col-md-4 col-sm-12 col-form-label font-weight-bold">Quantity Mentioned in E.D.R.M </label>
+                                    <div class="col-lg-9 col-md-8 col-sm-12">
+                                        <label class="form-control-plaintext">
+                                            <span class="colon">:</span>
+                                            @Html.DisplayFor(model => model.ReqQty, new { @class = "plaintext", @readonly = "readonly" })
+                                        </label>
+                                    </div>
+                                    <label class="col-lg-3 col-md-4 col-sm-12 col-form-label font-weight-bold">Unit</label>
+                                    <div class="col-lg-9 col-md-8 col-sm-12">
+                                        <label class="form-control-plaintext">
+                                            <span class="colon">:</span>
+                                            @Html.DisplayFor(model => model.UnitName, new { @class = "plaintext", @readonly = "readonly" })
+                                        </label>
+                                    </div>
+                                    <label class="col-lg-3 col-md-4 col-sm-12 col-form-label font-weight-bold">
+                                        Quantity of Mineral
+                                        <br />
+
+                                        @if (Model.ApprovedQty >= 0)
+                                        {
+                                            var vv = Convert.ToDecimal(Model.ApprovedQty - Model.RTP_ApprovedQty);
+                                            <small class="text-danger">Your Available RTP Quantity is   @Model.ApprovedQty .</small>
+                                            <input data-val="true"
+                                                   id="RTPBalanceQty" name="RTPBalanceQty" type="hidden" value="@Model.ApprovedQty" />
+                                        }
+                                    </label>
+                                    <div class="col-lg-9 col-md-8 col-sm-12">
+                                        <label class="form-control-plaintext">
+                                            <span class="colon">:</span>
+                                            <span id="ApprovedQty">
+
+                                                @Html.DisplayFor(model => model.ApprovedQty, new { @class = "plaintext", @readonly = "readonly",id= "ApprovedQty" })
+                                                    </span>
+</label>
+                                    </div>
+                                    <label class="col-lg-3 col-md-4 col-sm-12 col-form-label font-weight-bold">Reciever's Name</label>
+                                    <div class="col-lg-9 col-md-8 col-sm-12">
+                                        <label class="form-control-plaintext">
+                                            <span class="colon">:</span>
+                                            @Html.DisplayFor(model => model.EndUser, new { @class = "plaintext", @readonly = "readonly" })
+                                        </label>
+                                    </div>
+                                    <label class="col-lg-3 col-md-4 col-sm-12 col-form-label font-weight-bold">Reciever's Address</label>
+                                    <div class="col-lg-9 col-md-8 col-sm-12">
+                                        <label class="form-control-plaintext">
+                                            <span class="colon">:</span>
+                                            @Html.DisplayFor(model => model.AddressofConsignee, new { @class = "plaintext", @readonly = "readonly" })
+                                        </label>
+                                    </div>
+                                    <label class="col-lg-3 col-md-4 col-sm-12 col-form-label font-weight-bold">Name of Railway Siding from where the mineral is loaded</label>
+                                    <div class="col-lg-9 col-md-8 col-sm-12">
+                                        <label class="form-control-plaintext">
+                                            <span class="colon">:</span>
+                                            @Html.DisplayFor(model => model.AddressofRailwaySliding, new { @class = "plaintext", @readonly = "readonly" })
+                                        </label>
+                                    </div>
+                                    <label class="col-lg-3 col-md-4 col-sm-12 col-form-label font-weight-bold">Name of Railway Siding where the Mineral will be received </label>
+                                    <div class="col-lg-9 col-md-8 col-sm-12">
+                                        <label class="form-control-plaintext">
+                                            <span class="colon">:</span>
+                                            @Html.DisplayFor(model => model.DestinationRailwaySiding, new { @class = "plaintext", @readonly = "readonly" })
+                                        </label>
+                                    </div>
+                                </div>
+                           
+                            <div class="row">
+                                <div class="col-lg-12 mt-4">
+                                    <input type="button"   value="Print and Continue" class="btn btn-success btn-md " onclick="return GeneratePass(1);" />
+                                    <input type="button"   value="Print and Close" class="btn btn-danger btn-md" onclick="return printCloseClick();" />
+                                </div>
+
+
+                            </div>
+
+                        </div>
+
+                    }
+                </section>
+            </div>
+        </div>
+    </div>
+    <!-- MAIN CONTENT AREA ENDS -->
+</section>
+@*<uc1:footer runat="server" ID="footer" />*@
+
+<script>
+    backMe = "yes"
+    $(document).ready(function () {
+        loadNavigation('Add', 'glhelpdesk', 'plraiseticket', 'tl', 'E-Permit', 'e-Transit Pass - Rail', ' ');
+        $('.datetime').datetimepicker({
+            format: "DD/MM/YYYY"
+        }).keydown(false);
+    });
+</script>
+
+<script>
+    $("#ApprovedQty").keydown(function (e) {
+        // Allow: backspace, delete, tab, escape, enter and .
+        if ($.inArray(e.keyCode, [46, 8, 9, 27, 13, 110, 190]) !== -1 ||
+            // Allow: Ctrl+A, Command+A
+            (e.keyCode === 65 && (e.ctrlKey === true || e.metaKey === true)) ||
+            // Allow: home, end, left, right, down, up
+            (e.keyCode >= 35 && e.keyCode <= 40)) {
+            // let it happen, don't do anything
+            return;
+        }
+        // Ensure that it is a number and stop the keypress
+        if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) {
+            e.preventDefault();
+            return false;
+        }
+    });
+
+    function printCloseClick() {
+        var entQty = $('#ApprovedQty').text();
+        var fid = $('#ForwardingNoteId').val();
+        if ($('#ApprovedQty').text() > 5000) {
+            alert("Maximum Carrying Capacity in Railway Rack must be 5000 Tonne. [MAX].Please try again!");
+            $('#ApprovedQty').focus();
+            $('#ApprovedQty').text("").trigger("change");
+            return false;
+        }
+       else if (parseFloat(entQty) > 0) {
+
+            var param = "?ForwardingNoteId=" + fid + "&entQty=" + entQty;
+
+           // var url = "@Url.Action("PrintAndCloseTP", "Transit", new { Area = "Permit"})" + "?ForwardingNoteId=" + fid + "&entQty=" + entQty;
+           // var vvv = url.replace("ABCD", entQty);
+
+            window.location.href = "@Url.Action("PrintAndCloseTP", "Transit", new { Area = "Permit"})" + "?ForwardingNoteId=" + fid + "&entQty=" + entQty;
+        }
+        else {
+            alert("Please enter Qty for print and close.");
+        }
+    }
+
+
+    function GeneratePass(id) {
+       
+       
+        if ($('#ApprovedQty').text() && $('#ApprovedQty').text() > 0) {
+            var entQty = $('#ApprovedQty').text();
+            var appQty = $('#RTP_ApprovedQty').val();
+            var Balance = $('#RTPBalanceQty').val();
+
+            //  var fnQty = parseFloat(ttlQty) - parseFloat(appQty);
+            //  ttlQty = parseFloat(entQty) + (parseFloat(appQty)
+
+            //if (appQty != "" && parseFloat(appQty) != 0) {
+            //    // if (parseFloat(ttlQty) < (parseFloat(entQty) + parseFloat(appQty))) {
+            //    if (parseFloat(entQty) > parseFloat(Balance)) {
+            //        alert("Your available quantity is " + appQty + " . You Can not entered more quantity then available quantity.");
+            //        return false;
+            //    }
+            //}
+
+            if (parseFloat(entQty) > parseFloat(Balance)) {
+                alert("Your available quantity is " + Balance + " . You Can not entered more quantity then available quantity.");
+                return false;
+            }
+            else if ($('#ApprovedQty').text() > 5000) {
+                alert("Maximum Carrying Capacity in Railway Rack must be 5000 Tonne. [MAX].Please try again!");
+                $('#ApprovedQty').focus();
+                $('#ApprovedQty').text("").trigger("change");
+                return false;
+            }
+            else {
+                if (id == 2) {
+                    var mineralUnitData = $("#UnitName").val();
+                    var AppNo = $("#ForwardingNoteNumber").val();
+
+                    var vv = parseFloat(parseFloat(Balance) - parseFloat(entQty)).toFixed(2);
+
+                    if (vv > 0) {
+                        var vv = confirm("Remaining " + parseFloat(parseFloat(Balance) - parseFloat(entQty)).toFixed(2) + " " + mineralUnitData + " will be treated as handling loss against RTP Application No.: " + AppNo);
+
+                        if (vv == false) {
+                            return false;
+                        }
+                    }
+                }
+            }
+        }
+        else {
+            if ($('#ApprovedQty').text() <= 0) {
+                alert("Please Enter RTP Quantity Greater than Zero. .");
+            }
+            else {
+                alert("Please Enter RTP Quantity .");
+            }
+            return false;
+        }
+
+        //if ($('#TrainNo').val()) {
+        //    if ($('#RackNo').val()) {
+
+        if (confirm("Are you confirmed to Generate RTP?")) {
+            $.ajax({
+                url: '@Url.Action("UpdateRTPPass", "Transit", new { Area = "Permit" })',
+                type: "POST",
+                data: {
+                    ForwardingNoteID: $("#ForwardingNoteId").val(),
+                    TrainNo: 0,
+                    RackNo: 0,
+                    ApprovedQty: $('#ApprovedQty').text(),
+                    PassClick: id
+                },
+                success: function (data) {
+                    if (data != null && data != 0) {
+                        alert("You have successfully generated RTP Pass");
+                        var url = '@Url.Action("RailTPDesignForWardingNote", "TransitPass", new { Area = "Permit" })/' + data;
+                        window.location.href = url;
+                    }
+                    else {
+                        alert("RTP could not generated.Please try after some time.");
+                    }
+                }
+            });
+        }
+
+    }
+
+
+    //    else {
+    //        alert("Please Enter Rack Number");
+    //        return false;
+    //    }
+    //}
+    //else {
+    //    alert("Please Enter Train Number");
+    //    return false;
+    //}
+    //}
+    $("#RTP_ApprovedQty").blur(function () {
+
+        var appQty = $('#ApprovedQty').val();
+        var entQty = $('#RTP_ApprovedQty').val();
+
+        if (parseFloat(entQty) > parseFloat(actualRTPQty)) {
+            var d = parseFloat(appQty) - parseFloat(actualRTPQty);
+            alert("You have already applied for RTP of " + actualRTPQty + " Qty. You have only " + d + " qty available. You can not enterd qty higher then available qty.");
+            return false;
+        }
+        else {
+
+        }
+
+
+    });
+
+    var actualRTPQty = 0;
+    var ttlQty = 0;
+
+    $(document).ready(function () {
+        actualRTPQty = $('#RTP_ApprovedQty').val();
+        ttlQty = $('#ApprovedQty').val();
+    });
+
+</script>

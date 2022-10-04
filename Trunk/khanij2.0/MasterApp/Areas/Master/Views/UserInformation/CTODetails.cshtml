@@ -1,0 +1,131 @@
+﻿@model MasterEF.UserInformationEF
+@{
+    ViewData["Title"] = "CTODetails";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@if (ViewBag.msg != null)
+{
+    <script>
+        alert('@ViewBag.msg');
+    </script>
+}
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        @Html.Partial("_navigation")
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="javascript:void(0);">
+                                Consent To Operate
+                            </a>
+                        </li>
+                    </ul>
+                    @Html.Partial("_util")
+                </div>
+                @{ string UserType = "Lessee";}
+                <section class="box form-container">
+                    <div class="content-body">
+                        @using (Html.BeginForm("CTODetails", "UserInformation", FormMethod.Post, new { enctype = "multipart/form-data", AUTOCOMPLETE = "Off", id = "form1" }))
+                        {
+                        <h5 class="text-brown font-weight-bold mt-0">Consent To Operate</h5>
+                        <div class="row">
+                            @Html.HiddenFor(x => x.CTO_ID)
+                            <div class="col-lg-6 col-md-6 col-sm-12 form-group">
+                                <label class="col-form-label pt-0 font-weight-bolder">CTO Approval Number<span class="text-danger">*</span></label>
+                                @Html.TextBoxFor(x => x.CTO_ORDER_NO, new { @maxlength = "100", @class = "form-control" })
+                            </div>
+                            <div class="col-lg-6 col-md-6 col-sm-12 form-group">
+                                <label class="col-form-label pt-0 font-weight-bolder">Consent To Operate Order Date  <span class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    @Html.TextBoxFor(m => m.CTO_ORDER_DATE, new { @class = "form-control datepicker", id = "dt_CTO_Order_Date" })
+                                    <div class="input-group-prepend">
+                                        <label class="input-group-text" for="dt_CTO_Order_Date"><i class="far fa-calendar"></i></label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-6 col-md-6 col-sm-12 form-group">
+                                <label class="col-form-label pt-0 font-weight-bolder">CTO Valid From<span class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    @Html.TextBoxFor(m => m.CTO_VALID_FROM, new { @class = "form-control datepicker", id = "dt_CTO_VALID_FROM" })
+                                    <div class="input-group-prepend">
+                                        <label class="input-group-text" for="dt_CTO_VALID_FROM"><i class="far fa-calendar"></i></label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-6 col-md-6 col-sm-12 form-group">
+                                <label class="col-form-label font-weight-bolder">CTO Valid To<span class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    @Html.TextBoxFor(m => m.CTO_VALID_TO, new { @class = "form-control datepicker", id = "dt_CTO_VALID_TO" })
+                                    <div class="input-group-prepend">
+                                        <label class="input-group-text" for="dt_CTO_VALID_TO"><i class="far fa-calendar"></i></label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-6 col-md-6 col-sm-12 form-group">
+                                <label for="inputLoginId" class="col-form-label font-weight-bolder">CTO Letter<span class="text-danger">*</span></label>
+                                <div class="custom-file">
+                                    <input type="file" class="custom-file-input" id="flCTOLetter" name="flCTOLetter">
+                                    <label class="custom-file-label" for="customFile">Choose Files</label>
+                                </div>
+                                <a href="@Url.Action("Download", "UserInformation", new { name = Model.FILE_CTO_LETTER, path = Model.CTO_LETTER_PATH })" target="_blank" class="file-download-licensee">@((Model.FILE_CTO_LETTER != null) ? Model.FILE_CTO_LETTER : "")</a>
+                            </div>
+                            <div class="col-lg-6 col-md-6 col-sm-12 form-group">
+                                <label for="inputLoginId" class="col-form-label font-weight-bolder">Remarks<span class="text-danger">*</span></label>
+                                @Html.TextAreaFor(x => x.Remarks, new { @class = "form-control", @style = "Resize:none", @maxlength = "500" })
+                            </div>
+                        </div>
+                            @if (@Model.STATUS != 5)
+                            {
+                                <div class="row" style="position: absolute; bottom: 20px; right: 30px;">
+
+                                    <div class="col-md-12 col-sm-12">
+                                        @if (UserType.ToUpper() == "LESSEE")
+                                        {
+                                            <input type="submit" value="Save & Update" class="btn btn-success btn-md ml-0 waves-effect waves-light">
+                                            <input type="button" title="Forward to DD" value="Forward To DD" name="cmd" class="btn btn-warning text-dark btn-md waves-effect waves-light ml-0" onclick="return OnForwarding('Forward To DD');" />
+                                        }
+                                        <input type="button" value="Approve" class="btn btnsave DMO-Button" id="approve" name="approve" onclick="return OnForwarding('Approve');" style="display: none;">
+                                        <input type="button" value="Reject" class="btn btnsave DMO-Button" id="reject" name="reject" onclick="return OnForwarding('Reject');" style="display: none;">
+
+                                    </div>
+                                </div>
+                            }
+                        }
+
+
+
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+    <!-- MAIN CONTENT AREA ENDS -->
+</section>
+<uc1:footer runat="server" ID="footer" />
+<link href="../css/bootstrap-datetimepicker.min.css" rel="stylesheet">
+<script src="../js/moment.min.js"></script>
+<script src="../js/bootstrap-datetimepicker.min.js"></script>
+
+<script>
+    indicateMe = "yes"
+    backMe = "yes"
+    $(document).ready(function () {
+        loadNavigation('Consent To Establish', 'glRoleRes', 'pllesseprof', 'tl', 'Roles and Responsibity', 'Lessee Profile', ' ');
+    });
+</script>
+
+<script>
+    $(document).ready(function () {
+        $('.datepicker').datetimepicker({
+            format: 'LT',
+            format: 'DD-MM-YYYY',
+
+        });
+    });
+</script>
+

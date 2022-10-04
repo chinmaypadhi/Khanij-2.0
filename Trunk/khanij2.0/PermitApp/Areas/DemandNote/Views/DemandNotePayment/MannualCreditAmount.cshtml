@@ -1,0 +1,340 @@
+﻿<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+@using PermitEF;
+@using  Microsoft.AspNetCore.Http;
+@using Microsoft.AspNetCore.Mvc;
+@using PermitApp.Helper;
+@inject IHttpContextAccessor HttpContextAccessor
+@using PermitApp.Web;
+@model List<PermitEF.CreditAmountModel>
+@{
+    ViewData["Title"] = "SubmittedNotice";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+    UserLoginSession profile = HttpContextAccessor.HttpContext.Session.Get<UserLoginSession>(KeyHelper.UserKey);
+}
+<script>
+    $(document).ready(function () {
+        loadNavigation('Demand/Credit Note', 'glTMng', 'plpaymenthead', 'tl', 'Notice', 'Demand/Credit Note Payment', ' ');
+        $('.datepicker').datetimepicker({
+            format: 'LT',
+            format: "DD-MM-YYYY",
+            daysOfWeekDisabled: [],
+        });
+    });
+</script>
+<input type="hidden" id="hdnPayment" value="@profile.UserType" />
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        @Html.Partial("_CMSnavigation")
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+
+                <section class="box form-container">
+                    <a id="IdGradeRom" href="javascript:void(0);"
+                       class="btn-floating btn btn-success ml-2"
+                       data-toggle="modal"
+                       data-target=".alert-modal" data-placement="top" title="Add New Grade Wise ROM" onclick="clearData();">Add Credit Amount Details</a>
+                    @*<div>  <input type="button" id="btnAddMo" value="Add New Credit Amount Details" class="btn btn-primary" onclick="onSubmit()" name="submit"></div>*@
+                    <div class="content-body pt-0">
+                        <div class="legend-box">
+                            <ul class="d-flex mb-1 justify-content-end list-unstyled">
+                                <li><span class="bg-success"></span> Active</li>
+                                <li><span class="bg-warning"></span> Inactive</li>
+                            </ul>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <table id="table-exports" class="table table-sm table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th width="30">Sl#</th>
+                                            <th> Payment Type</th>
+                                            <th>Lessee Name</th>
+                                            <th>Credit Amount</th>
+                                            <th>Assessment Copy</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tBodyId">
+                                        @{int p = 0;}                                         @foreach (var x in Model)
+                                        {
+                                            p = p + 1;
+                                            <tr>
+                                                <td>@p</td>
+                                                <td>@x.AssesmentHead</td>
+                                                <td>@x.UserName </td>
+                                                <td>@x.CreditedAmmount</td>
+                                                <td><a target="_blank" href="@Url.Content(@x.AssessmentCopyPath)" a><i class="fa fa-upload" aria-hidden="true"></i></a></td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+    <!-- MAIN CONTENT AREA ENDS -->
+</section>
+<div id="modal1" class="modal fade alert-modal" tabindex="-1" role="dialog" aria-labelledby="alertModal" aria-hidden="true">
+    <div class="modal-dialog modal-md" role="document">
+        <div class="modal-content">
+            <div class="modal-header p-2">
+                <h5 class="modal-title m-0">Add Credit Amount Details</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" id="closetab">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="form-group row">
+                            <label class="col-sm-5 col-form-label font-weight-bolder">Payment Type<span class="text-danger">*</span></label>
+                            <div class="col-sm-7">
+                                <select id="PaymentType" class="form-control searchableselect" ><option value="0">--select--</option></select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-12">
+                        <div class="form-group row">
+                            <label class="col-sm-5 col-form-label font-weight-bolder">
+                                Lessee Name                                <span class="text-danger">*</span>
+                            </label>
+                            <div class="col-sm-7">
+
+                                <select name="Lessee" id="LesseeName" class="form-control searchableselect"><option value="0">--select--</option></select>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-12">
+                        <div class="form-group row">
+                            <label class="col-sm-5 col-form-label font-weight-bolder">Credit Amount<span class="text-danger">*</span></label>
+                            <div class="col-sm-7">
+                                <input type="text" id="txtCreditAmount" onkeypress = "return onlyDotsAndNumbers(this,event);" class="form-control" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-12">
+                        <div class="form-group row">
+                            <label class="col-sm-5 col-form-label font-weight-bolder">
+                                Upload Assessment Copy
+                                <span class="text-danger">*</span>
+                            </label>
+                            <div class="col-sm-7">
+                                <input id="txtExminePrice" class="form-control" type="file">
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <button class="btn btn-primary mb-1" id="btnSubmitGrade" onclick="onSubmit();" href="#">Submit</button>
+                <button class="btn btn-primary mb-1" id="btnCancelGrade" onclick="window.location.reload();" href="#">Cancel</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+
+
+<script>
+    $(document).ready(function () {
+
+        BindPaymentType();
+        BindLesseeDetails();
+       // BindData();
+        $(function () {
+            $('#table-exports').DataTable();
+        });
+    });
+       @*function BindData() {
+        $.ajax({
+            type: "POST",
+            url: '@Url.Action("ViewCreditAmountDetails")',
+            data: { },
+            dataType: "json",
+            success: function (data) {
+                debugger;
+                //tBodyId
+
+
+                var html = "";
+
+
+                if (data.length == 0) {
+                    thiHtml = '<tr><td colspan="5"><center><b>Record not found.</b></center></td></tr>';
+                }
+                for (var i = 0; i < data.length; i++) {
+                    html += '<tr>';
+                    html += '<td>' + (i + 1) + '</td>';
+                    html += '<td>' + data[i].AssesmentHead+'</td>';
+                    html += '<td>' + data[i].UserName+'</td>';
+                    html += '<td>' + data[i].CreditedAmmount +'</td>';
+                    html += '<td><a href="@Url.Content("data[i].AssessmentCopyPath")"a><i class="fa fa-upload" aria-hidden="true"></i></a></td>';
+                    html += '</tr>';
+
+                }
+                $("#tBodyId").html(html);
+            },
+        });
+    }*@
+    function clearData() {
+        $('#PaymentType').val('0');
+        $('#LesseeName').val('0');
+        $('#txtCreditAmount').val("");
+        $('#txtExminePrice').val('');
+    }
+
+     function onSubmit() {
+
+         if ($("#PaymentType").val() == "0") {
+             swal("","Please choose Payment Type","warning");
+         }
+         else if ($("#LesseeName").val() == "0") {
+             swal("", "Please choose Lessee Name.", "warning");
+         }
+         else if ($("#txtCreditAmount").val() == "") {
+             swal("", "Please enter Credit Amount.", "warning");
+         }
+         else if ($("#txtExminePrice").val() == "") {
+             swal("", "Please choose a file.", "warning");
+         }
+         else {
+             var thisRecord = new Object();
+             thisRecord.PaymentType = $('#PaymentType').val().trim();
+             thisRecord.LesseeName = $('#LesseeName').val().trim();
+             thisRecord.txtCreditAmount = $('#txtCreditAmount').val().trim();
+
+
+             var formData = new FormData();
+             var $file2 = document.getElementById('txtExminePrice');
+             formData.append("FileData", $file2.files[0]);
+             formData.append("alldata", JSON.stringify(thisRecord));
+
+             $.ajax({
+                 type: "POST",
+                 url: '@Url.Action("ManualCreditAmount")',
+                 data: formData,
+                 dataType: "json",
+                 cache: false,
+                 async: false,
+                 contentType: false,
+                 processData: false,
+                 success: function (data) {
+                     BindPaymentType();
+                     $('#closetab').click();
+                     clearData();
+                     swal("",data.message,"success");
+                   //  window.location.reload();
+                 },
+                 failure: function (response) {
+                     swal("", response.responseText, "warning");
+                 },
+                 error: function (response) {
+                     swal("", response.responseText, "warning");
+                 }
+             });
+         }
+    }
+    function onlyDotsAndNumbers(txt, event) {
+        var charCode = (event.which) ? event.which : event.keyCode
+        if (charCode == 46) {
+            if (txt.value.indexOf(".") < 0)
+                return true;
+            else
+                return false;
+        }
+
+        if (txt.value.indexOf(".") > 0) {
+            var txtlen = txt.value.length;
+            var dotpos = txt.value.indexOf(".");
+            //Change the number here to allow more decimal points than 2
+            if ((txtlen - dotpos) > 2)
+                return false;
+        }
+
+        if (charCode > 31 && (charCode < 48 || charCode > 57))
+            return false;
+
+        return true;
+    }
+
+    function BindPaymentType() {
+
+        $.ajax({
+            type: "POST",
+            url: '@Url.Action("ViewPaymentType")',
+            data: {},
+                 dataType: "json",
+                 cache: false,
+                 async: false,
+                 contentType: false,
+                 processData: false,
+              success: function (data) {
+                  debugger;
+
+                  var html = "";
+
+                  html += "<option value='0'>--select--</option>";
+                  if (data.length > 0) {
+                      for (var i = 0; i < data.length; i++) {
+
+                          html += "<option value='" + data[i].PaymentTypeId + "'>" + data[i].PaymentType +"</option>";
+                      }
+
+
+                      $("#PaymentType").html(html);
+
+                  }
+
+
+
+                 },
+            failure: function (response) {
+                swal("", response.responseText, "warning");
+                 },
+            error: function (response) {
+                swal("", response.responseText, "warning");
+                 }
+             });
+    }
+
+
+        function BindLesseeDetails() {
+
+        $.ajax({
+            type: "POST",
+            url: '@Url.Action("ViewLesseeDetails")',
+            data: {},
+                 dataType: "json",
+                 cache: false,
+                 async: false,
+                 contentType: false,
+                 processData: false,
+              success: function (data) {
+                  debugger;
+
+                  var html = "";
+
+                  html += "<option value='0'>--select--</option>";
+                  if (data.length > 0) {
+                      for (var i = 0; i < data.length; i++) {
+
+                          html += "<option value='" + data[i].UserId + "'>" + data[i].ApplicantName +"</option>";
+                      }
+
+
+                      $("#LesseeName").html(html);
+
+                  }
+                 },
+                 failure: function (response) {
+                     swal("", response.responseText, "warning");                 },
+                 error: function (response) {
+                     swal("", response.responseText, "warning");                 }
+             });
+    }
+</script>

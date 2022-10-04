@@ -1,0 +1,443 @@
+﻿@model PermitEF.ECCappingEF
+@using PermitApp.Helper;
+
+@{
+    ViewBag.Title = "DMO Approval";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+ var Results = ViewBag.Result;
+}
+
+<script src=" https://cdn.datatables.net/1.10.24/js/jquery.dataTables.min.js"></script>
+
+<div class="main-tab">
+    <ul class="nav nav-tabs">
+        <li class="nav-item ">
+            <a class="nav-link active" href="javascript:void(0);">
+                EC Capping Approval
+            </a>
+        </li>
+    </ul>
+    @Html.Partial("_CMSutil")
+</div>
+
+
+
+
+
+<section class="box form-container">
+
+
+    <div class="content-body">
+
+        <div class="row">
+            <div class="col-sm-12">
+
+                <input type="hidden" value="" id="cappingid" />
+                <table id="tableexport" class="table table-sm table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Sr.No.</th>
+                            <th>Applicant Name</th>
+                            <th>District</th>
+                            <th>Financial Year</th>
+                            <th>Mineral Grade</th>
+                            <th>Opening Stock</th>
+                            <th>Created On</th>
+                            <th>EC Details</th>
+                            <th>Action</th>
+
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @{
+                            var count = 1;
+
+
+                            @foreach (var b in Results)
+                            {
+
+                            <tr>
+
+                               
+                                <td>@count</td>
+                                <td>@b.UserName </td>
+                                <td> @b.DistrictName </td>
+                                <td> @b.FinancialYear </td>
+                                <td>@b.MineralGrade </td>
+                                <td>@b.OpeningStockValue</td>
+                                <td>@b.CreatedDate</td>
+
+                                <td class="noprint">
+                                    <a class="btn-floating btn-outline-primary btn-sm" id="inf"
+                                       onclick="ShowHistory(@b.LesseeID);"
+                                       title="(ECCapping Details)"><i class="icon-pencil-alt-solid"></i></a>
+                                </td>
+
+                               
+                                <td>
+                                    @*<a href="@Url.Content("~/ECCapping/ecCapping/EditECcapping/")@b.ECCappingID"
+                                        class="btn-floating btn-outline-primary btn-sm"
+                                        title="Edit"><i class="icon-pencil-alt-solid"></i></a>*@
+
+
+                                    <button class="btn btn-primary" onclick="return Apporrejdata(@b.ECCappingID);"><i class="icon-pencil-alt-solid"></i></button>
+
+                                </td>
+
+
+
+                            </tr>
+                                count++;
+                            }
+                        }
+
+                    </tbody>
+                </table>
+
+
+            </div>
+        </div>
+    </div>
+
+
+
+
+
+
+    <div id="myModal" class="modal fade" role="dialog" aria-labelledby="gridSystemModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    Action
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label class="pr-3">Status:</label>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="act" id="inlineRadio1" value="1">
+                            <label class="form-check-label" for="inlineRadio1">Approve</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="act" id="inlineRadio2" value="2">
+                            <label class="form-check-label" for="inlineRadio2">Reject</label>
+                        </div>
+                    </div>
+                    @*<input type="radio" name="act" value="1"> Approve
+                        <input type="radio" name="act" value="2"> Reject*@
+                    <div class="form-group">
+                        <label class="pr-3">Remark:</label>
+
+                        <textarea name="remarks" id="remarks" class="form-control" placeholder="Remarks...."></textarea>
+
+
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" onclick="return Savedata();">Submit</button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+    <!--<div id="myModal1" class="modal fade" role="dialog" data-dismiss="modal" aria-labelledby="gridSystemModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+
+                </div>
+                EC Details
+                <div class="modal-body">
+                    <div class="form-group">
+                        <table class="table table-sm table-bordered" id="CustomerGrid">
+                            <thead>
+                                <tr>
+                                    <th>Financial Year</th>
+                                    <th>EC Qty.</th>
+                                    <th>Remamining Qty.</th>
+
+                                </tr>
+                            </thead>
+                            <tbody id="Eccaptab">
+                            </tbody>
+                        </table>
+                    </div>
+
+
+
+                </div>
+
+            </div>-->
+    <!-- /.modal-content -->
+    <!--</div>--><!-- /.modal-dialog -->
+    <!--</div>-->
+
+    <div class="modal fade" id="Notice_model2" tabindex="-1" role="dialog" aria-labelledby="basicModal" aria-hidden="true">
+        <div class="modal-dialog  modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">EC Capping Details</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="table-responsive">
+                        <table id="tblHistory2" class="table table-sm table-bordered">
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+
+    <script>
+
+
+        $(document).ready(function () {
+
+            $("#tableexport").dataTable();
+
+            $("#myModal").modal('hide');
+            $("#Notice_model2").modal('hide');
+        });
+
+
+    </script>
+
+
+
+
+    <script>
+
+        var id;
+
+        function Apporrejdata(data) {
+             var id = data;
+            $("#cappingid").val(id);
+
+
+            $("#myModal").modal('show');
+
+
+
+
+        }
+
+        function Savedata()
+        {
+
+            var eccap = $("#cappingid").val();
+            var remark = $("#remarks").val();
+            var radioValue = $("input[name='act']:checked").val();
+            debugger;
+
+            if (radioValue == undefined)
+            {
+                swal('Should Check One');
+                return false;
+            }
+
+
+            if (confirm("Before Declare Opening Stock you need to apply your Digital Signature. Are you sure to submit your request of opening stock ?"))
+            {
+
+                var Postdata = 'action=signdoc' + "\n" + 'datatosign=Digital Signature Required' + "\n" + 'signaction=sign' + "\n" + 'filepath=' + "\n" + 'panNumberParam=' + "\n" + 'expirycheck=false' + "\n" + 'issuername=' + "\n" + 'certclass=1|2|3' + "\n" + 'certtype=ALL';
+                connection.send(Postdata);
+                connection.onerror = function (error) {
+                    alert('Please check the server connection: ' + error);
+                    alert(error);
+                };
+
+                connection.onmessage = function (e) { // when DSC is success then following function executed.
+                    if (e.data.indexOf("subProtocol") == -1)
+                    {
+                        if (e.data == '' || e.data == undefined || e.data == null) {
+                            e.preventDefault();
+                        }
+                        else {
+                            $("#DSCResponse").val(e.data).change();
+                            $.ajax(
+                                {
+                                    url: "/ECCapping/ecCapping/CheckVerifyResponse",
+                                    type: "POST",
+                                    data: { contentType: "pkcs7", signDataBase64Encoded: e.data, responseType: "plain" },
+                                    success: function (msg) {
+                                        debugger;
+                                        if (msg == "SUCCESS") {
+                                            $.ajax(
+                                                {
+                                                    //url: "/Permit/LTP/GetuserDetailsUsingRTP",
+                                                    url: '@Url.Action("DMOApproval", "ecCapping", new { Area = "ECCapping" })',
+                                                    type: "POST",
+                                                    data: { ECCappingID: eccap, Remarks: remark, IsApproved: radioValue },
+                                                    dataType: "json",
+                                                    success: function (response) {
+                                                        if (response == "Ok") {
+
+                                                            swal({
+                                                                title: "Action Taken Succefully!",
+                                                                type: "Sweet"
+                                                            }).then(okay => {
+                                                                if (okay) {
+                                                                    window.location.href = '@Url.Action("DMOApproval", "ecCapping")'
+                                                                }
+                                                            });
+
+                                                        }
+
+                                                        else {
+                                                            swal("Something Went Wrong!");
+
+                                                        }
+
+                                                    }
+                                                });
+
+                                            return true;
+                                        }
+                                        else {
+                                            return false;
+                                        }
+                                    }
+                                });
+                        }
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+
+            }
+            else
+            {
+                return false;
+            }
+
+        }
+
+
+
+
+        //following code is for DSC Signature
+        try {
+            var connection = new WebSocket('wss://localhost.emudhra.com:8080');
+
+            connection.onopen = function () {
+                console.log('Connection Opened');
+            };
+            connection.onerror = function (error) {
+                //  alert('Please check the DSC connection: ' + error);
+            };
+            connection.onmessage = function (e) {
+                if (e.data.indexOf("subProtocol") == -1) {
+                    //  alert(e.data);
+                }
+            };
+        }
+        catch (e) {
+            alert("No DSC Connection Found");
+        }
+    //-----------------------------
+
+
+
+
+    </script>
+
+
+    @*<script>
+
+
+
+
+
+         $("#inf").click(function () {
+
+             $("#myModal1").modal('show');
+
+        $.ajax(
+            {
+
+                url: '@Url.Action("ECCappingPreviousDetails", "ecCapping", new { Area = "ECCapping" })',
+                type: "POST",
+                data: { },
+                dataType: "json",
+                success: function (response) {
+
+                    var thtml = "";
+                    $("#Eccaptab").html("");
+
+                    if (response != null || response != "" )
+                    {
+                        for (var i = 0; i < response.length; i++)
+                        {
+
+                            thtml += "<tr><td>" + response[i].FinancialYear + "</td><td>" + response[i].ECQuantity + "</td><td>" + response[i].RemainingQuantity + "</td></tr>";
+                           // $("#Eccaptab").append("<tr><td>" + response[i].FinancialYear + "</td><td>" + response[i].ECQuantity + "</td><td>" + response[i].RemainingQuantity + "</td></tr>");
+                        }
+
+                    }
+
+                    else
+                    {
+                        swal("Something Went Wrong!");
+
+                    }
+                    $("#Eccaptab").html(thtml);
+
+                }
+            }
+        );
+
+    });
+
+    </script>*@
+
+
+
+
+
+
+
+    <script>
+        function ShowHistory(intLesseid) {
+           
+        $.ajax({
+            type: "POST",
+            url: '@Url.Content("~/ECCapping/ecCapping/ECCappingPreviousDetails")',
+            data: {
+                "id": intLesseid
+            },
+            dataType: "Json",
+            success: function (data) {
+                var row = '<thead><tr><th width="30px">Sl#</th><th>Financial Year</th><th>ECApprovedQuantity</th><th>RemainingQuantity</th></tr ></thead >'
+                if (data != "") {
+                    for (var i = 0; i < data.length; i++) {
+                        row += '<tr><th width="30px">' + (parseInt(i) + 1) + '</th><th>' + data[i].FinancialYear + '</th><th>' + data[i].ECQuantity + '</th><th>' + data[i].RemainingQuantity + '</th></tr >'
+                    }
+                }
+                else
+                {
+                    row += 'No Data Found!'
+
+                }
+                $("#tblHistory2").html(row);
+                $('#Notice_model2').modal('show');
+            },
+            error: function () {
+                alert('Error');
+            }
+        })
+    }
+
+
+    </script>
+
+</section>

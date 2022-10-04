@@ -1,0 +1,413 @@
+﻿@*// *********************************************************************************************************
+    //  View Name                : Add
+    //  Desciption               : To Save and Update Website Gallery Details
+    //  Created By               : Lingaraj Dalai
+    //  Created On               : 28 Oct 2021
+    // ********************************************************************************************************
+*@
+@model HomeEF.AddGalleryModel
+@{
+    ViewData["Title"] = "Add";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+@if (TempData["Message"] != null)
+{
+    <script>
+        var vv = '@TempData["Message"]';
+        if (vv == 1) {
+            swal("","Gallery created successfully.","success");
+        }
+        else if (vv == 3) {
+            swal("", "Something Errror occured. Please Try After Sometime!!", "error");
+        }
+    </script>
+}
+<script>
+    indicateMe = "yes"
+    $(document).ready(function () {
+        $('.searchableselect').searchableselect();
+        var filesize = 0;
+        var _URL = window.URL || window.webkitURL;
+        $('input[name="ThumbnailImgFile"]').bind('change', function () {
+            var file, img;
+            $("input[name='Submit']").attr('disabled', false);
+            filesize = this.files[0].size;
+            if ((file = this.files[0])) {
+                img = new Image();
+                img.onload = function () {
+                    var width = this.width;
+                    var height = this.height;
+                    $("#width").html(width);
+                    $("#height").html(height);
+                    if (width > 419 || height > 280) {
+                        swal("", "Width and heigth should not be more than 419X280px ", "warning");
+                        this.value = '';
+                        $("input[name='Submit']").attr('disabled', true);
+                        return false;
+                    }
+                };
+                img.src = _URL.createObjectURL(file);
+            }
+            var val = $(this).val().toLowerCase(),
+                regex = new RegExp("(.*?)\.(jpeg|jpg|png)$");
+            if (!(regex.test(val))) {
+                swal("", "docx,pdf,xlsx,tif type is not an allowed file type. You can use only jpg, jpeg, png types of file(s). ", "warning");
+                this.value = '';
+                $("input[name='Submit']").attr('disabled', true);
+                return false;
+            }
+            else if (filesize > 2048000) {
+                swal("", "File size must be 2 MB !", "warning");
+                $("input[name='Submit']").attr('disabled', true);
+                return false;
+            }
+            else {
+                var fileName = $(this).val().split("\\").pop();
+                $(this).next('.custom-file-label').html(fileName);
+            }
+            return false;
+        });
+        $('input[name="ImgFile"]').bind('change', function () {
+            $("input[name='Submit']").attr('disabled', false);
+            filesize = this.files[0].size;
+            if ((file = this.files[0])) {
+                img = new Image();
+                img.onload = function () {
+                    var width = this.width;
+                    var height = this.height;
+                    $("#width").html(width);
+                    $("#height").html(height);
+                    if (width > 1280 || height > 538) {
+                        swal("", "Width and heigth should not be more than 1280X538px ", "warning");
+                        this.value = '';
+                        $("input[name='Submit']").attr('disabled', true);
+                        return false;
+                    }
+                };
+                img.src = _URL.createObjectURL(file);
+            }
+            var val = $(this).val().toLowerCase(),
+                regex = new RegExp("(.*?)\.(jpeg|jpg|png)$");
+            if (!(regex.test(val))) {
+                swal("", "docx,pdf,xlsx,tif type is not an allowed file type. You can use only jpg, jpeg, png types of file(s). ", "warning");
+                this.value = '';
+                $("input[name='Submit']").attr('disabled', true);
+                return false;
+            }
+            else if (filesize > 2048000) {
+                swal("", "File size must be 2 MB !", "warning");
+                $("input[name='Submit']").attr('disabled', true);
+                return false;
+            }
+            else {
+                var fileName = $(this).val().split("\\").pop();
+                $(this).next('.custom-file-label').html(fileName);
+            }
+            return false;
+        });
+        $('input[name="VideoFile"]').bind('change', function () {
+            $("input[name='Submit']").attr('disabled', false);
+            filesize = this.files[0].size;
+            var val = $(this).val().toLowerCase(),
+                regex = new RegExp("(.*?)\.(mp4)$");
+            if (!(regex.test(val))) {
+                swal("", "docx,pdf,xlsx,tif  type is not an allowed file type. You can use only mp4 types of file(s). ", "warning");
+                this.value = '';
+                $("input[name='Submit']").attr('disabled', true);
+                return false;
+            }
+            else if (filesize > 5048000) {
+                swal("", "File size must be 5 MB !", "warning");
+                $("input[name='Submit']").attr('disabled', true);
+                return false;
+            }
+            else {
+                var fileName = $(this).val().split("\\").pop();
+                $(this).next('.custom-file-label').html(fileName);
+            }
+            return false;
+        });
+        $('input[name="ThumbnailVideoImgFile"]').bind('change', function () {
+            $("input[name='Submit']").attr('disabled', false);
+            filesize = this.files[0].size;
+            if ((file = this.files[0])) {
+                img = new Image();
+                img.onload = function () {
+                    var width = this.width;
+                    var height = this.height;
+                    $("#width").html(width);
+                    $("#height").html(height);
+                    if (width > 419 || height > 280) {
+                        swal("", "Width and heigth should not be more than 419X280px ", "warning");
+                        this.value = '';
+                        $("input[name='Submit']").attr('disabled', true);
+                        return false;
+                    }
+                };
+                img.src = _URL.createObjectURL(file);
+            }
+            var val = $(this).val().toLowerCase(),
+                regex = new RegExp("(.*?)\.(jpeg|jpg|png)$");
+            if (!(regex.test(val))) {
+                swal("", "docx,pdf,xlsx,tif  type is not an allowed file type. You can use only jpg, jpeg, png types of file(s). ", "warning");
+                this.value = '';
+                $("input[name='Submit']").attr('disabled', true);
+                return false;
+            }
+            else if (filesize > 2048000) {
+                swal("", "File size must be 2 MB !", "warning");
+                $("input[name='Submit']").attr('disabled', true);
+                return false;
+            }
+            else {
+                var fileName = $(this).val().split("\\").pop();
+                $(this).next('.custom-file-label').html(fileName);
+            }
+            return false;
+        });
+        loadNavigation('Add', 'glhelpdesk', 'plraiseticket', 'tl', 'CMS', 'Gallery', ' ');
+        ContentType();
+    });
+    function Validate() {
+        var Iss = false;
+        if (!DropDownValidation("ContentTypeId", "Content Type")) {
+            return false;
+        }      
+        if ($("#ContentTypeId").val() == "1" && $("#hdnThumbnailPath").val() == "") {
+            if (!FileUploadValidation("ThumbnailImgFile", "Thumbnail Photo")) {
+                return false;
+            }
+        }
+        if ($("#ContentTypeId").val() == "1" && $("#hdnImgPath").val() == "") {
+            if (!FileUploadValidation("ImgFile", "Large Photo")) {
+                return false;
+            }
+        } 
+        if ($("#ContentTypeId").val() == "1" && !blankFieldValidation("VCH_GALLERY_DESC", "Gallery Descrpition")) {
+            return false;
+        }
+        if ($("#ContentTypeId").val() == "2" && $("#hdnVideoPath").val() == "" && $("#VCH_VIDEO_URL").val() == "") {
+            if (!FileUploadValidation("VideoFile", "Video File")) {
+                return false;
+            }
+        }
+        if ($("#ContentTypeId").val() == "2" && $("#hdnThumbnailVideoImgPath").val() == "") {
+            if (!FileUploadValidation("ThumbnailVideoImgFile", "Thumbnail Video File")) {
+                return false;
+            }
+        }        
+        Iss = true;
+        return Iss;
+    }
+    function ContentType() {
+        if ($("#ContentTypeId").val() == "1") {
+            $(".divphoto").show();
+            $(".divvideo").hide();
+        }
+        else {
+            $(".divvideo").show();
+            $(".divphoto").hide();
+        }
+    }
+</script>
+<script>
+    var _URL = window.URL || window.webkitURL;
+    $("#file").change(function (e) {
+        var file, img;
+        if ((file = this.files[0])) {
+            img = new Image();
+            img.onload = function () {
+                var width = this.width;
+                var height = this.height;
+                $("#width").html(width);
+                $("#height").html(height);
+                if (width > 200 || height > 200) {
+                    swal("", "Width and heigth should not be more than 200px", "warning");
+                    return false;
+                }
+            };
+            img.src = _URL.createObjectURL(file);
+        }
+    });
+</script>
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        @Html.Partial("_navigation")
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="javascript:void(0);">
+                                Add
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="~/Website/Gallery/ViewList">
+                                View
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="~/Website/Gallery/Archive">
+                                Archive
+                            </a>
+                        </li>
+                    </ul>
+                    @Html.Partial("_util")
+                </div>
+                <section class="box form-container">
+                    <div class="content-body">
+                        <h5>Gallery </h5>
+                        @using (Html.BeginForm("Add", "Gallery", FormMethod.Post, new { enctype = "multipart/form-data", AUTOCOMPLETE = "Off", id = "form1" }))
+                        {
+                            <div class="row">
+                                <div class="col-lg-4 col-md-6">
+                                    <label class="col-form-label">Content Type <span class="text-danger">*</span></label>
+                                    <div class="form-group">
+                                        @Html.DropDownListFor(model => model.INT_CONTENT_TYPE,
+                                                                         new SelectList(new List<SelectListItem>
+                                           {new SelectListItem { Text = "Photo", Value = "1"}, new SelectListItem { Text = "Video", Value = "2"},
+                                           }, "Value", "Text"),
+                                          new { @id = "ContentTypeId", @class = "form-control searchableselect", @autofocus = "autofocus", @onchange = "ContentType()" })
+                                        @Html.HiddenFor(m => m.INT_CONTENT_TYPE, new { @id = "hfContentType" })
+                                        @Html.ValidationMessageFor(m => m.INT_CONTENT_TYPE, "", new { @class = "text-danger" })
+                                        @Html.HiddenFor(m => m.INT_GALLERY_ID)
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="divphoto">
+                                <div class="row">
+                                    <div class="col-lg-4 col-md-6">
+                                        <label class="col-form-label">Thumbnail Photo <span class="text-danger">*</span></label>
+                                        <div class="custom-file">
+                                            <div class="form-group">
+                                                <input type="file" class="custom-file-input" id="ThumbnailImgFile" name="ThumbnailImgFile">
+                                                <label class="custom-file-label" for="customFile">Choose Files</label>
+                                                <small class="text-danger">(<strong>.jpeg, .jpg, .png</strong> file only, image size of <strong>419X280</strong> and <strong>max file size 2 MB</strong>)</small>
+                                            </div>
+                                        </div>
+                                        @Html.ValidationMessageFor(m => m.ThumbnailImgFile, "", new { @class = "text-danger" })
+                                        @if (Model.VCH_THUMBNAIL_IMG_PATH != null && Model.VCH_THUMBNAIL_IMG_PATH != "")
+                                        {
+                                            <label class="form-control-plaintext" id="lblNotificationfile">@Model.THUMBNAIL_PATH <a href="~/Website/Gallery/DownloadImgFiles?filename=@Model.THUMBNAIL_PATH" data-original-title="Download Thumbnail Photo Copy"><i class="icon-download-solid h5"></i></a></label>
+                                        }
+                                        @Html.HiddenFor(m => m.VCH_THUMBNAIL_IMG_PATH, new { @id = "hdnThumbnailPath" })
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-lg-4 col-md-6">
+                                        <label class="col-form-label">Enlarge Photo <span class="text-danger">*</span></label>
+                                        <div class="custom-file">
+                                            <div class="form-group">
+                                                <input type="file" class="custom-file-input" id="ImgFile" name="ImgFile">
+                                                <label class="custom-file-label" for="customFile">Choose Files</label>
+                                                <small class="text-danger">(<strong>.jpeg, .jpg, .png</strong> file only, image size of <strong>1280X538</strong> and <strong>max file size 2 MB</strong>)</small>
+                                            </div>
+                                        </div>
+                                        @Html.ValidationMessageFor(m => m.ImgFile, "", new { @class = "text-danger" })
+                                        @if (Model.VCH_IMG_PATH != null && Model.VCH_IMG_PATH != "")
+                                        {
+                                            <label class="form-control-plaintext" id="lblNotificationfile">@Model.LARGE_PATH <a href="~/Website/Gallery/DownloadImgFiles?filename=@Model.LARGE_PATH" data-original-title="Download Large Photo Copy"><i class="icon-download-solid h5"></i></a></label>
+                                        }
+                                        @Html.HiddenFor(m => m.VCH_IMG_PATH, new { @id = "hdnImgPath" })
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-lg-4 col-md-6">
+                                        <label class="col-form-label">Description <span class="text-danger">*</span></label>
+                                        <div class="form-group">
+                                            @Html.TextAreaFor(m => m.VCH_GALLERY_DESC, new { @class = "form-control", @autofocus = "autofocus", @rows = "5", @maxlength = 500 })
+                                            @Html.ValidationMessageFor(m => m.VCH_GALLERY_DESC, "", new { @class = "text-danger" })
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="divvideo" style="display:none;">
+                                <div class="row">
+                                    <div class="col-lg-4 col-md-6">
+                                        <label class="col-form-label">Upload Video <span class="text-danger">*</span></label>
+                                        <div class="custom-file">
+                                            <div class="form-group">
+                                                <input type="file" class="custom-file-input" id="VideoFile" name="VideoFile">
+                                                <label class="custom-file-label" for="customFile">Choose Files</label>
+                                                <small class="text-danger">(<strong>.mp4,.3gp</strong> file only and <strong>max file size 5 MB</strong>)</small>
+                                            </div>
+                                        </div>
+                                        @Html.ValidationMessageFor(m => m.VideoFile, "", new { @class = "text-danger" })
+                                        @if (Model.VCH_VIDEO_PATH != null && Model.VCH_VIDEO_PATH != "")
+                                        {
+                                            <label class="form-control-plaintext" id="lblNotificationfile">@Model.VCH_VIDEO_PATH <a href="~/Website/Gallery/DownloadVideoFiles?filename=@Model.LARGE_PATH" data-original-title="Download Video"><i class="icon-download-solid h5"></i></a></label>
+                                        }
+                                        @Html.HiddenFor(m => m.VCH_VIDEO_PATH, new { @id = "hdnVideoPath" })
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-lg-4 col-md-6">
+                                        <label class="col-form-label">Video URL </label>
+                                        <div class="form-group">
+                                            @Html.TextBoxFor(m => m.VCH_VIDEO_URL, new { @class = "form-control", @autofocus = "autofocus", @maxlength = 250 })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-lg-4 col-md-6">
+                                        <label class="col-form-label">Upload Thumbnail Photo <span class="text-danger">*</span></label>
+                                        <div class="custom-file">
+                                            <div class="form-group">
+                                                <input type="file" class="custom-file-input" id="ThumbnailVideoImgFile" name="ThumbnailVideoImgFile">
+                                                <label class="custom-file-label" for="customFile">Choose Files</label>
+                                                <small class="text-danger">(<strong>.jpeg, .jpg, .png</strong> file only, image size of <strong>419X280</strong> and <strong>max file size 2 MB</strong>)</small>
+                                            </div>
+                                        </div>
+                                        @Html.ValidationMessageFor(m => m.ThumbnailVideoImgFile, "", new { @class = "text-danger" })
+                                        @if (Model.VCH_THUMBNAIL_VIDEOIMG_PATH != null && Model.VCH_THUMBNAIL_VIDEOIMG_PATH != "")
+                                        {
+                                            <label class="form-control-plaintext" id="lblNotificationfile">@Model.THUMBNAIL_PATH <a href="~/Website/Gallery/DownloadVideoFiles?filename=@Model.THUMBNAIL_PATH" data-original-title="Download Thumbnail Video Copy"><i class="icon-download-solid h5"></i></a></label>
+                                        }
+                                        @Html.HiddenFor(m => m.VCH_THUMBNAIL_VIDEOIMG_PATH, new { @id = "hdnThumbnailVideoImgPath" })
+                                    </div>
+                                </div>
+                            </div>                       
+                            <div class="row">
+                                <div class="col-lg-4 col-md-6">
+                                    <label class="col-form-label">Sequence </label>
+                                    <div class="form-group">
+                                        @Html.TextBoxFor(m => m.INT_SEQUENCE, new { @class = "form-control", @autofocus = "autofocus", @readonly = "readonly" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-4 col-md-6">
+                                    <label class="col-form-label pt-0">Status</label>
+                                    <div class="form-group">
+                                        @Html.RadioButtonFor(n => n.BIT_STATUS, true, new { @class = "custom-radio", id = "Rdbtn_Active" })
+                                        <label class="radio-label mr-2">Publish</label>
+                                        @Html.RadioButtonFor(n => n.BIT_STATUS, false, new { @checked = true, @class = "custom-radio", id = "Rdbtn_Inactive" })
+                                        <label class="radio-label">Unpublish</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-12 col-sm-12">
+                                    <input type="submit" value='@ViewBag.Button' name="Submit" class="btn btn-success btn-md ml-0 waves-effect waves-light  btnsave" id="Submit" onclick="return Validate()">
+                                    @if (ViewBag.Button == "Update")
+                                    {
+                                        <a href="~/Website/Gallery/ViewList" class="btn btn-danger btn-md ml-0 waves-effect waves-light btncancel">Cancel</a>
+                                    }
+                                    else
+                                    {
+                                        <a href="~/Website/Gallery/Add" class="btn btn-danger btn-md ml-0 waves-effect waves-light btncancel">Cancel</a>
+                                    }
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+    <!-- MAIN CONTENT AREA ENDS -->
+</section>
+

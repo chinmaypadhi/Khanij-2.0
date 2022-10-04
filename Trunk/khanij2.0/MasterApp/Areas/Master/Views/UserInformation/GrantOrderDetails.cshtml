@@ -1,0 +1,421 @@
+﻿@model MasterEF.UserInformationEF
+@{
+    ViewData["Title"] = "GrantOrderDetails";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        @*  <uc1:navigation runat="server" ID="navigation" />*@
+        @Html.Partial("_navigation")
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="javascript:void(0);">
+                                Grant Order
+                            </a>
+                        </li>
+                    </ul>
+                    @Html.Partial("_util")  
+                </div>
+
+                <section class="box form-container">
+                    <div class="content-body">
+
+                        <h5 class="text-brown font-weight-bold mt-0"> Grant Order Details</h5>
+                        @{ string UserType = "Lessee"; }
+                        @using (Html.BeginForm("GrantOrderDetails", "UserInformation", FormMethod.Post, new { enctype = "multipart/form-data", AUTOCOMPLETE = "Off", id = "form1" }))
+                        {
+                            <div class="row">
+                                <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                    <label class="col-form-label pt-0 font-weight-bolder">Grant Order Number <span class="text-danger">*</span></label>
+                                    @(Html.TextBoxFor(x => x.GrantOrderNumber, new { @maxlength = "50", @class = "form-control" }))
+
+                                </div>
+                                <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                    <label class="col-form-label pt-0 font-weight-bolder">Date Of Grant Order<span class="text-danger">*</span></label>
+                                    <div class="input-group">
+                                        @Html.TextBoxFor(m => m.GrantOrderDate, new { @class = "form-control datepicker", id = "dt_GRANT_ORDER_DATE" })
+                                        <div class="input-group-prepend">
+                                            <label class="input-group-text" for="dt_GRANT_ORDER_DATE"><i class="far fa-calendar"></i></label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                    <label class="col-form-label pt-0 font-weight-bolder">Lease Validity From<span class="text-danger">*</span></label>
+                                    <div class="input-group">
+                                        @Html.TextBoxFor(m => m.FromValidity, new { @class = "form-control datepicker", id = "dt_FROM_VALIDITY" })
+                                        <div class="input-group-prepend">
+                                            <label class="input-group-text" for="dt_FROM_VALIDITY"><i class="far fa-calendar"></i></label>
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                                <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                    <label class="col-form-label font-weight-bolder">Lease Validity Upto<span class="text-danger">*</span></label>
+                                    <div class="input-group">
+                                        @Html.TextBoxFor(m => m.ToValidity, new { @class = "form-control datepicker", id = "dt_TO_VALIDITY" })
+                                        <div class="input-group-prepend">
+                                            <label class="input-group-text" for="dt_TO_VALIDITY"><i class="far fa-calendar"></i></label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                    <label for="inputLoginId" class="col-form-label font-weight-bolder">Grant Order Copy With Approved lease Plan <span class="text-danger">*</span></label>
+                                    <div class="custom-file">
+                                        <input type="file" class="custom-file-input" id="flGrantOrderCopy" name="flGrantOrderCopy">
+                                        <label class="custom-file-label" for="customFile">Choose Files</label>
+                                    </div>
+                                    <a href="@Url.Action("Download", "Application", new { name = Model.GrantOrderFileName, path = Model.GrantOrderFilePath })" target="_blank" class="file-download-licensee">@((Model.GrantOrderFileName != null) ? Model.GrantOrderFileName : "")</a>
+                                </div>
+                                <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                    <label for="inputLoginId" class="col-form-label font-weight-bolder">Lease Deed Number<span class="text-danger">*</span></label>
+                                    @(Html.TextBoxFor(x => x.ExecutionOfDeedNumber, new { @maxlength = "50", @class = "form-control" }))
+                                </div>
+
+                                <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                    <label class="col-form-label font-weight-bolder">Lease Deed Date<span class="text-danger">*</span></label>
+                                    <div class="input-group">
+                                        @Html.TextBoxFor(m => m.ExecutionOfDeedDate, new { @class = "form-control datepicker", id = "dt_EXECUTION_OF_DEED_DATE" })
+                                        <div class="input-group-prepend">
+                                            <label class="input-group-text" for="dt_EXECUTION_OF_DEED_DATE"><i class="far fa-calendar"></i></label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                    <label class="col-form-label font-weight-bolder">Lease Deed Document with plan/LOI Letter<span class="text-danger">*</span></label>
+                                    <div class="custom-file">
+                                        <input type="file" class="custom-file-input" id="flLeaseDeedDoc" name="flLeaseDeedDoc">
+                                        <label class="custom-file-label" for="customFile">Choose Files</label>
+                                    </div>
+                                    <a href="@Url.Action("Download", "Application", new { name = Model.ExecutionOfDeedFileName, path = Model.ExecutionOfDeedFilePath })" target="_blank" class="file-download-licensee">@((Model.ExecutionOfDeedFileName != null) ? Model.ExecutionOfDeedFileName : "")</a>
+                                </div>
+                                <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                    <label for="inputLoginId" class="col-form-label font-weight-bolder">Lease Period(In Years)<span class="text-danger">*</span></label>
+                                    @(Html.TextBoxFor(x => x.Lease_Period, new { @class = "form-control" }))
+                                </div>
+
+                                <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                    <label class="col-form-label font-weight-bolder">Remarks<span class="text-danger">*</span></label>
+                                    @Html.TextAreaFor(x => x.Remarks, new { @class = "form-control", @style = "Resize:none", @maxlength = "500" })
+                                </div>
+
+
+                            </div>
+
+
+
+                            @if (@Model.STATUS != 5)
+                            {
+                                <div class="row" style="position: absolute; bottom: 20px; right: 30px;">
+                                    <div class="col-md-12 col-sm-12">
+
+                                        @if (UserType.ToUpper() == "LESSEE")
+                                        {
+                                            <input type="submit" value="Save & Update" class="btn btn-success btn-md ml-0 waves-effect waves-light ">
+                                            <input type="button" title="Forward to DD" value="Forward To DD" name="cmd" class="btn btn-warning text-dark btn-md waves-effect waves-light" onclick="return OnForwarding('Forward To DD');" />
+                                        }
+                                        <input type="button" value="Approve" class="btn btnsave DMO-Button" id="approve" name="approve" onclick="return OnForwarding('Approve');" style="display: none;">
+                                        <input type="button" value="Reject" class="btn btnsave DMO-Button" id="reject" name="reject" onclick="return OnForwarding('Reject');" style="display: none;">
+                                    </div>
+                                </div>
+                            }
+                        }
+                        @*<div class="row">
+            <div class="col-sm-12">
+                <a href="javascript:void(0);" class="btn btn-success btn-md ml-0 waves-effect waves-light">Save &amp; Update</a>
+                <a href="#" class="btn btn-warning text-dark btn-md waves-effect waves-light ml-0">Forward to DD</a>
+            </div>
+        </div>*@
+
+
+
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+    <!-- MAIN CONTENT AREA ENDS -->
+</section>
+<uc1:footer runat="server" ID="footer" />
+<script>
+    indicateMe = "yes"
+    backMe = "yes"
+    $(document).ready(function () {
+        loadNavigation('GrantOrderDetails', 'glRoleRes', 'pllesseprof', 'tl', 'Roles and Responsibity', 'Lessee Profile', ' ');
+    });
+</script>
+
+<script>
+    $(document).ready(function () {
+        $('.datepicker').datetimepicker({
+            format: 'LT',
+            format: 'DD-MM-YYYY',
+           
+        });
+    });
+</script>
+<script>
+
+    //create By Kavita
+    function OnForwarding(btnAction) {
+        //var checkdata = checkFields();
+        //if (checkdata == 1) {
+
+        var Type;
+        if (btnAction == 'Forward To DD') {
+            Type = 'forward';
+        }
+        else if (btnAction == 'Approve') {
+            Type = 'Approve';
+            $("#Remarks").prop('required', false);
+        }
+        if (btnAction == 'Reject') {
+            Type = 'Reject';
+            $("#Remarks").prop('required', true);
+
+            if ($("#Remarks").val() == "") {
+                $("#Remarks").focus();
+                alert('Remarks is required!')
+                return;
+            }
+        }
+
+        if (confirm("Before " + Type + " you need to apply your Digital Signature. Are you confirmed to " + Type + " Profile??")) {
+
+
+            var Postdata = 'action=signdoc' + "\n" + 'datatosign=Digital Signature Required' + "\n" + 'signaction=sign' + "\n" + 'filepath=' + "\n" + 'panNumberParam=' + "\n" + 'expirycheck=false' + "\n" + 'issuername=' + "\n" + 'certclass=1|2|3' + "\n" + 'certtype=ALL';
+            connection.send(Postdata);
+
+            connection.onerror = function (error) {
+                alert('Please check the server connection: ' + error);
+                alert(error);
+            };
+
+            connection.onmessage = function (e) { // when DSC is success then following function executed.
+                if (e.data.indexOf("subProtocol") == -1) {
+                    //debugger;
+                    //alert(e.data);
+                    $("#DSCResponse").val(e.data).change();
+                    $.ajax(
+                    {
+
+                        url: '@Url.Action("CheckVerifyResponse", "ForwardingNote", new { Area = "Transit" })',
+                        type: "POST",
+                        data: { contentType: "pkcs7", signDataBase64Encoded: e.data, responseType: "plain" },
+                        success: function (msg) {
+                            if (msg == "SUCCESS") {
+                                // debugger;
+
+                                if (btnAction == "Forward To DD") {
+                                    $("#SubResion").val("Forward To DD");
+                                }
+                                else if (btnAction == "Approve") {
+                                    $("#SubApprove").val("Approve");
+                                }
+                                else if (btnAction == "Reject") {
+                                    $("#SubReject").val("Reject");
+                                }
+                                $("#frmLesseeGrantOffice").submit();
+                            }
+                        }
+                    });
+
+
+
+                }
+                else {
+                    alert(e.data);
+                }
+
+
+            };
+        }
+        else {
+            return false;
+        }
+
+        //}
+        //else {
+        //    return false;
+        //}
+    }
+
+</script>
+<script type="text/javascript">
+
+    $("input[name='lesseeProfile']").css('pointer-events', 'none')
+    //Profile Percentage
+    var gauge1 = loadLiquidFillGauge("fillgauge1", new Number(@ViewBag.completionCount));
+    var config1 = liquidFillGaugeDefaultSettings();
+
+    //Slide js
+    $(document).on('ready', function () {
+        $("#reject").click(function () {
+            $("#Remarks").prop('required', true);
+        });
+        $("#approve").click(function () {
+            $('#Remarks').prop('required', false);
+        });
+    });
+
+
+
+
+    $("#FROM_VALIDITY").on("change", function () {
+        //var fromDateString = $("#FROM_VALIDITY").val() || "";
+        //var toDateString = $("#TO_VALIDITY").val() || "";
+
+
+        ////Splitting both the dates
+        //var splittedFromDate = fromDateString.split("/");
+        //if (splittedFromDate.length != 3)
+        //    splittedFromDate = fromDateString.split("-");
+
+        //var splittedToDate = toDateString.split("/");
+        //if (splittedToDate.length != 3)
+        //    splittedToDate = toDateString.split("-");
+
+        ////Substracting dates
+        //var totalYear = (splittedToDate[2]) - (splittedFromDate[2]);
+        //console.log(totalYear);
+        //if (totalYear > 0)
+        //    $("#LEASE_PERIOD").val(totalYear);
+        //else
+        //    $("#LEASE_PERIOD").val(0);
+
+    });
+    $("#TO_VALIDITY").on("change", function () {
+        //var fromDateString = $("#FROM_VALIDITY").val() || "";
+        //var toDateString = $("#TO_VALIDITY").val() || "";
+
+
+        ////Splitting both the dates
+        //var splittedFromDate = fromDateString.split("/");
+        //if (splittedFromDate.length != 3)
+        //    splittedFromDate = fromDateString.split("-");
+
+        //var splittedToDate = toDateString.split("/");
+        //if (splittedToDate.length != 3)
+        //    splittedToDate = toDateString.split("-");
+
+        ////Substracting dates
+        //var totalYear = (splittedToDate[2]) - (splittedFromDate[2]);
+        //console.log(totalYear);
+        //if (totalYear > 0)
+        //    $("#LEASE_PERIOD").val(totalYear);
+        //else
+        //    $("#LEASE_PERIOD").val(0);
+
+    });
+
+    @if (Model.TodateIntimation == "Validity Expired")
+    {
+         <Text>
+    $("#TO_VALIDITY").addClass('TodateExpiry')
+    $("#TO_VALIDITY").prop('title', '@Model.TodateIntimation')
+         </Text>
+    }
+    else if ((Model.TodateIntimation == "Done"))
+    {
+          <Text>
+    $("#TO_VALIDITY").removeClass('TodateExpiry')
+    $("#TO_VALIDITY").removeClass('TodateIntimation')
+
+         </Text>
+
+    }
+    else
+    {
+        <Text>
+    $("#TO_VALIDITY").addClass('TodateIntimation')
+    $("#TO_VALIDITY").prop('title', '@Model.TodateIntimation')
+    </Text>
+    }
+
+
+    //MEssage
+    @if (TempData["Message"] != null)
+    {
+        <Text>
+    alert('@TempData["Message"]')
+    </Text>
+    }
+
+    @if (UserType != "District User")
+    {
+        //For Disabling all DOM if  is  Forwarded to DD/DMO and Approval is Pending
+        if (Model.STATUS == 1)
+        {
+             <Text>
+
+    $('.pointer').css("pointer-events", "none");
+    $('.btnsave').hide();
+    </Text>
+        }
+        else if (Model.STATUS == 2)
+        {
+
+        }
+         <Text>   $('#Remarks').attr('readonly', 'readonly');   </Text>
+    }
+    else  // While Approving or Rejectiong By DG/DMO
+    {
+                       <Text>
+    $("#Remarks").removeAttr("readonly");
+    $('.slider').css("pointer-events", "none");
+    </Text>
+        if (Model.STATUS == 1)
+        {
+
+        <Text>
+    $('.btnsave').hide();
+    $('.DMO-Button').show();
+    $('.pointer').css("pointer-events", "none");
+    </Text>
+        }
+        else
+        {
+         <Text>$('.pointer').css("pointer-events", "none");
+    $('.btnsave').hide();
+    $('.DMO-Button').hide();   </Text>
+        }
+    }
+
+    $(function () {
+        return { "__RequestVerificationToken": $('input[name=__RequestVerificationToken]').val() }
+    });
+
+
+    var lheight = $("#left-detail-pan").css("height");
+    $("#left-pan").css("height", lheight + 08);
+
+    $("#LEASE_PERIOD").keydown(function (e) {
+        //// Allow: backspace, delete, tab, escape, enter and .
+        //if ($.inArray(e.keyCode, [46, 8, 9, 27, 13, 110, 190]) !== -1 ||
+        //    // Allow: Ctrl+A, Command+A
+        //    (e.keyCode === 65 && (e.ctrlKey === true || e.metaKey === true)) ||
+        //    // Allow: home, end, left, right, down, up
+        //    (e.keyCode >= 35 && e.keyCode <= 40)) {
+        //    // let it happen, don't do anything
+        //    return;
+        //}
+        //// Ensure that it is a number and stop the keypress
+        //if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) {
+        //    e.preventDefault();
+        //}
+
+        //var regex = new RegExp("^[a-zA-Z0-9 \b]+$");
+        //var str = String.fromCharCode(!e.charCode ? e.which : e.charCode);
+        //if (regex.test(str)) {
+        //    return true;
+        //}
+        //e.preventDefault();
+        //return false;
+    });
+
+</script>

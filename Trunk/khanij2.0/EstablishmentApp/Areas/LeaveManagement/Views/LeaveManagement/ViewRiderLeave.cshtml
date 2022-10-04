@@ -1,0 +1,159 @@
+﻿@*// *********************************************************************************************************
+    //  View Name                : ViewRiderLeaveType
+    //  Desciption               : To view Rider Leave
+    //  Created By               : Suresh kumar behera
+    //  Created On               : 13-july-2021
+    // ********************************************************************************************************
+*@
+
+@model IEnumerable<EstablishmentEf.RiderLeave>
+@{
+    ViewData["Title"] = "ViewRiderLeave";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+@*@inject EstablishmentApp.KhanijSecurity.KhanijIDataProtection protector;*@
+@using EstablishmentApp.Web;
+@if (TempData["msg"] != null)
+{
+    <script>
+        var vv = '@TempData["msg"]';
+        if (vv == 1) {
+            swal("", "Rider Leave saved successfully.", "success");
+        }
+        else if (vv == 2) {
+            swal("", "Rider Leave allready exists.", "warning");
+        }
+        else if (vv == 3) {
+            swal("", "Rider Leave updated sucessfully", "success");
+        }
+        else if (vv == 4) {
+            swal("", "Rider Leave deleted sucessfully", "success");
+        }
+        else {
+            swal("", "Something Errror occured. Please Try After Sometime!!", "error");
+        }
+    </script>
+
+    TempData["msg"] = null;
+
+}
+
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        @*@Html.Partial("_navigation")*@
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link" href="@Url.Content("~/LeaveManagement/LeaveManagement/AddRiderLeave")">
+                                Add Rider Leave
+                            </a>
+                        </li>
+                        <li class="nav-item">
+
+                            <a class="nav-link active" href="">
+                                View Rider Leave
+                            </a>
+                        </li>
+                    </ul>
+
+                    @*@Html.Partial("_util")*@
+                </div>
+
+                <section class="box form-container">
+
+
+                    <div class="content-body pt-0">
+                        <div class="legend-box">
+                            <ul class="d-flex mb-1 justify-content-end list-unstyled">
+                                <li><span class="bg-success"></span> Active</li>
+                                <li><span class="bg-warning"></span> Inactive</li>
+                            </ul>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-12">
+
+                                <table id="table-exports" class="table table-sm table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th width="30px">Sl#</th>
+                                            <th>District</th>
+                                            <th>Designation</th>
+                                            <th>Leave Type</th>
+                                            <th>No. of Days</th>
+                                            <th>Document Required</th>
+                                            <th width="60px" class="noprint">Action</th>
+
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+
+                                        @{
+                                            var count = 0;
+                                            foreach (var item in Model)
+                                            {
+
+                                                count++;
+
+                                                <tr class="active-row">
+
+                                                    <td>@count</td>
+                                                    <td>@item.DistrictName</td>
+                                                    <td>@item.Designation</td>
+                                                    <td>@item.LeaveType</td>
+                                                    <td>@item.NoOfDays</td>
+                                                    @if (@item.IsDocumentRequired == true)
+                                                    {
+                                                        <td> Yes </td>
+                                                    }
+                                                    else
+                                                    {
+                                                        <td>No</td>
+                                                    }
+                                                <td class="noprint">
+                                                    <a href="@CustomQueryStringHelper.EncryptString("LeaveManagement","AddRiderLeave","LeaveManagement",new {id=item.RiderLeaveId })"
+                                                       class="btn-floating btn-outline-primary btn-sm"
+                                                       title="Edit"><i class="icon-pencil-alt-solid"></i></a>
+                                                    <a href="@CustomQueryStringHelper.EncryptString("LeaveManagement","DeleteRiderLeave","LeaveManagement",new {id=item.RiderLeaveId })"
+                                                       class="btn-floating btn-outline-danger btn-sm"
+                                                       title="Delete" onclick="return confirm('Are you sure to Delete?')"><i class="icon-trash-alt-solid"></i></a>
+
+                                                    @*<a href="@Url.Content("~/LeaveManagement/LeaveManagement/AddRiderLeave/")@protector.Decode(Convert.ToString(@item.RiderLeaveId))" class="btn-outline-primary btn-sm"><i class="icon-pencil-alt-solid"></i></a>
+                                                    <a href="@Url.Content("~/LeaveManagement/LeaveManagement/DeleteRiderLeave/")@protector.Decode(Convert.ToString(@item.RiderLeaveId))" class="btn-outline-danger btn-sm" onclick="return confirm('Are you sure to Delete?')"><i class="icon-trash-alt-solid"></i></a>*@
+
+                                                </td>
+
+                                                </tr>
+
+                                            }
+                                        }
+
+                                    </tbody>
+                                </table>
+
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+    <!-- MAIN CONTENT AREA ENDS -->
+</section>
+
+<script>
+
+    $(document).ready(function () {
+        loadNavigation('ViewRiderLeave', 'glempprofile', 'plofficetype', 'tl', 'Leave Management', 'View Rider Leave', ' ');
+
+        $('.searchableselect').searchableselect();
+
+        $('.shorting-lnk').click(function () {
+            $('.shorting-lnk i').toggleClass('fa-sort-amount-up-alt fa-sort-amount-down-alt ');
+        });
+
+    });
+</script>
+

@@ -1,0 +1,176 @@
+﻿@model PermitEF.ePermitModel
+
+@{
+    ViewData["Title"] = "Generate Permit";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+
+<section class="wrapper main-wrapper row">
+    <div class="col-12" id="mainDiv">
+        @Html.Partial("_CMSnavigation")
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link" href="@Url.Content("~/Permit/LTP/Permit")">
+                                Apply New LTP
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="javascript:void(0);">
+                                Generated e-LTP Permit
+                            </a>
+                        </li>
+
+                    </ul>
+                    @Html.Partial("_CMSutil")
+                </div>
+
+                <section class="box form-container">
+                    @using (Html.BeginForm("Permit_List", "LTP", FormMethod.Post, new { AUTOCOMPLETE = "Off", id = "form1" }))
+                    {
+                    @*<div class="search-box">
+                            <div class="searchform px-3 py-3">
+                                <div class="row">
+
+
+                                    <div class="col-sm-4">
+                                        <div class="form-group row">
+                                            <label for="inputText" class="col-sm-4 col-form-label">
+                                                Mineral Grade
+                                            </label>
+                                            <div class="col-sm-8">
+                                                <div class="input-group">
+
+                                                    <div class="input-group-prepend">
+                                                        @Html.DropDownListFor(model => model.MineralGradeId, ViewBag.MineralGradeLst as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control form-group", autofocus = "autofocus", required = "required" })
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-2">
+                                        <button type="submit" class="btn btn-sm btn-success m-0 waves-effect waves-light" id="btnSubmit" onclick="GetDataByParameter()">Search</button>
+                                    </div>
+
+
+
+
+                                    <div class="col-sm-2">
+                                        <button type="button" id="btnMergeEPermit" class="btn btn-sm btn-success m-0 waves-effect waves-light" style="margin-right: 10px; width: 150px;">Merge e-Permit</button>
+                                    </div>
+
+
+                                </div>
+
+
+
+
+                            </div>
+                        </div>*@
+
+                    <div class="content-body">
+
+                        <div class="row">
+                            <div class="col-sm-12">
+                                    <table id="table-exports" class="table table-sm table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th>Sl#</th>
+                                                <th>E-Permit Number</th>
+                                                <th>Generated Date</th>
+                                                <th>Mineral Name</th>
+                                                <th>From Railway Siding</th>
+                                                <th>To Railway Siding</th>
+                                                <th>Permited Qty</th>
+                                                <th></th>
+                                                <th style="display:none;"></th>
+
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @{int i = 1;}
+                                            @foreach (var b in ViewBag.ViewList)
+                                                {
+                                            <tr>
+                                                <td>@i</td>
+                                                <td><p class="m-0">@b.LTPPermitNo</p> </td>
+                                                <td><p class="m-0">@b.ApplicationDate</p> </td>
+                                                <td><p class="m-0">@b.MineralName</p> </td>
+                                                <td><p class="m-0">@b.FromStationSideName</p> </td>
+                                                <td><p class="m-0">@b.ToStationSideName</p> </td>
+                                                <td><p class="m-0">@b.ProposedqtybyRailway</p> </td>
+
+                                                @if (b.LTPFilePath == "" || b.LTPFilePath == null)
+                                                        {
+                                                <td>
+                                                    <a class="text-primary" href="@Url.Content("~/Permit/LTP/DownloadLtp_Permit/")@b.LTPPermitId"
+                                                    
+                                                       title="Generate Ltp-Permit">Generate Ltp-Permit</a>
+                                                </td>
+                                                        }
+
+                                                        else
+                                                        {
+                                                <td>
+                                                    <a class="text-primary" href="@Url.Content("~/Permit/LTP/DownloadLtp_Permit/")@b.LTPPermitId"
+                                                      
+                                                       title="Download">Download</a>
+                                                </td>
+                                                        }
+                                                <td style="display:none;">@b.LTPPermitId</td>
+                                            </tr>
+                                                    i++;
+                                                }
+                                        </tbody>
+                                    </table>
+
+
+                            </div>
+                        </div>
+                    </div>
+                    }
+                </section>
+            </div>
+        </div>
+    </div>
+    <!-- MAIN CONTENT AREA ENDS -->
+</section>
+
+
+<script>
+    backMe="yes"
+    $(document).ready(function () {
+        loadNavigation('ViewList', 'glhelpdesk', 'plraiseticket', 'tl', 'E-Permit', 'Saved permit', ' ');
+        $('.searchableselect').searchableselect();
+
+        $('.shorting-lnk').click(function () {
+            $('.shorting-lnk i').toggleClass('fa-sort-amount-up-alt fa-sort-amount-down-alt ');
+        });
+        $('.filter-dropdown').hide();
+        $('.filter-lnk').click(function () {
+            $(this).toggleClass('active');
+            $(this).siblings('.filter-dropdown').slideToggle();
+        });
+        $('.filter-btn').click(function () {
+            $(this).parent('.shorting-cell .filter-dropdown').slideUp();
+            if ($(this).parent().parent('.shorting-cell').find('.filter-lnk').hasClass('active')) {
+                $(this).parent().siblings('.filter-lnk').removeClass('active');
+            }
+        });
+       @* $("#excelIcon").click(function () {
+            exportTableToExcel("ePermitList", "text")
+        });*@
+    });
+</script>
+<script>
+    $(document).ready(function () {
+        $('.datepicker').datetimepicker({
+            format: 'LT',
+            format: 'DD-MM-YYYY',
+
+        });
+    });
+</script>

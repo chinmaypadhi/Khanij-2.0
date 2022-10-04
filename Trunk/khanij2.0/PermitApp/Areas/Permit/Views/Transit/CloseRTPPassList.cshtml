@@ -1,0 +1,342 @@
+﻿@model PermitEF.ForwardingNoteModel
+@*// *********************************************************************************************************
+    //  View Name                : CloseRTPPassList
+    //  Desciption               : To Close permit list
+    //  Created By               : Sanjay kumar
+    //  Created On               : 30 June 2021
+    // ********************************************************************************************************
+*@
+
+@{
+    ViewData["Title"] = "CloseRTPPassList";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+
+<section class="wrapper main-wrapper row">
+    <div class="col-12" id="mainDiv">
+        @Html.Partial("_CMSnavigation")
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link active " href="#">
+                                e-Railway Transit Pass Details
+                            </a>
+                        </li>
+
+
+                    </ul>
+                    @Html.Partial("_CMSutil")
+                </div>
+                <section class="box form-container">
+                    @using (Html.BeginForm("CloseRTPPassList", "Transit", FormMethod.Post, new { enctype = "multipart/form-data", AUTOCOMPLETE = "Off", id = "form1" }))
+                    {
+
+
+                      
+                            <div class="content-body">
+
+                                <div class="row">
+                                    <div class="col-sm-12">
+                                        <div class="table-responsive" id="viewtable">
+                                            <table id="table-exports" class="table table-sm table-bordered">
+                                                <thead>
+                                                    <tr>
+                                                        <th style="display:none;"></th>
+                                                        <th style="display:none;"></th>
+                                                        <th style="display:none;"></th>
+                                                        <th style="display:none;"></th>
+                                                        <th>Sl#</th>
+                                                        <th>RTP Application No</th>
+                                                        <th>e-Permit No</th>
+                                                        <th>Pass No.</th>
+                                                        <th>Date Of Dispatch</th>
+                                                        <th>Mineral Name</th>
+                                                        <th>Unit</th>
+                                                        <th>Purchaser</th>
+                                                        <th>Purchaser Address</th>
+                                                        <th>Issued Quantity</th>
+                                                        <th>Close RTP</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    @foreach (var b in ViewBag.ViewList)
+                                                    {
+                                                        <tr>
+                                                            <td style="display:none;">@b.RoyaltyPaidTransitPassId</td>
+                                                            <td style="display:none;">@b.ForwardingNoteId</td>
+                                                            <td style="display:none;">@b.BulkPermitId</td>
+                                                            <td style="display:none;">@b.EndUserId</td>
+                                                            <td>@b.SRNO</td>
+                                                            <td>@b.ForwardingNoteNumber</td>
+                                                            <td>@b.BulkPermitNumber</td>
+                                                            <td>@b.PassNo</td>
+                                                            <td>@b.DateOfDispatch</td>
+                                                            <td class="text-right">
+                                                                @b.MineralName
+                                                            </td>
+                                                            <td class="text-right">@b.UnitName</td>
+                                                            <td>@b.EndUser</td>
+                                                            <td>@b.Address</td>
+                                                            <td>@b.StockQty</td>
+                                                            <td><input type='button' class='btn-floating btn-outline-danger btn-sm' onclick='return CloseRTP(this)' value='Close RTP' data-toggle="modal" data-target="#RTPwindow" /></td>
+                                                        </tr>
+
+                                                    }
+                                                </tbody>
+                                            </table>
+                                        </div>
+
+
+                                    </div>
+                                </div>
+                            </div>
+
+
+                       
+                    }
+                </section>
+            </div>
+        </div>
+    </div>
+    <!-- MAIN CONTENT AREA ENDS -->
+
+    <div class="modal fade" id="RTPwindow">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title m-0">Close RTP Trip</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-lg-12 col-md-12 col-sm-12">
+                            <div class="row">
+                                <label class="col-sm-4 col-form-label font-weight-bolder">Enter Qty</label>
+                                <div class="col-sm-4">
+                                   
+                                    <input type="text" name="NewRTPQty" id="NewRTPQty" class="form-control form-group"/>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-12 col-md-12 col-sm-12 form-group">
+                            <div class="row">
+                                <label class="col-sm-4 col-form-label font-weight-bolder">Select Date</label>
+                                <div class="col-sm-4">
+                                   
+                                    <div class="input-group">
+                                        @(Html.TextBoxFor(model => model.Date_OfExecution, new { @class = "form-control datepicker", id = "Date_OfExecution",name = "RTPDate" }))
+                                        <div class="input-group-prepend">
+                                            <label class="input-group-text" for="Date_OfExecution"><i class="icon-calendar-alt"></i></label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-12 col-md-12 col-sm-12 ">
+                            <div class="row">
+                                <label class="col-sm-4 col-form-label font-weight-bolder">Upload Railway Receipt</label>
+                                <div class="col-sm-4">
+
+                                    <div class="custom-file">
+                                        <input type="file" class="custom-file-input" id="flRailCopy" name="UploadFile">
+                                        <label class="custom-file-label" for="flRailCopy">Choose Files</label>
+                                    </div>
+                                </div>
+
+                               
+                            </div>
+                                <input type="text" name="RTPPassNo" id="RTPPassNo" style="visibility: hidden; display: none" />
+                                <input type="text" name="RTPPassQty" id="RTPPassQty" style="visibility: hidden; display: none" />
+                            </div>
+
+                        <div class="col-lg-12 col-md-12 col-sm-12 mt-3">
+
+
+                                <button type="button" class="btn btn-danger" id="btnUpload" onclick="UploadDoc()">Close Trip</button>
+                                <button type="button" class="btn btn-primary" id="btnCancel" onclick="CloseWindow()">Cancel</button>
+                           
+                           
+
+                        </div>
+                        </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</section>
+
+<script>
+   
+  backMe="yes"
+    $(document).ready(function () {
+        loadNavigation('ViewList', 'glhelpdesk', 'plraiseticket', 'tl', 'E-Permit', 'Apply e-permit', ' ');
+        $('.searchableselect').searchableselect();
+      
+        $('.shorting-lnk').click(function () {
+            $('.shorting-lnk i').toggleClass('fa-sort-amount-up-alt fa-sort-amount-down-alt ');
+        });
+        $('.filter-dropdown').hide();
+        $('.filter-lnk').click(function () {
+            $(this).toggleClass('active');
+            $(this).siblings('.filter-dropdown').slideToggle();
+        });
+        $('.filter-btn').click(function () {
+            $(this).parent('.shorting-cell .filter-dropdown').slideUp();
+            if ($(this).parent().parent('.shorting-cell').find('.filter-lnk').hasClass('active')) {
+                $(this).parent().siblings('.filter-lnk').removeClass('active');
+            }
+        });
+      @*  $("#excelIcon").click(function () {
+            exportTableToExcel("datatable", "text")
+        });*@
+    });
+</script>
+<script>
+    $(document).ready(function () {
+        $('.datepicker').datetimepicker({
+            format: 'LT',
+            format: 'DD-MMM-YYYY',
+
+        });
+    });
+</script>
+<script>
+    var RTPPassNo = "";
+    var filesize = 0;
+    var ForwardingNoteID;
+    var DispatchedQty;
+    var RTPId;
+    function CloseRTP(obj) {
+
+        var $row = $(obj).closest("tr");
+        var $DispatchedQty = $row.find("td:nth-child(14)");
+        var $ForwardingNoteID = $row.find("td:nth-child(2)");
+        var $RTPPassNo = $row.find("td:nth-child(8)");
+        var $RTPId = $row.find("td:nth-child(1)");
+       // var item = $("#PassDetails").data("kendoGrid").dataItem(row);
+        $.each($ForwardingNoteID, function () {
+            ForwardingNoteID = $(this).text();
+           
+        });
+        $.each($DispatchedQty, function () {
+            DispatchedQty = $(this).text();
+        });
+        $.each($RTPPassNo, function () {
+            RTPPassNo = $(this).text();
+        });
+        $.each($RTPId, function () {
+            RTPId = $(this).text();
+        });
+        if (RTPPassNo == "" && DispatchedQty=="") {
+            $("#window_wnd_title").html("Close RTP For : " + RTPPassNo + " , Dispatched Qty : " + DispatchedQty);
+            $("#RTPPassNo").val(ForwardingNoteID).change();
+            $("#RTPPassQty").val(item.StockQty).change();
+        }
+        //if (item != null) {
+        //    DispatchedQty = item.StockQty;
+        //    ForwardingNoteID = item.ForwardingNoteId;
+
+        //    $("#window_wnd_title").html("Close RTP For : " + item.PassNo + " , Dispatched Qty : " + item.StockQty);
+
+        //    RTPPassNo = item.PassNo;
+        //    RTPId = item.RoyaltyPaidTransitPassId;
+        //    $("#RTPPassNo").val(ForwardingNoteID).change();
+        //    $("#RTPPassQty").val(item.StockQty).change();
+
+        //}
+        //console.log(item);
+
+        var win = $("#RTPwindow").data("kendoWindow");
+        win.center().open();
+
+
+
+    }
+    $('#NewRTPQty').keypress(function (e) {
+        if (isNaN(this.value + String.fromCharCode(event.keyCode))) return false;
+    });
+
+    $('#flRailCopy').bind('change', function () {
+        filesize = this.flRailCopy[0].size;
+        return false;
+    });
+    function UploadDoc() {
+        var vRTPDqty = $("#NewRTPQty").val();
+        var vRRDate = $("#Date_OfExecution").val();
+
+
+
+      //  var dispatchedQty = Number($("#RTPPassQty").val());
+
+
+        if (RTPPassNo == "") {
+            return false;
+        }
+        else if (vRTPDqty == "" || vRTPDqty == "0") {
+            alert("Enter RR Qty");
+            return false;
+        }
+        else if (Number(vRTPDqty) > Number(DispatchedQty)) {
+            alert("You will not enter more Qty then dispatched");
+            return false;
+        }
+        else if (vRRDate == "") {
+            alert("Select Date");
+            return false;
+        }
+        //else if (filesize == 0) {
+        //    alert("Upload Railway Receipt");
+        //    return false;
+        //}
+        else if (filesize > 2048000) {
+            alert("Upload file should be less then equal to 2 MB!");
+            return false;
+        }
+
+        if (confirm("Are you sure you want to close RTP?")) {
+            $.ajax({
+                url: '@Url.Action("CloseRTPTripForForwardingNote", "Transit", new { Area = "Permit" })',
+                type: "POST",
+                cache: false,
+                processData: true,
+                //contentType: 'application/json',
+                data: {
+                    ForwardingNoteID: ForwardingNoteID,
+                    RTPQty: vRTPDqty,
+                    RTPDate: vRRDate,
+                    RTPId: RTPId
+
+                },
+                success: function (data) {
+                    if (data != null && data == "SUCCESS") {
+                        alert("You have successfully closed RTP.");
+                       // var win = $("#RTPwindow").data("kendoWindow");
+                        $('#RTPwindow').modal('toggle');
+                       // win.center().close();
+                        //$("#PassDetails").data("kendoGrid").dataSource.read();
+                        $("#NewRTPQty").val("");
+                        $("#Date_OfExecution").val("");
+                        var url = '@Url.Action("CloseRTPPassList", "Transit")?ForwardingNoteId=' + ForwardingNoteID;
+                        window.location.href = url;
+                        //$(".k-upload-files.k-reset").find("li").parent().remove();
+                    }
+                    else if (data != null && data != "SUCCESS") {
+                        alert(data);
+                    }
+                    else {
+                        alert("RTP close failed for this Application. Please try after some time.");
+                    }
+                }
+            });
+        }
+    }
+
+</script>

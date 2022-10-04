@@ -1,0 +1,809 @@
+﻿@*// *********************************************************************************************************
+    //  View Name                : Registration
+    //  Desciption               : Register Vehicle Owner
+    //  Created By               : Akshaya Dalei
+    //  Created On               : 24 July 2021
+    // ********************************************************************************************************
+*@
+
+@{
+    ViewData["Title"] = "Registration";
+    Layout = "~/Views/Shared/_WebHeaderLayout.cshtml";
+}
+@inject Microsoft.Extensions.Options.IOptions<userregistrationEF.KeyList> metaOptions
+
+@{
+    var options = metaOptions.Value;
+}
+@model userregistrationEF.TransporterModel
+@using userregistrationEF
+
+
+<form id="form1" action="Registration" method="post" onsubmit="return confirm('Do you really want to submit the form?');">
+    <div class="inner-naviagtion">
+        <div class="container">
+            <div>
+                <nav aria-label="breadcrumb mb-0">
+                    <ol class="breadcrumb ">
+                        <li class="breadcrumb-item"><a href="@options.HomeUrl"><span class="fas fa-home"></span></a></li>
+                        <li class="breadcrumb-item text-white" aria-current="page">Registrations</li>
+                        <li class="breadcrumb-item active text-white" aria-current="page">Vehicle Owner</li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+    </div>
+    <div class="inner-content">
+        <div class="container">
+
+            <h3 class="heading">Vehicle Owner Registration </h3>
+            <div class="row">
+                <div class="col-sm-6">
+                    <div class="form-group row">
+                        <label for="inputName" class="col-sm-4 col-form-label ">Owner Type<span class="text-danger">*</span></label>
+                        <div class="col-sm-8">
+                            <div class="py-2">
+                                <div class="custom-control custom-radio custom-control-inline">
+                                    <input type="radio" checked="checked" onchange="onRadioChange();" class="custom-control-input" id="Individual" name="TransporterTypeStatus" value="Individual/Proprietor">
+                                    <label class="custom-control-label" for="Individual">Individual/Proprietor</label>
+                                </div>
+                                <div class="custom-control custom-radio custom-control-inline">
+                                    <input type="radio" class="custom-control-input" onchange="onRadioChange();" id="Firm" name="TransporterTypeStatus" value="Firm">
+                                    <label class="custom-control-label" for="Firm">Firm</label>
+                                </div>
+                                <div class="custom-control custom-radio custom-control-inline">
+                                    <input type="radio" class="custom-control-input" onchange="onRadioChange();" id="Association" name="TransporterTypeStatus" value="Association">
+                                    <label class="custom-control-label" for="Association">Association</label>
+                                </div>
+                                <div class="custom-control custom-radio custom-control-inline">
+                                    <input type="radio" class="custom-control-input" onchange="onRadioChange();" id="Company" name="TransporterTypeStatus" value="Company">
+                                    <label class="custom-control-label" for="Company">Company</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6" id="IdDIVFirmAs">
+                    <div class="form-group row">
+                        <label for="inputName" class="col-sm-4 col-form-label ">Firm as<span class="text-danger">*</span></label>
+                        <div class="col-sm-7">
+                            <div class="py-2">
+                                <div class="custom-control custom-radio custom-control-inline">
+                                    <input type="radio" class="custom-control-input" id="Partnership" name="Firm" value="Partnership">
+                                    <label class="custom-control-label" for="Partnership">Partnership</label>
+                                </div>
+                                <div class="custom-control custom-radio custom-control-inline">
+                                    <input type="radio" class="custom-control-input" id="Proprietary" name="Firm" value="Proprietary">
+                                    <label class="custom-control-label" for="Proprietary">Proprietary</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6" id="IdDIVCompanyAs">
+                    <div class="form-group row">
+                        <label for="inputName" class="col-sm-4 col-form-label ">Company as<span class="text-danger">*</span></label>
+                        <div class="col-sm-8">
+                            <div class="py-2">
+                                <div class="custom-control custom-radio custom-control-inline">
+                                    <input type="radio" class="custom-control-input" id="Private" name="Company" value="Private">
+                                    <label class="custom-control-label" for="Private">Private</label>
+                                </div>
+                                <div class="custom-control custom-radio custom-control-inline">
+                                    <input type="radio" class="custom-control-input" id="PublicLimited" name="Company" value="PublicLimited">
+                                    <label class="custom-control-label" for="PublicLimited">Public Limited</label>
+                                </div>
+                                <div class="custom-control custom-radio custom-control-inline">
+                                    <input type="radio" class="custom-control-input" id="PSU" name="Company" value="PSU">
+                                    <label class="custom-control-label" for="PSU">PSU</label>
+                                </div>
+                                <div class="custom-control custom-radio custom-control-inline">
+                                    <input type="radio" class="custom-control-input" id="Joint_Venture" name="Company" value="JointVenture">
+                                    <label class="custom-control-label" for="Joint_Venture">Joint Venture</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6" id="IdDIVAadhar">
+                    <div class="form-group row">
+                        <label for="inputMail" class="col-sm-4 col-form-label ">Aadhaar Card Number <span class="text-danger">*</span></label>
+                        <div class="col-sm-7">
+                            <input id="AadhaarNumber" maxlength="12" name="AadhaarNumber" type="text" class="form-control">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6" id="IdDIVNameOfCompany">
+                    <div class="form-group row">
+                        <label for="inputMail" class="col-sm-4 col-form-label ">Name of Company / Firm / Association<span class="text-danger">*</span></label>
+                        <div class="col-sm-7">
+                            <input type="text" maxlength="50" id="CompanyName" name="CompanyName" class="form-control">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6" id="IdDIVGSTNo">
+                    <div class="form-group row">
+                        <label for="inputMail" class="col-sm-4 col-form-label ">GST No.<span class="text-danger">*</span></label>
+                        <div class="col-sm-7">
+                            <input id="TINNo" maxlength="15" name="TINNo" type="text" class="form-control">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="form-group row">
+                        <label for="inputMail" class="col-sm-4 col-form-label ">Name Of Applicant <span class="text-danger">*</span></label>
+                        <div class="col-sm-7">
+                            <input type="text" maxlength="100" id="TransporterName" name="TransporterName" class="form-control">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="form-group row">
+                        <label class="col-sm-4 col-form-label ">State<span class="text-danger">*</span></label>
+                        <div class="col-sm-7">
+                            <select id="StateId" name="StateId" class="form-control  searchableselect">
+                                <option value="">Select State</option>
+                                @{
+                                    List<TransporterModel> lsttransporterModels = (List<TransporterModel>)ViewData["StateDetails"];
+                                    if (lsttransporterModels != null)
+                                    {
+                                        foreach (var item in lsttransporterModels)
+                                        {
+                                            <option value="@item.StateId">@item.StateName</option>
+                                        }
+                                    }
+                                }
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="form-group row">
+                        <label for="inputMail" class="col-sm-4 col-form-label ">Mobile Number<span class="text-danger">*</span></label>
+                        <div class="col-sm-7">
+                            <input id="MobileNo" maxlength="10" name="MobileNo" type="text" class="form-control">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="form-group row">
+                        <label class="col-sm-4 col-form-label ">District<span class="text-danger">*</span></label>
+                        <div class="col-sm-7">
+                            <select id="DistrictId" name="DistrictId" class="form-control  searchableselect">
+                                <option value="">Select District</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="form-group row">
+                        <label for="dropdownDepart" class="col-sm-4 col-form-label ">PAN Card Number<span class="text-danger">*</span></label>
+                        <div class="col-sm-7">
+                            <input id="PAN" name="PAN" maxlength="10" type="text" class="form-control">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="form-group row">
+                        <label for="inputName" class="col-sm-4 col-form-label ">Pin Code<span class="text-danger">*</span></label>
+                        <div class="col-sm-7">
+                            <input id="PinCode" maxlength="6" name="PinCode" type="text" class="form-control">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="form-group row">
+                        <label for="inputMail" class="col-sm-4 col-form-label ">Complete Address<span class="text-danger">*</span></label>
+                        <div class="col-sm-7">
+                            <textarea id="Address" maxlength="500" name="Address" class="form-control" rows="1"></textarea>
+                            <small class="text-danger">Maximum <strong>500</strong> characters</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="form-group row">
+                        <label for="dropdownDepart" class="col-sm-4 col-form-label ">E-mail ID<span class="text-danger">*</span></label>
+                        <div class="col-sm-7">
+                            <input type="text" id="EmailID" maxlength="50" name="EmailID" class="form-control">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="form-group row">
+                        <label for="inputMail" class="col-sm-4 col-form-label ">Security Question<span class="text-danger">*</span></label>
+                        <div class="col-sm-7">
+                            <select id="SQuestionId" name="SQuestionId" class="form-control">
+                                <option>select</option>
+                                @{
+                                    List<TransporterModel> lstSQuestion = (List<TransporterModel>)ViewData["SQuestion"];
+                                    if (lstSQuestion != null)
+                                    {
+                                        foreach (var item in lstSQuestion)
+                                        {
+                                            <option value="@item.SQuestionId">@item.SQuestion</option>
+                                        }
+                                    }
+                                }
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="form-group row">
+                        <label for="inputMail" class="col-sm-4 col-form-label ">Answer<span class="text-danger">*</span></label>
+                        <div class="col-sm-7">
+                            <input id="SQAnswer" maxlength="50" name="SQAnswer" type="text" class="form-control">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="form-group row">
+                        <label for="inputMail" class="col-sm-4 col-form-label ">Enter Captcha<span class="text-danger">*</span></label>
+                        <div class="col-sm-7">
+                            <input id="captcha" name="captcha" type="text" class="form-control">
+                        </div>
+
+
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="form-group row">
+
+                        <div class="col-sm-4">
+                            <div class="input-group">
+                                <div id="capt1" class="form-control" ondrag="return false" oncopy="return false" onselectstart="return false" oncut="return false"></div>
+                                <label class="input-group-text" for="inputDate1"> <a href="javascript:;" onclick="updateCaptcha();"><i class="fas fa-sync-alt"></i></a> </label>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="col-sm-6">
+                    <div class="form-group row">
+                        <label for="inputMail" class="col-sm-4 col-form-label ">Enter OTP<span class="text-danger">*</span></label>
+                        <div class="col-sm-7">
+                            <input type="text" id="VerifyOTP" name="VerifyOTP" class="form-control">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <a href="javascript:void(0);" id="btnsendOtp" class="btn btn-success btn-md ml-0 waves-effect waves-light">Send OTP</a>
+
+                </div>
+                <div class="col-sm-12">
+                    <div class="form-group row">
+                        <div class="custom-control custom-checkbox ml-2">
+                            <input type="checkbox" class="custom-control-input" name="chkIagree" id="chkIagree">
+                            <label class="custom-control-label text-danger" for="chkIagree">
+                                Declaration - I declare that all the information given above is true as per my knowledge and belief. I am aware that if any of the above information is found to be false or untrue, there may be penalty / penalty under the appropriate rules.
+                                The Department of Mineral Resources will not be responsible for authenticating any of the above information.
+                            </label>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+            <div class="col-sm-12">
+                <div class="form-group row" id="divButtons">
+                    <input type="submit" onclick="return ValidateForm()" class="btn btn-primary btn-md ml-0" name="Submit" id="Submit" value="Submit" />
+                    <a href="/VehicleOwner/VehicleOwner/Registration" class="btn btn-danger btn-md">Clear</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+    @(Html.HiddenFor(model => model.PaymentMode))
+    @(Html.HiddenFor(model => model.PaymentBank))
+    @(Html.HiddenFor(model => model.RegistrationFees))
+    @(Html.HiddenFor(model => model.RegistrationFeesId))
+    @(Html.HiddenFor(model => model.TransactionalID))
+</form>
+
+
+@{
+    if (ViewBag.msg == "1")
+    {
+        <script>
+               swal("","You are successfully registered in Khanij Online System as a Vehicle Owner. Your Registration Number is @ViewBag.UserCode. Your User Name is @ViewBag.UserName and Password is @ViewBag.Password .","success");
+        </script>
+    }
+
+}
+
+<script>
+    $(document).ready(function () {
+        debugger;
+        $('#IdDIVGSTNo').hide();
+        $('#IdDIVFirmAs').hide();
+        $('#IdDIVCompanyAs').hide();
+        $('#IdDIVNameOfCompany').hide();
+        $('#IdDIVAadhar').show();
+
+        //--------------------------
+        if ($('input[name="chkIagree"]:checked').length > 0) {
+            $('#divButtons').show();
+            $(this).attr('checked', true);
+        }
+        else {
+            $('#divButtons').hide();
+            $(this).attr('checked', false);
+        }
+        //--------------------------------
+        updateCaptcha();
+        $('.selectpicker').selectpicker();
+        $('.searchableselect').searchableselect();
+
+    });
+
+    function updateCaptcha() {
+        debugger;
+        $.ajax({
+            url: '/VehicleOwner/VehicleOwner/CaptchaImage',
+            data: {},
+            dataType: 'json',
+            type: 'post',
+            success: function (data) {
+                $("#capt1").html(data);
+            },
+            error: function (err) {
+                swal("", err.responseText, "warning");
+            }
+        });
+    }
+
+    function onRadioChange() {
+        if ($("#Firm").is(":checked")) {
+            $('#IdDIVGSTNo').show();
+            $('#IdDIVFirmAs').show();
+            $('#IdDIVCompanyAs').hide();
+            $('#IdDIVNameOfCompany').show();
+            $('#IdDIVAadhar').hide();
+        }
+        else if ($("#Company").is(":checked")) {
+            $('#IdDIVGSTNo').show();
+            $('#IdDIVFirmAs').hide();
+            $('#IdDIVCompanyAs').show();
+            $('#IdDIVNameOfCompany').show();
+            $('#IdDIVAadhar').hide();
+        }
+        else if ($("#Association").is(":checked")) {
+            $('#IdDIVGSTNo').show();
+            $('#IdDIVFirmAs').hide();
+            $('#IdDIVCompanyAs').hide();
+            $('#IdDIVNameOfCompany').show();
+            $('#IdDIVAadhar').hide();
+        }
+        else {
+            $('#IdDIVGSTNo').hide();
+            $('#IdDIVFirmAs').hide();
+            $('#IdDIVCompanyAs').hide();
+            $('#IdDIVNameOfCompany').hide();
+            $('#IdDIVAadhar').show();
+        }
+    }
+
+    $('#PAN').keypress(function (e) {
+        var regex = new RegExp("^[a-zA-Z0-9]+$");
+        var str = String.fromCharCode(!e.charCode ? e.which : e.charCode);
+        if (regex.test(str)) {
+            return true;
+        }
+
+        e.preventDefault();
+        return false;
+    });
+
+    $('#TINNo').keypress(function (e) {
+        var regex = new RegExp("^[a-zA-Z0-9]+$");
+        var str = String.fromCharCode(!e.charCode ? e.which : e.charCode);
+        if (regex.test(str)) {
+            return true;
+        }
+
+        e.preventDefault();
+        return false;
+    });
+
+
+    $("#PinCode").keydown(function (e) {
+        // Allow: backspace, delete, tab, escape, enter and .
+        if ($.inArray(e.keyCode, [46, 8, 9, 27, 13, 110, 190]) !== -1 ||
+            // Allow: Ctrl+A, Command+A
+            (e.keyCode === 65 && (e.ctrlKey === true || e.metaKey === true)) ||
+            // Allow: home, end, left, right, down, up
+            (e.keyCode >= 35 && e.keyCode <= 40)) {
+            // let it happen, don't do anything
+            return;
+        }
+        // Ensure that it is a number and stop the keypress
+        if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) {
+            e.preventDefault();
+        }
+    });
+
+
+    $("#MobileNo").keydown(function (e) {
+        // Allow: backspace, delete, tab, escape, enter and .
+        if ($.inArray(e.keyCode, [46, 8, 9, 27, 13, 110, 190]) !== -1 ||
+            // Allow: Ctrl+A, Command+A
+            (e.keyCode === 65 && (e.ctrlKey === true || e.metaKey === true)) ||
+            // Allow: home, end, left, right, down, up
+            (e.keyCode >= 35 && e.keyCode <= 40)) {
+            // let it happen, don't do anything
+            return;
+        }
+        // Ensure that it is a number and stop the keypress
+        if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) {
+            e.preventDefault();
+        }
+    });
+
+    $('#AadhaarNumber').keypress(function (e) {
+        var regex = new RegExp("^[0-9]+$");
+        var str = String.fromCharCode(!e.charCode ? e.which : e.charCode);
+        if (regex.test(str)) {
+            return true;
+        }
+
+        e.preventDefault();
+        return false;
+    });
+
+    $('#StateId').change(function () {
+        if ($('#StateId').val() != "") {
+            $.ajax({
+                url: '/VehicleOwner/VehicleOwner/GetDistrictByStateId',
+                data: { 'StateId': $('#StateId').val() },
+                dataType: 'json',
+                type: 'post',
+                success: function (data) {
+                    var row = "";
+                    $('#DistrictId').html('');
+                    row += "<option value=''>Select District</option>";
+                    $.each(data, function (ind, item) {
+                        row += "<option value='" + item.districtId + "'>" + item.districtName + "</option>";
+                    });
+                    $('#DistrictId').html(row);
+                },
+                error: function (err) {
+
+                }
+            });
+        }
+        else {
+            var District = "";
+            $('#DistrictId').html('');
+            District += "<option value=''>Select District</option>";
+            $('#DistrictId').html(District);
+        }
+    });
+
+    function ValidateForm() {
+        var btnval = $('input[name=TransporterTypeStatus]:checked').val();
+        if (btnval == "Individual/Proprietor") {
+            if ($("#AadhaarNumber").val() == "") {
+                swal("", "Please enter Aadhaar Number", "warning");
+                // swal("", "Please enter Aadhaar Number", "warning");
+                $("#AadhaarNumber").focus();
+                return false;
+            }
+            if ($("#AadhaarNumber").val().length != 12) {
+                swal("", "Please Enter Valid Aadhaar Card Number !", "warning");
+                $("#AadhaarNumber").focus();
+                return false;
+            }
+
+        }
+
+        if (btnval == "Firm") {
+            if (!$('input[name=Firm]:checked').val()) {
+                swal("", "Please Choose Firm As", "warning"); 
+                return false;
+            }
+            if ($("#CompanyName").val()=="") {
+                swal("", "Please Enter Name Of Company", "warning");
+                $("#CompanyName").focus();
+                return false;
+            }
+            if ($('#TINNo').val() == "") {
+                swal("", "Please Enter GST Number", "warning");
+                $("#TINNo").focus();
+                return false;
+            }
+            if ($('#TINNo').val().length !=15) {
+                swal("", "Please Enter Valid GST Number", "warning");
+                $("#TINNo").focus();
+                return false;
+            }
+
+        }
+
+        if (btnval == "Association") { 
+            if ($("#CompanyName").val() == "") {
+                swal("", "Please Enter Name Of Company", "warning");
+                $("#CompanyName").focus();
+                return false;
+            }
+            if ($('#TINNo').val() == "") {
+                swal("", "Please Enter GST Number", "warning");
+                $("#TINNo").focus();
+                return false;
+            }
+            if ($('#TINNo').val().length != 15) {
+                swal("", "Please Enter Valid GST Number", "warning");
+                $("#TINNo").focus();
+                return false;
+            }
+
+        }
+
+        if (btnval == "Company") {
+
+            if (!$('input[name=Company]:checked').val()) {
+                swal("", "Please Choose Company As", "warning");
+                return false;
+            }
+
+            if ($("#CompanyName").val() == "") {
+                swal("", "Please Enter Name Of Company", "warning");
+                $("#CompanyName").focus();
+                return false;
+            }
+            if ($('#TINNo').val() == "") {
+                swal("", "Please Enter GST Number", "warning");
+                $("#TINNo").focus();
+                return false;
+            }
+            if ($('#TINNo').val().length != 15) {
+                swal("", "Please Enter Valid GST Number", "warning");
+                $("#TINNo").focus();
+                return false;
+            }
+
+        }
+
+        if ($("#TransporterName").val() == "") {
+            swal("", "Please enter Transporter Name", "warning");
+            $("#TransporterName").focus();
+            return false;
+        }
+
+
+        if (CheckSpaceAtFirstPlaceAndLastPlace($("#TransporterName").val()) == false) {
+            swal("", "Please Check Transporter Name For Spaces at Beginning And End Place", "warning");
+            $("#TransporterName").focus();
+            return false;
+        }
+
+        if ($("#StateId").val() == "") {
+            swal("", "Please select State Name ", "warning");
+            $("#StateId").focus();
+            return false;
+        }
+
+        if ($("#MobileNo").val() == "") {
+            swal("", "Please enter Mobile ", "warning");
+            $("#MobileNo").focus();
+            return false;
+        }
+        if ($("#MobileNo").val().length != 10) {
+            swal("", "Please enter Valid Mobile ", "warning");
+            $("#MobileNo").focus();
+            return false;
+        }
+        if ($("#DistrictId").val() == "") {
+            swal("", "Please select District ", "warning");
+            $("#DistrictId").focus();
+            return false;
+        }
+        if ($("#PAN").val() == "") {
+            swal("", "Please enter PAN number ", "warning");
+            $("#PAN").focus();
+            return false;
+        }
+        if ($("#PAN").val().length != 10) {
+            swal("", "Please Enter Valid PAN Number !", "warning");
+            $("#PAN").focus();
+            return false;
+        }
+        if ($("#PinCode").val() == "") {
+            swal("", "Please enter Pincode ", "warning");
+            $("#PinCode").focus();
+            return false;
+        }
+        if ($("#PinCode").val().length !=6) {
+            swal("", "Please enter Valid Pincode ", "warning");
+            $("#PinCode").focus();
+            return false;
+        }
+        if ($("#Address").val() == "") {
+            swal("", "Please enter Address ", "warning");
+            $("#Address").focus();
+            return false;
+        }
+
+        if (CheckSpaceAtFirstPlaceAndLastPlace($("#Address").val()) == false) {
+            swal("", "Please Check Address For Spaces at Beginning And End Place", "warning");
+            $("#Address").focus();
+            return false;
+        }
+        if ($("#EmailID").val() == "") {
+            swal("", "Please enter EmailID ", "warning");
+            $("#EmailID").focus();
+            return false;
+        }
+        if (ValidateEmailAddress(document.getElementById("EmailID")) == false) {
+            swal("", "Please Enter Valid EmailId", "warning");
+            $("#EmailID").focus();
+            return false;
+        }
+
+        if ($("#SQuestionId").val() == "") {
+            swal("", "Please Select Question ", "warning");
+            $("#SQuestionId").focus();
+            return false;
+        }
+        if ($("#SQAnswer").val() == "") {
+            swal("", "Please enter your Answer ", "warning");
+            $("#SQAnswer").focus();
+            return false;
+        }
+        if (CheckSpaceAtFirstPlaceAndLastPlace($("#SQAnswer").val()) == false) {
+            swal("", "Please Check Security Answer For Spaces at Beginning And End Place", "warning");
+            $("#SQAnswer").focus();
+            return false;
+        }
+        if ($("#captcha").val() == "") {
+            swal("", "Please enter captcha ", "warning");
+            $("#captcha").focus();
+            return false;
+        }
+
+        if ($("#capt1").html() != $("#captcha").val()) {
+            swal("", "In Valid captcha!", "warning");
+            $("#captcha").focus();
+            updateCaptcha();
+            return false;
+        }
+
+        return true;
+    }
+
+    $("#btnsendOtp").click(function () {
+        debugger;
+        if (ValidateForm()) {
+            var mobileNumber = $("#MobileNo").val();
+            var EmailID = $("#EmailID").val();
+
+            if (mobileNumber == "") {
+                swal("", "Please enter mobile number", "warning");
+                $('#MobileNo').focus();
+                return false;
+            }
+            else {
+                $('#btnsendOtp').attr('readonly', 'readonly');
+
+                $.ajax({
+                    url: '/VehicleOwner/VehicleOwner/SendOTP',
+                    dataType: "",
+                    type: "POST",
+                    data: {
+                        MobileNumber: mobileNumber,
+                        EmailID: EmailID
+                    },
+                    success: function (data) {
+                        debugger;
+                        console.log(data);
+                        if (data != null) {
+                            $('#btnsendOtp').removeAttr('readonly');
+                            if (data == "SUCCESS") {
+                                swal("", "Enter Verification Code received on submitted Mobile/Email Id", "success");
+                            }
+                            else {
+                                swal("", data, "warning");
+                            }
+                        }
+                    }
+                })
+            }
+        }
+    });
+
+    $('#chkIagree').click(function () {
+        if (ValidateForm()) {
+            if ($('#VerifyOTP').val() != "") {
+                $.ajax({
+                    url: '/VehicleOwner/VehicleOwner/VerifyOTP',
+                    data: {
+                        OTP: $('#VerifyOTP').val(),
+                        MobileNumber: $("#MobileNo").val(),
+                        EmailID: $("#EmailID").val()
+                    },
+                    success: function (result) {
+                        if (result == "SUCCESS") {
+                            if ($('input[name="chkIagree"]:checked').length > 0) {
+                                $('#divButtons').show();
+                                $(this).attr('checked', 'checked');
+
+                            }
+
+                            else {
+                                $('#divButtons').hide();
+                                ChangeCheckBoxStatus();
+                            }
+                        }
+                        else if (result == "REQUIRED") {
+                            swal("", "Please enter mobile number and e-mail and OTP !", "warning");
+                            $('#divButtons').hide();
+                            ChangeCheckBoxStatus();
+                        }
+                        else {
+                            swal("", "This is an invalid OTP.Please send another OTP and try again !", "warning");
+                            $('#divButtons').hide();
+                            ChangeCheckBoxStatus();
+                        }
+                    },
+                    error: function (result) {
+                        swal("", "OTP Verification failed.Please try again !", "warning");
+                        $('#divButtons').hide();
+                        ChangeCheckBoxStatus();
+                    }
+                });
+            }
+            else {
+                $('#chkIagree').prop('checked', false);
+                swal("", "Please Enter OTP", "warning");
+                $('#divButtons').hide();
+                ChangeCheckBoxStatus();
+                return false;
+            }
+        }
+        else {
+
+            $('#divButtons').hide();
+            ChangeCheckBoxStatus();
+        }
+
+    });
+
+    function ChangeCheckBoxStatus() {
+        if ($('input[type="checkbox"]').is(':checked') == true) {
+            $('input[type="checkbox"]').prop('checked', false);
+        }
+    }
+
+    function CheckSpaceAtFirstPlaceAndLastPlace(str) {
+        var regex = /^(?!\s)(?![\s\S]*\s$)[a-zA-Z0-9\s()-]+$/;
+        return regex.test(str);
+    }
+
+    $("#EmailID").keydown(function (evt) {
+        debugger;
+        evt = (evt) ? evt : window.event;
+        var charCode = (evt.which) ? evt.which : evt.keyCode;
+        if (charCode == 32) {
+            return false;
+        }
+        return true;
+
+    });
+
+    function ValidateEmailAddress(inputText) {
+        debugger;
+        var mailformat = /^\w+([\.-]?\w+)@@\w+([\.-]?\w+)(\.\w{2,3})+$/;
+        if (inputText.value.match(mailformat)) {
+            inputText.focus();
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+</script>
+
+
+

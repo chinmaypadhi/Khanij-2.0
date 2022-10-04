@@ -1,0 +1,293 @@
+﻿@using Microsoft.AspNetCore.Mvc.Localization
+@using userregistrationApp.Services;
+@inject IHtmlLocalizer<CommonResources> SharedLocalizer
+@inject CommonLocalizationService commonlocalizer
+@inject Microsoft.Extensions.Options.IOptions<userregistrationEF.KeyList> metaOptions
+
+@{
+    var options = metaOptions.Value;
+}
+<!DOCTYPE html>
+<html lang="en">
+<head id="Head1">
+    <meta http-equiv="content-type" content="text/html;charset=UTF-8" />
+    <meta charset="utf-8" />
+    <title>Khanij Online - Home</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta content="" name="description" />
+    <meta content="" name="author" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <link href="~/CMScss/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/CMScss/all.min.css" rel="stylesheet" />
+    <link href="~/CMScss/khanij-icon.css" rel="stylesheet" />
+    <link href="~/CMScss/common.css" rel="stylesheet" />
+    <link href="~/CMScss/home.css" rel="stylesheet" />
+    <link href="~/CMScss/inner.css" rel="stylesheet" />
+    <link href="~/CMScss/homeicomoon.css" rel="stylesheet" />
+    <link rel="stylesheet" href="~/CMScss/owl.carousel.min.css">
+    <link rel="stylesheet" href="~/CMScss/perfect-scrollbar.css" />
+    <link href="~/CMScss/lightgallery.css" rel="stylesheet" />
+    <link rel="stylesheet" href="~/CMScss/animate.css">
+    <link href="~/CMScss/Scrollspy.css" rel="stylesheet" type="text/css">
+    <link href="~/CMScss/customBlack.css" rel="alternate stylesheet" type="text/css" media="screen" title="black" />
+    <link rel="stylesheet" type="text/css" href="~/CMScss/bootstrap-select.min.css">
+    <link href="~/CMScss/bootstrap-datetimepicker.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="~/CMScss/searchable-select.min.css"> 
+    <script src="~/CMSjs/jquery.min.js"></script>
+    <script src="~/CMSjs/specialChar.js"></script>
+    <script src="~/CMSjs/CSMValidation.js"></script>
+    <script src="~/CMSjs/sweetalert.min.js"></script>
+    <script>
+        $(document).ready(function () {
+
+            updateCaptchaFeedBack();
+
+            $("#btnFeedBack").click(function () {
+                debugger;
+                var Iss = false;
+
+                if (!blankFieldValidation("FULL_NAME", "Full Name")) {
+                    return false;
+                }
+                else if (!blankFieldValidation("MAIL_ID", "E Mail")) {
+                    return false;
+                }
+                else if (!ValidateEmail($('#MAIL_ID').val())) {
+                    swal("", "Please Enter valid Email Id", "warning");
+                    return false;
+                }
+                else if (!blankFieldValidation("FEEDBACK", "Feedback")) {
+                    return false;
+                }
+                else if (!blankFieldValidation("txtCaptcha", "Captcha Required")) {
+                    return false;
+                }
+                else if ($('#capt1').html() != $('#txtCaptcha').val()) {
+                    alert('Invalid Captcha');
+                    return false;
+                }
+                Iss = true;
+                return Iss;
+            });
+        });
+
+        function updateCaptchaFeedBack() {
+            debugger;
+
+            $.ajax({
+                url: '/Home/CaptchaImage',
+                data: {},
+                dataType: 'json',
+                type: 'post',
+                success: function (data) {
+                    $("#captFeedBack").html(data);
+                },
+                error: function (err) {
+                    alert(err);
+                }
+            });
+        }
+    </script>
+
+</head>
+
+<body class="landing-screen">
+    <header>
+        <div class="top-menu">
+            <div class="header">
+                <nav class="navbar">
+                    <a class="navbar-brand" href="@options.HomeUrl">
+                        <img src="../../CMSimg/govt-logo.png" class="login-logo" alt="Logo" />
+                        <h1 class="mb-1">
+                            @SharedLocalizer["Mineral Resources Department"]
+                            <small class="d-block">@commonlocalizer.Get("Government of Chhattisgarh")</small>
+                        </h1>
+                    </a>
+                    <div class="ml-lg-auto contact-culm">
+                        <a href="javascript:void(0);" class="toplnk-mobile d-block d-lg-none"><i class="fas fa-ellipsis-v"></i> </a>
+                        <ul class="top-link mb-2">
+                            <li class="nav-item language-change">
+                                <partial name="_Culture" />
+                            </li>
+                            <li class="font-increase-decrease ">
+                                <a href="javascript:decreaseFontSize();" class="fontresize" title="Decrease Font Size">A<sup>-</sup></a>
+                                <a href="javascript:reSetFontSize();" class="fontresize" title="Normal Font Size">A</a>
+                                <a href="javascript:increaseFontSize();" class="fontresize" title="Increase Font Size">A<sup>+</sup></a>
+                            </li>
+                            <li>
+                                <a href="javascript:void(0)" onclick="chooseStyle('none', 60);" title="Normal View" class="white-theme"></a>
+                                <a href="javascript:void(0)" onclick="chooseStyle('black', 60);" title="Contrast View" class="dark-theme  mr-2"></a>
+                            </li>
+                            
+
+                        </ul>
+
+                        <ul class="contact-dtls mb-0 align-items-sm-center">
+                            <li>
+                                <i class="icon-call mr-2"></i>
+                                <h6 class="mb-0">
+                                    <small class="d-block">@SharedLocalizer["Call Us"] </small>
+                                    <a href="tel:1800 233 3767">1800 233 3767</a>
+                                </h6>
+                            </li>
+                            <li class="pr-0">
+                                <i class="icon-mail mr-2"></i>
+                                <h6 class="mb-0">
+                                    <small class="d-block">@SharedLocalizer["Mail Us"] </small>
+                                    <a href="mailto:khanijonline@gmail.com">khanijonline@gmail.com</a>
+                                </h6>
+                            </li>
+
+                        </ul>
+                    </div>
+                </nav>
+            </div>
+        </div>
+        <nav class="navbar navbar-expand-lg navbar-dark menu-bar shadow-sm">
+
+            <a class="navbar-toggler" href="javascript:void(0);" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <i class="fas fa-bars"></i> <span>Menu</span>
+            </a>
+
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav align-items-lg-center mr-auto" id="ulMainmenu">
+                    <li class="nav-item">
+                        <a class="nav-link" href="@options.HomeUrl"><span class="fas fa-home"></span> <span class="sr-only">(current)</span></a>
+                    </li>
+                     
+                </ul>
+
+            </div>
+            <ul class="khanij-online d-flex list-type-none">
+                <li>
+
+                    <a href="/Home/Index" title="Web based mines & minerals management system">
+                        <img src="~/CMSimg/khanij-online.jpg" alt="Khanij Online" class="mr-4" />
+                        <span class="web-based-title"> @SharedLocalizer["Web based mines minerals"] <br /> @SharedLocalizer["management system"]</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" title="MRD Dealing" class="text-uppercase text-white mrd-btn"><i class="icon-mrd_dealing mr-2"></i>@SharedLocalizer["mrd dealing"] </a>
+                </li>
+            </ul>
+
+        </nav>
+    </header>
+
+    @RenderBody()
+    <footer class="fp-section footer-container">
+        <div class="container py-5">
+            <div class="row">
+                <div class="col-lg-5 col-md-6 col-sm-12 pb-lg-0  pb-4">
+                    <h4 class="text-white  ">@SharedLocalizer["Statistical Report"] </h4>
+                    <ul class="footer-top-links">
+                        <li><a href="#">@SharedLocalizer["Year Wise Revenue Collected Reported"] </a></li>
+                        <li><a href="#">@SharedLocalizer["Year Wise Dispatch Report for Buaxite , Iron Ore and Coal"] </a></li>
+                        <li><a href="#">@SharedLocalizer["Sale Value Report for Bauxite, Iron Ore & Cool Mines Wise"]</a></li>
+                        <li><a href="#">@SharedLocalizer["Yearly Production and Deducation Report"]</a></li>
+                        <li><a href="#">@SharedLocalizer["Mine Wise and Grade Wise"] </a></li>
+                        <li><a href="#">@SharedLocalizer["Monthly Pit Mouth Value"] </a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-3 col-md-6 col-sm-12 pb-lg-0  pb-4">
+                    <h4 class="text-white ">@SharedLocalizer["Address"] </h4>
+                    <ul class="address footer-top-links">
+                        <li class="location mb-4">
+                            @SharedLocalizer["Indravati  Bhavan, Block-4 Second Floor"]
+                            <br />@SharedLocalizer["News Raipur Atal Nagar, Chhattigarh, India"]
+                        </li>
+                        <li class="phoneno"><a href="#">+91-771-2221840 , 2221844,2221849</a></li>
+                        <li class="gmail"><a href="#">dgm.cg@nic.in</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-4 col-md-12 col-sm-12">
+                    <h4 class="font-weight-bold text-white mb-3 wow fadeInUp owl-loaded owl-drag" data-wow-duration="3s" style="visibility: visible; animation-duration: 3s; animation-name: fadeInUp;">@SharedLocalizer["Feedback"]</h4>
+
+                    <form id="formfeedback" autocomplete="off">
+                        <div class="row form-group pt-2">
+                            <div class="col">
+                                <input type="text" name="FULL_NAME" id="FULL_NAME" class="form-control" onkeypress="return inputLimiter(event,'NameCharactersAndNumbers')" placeholder="Your Name" />
+
+                            </div>
+                            <div class="col">
+                                <input type="text" name="MAIL_ID" id="MAIL_ID" class="form-control" placeholder="Email Id" />
+                            </div>
+                        </div>
+                        <div class="row form-group">
+                            <div class="col">
+                                <input type="text" name="FEEDBACK" id="FEEDBACK" class="form-control" onkeypress="return inputLimiter(event,'NameCharactersAndNumbers')" placeholder="Enter Message" />
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-12 col-md-6 mb-3">
+                                <div class="input-group">
+                                    <input type="text" id="txtCaptcha" class="form-control" placeholder="Captcha" aria-label="Recipient's username" aria-describedby="basic-addon2">
+                                    <div class="input-group-append">
+                                        <div class="input-group-text" id="basic-addon2">
+                                            <div id="captFeedBack" ondrag="return false" oncopy="return false" onselectstart="return false" oncut="return false" class="mr-2"></div>
+                                            <a href="javascript:void(0);" onclick="updateCaptchaFeedBack();">
+                                                <i class="fas fa-redo"></i>
+                                            </a>
+                                        </div>
+                                    </div>
+
+
+                                </div>
+                            </div>
+                            <div class="col-lg-12 col-md-6 mt-md-0  mt-3">
+                                <input type="submit" value="Submit" name="Submit" class="btn btn-danger" id="btnFeedBack">
+                            </div>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+
+        </div>
+
+        <div class="footer-links">
+            <ul>
+                @Html.Raw((String)ViewData["FootermenuTable"])
+                @*<li><a href="#">Home</a></li>
+                    <li><a href="#">Privacy Policy</a></li>
+                    <li><a href="#">Terms of use</a></li>
+                    <li><a href="#">Sitemap</a></li>*@
+            </ul>
+        </div>
+
+        <div class="text-center copyright-text">
+            <p class="mb-1">Visitor No. <span class="font-weight-bold text-warning">6224754</span></p>
+            <p class="mb-0">
+                &copy; @SharedLocalizer["Department of Geology & Mining, Goverment of Chhattigarh. All right reserved"]
+            </p>
+        </div>
+
+
+    </footer>
+    @RenderSection("Scripts", required: false)
+    <input type="hidden" id="hdnMainmenu" value="@ViewData["MainmenuTable"]" />
+    <script>
+        $(document).ready(function () {
+            $('#ulMainmenu').append($('#hdnMainmenu').val());
+        });
+    </script>
+    <script src="~/CMSjs/popper.min.js"></script>
+    <script src="~/CMSjs/owl.carousel.min.js"></script>
+    <script src="~/CMSjs/bootstrap.min.js"></script>
+    <script src="~/CMSjs/districtDetails.js"></script>
+    <script src="~/CMSjs/distwiseactive.js"></script>
+    <script src="~/CMSjs/wow.min.js"></script>
+    <script src="~/CMSjs/highcharts.js"></script>
+    <script src="~/CMSjs/lightgallery-all.min.js"></script>
+    <script src="~/CMSjs/styleswitch.js"></script>
+    <script src="~/CMSjs/website.js"></script>
+    <script src="~/CMSjs/bootstrap-select.min.js"></script>
+    <script src="~/CMSjs/moment.min.js"></script>
+    <script src="~/CMSjs/bootstrap-datetimepicker.min.js"></script>
+    <script src="~/CMSjs/searchable-select.min.js"></script>
+    <link rel="stylesheet" href="~/CMScss/dataTables.bootstrap4.min.css">
+    <script src="~/CMSjs/jquery.dataTables.min.js"></script>
+    <script src="~/CMSjs/dataTables.bootstrap4.min.js"></script>
+
+</body>
+</html>

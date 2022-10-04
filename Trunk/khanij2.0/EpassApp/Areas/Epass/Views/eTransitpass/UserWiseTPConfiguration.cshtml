@@ -1,0 +1,197 @@
+﻿@*// ***********************************************************************
+    //  View Name                : UserWiseTPConfiguration
+    //  Desciption               : Used to generate UserWiseTPConfiguration
+    //  Created By               : shyam rahangdale
+    //  Created On               : 04-01-2022
+    // ************************************************************************@
+@model EpassEF.UserWiseTPConfigurationViewModel
+@{
+    ViewData["Title"] = "UserWiseTPConfiguration";
+
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@inject EpassApp.KhanijSecurity.KhanijIDataProtection protector;
+@if (TempData["Masg"] != null)
+{
+    <script>
+        swal("",'@TempData["Masg"]', "success");
+    </script>
+    TempData["Masg"] = null;
+}
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        @Html.Partial("_navigation")
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="javascript:void(0)">
+                                Add
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link" href="@Url.Content("~/EPass/eTransitPass/ListUserWiseTPConfiguration")">
+                                View
+                            </a>
+                        </li>
+
+                    </ul>
+                    @Html.Partial("_util")
+                </div>
+
+                <section class="box form-container">
+                    <div class="content-body">
+                        @using (Html.BeginForm("UserWiseTPConfiguration", "eTransitPass", FormMethod.Post, new { @id = "formUserWiseTPConfiguration" }))
+                        {
+                            @Html.AntiForgeryToken();
+                            @Html.HiddenFor(m => m.ID)
+                            <div class="row">
+                                <div class="col">
+                                    <div class="form-group row">
+                                        <label class="col-lg-4  col-form-label font-weight-bolder">District <span class="text-danger">*</span></label>
+                                        <div class="col-lg-8 ">
+                                            <div class="py-2">
+                                                @Html.DropDownListFor(m => m.DistrictID, ViewBag.DistrictList as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control form-control-sm searchableselect" })
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col">
+                                    <div class="form-group row">
+                                        <label class="col-lg-4 col-form-label font-weight-bolder">User Type<span class="text-danger">*</span></label>
+                                        <div class="col-lg-8">
+                                            <div class="py-2">
+                                                @Html.DropDownListFor(m => m.UserTypeID, ViewBag.UserTypeList as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control form-control-sm searchableselect" })
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                            </div>
+                            <div class="row">
+                                <div class="col">
+                                    <div class="form-group row">
+                                        <label class="col-lg-4  col-form-label font-weight-bolder">User Name<span class="text-danger">*</span></label>
+                                        <div class="col-lg-8">
+                                            @Html.TextBoxFor(m => m.UserID, new { @class = "form-control", @maxlength = 200, Onkeypress = "return inputLimiter(event,'NameCharactersAndNumbers')" })
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col">
+                                    <div class="form-group row">
+                                        <label class="col-lg-4 col-form-label font-weight-bolder">Transportation Mode<span class="text-danger">*</span></label>
+                                        <div class="col-lg-8">
+                                            <div class="py-2">
+                                                @Html.DropDownListFor(m => m.TransportationModeID, ViewBag.TransportationModeList as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control form-control-sm searchableselect" })
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <div class="row">
+                                <div class="col">
+                                    <div class="form-group row">
+                                        <label class="col-lg-4 col-form-label font-weight-bolder">Intigration With WB<span class="text-danger">*</span></label>
+                                        <div class="col-lg-8">
+                                            <div class="py-2">
+                                                @Html.RadioButtonFor(n => n.IntigrationWithWB, true, new { @checked = true, @class = "custom-radio", id = "Rdbtn_IntigrationWithWBYes" }) Yes
+                                                @Html.RadioButtonFor(n => n.IntigrationWithWB, false, new { @class = "custom-radio", id = "Rdbtn_IntigrationWithWBInactiveNO" })NO
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col">
+                                    <div class="form-group row">
+                                        <label class="col-lg-4 col-form-label font-weight-bolder">Stamping Validity<span class="text-danger">*</span></label>
+                                        <div class="col-lg-8">
+                                            <div class="py-2">
+                                                @Html.RadioButtonFor(n => n.CheckStampingValidity, true, new { @checked = true, @class = "custom-radio", id = "Rdbtn_CheckStampingValidityYes" }) Yes
+                                                @Html.RadioButtonFor(n => n.CheckStampingValidity, false, new { @class = "custom-radio", id = "Rdbtn_CheckStampingValidityNO" })NO
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+
+                                <div class="col">
+                                    <div class="form-group row">
+                                        <label class="col-lg-4 col-form-label font-weight-bolder">eTPGenration Mode<span class="text-danger">*</span></label>
+                                        <div class="col-lg-8">
+                                            <div class="py-2">
+                                                @Html.RadioButtonFor(n => n.eTPGenrationMode, "Paper", new { @checked = true, @class = "custom-radio", id = "Rdbtn_eTPGenrationModePaper" }) Paper
+                                                @Html.RadioButtonFor(n => n.eTPGenrationMode, "QR", new { @class = "custom -radio", id = "Rdbtn_eTPGenrationModeQR" })QR
+                                                @Html.RadioButtonFor(n => n.eTPGenrationMode, "Both", new { @class = "custom-radio", id = "Rdbtn_eTPGenrationModeBoth" })Both
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                            <div class="row">
+
+                                <div class="col-sm-6  offset-lg-2 offset-md-4">
+                                    <input type="submit" value='@ViewBag.Button' class="btn btn-primary btn-md ml-0" name="Submit" id="Submit" />
+                                    <input type="reset" name="Reset" class="btn btn-danger btn-md" value="Reset" />
+                                </div>
+                            </div>
+
+                        }
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN CONTENT AREA ENDS -->
+</section>
+
+<script>
+    $(document).ready(function () {
+        $("#Submit").click(function () {
+
+            if (!DropDownValidation("DistrictID", "District Name")) {
+
+                return false;
+            }
+            if (!DropDownValidation("UserTypeID", "User Type")) {
+
+                return false;
+            }
+            if (!DropDownValidation("TransportationModeID", "Transportation Mode")) {
+
+                return false;
+            }
+
+            if (!blankFieldValidation("UserName", "User Name")) {
+                return false;
+            }
+            if (!checkInput("eTPGenrationMode", "Genration Mode")) {
+                return false;
+            }
+
+
+        });
+        loadNavigation('UserWiseTPConfiguration', 'glempprofile', 'plofficetype', 'tl', 'eTransitPass', 'UserWiseTPConfiguration', ' ');
+        $('.searchableselect').searchableselect();
+
+        $('.shorting-lnk').click(function () {
+            $('.shorting-lnk i').toggleClass('fa-sort-amount-up-alt fa-sort-amount-down-alt ');
+        });
+
+    });
+</script>
+

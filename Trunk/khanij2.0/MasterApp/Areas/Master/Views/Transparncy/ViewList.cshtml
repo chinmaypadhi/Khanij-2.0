@@ -1,0 +1,143 @@
+﻿@model MasterEF.Transparncymaster
+@{
+    ViewData["Title"] = "ViewList";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+@using MasterApp.Web;
+@if (ViewBag.msg != null)
+{
+    <script>
+        swal("",'@ViewBag.msg',"success");
+    </script>
+}
+<script>
+
+    $(document).ready(function () {
+        loadNavigation('ViewList', 'glTMng', 'plTransparncy', 'tl', 'Master', 'Transparncy', '');
+
+        $('.searchableselect').searchableselect();
+    });
+</script>
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        @Html.Partial("_CMSnavigation")
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link" href="~/Master/Transparncy/Add">
+                                Add
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="javascript:void(0);">
+                                View
+                            </a>
+                        </li>
+                    </ul>
+                    @Html.Partial("_CMSutil")
+                </div>
+
+                <section class="box form-container">
+                    @using (Html.BeginForm("Viewlist", "Transparncy", FormMethod.Post, new { AUTOCOMPLETE = "Off", id = "form1" }))
+                    {
+                        <div class="search-box" style="display:none;">
+                            <div class="searchform px-3 pt-3">
+                                <div class="row">
+                                    <div class="col-sm-5">
+                                        <div class="form-group row">
+                                            <label for="inputText" class="col-sm-3 col-form-label">
+                                                Notice Text
+                                            </label>
+                                            <div class="col-sm-8">
+                                                @Html.TextBoxFor(m => m.NoticeText, new { @class = "form-control" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-5">
+                                        <div class="form-group row">
+                                            <div class="col-sm-9 offset-md-3">
+                                                <input type="submit" value="Show" name="Show1" />
+                                                @*<a href="#" class="btn btn-sm btn-success ml-0"> Show </a>*@
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                    <div class="content-body">
+                        <div class="legend-box">
+                            <ul class="d-flex mb-1 justify-content-end list-unstyled">
+                                <li><span class="bg-success"></span> Active</li>
+                                <li><span class="bg-warning"></span> Inactive</li>
+                            </ul>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <table id="table-exports" class="table table-sm table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th width="30"> Sl#</th>
+                                            <th>
+                                                Notice
+                                            </th>
+                                            <th>
+                                                Image
+                                            </th>
+                                            <th>
+                                                Status
+                                            </th>
+                                            <th>
+                                                Publish
+                                            </th>
+                                            <th width="100" class="noprint text-center">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+
+                                        @{ int i = 1;
+                                        }
+                                        @foreach (var b in ViewBag.ViewList)
+                                        {
+                                            var dyclass = b.ActiveStatus == "Active" ? "active-row" : "inactive-row";
+                                            <tr class="@dyclass">
+                                                <td>
+                                                    @i
+                                                    @{ i++; }
+                                                </td>
+                                                <td>@b.NoticeText</td>
+                                                <td><img src="~/@b.NoticeFilePath" height="100" width="100" /> </td>
+                                                @if (b.ActiveStatus == "Active")
+                                                {
+                                                    <td class="text-success">@b.ActiveStatus</td>
+                                                }
+                                                else
+                                                {
+                                                    <td class="text-orange">@b.ActiveStatus</td>
+                                                }
+                                                <td>@b.IsPublish</td>
+                                                <td class="noprint text-center">
+                                                    <a href="@CustomQueryStringHelper.EncryptString("Master","Add","Transparncy",new {id=b.DNId })"
+                                                       class="btn-floating btn-outline-primary btn-sm"
+                                                       title="Edit"><i class="icon-pencil-alt-solid"></i></a>
+                                                    <a href="@CustomQueryStringHelper.EncryptString("Master","Delete","Transparncy",new {id=b.DNId })"
+                                                       class="btn-floating btn-outline-danger btn-sm" onclick="return confirm('Are you sure to Delete?')"
+                                                       title="Delete"><i class="icon-trash-alt-solid"></i></a>
+                                                </td>
+                                            </tr>
+                                        }
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+</section>
+

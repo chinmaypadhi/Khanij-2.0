@@ -1,0 +1,1292 @@
+﻿@*// *********************************************************************************************************
+    //  View Name                : Add workflow activity
+    //  Desciption               : To Add work flow activity
+    //  Created By               : Suresh kumar behera
+    //  Created On               : 15-feb-2021
+    // ********************************************************************************************************
+*@
+@model MasterEF.WorkFlowEF
+@*@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer*@
+@{
+    ViewData["Title"] = "AddWorkFlow";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+@using MasterApp.Web;
+
+@if (TempData["msg"] != null)
+{
+    <script>
+        var vv = '@TempData["msg"]';
+        if (vv == 1) {
+            swal("", "WorkFlow saved successfully.", "success");
+        }
+        else if (vv == 2) {
+            swal("", "WorkFlow allready exists.", "warning");
+        }
+        else if (vv == 3) {
+            swal("", "WorkFlow updated sucessfully", "success");
+        }
+        else if (vv == 4) {
+            swal("", "WorkFlow  deleted sucessfully", "success");
+        }
+        else {
+            swal("", "Something Errror occured. Please Try After Sometime!!", "error");
+        }
+    </script>
+
+    TempData["msg"] = null;
+
+}
+<script>
+    $(document).ready(function () {
+        indicateMe = "yes"
+        loadNavigation('AddWorkFlow', 'glholiday', 'plappleav', 'tl', 'Work Flow', 'Add WorkFlow', ' ');
+
+        //---bind submodule----
+        $("#intModuleId").change(function () {
+            $.ajax({
+                type: "POST",
+                url: '@Url.Content("~/WorkFlowEngine/WorkFlowActivity/BindSubMudule")',
+
+                data: {
+                    "ModuleId": $('#intModuleId').val()
+                },
+                dataType: "json",
+                success: function (data) {
+
+                    $("#intSubModuleId").empty();
+
+                    var ops = '<option value="">--Select--</option>';
+                    for (var i = 0; i < data.length; i++) {
+                        ops += '<option value="' + data[i].value + '">' + data[i].text + '</option>';
+                    }
+
+                    $("#intSubModuleId").html(ops);
+
+                },
+                error: function () {
+                    alert('Error');
+
+                }
+            });
+
+        });
+
+        //---bind activity
+        $("#intSubModuleId").change(function () {
+            $.ajax({
+                type: "POST",
+                url: '@Url.Content("~/WorkFlowEngine/WorkFlow/BindActivity")',
+
+                data: {
+                    "SubModuleId": $('#intSubModuleId').val()
+                },
+                dataType: "json",
+                success: function (data) {
+
+                    $("#intActivityId").empty();
+
+                    var ops = '<option value="">--Select--</option>';
+                    for (var i = 0; i < data.length; i++) {
+                        ops += '<option value="' + data[i].value + '">' + data[i].text + '</option>';
+                    }
+
+                    $("#intActivityId").html(ops);
+
+                },
+                error: function () {
+                    alert('Error');
+
+                }
+            });
+
+        });
+
+
+        //---bind step
+        $("#intActivityId").change(function () {
+            $.ajax({
+                type: "POST",
+                url: '@Url.Content("~/WorkFlowEngine/WorkFlow/BindStep")',
+
+                data: {
+                    "ActivityId": $('#intActivityId').val()
+                },
+                dataType: "json",
+                success: function (data) {
+
+                    $("#intStep").empty();
+
+                    var ops = '<option value="">--Select--</option>';
+                    for (var i = 0; i < data.length; i++) {
+                        ops += '<option value="' + data[i].value + '">' + data[i].text + '</option>';
+                    }
+
+                    $("#intStep").html(ops);
+
+                },
+                error: function () {
+                    alert('Error');
+
+                }
+            });
+
+        });
+
+             //---bind Action to be taken at,Action to be taken by
+        $("#intStep").change(function () {
+            $.ajax({
+                type: "POST",
+                url: '@Url.Content("~/WorkFlowEngine/WorkFlow/BindActivityDetails")',
+
+                data: {
+                    "ModuleId": $('#intModuleId').val(),
+                    "SubModuleId": $('#intSubModuleId').val(),
+                    "StepId": $('#intStep').val()
+
+                },
+                dataType: "json",
+                success: function (data) {
+                    $("#ActionToBeTakenAt").text(data.actionToBeTakenAt);
+                    $("#ActionToBeTakenBy").text(data.actionToBeTakenBy);
+                    $("#hidActionToBeTakenAt").text(data.intActionToBeTakenAt);
+                    $("#hidActionToBeTakenBy").text(data.intActionToBeTakenBy);
+
+                    //alert(data.intActionToBeTakenAt)
+                    //alert(data.intActionToBeTakenBy)
+                    if ($("#hidActionToBeTakenBy").text() == "1" || data.intActionToBeTakenBy==1) {
+
+                        $("#divPrimaryUser").hide();
+                        $("#divSecondaryUser").hide();
+                    }
+                    else {
+
+                        $("#divPrimaryUser").show();
+                        $("#divSecondaryUser").show();
+                    }
+                    //$("#intStep").empty();
+
+                    //var ops = '<option value="">--Select--</option>';
+                    //for (var i = 0; i < data.length; i++) {
+                    //    ops += '<option value="' + data[i].value + '">' + data[i].text + '</option>';
+                    //}
+
+                    //$("#intStep").html(ops);
+
+                },
+                error: function () {
+                    alert('Error');
+                    $("#ActionToBeTakenAt").text('--');
+                    $("#ActionToBeTakenBy").text('--');
+                    $("#hidActionToBeTakenAt").text(0);
+                    $("#hidActionToBeTakenBy").text(0);
+                }
+            });
+
+        });
+
+
+        //---if primary and secondary user is same----
+        $('#IsSameUser').on('change', function () {
+            var val = this.checked ? this.value : 'false';
+            if (val == 'true') {
+
+                var PrimarryOfficeLevel = $('#intPrimaryOfficeLevelId  option:selected').val();
+                var PrimarryDesignation = $('#intPrimaryDesignationId  option:selected').val();
+                var PrimaryAuthority = $('#intPrimaryAuthorityUserId  option:selected').val();
+
+                var PrimaryDistrictId = $('#intPrimaryDistrictId  option:selected').val();
+
+                //----bind secondary office level
+                $.ajax({
+                    type: "POST",
+                    url: '@Url.Content("~/WorkFlowEngine/WorkFlow/BindOfficeLevelById")',
+
+                    data: {
+                        "id": PrimarryOfficeLevel
+
+                    },
+                    dataType: "json",
+                    success: function (data) {
+
+                        $("#intSecondaryOfficeLevelid").empty();
+
+                        var ops = '';
+                        for (var i = 0; i < data.length; i++) {
+                            ops += '<option value="' + data[i].value + '">' + data[i].text + '</option>';
+                        }
+
+                        $("#intSecondaryOfficeLevelid").html(ops);
+
+                    },
+                    error: function () {
+                        alert('Error');
+
+                    }
+                });
+
+                  //----bind secondary district
+                $.ajax({
+                    type: "POST",
+                    url: '@Url.Content("~/WorkFlowEngine/WorkFlow/BindDistrictById")',
+
+                    data: {
+                        "id": PrimaryDistrictId
+
+                    },
+                    dataType: "json",
+                    success: function (data) {
+
+                        $("#intSecondaryDistrictId").empty();
+
+                        var ops = '';
+                        for (var i = 0; i < data.length; i++) {
+                            ops += '<option value="' + data[i].value + '">' + data[i].text + '</option>';
+                        }
+
+                        $("#intSecondaryDistrictId").html(ops);
+
+                    },
+                    error: function () {
+                        alert('Error');
+
+                    }
+                });
+
+                //----bind secondary designation
+                $.ajax({
+                    type: "POST",
+                    url: '@Url.Content("~/WorkFlowEngine/WorkFlow/BindDesignationById")',
+
+                    data: {
+                        "id": PrimarryDesignation
+
+                    },
+                    dataType: "json",
+                    success: function (data) {
+
+                        $("#intSecondaryDesignationId").empty();
+
+                        var ops = '';
+                        for (var i = 0; i < data.length; i++) {
+                            ops += '<option value="' + data[i].value + '">' + data[i].text + '</option>';
+                        }
+
+                        $("#intSecondaryDesignationId").html(ops);
+
+                    },
+                    error: function () {
+                        alert('Error');
+
+                    }
+                });
+
+                //----bind secondary authority
+                $.ajax({
+                    type: "POST",
+                    url: '@Url.Content("~/WorkFlowEngine/WorkFlow/BindEmployeeIdWise")',
+
+                    data: {
+                        "OfficeLevelId": PrimarryOfficeLevel,
+                        "UserTypeId": PrimarryDesignation,
+                        "EmployeeId": PrimaryAuthority
+                    },
+                    dataType: "json",
+                    success: function (data) {
+
+                        $("#intSecondaryAuthorityUserId").empty();
+
+                        var ops = '';
+                        for (var i = 0; i < data.length; i++) {
+                            ops += '<option value="' + data[i].value + '">' + data[i].text + '</option>';
+                        }
+
+                        $("#intSecondaryAuthorityUserId").html(ops);
+
+                    },
+                    error: function () {
+                        alert('Error');
+
+                    }
+                });
+
+
+
+
+            }
+            else {
+
+                //----bind secondary office level
+                $.ajax({
+                    type: "POST",
+                    url: '@Url.Content("~/WorkFlowEngine/WorkFlow/BindOfficeLevelById")',
+
+                    data: {
+                        "id": 0
+
+                    },
+                    dataType: "json",
+                    success: function (data) {
+
+                        $("#intSecondaryOfficeLevelid").empty();
+
+                        var ops = '<option value="">--Select--</option>';
+                        for (var i = 0; i < data.length; i++) {
+                            ops += '<option value="' + data[i].value + '">' + data[i].text + '</option>';
+                        }
+
+                        $("#intSecondaryOfficeLevelid").html(ops);
+
+                    },
+                    error: function () {
+                        alert('Error');
+
+                    }
+                });
+
+                  //----bind secondary district
+                $.ajax({
+                    type: "POST",
+                    url: '@Url.Content("~/WorkFlowEngine/WorkFlow/BindDistrictById")',
+
+                    data: {
+                        "id": 0
+
+                    },
+                    dataType: "json",
+                    success: function (data) {
+
+                        $("#intSecondaryDistrictId").empty();
+
+                        var ops = '<option value="">--Select--</option>';
+                        for (var i = 0; i < data.length; i++) {
+                            ops += '<option value="' + data[i].value + '">' + data[i].text + '</option>';
+                        }
+
+                        $("#intSecondaryDistrictId").html(ops);
+
+                    },
+                    error: function () {
+                        alert('Error');
+
+                    }
+                });
+                //----bind secondary designation
+                $.ajax({
+                    type: "POST",
+                    url: '@Url.Content("~/WorkFlowEngine/WorkFlow/BindDesignationById")',
+
+                    data: {
+                        "id": 0
+
+                    },
+                    dataType: "json",
+                    success: function (data) {
+
+                        $("#intSecondaryDesignationId").empty();
+
+                        var ops = '<option value="">--Select--</option>';
+                        for (var i = 0; i < data.length; i++) {
+                            ops += '<option value="' + data[i].value + '">' + data[i].text + '</option>';
+                        }
+
+                        $("#intSecondaryDesignationId").html(ops);
+
+                    },
+                    error: function () {
+                        alert('Error');
+
+                    }
+                });
+
+                //----bind secondary authority
+
+                $("#intSecondaryAuthorityUserId").empty();
+                var ops = '<option value="">--Select--</option>';
+                $("#intSecondaryAuthorityUserId").html(ops);
+
+
+
+
+
+
+            }
+
+        });
+
+        //----multiple user--
+
+        if ($("#bitAuthorityMultiple").val() == 'True') {
+            $("#divMultiple *").show();
+        }
+        else {
+            $("#divMultiple *").hide();
+        }
+
+        $('input[type=radio][name=bitAuthorityMultiple]').change(function () {
+            if (this.value == 'True') {
+                $("#divMultiple *").show();
+                //$("#divSecondaryAuthority *").hide();
+            }
+            else if (this.value == 'False') {
+                $("#divMultiple *").hide();
+                $("#intNoofMultipleAuthority").val('');
+                //$("#divSecondaryAuthority *").show();
+            }
+        });
+        //----end multiple user----
+
+
+
+        //----notification--
+
+        //if ($("#bitNotification").val() == 'True') {
+        //    $("#divNotificationType *").show();
+        //}
+        //else {
+        //    $("#divNotificationType *").hide();
+        //}
+
+        //$('input[type=radio][name=bitNotification]').change(function () {
+        //    if (this.value == 'True') {
+        //        $("#divNotificationType *").show();
+
+        //    }
+        //    else if (this.value == 'False') {
+        //        $("#divNotificationType *").hide();
+        //        $("select#intNotificationType").prop('selectedIndex', 0);
+        //    }
+        //});
+
+        //----escalation---
+
+        if ($("#bitEscalation").val() == 'True') {
+            $("#divEscalation *").show();
+        }
+        else {
+            $("#divEscalation *").hide();
+        }
+
+
+        $('input[type=radio][name=bitEscalation]').change(function () {
+            if (this.value == 'True') {
+                $("#divEscalation *").show();
+
+            }
+            else if (this.value == 'False') {
+                $("#divEscalation *").hide();
+                $("#intEscalationinDays").val('');
+            }
+        });
+        $("#intPrimaryOfficeLevelId").change(function () {
+            var PrimarryOfficeLevel = $('#intPrimaryOfficeLevelId  option:selected').val();
+            var PrimarryDesignation = $('#intPrimaryDesignationId  option:selected').val();
+            var PrimaryAuthority = "intPrimaryAuthorityUserId";
+            var PrimaryDistrictId = $('#intPrimaryDistrictId  option:selected').val();
+
+            BindEmployee(PrimarryOfficeLevel, PrimarryDesignation, PrimaryAuthority, PrimaryDistrictId);
+            //if (PrimarryOfficeLevel == "3") {
+
+            //    $("#divPrimaryUser").hide();
+            //    $("#divSecondaryUser").hide();
+
+            //}
+            //else {
+            //    $("#divPrimaryUser").show();
+            //    $("#divSecondaryUser").show();
+            //}
+        });
+
+        $("#intPrimaryDesignationId").change(function () {
+            var PrimarryOfficeLevel = $('#intPrimaryOfficeLevelId  option:selected').val();
+            var PrimarryDesignation = $('#intPrimaryDesignationId  option:selected').val();
+            var PrimaryAuthority = "intPrimaryAuthorityUserId";
+            var PrimaryDistrictId = $('#intPrimaryDistrictId  option:selected').val();
+            BindEmployee(PrimarryOfficeLevel, PrimarryDesignation, PrimaryAuthority, PrimaryDistrictId);
+        });
+
+        $("#intSecondaryOfficeLevelid").change(function () {
+
+            var SecondaryOfficeLevel = $('#intSecondaryOfficeLevelid  option:selected').val();
+            var SecondaryDesignation = $('#intSecondaryDesignationId  option:selected').val();
+            var SecondaryAuthority = "intSecondaryAuthorityUserId";
+            var SecondaryDistrictId = $('#intSecondaryDistrictId  option:selected').val();
+            BindEmployee(SecondaryOfficeLevel, SecondaryDesignation, SecondaryAuthority, SecondaryDistrictId);
+
+        });
+        $("#intSecondaryDesignationId").change(function () {
+            var SecondaryOfficeLevel = $('#intSecondaryOfficeLevelid  option:selected').val();
+            var SecondaryDesignation = $('#intSecondaryDesignationId  option:selected').val();
+            var SecondaryAuthority = "intSecondaryAuthorityUserId";
+            var SecondaryDistrictId = $('#intSecondaryDistrictId  option:selected').val();
+            BindEmployee(SecondaryOfficeLevel, SecondaryDesignation, SecondaryAuthority, SecondaryDistrictId);
+        });
+
+        //---add more
+        $("#Submit").click(function () {
+
+            var PrimarryOfficeLevel = $('#intPrimaryOfficeLevelId  option:selected').val();
+
+            //--check no of authority in case multiple authority
+            if ($("#Rdbtn_Multiple").is(":checked")) {
+                if (!blankFieldValidation("intNoofMultipleAuthority", "No. of Action Taking Authority")) {
+                    return false;
+                }
+                else {
+                    var rowCount = $('#datatable tr').length;
+                    var noOfAuthority = $("#intNoofMultipleAuthority").val();
+                    if (parseInt(rowCount) > parseInt(noOfAuthority)) {
+                        swal("", "You are try to add more than no of authority. ", "warning");
+                        return false;
+                    }
+                }
+            }
+            //---check no of record in case of single authority it should not more than one
+            if ($("#Rdbtn_Single").is(":checked")) {
+
+                    var rowCount = $('#datatable tr').length;
+                    if (parseInt(rowCount) > 1) {
+                        swal("", "You can not add more than one record for Action taking authority type 'Single'delete from grid view and add new one", "warning");
+                        return false;
+
+                }
+            }
+
+            EnableMaster();
+
+            if (!DropDownValidation("intModuleId", "Module")) {
+                return false;
+            }
+            if (!DropDownValidation("intSubModuleId", "SubModule")) {
+                return false;
+            }
+            if (!DropDownValidation("intEmpOfficeLevelId", "Office Level")) {
+                return false;
+            }
+            if (!DropDownValidation("intActivityId", "Activity")) {
+                return false;
+            }
+            if (!DropDownValidation("intStep", "Step")) {
+                return false;
+            }
+
+            //if ($("#Rdbtn_Single").is(":checked")) {
+
+            //    if (!DropDownValidation("intSecondaryOfficeLevelid", "Secondary Office Level")) {
+            //        return false;
+            //    }
+            //    if (!DropDownValidation("intSecondaryDesignationId", "Secondary Designation")) {
+            //        return false;
+            //    }
+            //    if (!DropDownValidation("intSecondaryAuthorityUserId", "secondary Authority")) {
+            //        return false;
+            //    }
+            //}
+            if ($("#Rdbtn_Multiple").is(":checked")) {
+                if (!blankFieldValidation("intNoofMultipleAuthority", "No. of Action Taking Authority")) {
+                    return false;
+                }
+            }
+
+            if ($("#Rdbtn_EscalationYes").is(":checked")) {
+
+                if (!blankFieldValidation("intEscalationinDays", "Escalation in Days")) {
+                    return false;
+                }
+                if (parseInt($("#intEscalationinDays").val()) <= 0) {
+                    swal("", "Escalation in Days", "warning");
+                    return false;
+                }
+            }
+
+            if (!DropDownValidation("intSetAuthority", "Set Authority")) {
+                return false;
+            }
+
+            //if ($("#Rdbtn_NotificationYes").is(":checked")) {
+
+            //    if (!DropDownValidation("intNotificationType", "NotificationType")) {
+            //        return false;
+            //    }
+            //}
+
+
+            if (!DropDownValidation("intPrimaryOfficeLevelId", "Primary Office Level")) {
+                return false;
+            }
+            if (!DropDownValidation("intPrimaryDesignationId", "primary Designation")) {
+                return false;
+            }
+            if (PrimarryOfficeLevel != "3") {
+                if (!DropDownValidation("intPrimaryAuthorityUserId", "Primary Authority")) {
+                    return false;
+                }
+            }
+            if (!DropDownValidation("intSecondaryOfficeLevelid", "Secondary Office Level")) {
+                return false;
+            }
+            if (!DropDownValidation("intSecondaryDesignationId", "Secondary Designation")) {
+                return false;
+            }
+            if (PrimarryOfficeLevel != "3") {
+                if (!DropDownValidation("intSecondaryAuthorityUserId", "secondary Authority")) {
+                    return false;
+                }
+            }
+        });
+
+        $("#Reset").click(function () {
+            window.location = "@Url.Content("~/WorkFlowEngine/WorkFlow/AddWorkFlow/")"
+        });
+
+        $("#divAuthorityUserWise *").hide();
+        $("#intSetAuthority").change(function () {
+            var AuthorityType = $('#intSetAuthority option:selected').val();
+            if (AuthorityType == 3) {//-----Default---take from user wise set auyhority not required
+                $("#divAuthorityUserWise *").show();
+                $("#divAuthority *").hide();
+                $("#divAuthorityType *").hide();
+                $("#divActionToBe *").hide();
+            }
+            else if (AuthorityType == 1) {//--No--not required primary/secondary authority like in first step approval
+                $("#divAuthorityUserWise *").show();
+                $("#divAuthority *").hide();
+                $("#divAuthorityType *").hide();
+                $("#divActionToBe *").hide();
+            }
+            else {
+                $("#divAuthority *").show();
+                $("#divAuthorityUserWise *").hide();
+
+                $("#divAuthorityType *").show();
+                $("#divActionToBe *").show();
+            }
+        });
+
+        $("#AuthoritySubmit").click(function () {
+            debugger;
+            //--check no of authority in case multiple authority
+            //if ($("#Rdbtn_Multiple").is(":checked")) {
+            //    if (!blankFieldValidation("intNoofMultipleAuthority", "No. of Action Taking Authority")) {
+            //        return false;
+            //    }
+            //    else {
+            //        var rowCount = $('#datatable tr').length;
+            //        var noOfAuthority = $("#intNoofMultipleAuthority").val();
+            //        if (parseInt(rowCount) > parseInt(noOfAuthority)) {
+            //            swal("", "You are try to add more than no of authority. ", "warning");
+            //            return false;
+            //        }
+            //    }
+            //}
+            ////---check no of record in case of single authority it should not more than one
+            //if ($("#Rdbtn_Single").is(":checked")) {
+
+            //    var rowCount = $('#datatable tr').length;
+            //    if (parseInt(rowCount) > 1) {
+            //        swal("", "You can not add more than one record for Action taking authority type 'Single'delete from grid view and add new one", "warning");
+            //        return false;
+
+            //    }
+            //}
+
+            //EnableMaster();
+
+            if (!DropDownValidation("intModuleId", "Module")) {
+                return false;
+            }
+            if (!DropDownValidation("intSubModuleId", "SubModule")) {
+                return false;
+            }
+            if (!DropDownValidation("intEmpOfficeLevelId", "Office Level")) {
+                return false;
+            }
+            if (!DropDownValidation("intActivityId", "Activity")) {
+                return false;
+            }
+            if (!DropDownValidation("intStep", "Step")) {
+                return false;
+            }
+
+
+            if ($("#Rdbtn_Multiple").is(":checked")) {
+                if (!blankFieldValidation("intNoofMultipleAuthority", "No. of Action Taking Authority")) {
+                    return false;
+                }
+            }
+
+            if ($("#Rdbtn_EscalationYes").is(":checked")) {
+
+                if (!blankFieldValidation("intEscalationinDays", "Escalation in Days")) {
+                    return false;
+                }
+                if (parseInt($("#intEscalationinDays").val()) <= 0) {
+                    swal("", "Escalation in Days", "warning");
+                    return false;
+                }
+            }
+
+            if (!DropDownValidation("intSetAuthority", "Set Authority")) {
+                return false;
+            }
+
+             $.ajax({
+                type: "POST",
+                url: '@Url.Content("~/WorkFlowEngine/WorkFlow/AddWorkFlowDefault")',
+                data: {
+                     "intModuleId": $('#intModuleId  option:selected').val()
+                    , "intSubModuleId": $('#intSubModuleId  option:selected').val()
+                    , "intActivityId": $('#intActivityId  option:selected').val()
+                    , "intStep": $('#intStep  option:selected').val()
+
+
+                    , "bitAuthorityMultiple": $('#bitAuthorityMultiple').val()
+                    , "intNoofMultipleAuthority": $('#intNoofMultipleAuthority').val()
+                    , "bitEscalation": $('#bitEscalation').val()
+                    , "intEscalationinDays": $('#intEscalationinDays').val()
+
+                    , "intActionToBeTakenAt": $('#hidActionToBeTakenAt').text()
+                    , "intActionToBeTakenBy": $('#hidActionToBeTakenBy').text()
+                    , "intSetAuthority": $('#intSetAuthority  option:selected').val()
+
+                },
+
+                dataType: "json",
+                 success: function (data) {
+                     //alert(data);
+                    //var b = data.Satus;
+                    //console.log(data);
+                    window.location = "@Url.Content("~/WorkFlowEngine/WorkFlow/AddWorkFlow/")"
+                    //$("#intEmployeeid").val(data.msg);
+
+                },
+                error: function () {
+                    alert('Error');
+                }
+            });
+
+
+    });
+
+        if (parseInt($("#hidintWorkFlowId").val()) > 0) {
+
+
+            //--multiple user
+            if ($("#Rdbtn_Multiple").is(":checked")) {
+                $("#divMultiple *").show();
+                //$("#divSecondaryAuthority *").hide();
+            }
+            else {
+                $("#divMultiple *").hide();
+                $("#intNoofMultipleAuthority").val('');
+                //$("#divSecondaryAuthority *").show();
+            }
+            //--end multiple user
+
+            //----escalation in days---
+
+            if ($("#Rdbtn_EscalationYes").is(":checked")) {
+                $("#divEscalation *").show();
+            }
+            else {
+                $("#divEscalation *").hide();
+            }
+            //---end escalation
+
+
+            var AuthorityType = $('#intSetAuthority option:selected').val();
+            if (AuthorityType == 3) {
+                $("#divAuthorityUserWise *").show();
+                $("#divAuthority *").hide();
+
+                $("#divAuthorityType *").hide();
+                $("#divActionToBe *").hide();
+            }
+            else if (AuthorityType == 1) {//--No--not required primary/secondary authority like in final approval
+                $("#divAuthorityUserWise *").show();
+                $("#divAuthority *").hide();
+
+                $("#divAuthorityType *").hide();
+                $("#divActionToBe *").hide();
+            }
+            else {
+                $("#divAuthority *").show();
+                $("#divAuthorityUserWise *").hide();
+
+                $("#divAuthorityType *").show();
+                $("#divActionToBe *").show();
+            }
+
+             $.ajax({
+                type: "POST",
+                url: '@Url.Content("~/WorkFlowEngine/WorkFlow/BindActivityDetails")',
+
+                 data: {
+                     "ModuleId": $('#intModuleId').val(),
+                     "SubModuleId": $('#intSubModuleId').val(),
+                    "StepId": $('#intStep').val()
+                },
+                dataType: "json",
+                success: function (data) {
+                    $("#ActionToBeTakenAt").text(data.actionToBeTakenAt);
+                    $("#ActionToBeTakenBy").text(data.actionToBeTakenBy);
+                    $("#hidActionToBeTakenAt").text(data.intActionToBeTakenAt);
+                    $("#hidActionToBeTakenBy").text(data.intActionToBeTakenBy);
+
+
+                    if ($("#hidActionToBeTakenBy").text() == "1" || data.intActionToBeTakenBy==1) {
+
+                        $("#divPrimaryUser").hide();
+                        $("#divSecondaryUser").hide();
+                    }
+                    else {
+
+                        $("#divPrimaryUser").show();
+                        $("#divSecondaryUser").show();
+                    }
+                    //$("#intStep").empty();
+
+                    //var ops = '<option value="">--Select--</option>';
+                    //for (var i = 0; i < data.length; i++) {
+                    //    ops += '<option value="' + data[i].value + '">' + data[i].text + '</option>';
+                    //}
+
+                    //$("#intStep").html(ops);
+
+                },
+                error: function () {
+                    alert('Error');
+                    $("#ActionToBeTakenAt").text('--');
+                    $("#ActionToBeTakenBy").text('--');
+                    $("#hidActionToBeTakenAt").text(0);
+                    $("#hidActionToBeTakenBy").text(0);
+                }
+            });
+
+
+            //----notification--
+
+            //if ($("#Rdbtn_NotificationYes").is(":checked")) {
+            //    $("#divNotificationType *").show();
+            //}
+            //else {
+            //    $("#divNotificationType *").hide();
+            //}
+            //---end notification
+
+            //--master data should not editable
+            DisableMaster();
+
+        }
+
+    });
+
+    function DisableMaster() {
+        $("#intModuleId").attr('disabled', true);
+        $("#intSubModuleId").attr('disabled', true);
+        $("#intActivityId").attr('disabled', true);
+        $("#intStep").attr('disabled', true);
+        $("#Rdbtn_Multiple").attr('disabled', true);
+        $("#Rdbtn_Single").attr('disabled', true);
+        $("#intNoofMultipleAuthority").attr('disabled', true);
+
+        $("#Rdbtn_EscalationYes").attr('disabled', true);
+        $("#Rdbtn_EscalationNo").attr('disabled', true);
+        $("#intEscalationinDays").attr('disabled', true);
+
+        $("#intSetAuthority").attr('disabled', true);
+        //$("#Rdbtn_NotificationNo").attr('disabled', true);
+        //$("#intNotificationType").attr('disabled', true);
+
+    }
+
+    function EnableMaster() {
+        $("#intModuleId").attr('disabled', false);
+        $("#intSubModuleId").attr('disabled', false);
+        $("#intActivityId").attr('disabled', false);
+        $("#intStep").attr('disabled', false);
+
+        $("#Rdbtn_Multiple").attr('disabled', false);
+        $("#Rdbtn_Single").attr('disabled', false);
+        $("#intNoofMultipleAuthority").attr('disabled', false);
+
+        $("#Rdbtn_EscalationYes").attr('disabled', false);
+        $("#Rdbtn_EscalationNo").attr('disabled', false);
+        $("#intEscalationinDays").attr('disabled', false);
+
+        $("#intSetAuthority").attr('disabled', false);
+        //$("#Rdbtn_NotificationNo").attr('disabled', false);
+        //$("#intNotificationType").attr('disabled', false);
+
+    }
+    //---bind employee---
+    function BindEmployee(OfficeId, DesignationId, drpEmployee, PostingDistrict) {
+        $.ajax({
+            type: "POST",
+            url: '@Url.Content("~/WorkFlowEngine/WorkFlow/BindEmployeeOfficeLevelWise")',
+
+            data: {
+                "OfficeLevelId": OfficeId,
+                "UserTypeId": DesignationId,
+                "PostingDistrict": PostingDistrict
+            },
+            dataType: "json",
+            success: function (data) {
+
+                $("#" + drpEmployee).empty();
+
+                var ops = '<option value="">--Select--</option>';
+                for (var i = 0; i < data.length; i++) {
+                    ops += '<option value="' + data[i].value + '">' + data[i].text + '</option>';
+                }
+
+                $("#" + drpEmployee).html(ops);
+
+            },
+            error: function () {
+                alert('Error');
+
+            }
+        });
+
+    }
+
+
+</script>
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="javascript:void(0);">
+                                Add WorkFlow
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="@Url.Content("~/WorkFlowEngine/WorkFlow/ViewWorkFlow")">
+                                View WorkFlow
+                            </a>
+                        </li>
+                    </ul>
+
+                </div>
+
+                <section class="box form-container">
+                    <div class="content-body">
+                        @Html.HiddenFor(m => m.intActionToBeTakenAt, new { @id = "hidActionToBeTakenAt" })
+                        @using (Html.BeginForm("AddWorkFlow", "WorkFlow", FormMethod.Post, new { AUTOCOMPLETE = "Off", id = "form1" }))
+                        {
+                            @Html.AntiForgeryToken();
+                            <div class="row">
+
+                                <div class="col-xl-12">
+                                    <div class="p-4  border mb-3">
+                                        <h6>Work Flow Details </h6>
+
+                                        <div class="row" id="divWork">
+                                            <div class="col-lg-3 col-md-6 col-sm-12">
+                                                <label class="col-form-label font-weight-bolder pt-0">Module<span class="text-danger">*</span></label>
+                                                <div class="form-group">
+
+                                                    @Html.DropDownListFor(m => m.intModuleId, ViewBag.Module as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control" })
+                                                    @Html.HiddenFor(m => m.intWorkFlowId, new { @id = "hidintWorkFlowId" })
+
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-3 col-md-6 col-sm-12">
+                                                <label class="col-form-label font-weight-bolder pt-0">Sub Module<span class="text-danger">*</span></label>
+                                                <div class="form-group">
+                                                    @Html.DropDownListFor(m => m.intSubModuleId, ViewBag.SubModule as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control  searchableselect" })
+                                                </div>
+
+                                            </div>
+                                            <div class="col-lg-3 col-md-6 col-sm-12">
+                                                <label class="col-form-label font-weight-bolder pt-0">Activity<span class="text-danger">*</span></label>
+                                                <div class="form-group">
+                                                    @Html.DropDownListFor(m => m.intActivityId, ViewBag.Activity as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control  searchableselect" })
+                                                </div>
+
+                                            </div>
+
+                                            <div class="col-lg-3 col-md-6 col-sm-12">
+                                                <label class="col-form-label font-weight-bolder pt-0">Step<span class="text-danger">*</span></label>
+                                                <div class="form-group">
+
+                                                    @Html.DropDownListFor(m => m.intStep, ViewBag.Step as IEnumerable<SelectListItem>, new { @class = "form-control  searchableselect" })
+                                                    @Html.HiddenFor(m => m.intStep, new { @id = "hidStep" })
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-3 col-md-6 col-sm-12">
+                                                <label class="col-form-label">Set Authority<span class="text-danger">*</span></label>
+                                                <div class="form-group">
+                                                    @Html.DropDownListFor(m => m.intSetAuthority, ViewBag.SetAuthority as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control  searchableselect" })
+
+                                                </div>
+                                            </div>
+
+                                            <div id="divAuthorityType" class="col-lg-3 col-md-6 col-sm-12">
+                                                <label class="col-form-label">Action taking Authority Type<span class="text-danger">*</span></label>
+                                                <div class="form-group">
+
+                                                    @Html.RadioButtonFor(n => n.bitAuthorityMultiple, true, new { @checked = true, @class = "custom-radio", id = "Rdbtn_Multiple" }) Multiple
+                                                    @Html.RadioButtonFor(n => n.bitAuthorityMultiple, false, new { @class = "custom-radio", id = "Rdbtn_Single" }) Single
+                                                    @Html.HiddenFor(m => m.bitAuthorityMultiple, new { @id = "hidbitAuthorityMultiple" })
+                                                </div>
+                                            </div>
+                                            <div id="divMultiple" class="col-lg-3 col-md-6 col-sm-12">
+
+                                                <label class="col-form-label">No of Action Taking Authority<span class="text-danger">*</span></label>
+                                                <div class="form-group">
+                                                    @Html.TextBoxFor(m => m.intNoofMultipleAuthority, new { @class = "form-control", @type = "number", @maxlength = 1, Onkeypress = "return inputLimiter(event,'Numbers')" })
+                                                </div>
+
+                                            </div>
+
+                                            <div class="col-lg-3 col-md-6 col-sm-12" style="display:none;">
+                                                <label class="col-form-label">Escalation in Day<span class="text-danger">*</span></label>
+                                                <div class="form-group">
+
+                                                    @Html.RadioButtonFor(n => n.bitEscalation, true, new { @checked = true, @class = "custom-radio", id = "Rdbtn_EscalationYes" }) Yes
+                                                    @Html.RadioButtonFor(n => n.bitEscalation, false, new { @class = "custom-radio", id = "Rdbtn_EscalationNo" })No
+                                                </div>
+                                            </div>
+                                            <div id="divEscalation" class="col-lg-3 col-md-6 col-sm-12" style="display:none;">
+
+                                                <label class="col-form-label">Enter Day<span class="text-danger">*</span></label>
+                                                <div class="form-group">
+                                                    @Html.TextBoxFor(m => m.intEscalationinDays, new { @class = "form-control", @type = "number", @maxlength = 2, Onkeypress = "return inputLimiter(event,'Numbers')" })
+                                                </div>
+
+                                            </div>
+
+                                            <div id="divActionToBe" class="col-xl-12">
+
+                                                <div class="row">
+
+                                                    <div class="col-lg-3 col-md-6 col-sm-12">
+
+                                                        <label class="col-form-label font-weight-bolder pt-0">Action to be taken at</label>
+                                                        <div class="form-group">
+                                                            <span id="ActionToBeTakenAt">--</span>
+                                                            @*@Html.HiddenFor(m => m.intActionToBeTakenAt, new { @id = "hidActionToBeTakenAt" })*@
+                                                            @Html.HiddenFor(m => m.ActionToBeTakenAt, new { @id = "hidActionToBeTakenAtTxt" })
+
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-lg-3 col-md-6 col-sm-12">
+
+                                                        <label class="col-form-label font-weight-bolder pt-0">Action to be taken by<span class="text-danger"></span></label>
+                                                        <div class="form-group">
+                                                            <span id="ActionToBeTakenBy">--</span>
+                                                            @Html.HiddenFor(m => m.intActionToBeTakenBy, new { @id = "hidActionToBeTakenBy" })
+                                                            @Html.HiddenFor(m => m.ActionToBeTakenBy, new { @id = "hidActionToBeTakenByTxt" })
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-lg-3 col-md-6 col-sm-12">
+
+                                                        <label class="col-form-label"></label>
+                                                        <div class="form-group">
+
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+
+
+                                            <div class="col-lg-3 col-md-6 col-sm-12">
+
+                                            </div>
+                                            <div class="col-lg-3 col-md-6 col-sm-12">
+
+                                            </div>
+
+
+                                            <div id="divAuthorityUserWise" class="col-xl-12">
+                                                <div class="p-4 border mb-3">
+                                                    <div class="col-sm-12 text-center">
+                                                        <a href="javascript:void(0);" class="btn btn-success btn-md ml-0" id="AuthoritySubmit" value="@ViewBag.Button">@ViewBag.Button</a>
+                                                        <a href="~/WorkFlowEngine/WorkFlow/AddWorkFlow" class="btn btn-danger btn-md" value="@ViewBag.Reset">@ViewBag.Reset</a>
+                                                    </div>
+
+                                                </div>
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+                                </div>
+
+
+
+                                <div id="divAuthority" class="col-xl-12">
+                                    <div class="p-4 border mb-3">
+                                        <table id="FaqsTable">
+                                            <tr>
+                                                <td>
+                                                    <div class="row">
+
+                                                        <div class="col-lg-12 col-md-12 col-sm-12">
+                                                            <h6>Primary Action Taking Authority</h6>
+
+                                                        </div>
+
+                                                        <div class="col-xl-12">
+
+                                                            <div class="row">
+
+                                                                <div class="col-lg-3 col-md-6 col-sm-12">
+
+                                                                    <label class="col-form-label">Office Level<span class="text-danger">*</span></label>
+                                                                    <div class="form-group">
+                                                                        @Html.DropDownListFor(m => m.intPrimaryOfficeLevelId, ViewBag.PrimaryOfficeLevel as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control  searchableselect" })
+
+                                                                    </div>
+                                                                </div>
+                                                                <div id="divPrimaryDistrict" class="col-lg-3 col-md-6 col-sm-12">
+
+                                                                    <label class="col-form-label">District<span class="text-danger">*</span></label>
+                                                                    <div class="form-group">
+
+                                                                        @Html.DropDownListFor(m => m.intPrimaryDistrictId, ViewBag.PrimaryDistrict as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control  searchableselect" })
+
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-lg-3 col-md-6 col-sm-12">
+
+                                                                    <label class="col-form-label">Designation<span class="text-danger">*</span></label>
+                                                                    <div class="form-group">
+
+                                                                        @Html.DropDownListFor(m => m.intPrimaryDesignationId, ViewBag.PrimaryDesignation as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control  searchableselect" })
+
+
+                                                                    </div>
+                                                                </div>
+                                                                <div id="divPrimaryUser" class="col-lg-3 col-md-6 col-sm-12">
+
+                                                                    <label class="col-form-label">User<span class="text-danger">*</span></label>
+                                                                    <div class="form-group">
+                                                                        @Html.DropDownListFor(m => m.intPrimaryAuthorityUserId, ViewBag.PrimaryAuthority as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control  searchableselect" })
+
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <div id="divSecondaryAuthority" class="col-xl-12">
+                                                            <div class="col-lg-12 col-md-12 col-sm-12">
+                                                                <p>
+                                                                   Is Primary User Act as Secondary User   ? @Html.CheckBoxFor(m => m.IsSameUser)
+                                                                </p>
+                                                                <h6>Secondary Action Taking Authority</h6>
+                                                            </div>
+
+                                                            <div class="col-xl-12">
+                                                                <div class="row">
+                                                                    <div class="col-lg-3 col-md-6 col-sm-12">
+
+                                                                        <label class="col-form-label">Office Level<span class="text-danger">*</span></label>
+                                                                        <div class="form-group">
+                                                                            @Html.DropDownListFor(m => m.intSecondaryOfficeLevelid, ViewBag.SecondaryOfficeLevel as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control  searchableselect" })
+                                                                        </div>
+                                                                    </div>
+                                                                    <div id="divSecondaryDistrict" class="col-lg-3 col-md-6 col-sm-12">
+
+                                                                        <label class="col-form-label">District<span class="text-danger">*</span></label>
+                                                                        <div class="form-group">
+
+                                                                            @Html.DropDownListFor(m => m.intSecondaryDistrictId, ViewBag.SecondaryDistrict as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control  searchableselect" })
+
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-lg-3 col-md-6 col-sm-12">
+                                                                        <label class="col-form-label">Designation<span class="text-danger">*</span></label>
+                                                                        <div class="form-group">
+                                                                            @Html.DropDownListFor(m => m.intSecondaryDesignationId, ViewBag.SecondaryDesignation as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control  searchableselect" })
+                                                                        </div>
+                                                                    </div>
+                                                                    <div id="divSecondaryUser" class="col-lg-3 col-md-6 col-sm-12">
+
+                                                                        <label class="col-form-label">User<span class="text-danger">*</span></label>
+                                                                        <div class="form-group">
+                                                                            @Html.DropDownListFor(m => m.intSecondaryAuthorityUserId, ViewBag.SecondaryAuthority as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control  searchableselect" })
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+
+                                                        </div>
+
+                                                        <div class="col-sm-12 mt-3">
+                                                            <button type="submit" class="btn btn-outline-success mr-3" id="Submit"><i class="icon-plus-solid"></i>Add More</button>
+                                                            <input type="reset" id="Reset" value="@ViewBag.Reset" class="btn btn-danger btn-md" />
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                            </tr>
+
+                                        </table>
+
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div id="viewtable">
+                                        <table id="datatable" class="table table-sm table-bordered">
+                                            <thead>
+                                                <tr>
+                                                    <th width="30px">Sl</th>
+                                                    <th>Authority Type</th>
+                                                    <th>Office Level</th>
+                                                    <th>Designation</th>
+                                                    <th>Authority</th>
+                                                    <th width="60px" class="noprint">Action</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @{
+
+                                                    var count = 0;
+                                                    foreach (var item in Model.WorkFlowtransaction)
+                                                    {
+                                                        count++;
+                                                        <tr class="active-row">
+
+                                                            <td>@count</td>
+                                                            <td>@item.AuthorityType</td>
+                                                            <td>@item.PrimaryOfficeLevel</td>
+                                                            <td>@item.PrimaryDesignation</td>
+                                                            <td>@item.PrimaryAuthorityUser</td>
+
+                                                            <td width="15%" class="noprint">
+                                                                <input type="hidden" id="hidChild" value="0" />
+                                                                <a href="@CustomQueryStringHelper.EncryptString("WorkFlowEngine","RemoveWorkFlowTransaction","WorkFlow",new {id=item.intId })"
+                                                                   class="btn-floating btn-outline-danger btn-sm"
+                                                                   title="Delete" onclick="return confirm('Are you sure to Delete?')"><i class="icon-trash-alt-solid"></i></a>
+
+                                                            </td>
+                                                        </tr>
+
+                                                    }
+                                                }
+
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+    <!-- MAIN CONTENT AREA ENDS -->
+</section>
+

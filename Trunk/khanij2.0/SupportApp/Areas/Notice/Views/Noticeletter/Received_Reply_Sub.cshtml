@@ -1,0 +1,143 @@
+﻿@using SupportApp.Web
+@model SupportEF.NoticeLetterEF
+
+@{
+    ViewData["Title"] = "Received_Reply_Sub";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+
+}
+<script>
+    $(document).ready(function () {
+        loadNavigation('Received_Reply_Sub', 'glTMng', 'plpaymenthead', 'tl', 'Notice', 'Notice Letter Inbox', ' ');
+        $('.datepicker').datetimepicker({
+            format: 'LT',
+            format: "DD-MM-YYYY",
+            daysOfWeekDisabled: [],
+        });
+    });
+</script>
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        @Html.Partial("_CMSnavigation")
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="#">
+                                Notice Letter Inbox
+                            </a>
+                        </li>
+                    </ul>
+                    @Html.Partial("_CMSutil")
+                </div>
+                <section class="box form-container">
+                    <div class="search-box">
+                        @using (Html.BeginForm("Received_Reply_Sub", "Noticeletter", FormMethod.Post, new { AUTOCOMPLETE = "Off", id = "form1" }))
+                        {
+                            <div class="searchform px-3 py-3">
+                                <div class="row">
+                                    <div class="col-sm-4">
+                                        <div class="form-group row">
+                                            <label for="inputText" class="col-sm-3 col-form-label">
+                                                From Date
+                                            </label>
+                                            <div class="col-sm-8">
+                                                <div class="input-group">
+                                                    <input type="text" class="form-control datepicker" id="Fromdate">
+                                                    <div class="input-group-prepend">
+                                                        <label class="input-group-text" for="Fromdate"><i class="icon-calendar-alt-solid"></i></label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <div class="form-group row">
+                                            <label for="inputText" class="col-sm-3 col-form-label">
+                                                To Date
+                                            </label>
+                                            <div class="col-sm-8">
+                                                <div class="input-group">
+                                                    <input type="text" class="form-control datepicker" id="Todate">
+                                                    <div class="input-group-prepend">
+                                                        <label class="input-group-text" for="Todate"><i class="icon-calendar-alt-solid"></i></label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-2">
+                                        <a href="#" class="btn btn-sm btn-success m-0 waves-effect waves-light"> Show </a>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                    <div class="content-body pt-0">
+                        <div class="legend-box">
+                            <ul class="d-flex mb-1 justify-content-end list-unstyled">
+                                <li><span class="bg-success"></span> Active</li>
+                                <li><span class="bg-warning"></span> Inactive</li>
+                            </ul>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <table id="table-exports" class="table table-sm table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th width="30">Sl#</th>
+                                            <th>Applicant Name</th>
+                                            <th>Reply Status</th>
+                                            <th>Take Action</th>
+                                            <th>Status</th>
+                                            @*<th>DD Attachment</th>
+                                            <th>User Attachment</th>*@
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @{ int i = 1;
+                                        }
+                                        @foreach (var b in ViewBag.NoticeDetails)
+                                        {
+                                            <tr class="active-row">
+                                                <td>@i</td>
+                                                <td><p class="m-0">@b.ApplicantName</p> </td>
+                                                @if (@b.IsReplay == 0)
+                                                {
+                                                    <td><p class="m-0">Reply Pending</p></td>
+                                                }
+                                                else
+                                                {
+                                                    <td><p class="m-0">Reply Received</p></td>
+                                                }
+
+                                                @if (@b.IsReplay == 1 && @b.IsHide == 0)
+                                                {
+                                                    <td>
+                                                        <a href="@CustomQueryStringHelper.EncryptString("Notice","Reply_GetRepliedData","Noticeletter",new {NoticeID=@b.NoticeID,UserID=@b.UserID })"><button class="btn-primary">Take Action</button></a>
+                                                        @*<a href="@Url.Action("Reply_GetRepliedData","Noticeletter",new { NoticeID = @b.NoticeID,UserID=@b.UserID })">Take Action</a>*@
+                                                    </td>
+                                                }
+                                                else
+                                                {
+                                                    <td></td>
+                                                }
+                                                <td><p class="m-0">@b.Status_Type</p> </td>
+                                                @*<td><p class="m-0"> @Html.ActionLink((string)b.UserFilePath, "DownloadFile", new { filename = "DownloadFile" })</p> </td>
+                                                <td><p class="m-0"> @Html.ActionLink((string)b.UserFilePath, "DownloadFile", new { filename = @b.UserFilePath })</p> </td>*@
+                                            </tr>
+                                            i++;
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+    <!-- MAIN CONTENT AREA ENDS -->
+</section>

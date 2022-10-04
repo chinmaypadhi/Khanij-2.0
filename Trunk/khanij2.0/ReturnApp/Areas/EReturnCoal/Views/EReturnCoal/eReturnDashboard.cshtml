@@ -1,0 +1,117 @@
+﻿@*// *********************************************************************************************************
+    //  View Name                : eReturnDashboard
+    //  Desciption               : To View Monthly Return Status
+    //  Created By               : Akshaya Dalei
+    //  Created On               : 08 Nov 2021
+    // ********************************************************************************************************
+*@
+
+@model IEnumerable<ReturnEF.MonthlyReturnModel>
+@{
+    ViewData["Title"] = "eReturn Dashboard";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@{
+    if (ViewBag.msg != null)
+    {
+        <script>
+                swal("",'@ViewBag.msg',"success");
+        </script>
+    }
+}
+<section class="wrapper main-wrapper row">
+
+    <div class="col-12">
+        @Html.Partial("_CMSnavigation")
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <a class="nav-link active" href="javascript:void(0);">Monthly Return</a>
+                    </ul>
+                    @Html.Partial("_CMSutil")
+                </div>
+
+                <section class="box form-container">
+                    <div class="content-body">
+                        <div class="table-responsive" id="viewtable">
+                            <table id="datatable" class="table table-sm table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th class="font-weight-bold">Month Year</th>
+                                        <th class="font-weight-bold">Status</th>
+                                        <th class="font-weight-bold">Modified On</th>
+                                        <th class="noprint font-weight-bold">Fill</th>
+                                        <th class="font-weight-bold">Print</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @{
+                                        if (Model.ElementAt(0).MineralName == "Coal")
+                                        {
+                                            foreach (var item in Model)
+                                            {
+                                                <tr>
+                                                    <td>@item.MonthYear</td>
+                                                    @if (item.Status == "Filled")
+                                                    {
+                                                        <td class="text-success">@item.Status</td>
+                                                    }
+                                                    else
+                                                    {
+                                                        <td class="text-warning">@item.Status</td>
+                                                    }
+                                                    <td>@item.ModifiedOn</td>
+                                                    @if (item.Status != "Filled")
+                                                    {
+                                                        <td class="noprint">
+                                                            <a href="/EReturnCoal/EReturnCoal/FORMII?MonthYear=@item.EncryptedId" class="btn-outline-primary btn-sm"
+                                                               >Fill</a>
+                                                        </td>
+                                                    }
+                                                    else
+                                                    {
+                                                        <td></td>
+                                                    }
+                                                    @if (item.Status == "Filled")
+                                                    {
+                                                        <td>
+                                                            <a href="/EReturnCoal/EReturnCoal/PrintCoalFIRSTSCHEDULE_FORMII?Month_Year=@item.EncryptedId" class="btn-outline-primary btn-sm"
+                                                               >
+                                                                Print
+                                                            </a>
+                                                        </td>
+                                                    }
+                                                    else
+                                                    {
+                                                        <td></td>
+                                                    }
+                                                </tr>
+                                            }
+                                        }
+                                    }
+
+                                </tbody>
+                            </table>
+                        </div>
+
+                    </div>
+
+                </section>
+            </div>
+        </div>
+    </div>
+</section>
+<script>
+    indicateMe = "yes"
+
+    $(document).ready(function () {
+        $(document).ready(function () {
+            loadNavigation('MontlyReturnCoal', 'glereturncoal', 'plmonretcoal', 'tl', 'E-Return Coal', 'Monthly Return', ' ');
+        });
+    });
+
+
+</script>
+

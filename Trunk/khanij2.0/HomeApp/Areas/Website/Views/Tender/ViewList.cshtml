@@ -1,0 +1,134 @@
+﻿@*// *********************************************************************************************************
+    //  View Name                : Add
+    //  Desciption               : To Save and Update Website Tender Details
+    //  Created By               : Lingaraj Dalai
+    //  Created On               : 11 Oct 2021
+    // ********************************************************************************************************
+*@
+@model IEnumerable<HomeEF.ViewTenderModel>
+@using HomeApp.Web;
+@{
+    ViewData["Title"] = "ViewList";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+@if (TempData["Message"] != null)
+{
+    <script>
+        swal("",'@TempData["Message"]',"success");
+    </script>
+}
+<script>
+    $(document).ready(function () {
+        loadNavigation('ViewList', 'glhelpdesk', 'plraiseticket', 'tl', 'CMS', 'Tender', ' ');
+        $('.searchableselect').searchableselect();
+        $('#datatable').DataTable();
+        $('.shorting-lnk').click(function () {
+            $('.shorting-lnk i').toggleClass('fa-sort-amount-up-alt fa-sort-amount-down-alt ');
+        });
+        $('.filter-dropdown').hide();
+        $('.filter-lnk').click(function () {
+            $(this).toggleClass('active');
+            $(this).siblings('.filter-dropdown').slideToggle();
+        });
+        $('.filter-btn').click(function () {
+            $(this).parent('.shorting-cell .filter-dropdown').slideUp();
+            if ($(this).parent().parent('.shorting-cell').find('.filter-lnk').hasClass('active')) {
+                $(this).parent().siblings('.filter-lnk').removeClass('active');
+            }
+        });
+        $("#excelIcon").click(function () {
+            exportTableToExcel("datatable", "text")
+        });
+    });
+</script>
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        @Html.Partial("_navigation")
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link" href="~/Website/Tender/Add">
+                                Add
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="javascript:void(0);">
+                                View
+                            </a>
+                        </li>
+                    </ul>
+                    @Html.Partial("_util")
+                </div>
+                <section class="box form-container">
+                    <div class="content-body">
+                        <h5 class="text-brown font-weight-bold mt-0"> Tender Details</h5>
+                        <div class="content-body pt-0">
+                            <div class="legend-box">
+                                <ul class="d-flex mb-1 justify-content-end list-unstyled">
+                                    <li><span class="bg-success"></span> Active</li>
+                                    <li><span class="bg-warning"></span> Inactive</li>
+                                </ul>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="table-responsive" id="viewtable">
+                                        <table id="datatable" class="table table-sm table-bordered">
+                                            <thead>
+                                                <tr>
+                                                    <th width="20px">Sl#</th>
+                                                    <th width="80px">Tender No.</th>
+                                                    <th>Tender Subject</th>
+                                                    <th width="100px">Opening Date & Time</th>
+                                                    <th width="100px">Closing Date & Time</th>
+                                                    <th class="text-center noprint">Document</th>
+                                                    <th width="50px" class="noprint">Action</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @{
+                                                    var count = 0;
+                                                    foreach (var item in Model)
+                                                    {
+                                                        count++;
+                                                        var dyclass = @item.BIT_STATUS == "Active" ? "active-row" : "inactive-row";
+                                                        <tr class="@dyclass">
+                                                            <td>@count</td>
+                                                            <td>@item.VCH_TENDER_NO</td>
+                                                            <td>@item.VCH_SUBJECT</td>
+                                                            <td>@item.DTM_TENDER_OPEN_DATETIME</td>
+                                                            <td>@item.DTM_TENDER_CLOSE_DATETIME</td>
+                                                            <td class="text-center"><a href='~/@item.VCH_DOCUMENT' data-original-title="Download " target="_blank"><i class="icon-file-pdf-solid h5 text-danger"></i></a></td>
+                                                            <td class="text-center noprint">
+                                                                @*<a href="@CustomQueryStringHelper.EncryptString("Website","Add","Tender",new {id=item.INT_TENDER_ID })" class="text-success btn-sm" title="Edit">
+            <i class="icon-pencil-alt-solid"></i>
+        </a>
+        <a href="@CustomQueryStringHelper.EncryptString("Website","Delete","Tender",new {id=item.INT_TENDER_ID })" class="text-danger btn-sm" title="Delete" onclick="return confirm('Are you sure to delete?')">
+            <i class="icon-trash-alt-solid"></i>
+        </a>*@
+                                                                <a href="/Website/Tender/Add/@item.INT_TENDER_ID" class="text-success btn-sm">
+                                                                    <i class="icon-pencil-alt-solid"></i>
+                                                                </a>
+                                                                <a href="/Website/Tender/Add/@item.INT_TENDER_ID" class="text-danger btn-sm" title="Delete" onclick="return confirm('Are you sure to delete?')">
+                                                                    <i class="icon-trash-alt-solid"></i>
+                                                                </a>
+                                                            </td>
+                                                        </tr>
+                                                    }
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+    <!-- MAIN CONTENT AREA ENDS -->
+</section>
+

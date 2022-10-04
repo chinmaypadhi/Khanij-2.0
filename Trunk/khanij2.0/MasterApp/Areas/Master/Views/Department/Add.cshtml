@@ -1,0 +1,132 @@
+﻿@model MasterEF.RoleTypeModel
+@using MasterEF;
+@{
+    ViewData["Title"] = "Add";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+
+@if (ViewBag.msg != null)
+{
+    <script>
+        swal("",'@ViewBag.msg',"success");
+    </script>
+}
+
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        @Html.Partial("_CMSnavigation")
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item"><a class="nav-link active" href="/Master/Department/Add">Add</a></li>
+                        <li class="nav-item"><a class="nav-link" href="/Master/Department/ViewList">View</a></li>
+                    </ul>
+                    @Html.Partial("_CMSutil")
+                </div>
+
+                <section class="box form-container">
+                    <div class="content-body">
+                        <form action="Add" method="post" autocomplete="off">
+                            @Html.AntiForgeryToken()
+                            <div class="row">
+                                <div class="col-lg-6 col-12">
+                                    <div class="form-group row">
+                                        <label for="dropdownDepart" class="col-sm-4 col-form-label">User Type <span class="text-danger">*</span></label>
+                                        <div class="col-sm-7">
+                                            <select id="ddlUserType" name="UserTypeId" class="form-control searchableselect" title="User Type">
+                                                <option value="">Select</option>
+                                                @{
+                                                    List<RoleTypeModel> listRoleTypeModel = (List<RoleTypeModel>)ViewData["UserType"];
+                                                    if (listRoleTypeModel != null)
+                                                    {
+                                                        foreach (var item in listRoleTypeModel)
+                                                        {
+                                                            if (item.UserTypeId == Model.UserTypeId)
+                                                            {
+                                                                <option selected="selected" value="@item.UserTypeId">@item.UserType</option>
+                                                            }
+                                                            else
+                                                            {
+                                                                <option value="@item.UserTypeId">@item.UserType</option>
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            </select>
+                                            <span class="text-danger">@Html.ValidationMessageFor(m => m.UserTypeId)</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 col-12">
+                                    <div class="form-group row">
+                                        <label for="dropdownDesign" class="col-sm-4 col-form-label">Department <span class="text-danger">*</span></label>
+                                        <div class="col-sm-7">
+                                            <input type="text" maxlength="50" id="txtDepartment" name="RoleTypeName" title="Department" value="@Model.RoleTypeName" class="form-control" Onkeypress = "return inputLimiter(event,'NameCharacters')" />
+                                            <input type="hidden" id="hdnRoleTypeId" name="RoleTypeId" value="@Model.RoleTypeId" />
+                                            <span class="text-danger">@Html.ValidationMessageFor(m => m.RoleTypeName)</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 col-12">
+                                    <div class="form-group row">
+                                        <label for="inputName" class="col-sm-4 col-form-label">Status <span class="text-danger">*</span></label>
+                                        <div class="col-sm-7">
+                                            <div class="py-2">
+                                                @Html.RadioButtonFor(n => n.IsActive, true, new { @checked = true, @class = "custom-radio", id = "Rdbtn_Active" })
+                                                <label class="radio-label">Active</label>
+                                                @Html.RadioButtonFor(n => n.IsActive, false, new { @class = "custom-radio", id = "Rdbtn_Inactive" })
+                                                <label class="radio-label">Inactive</label>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6 offset-lg-2 offset-md-4">
+                                    <input type="submit" value='@ViewBag.Button' class="btn btn-primary btn-md ml-0" name="Submit" id="Submit" />
+                                    <a href="~/Master/Department/Add" class="btn btn-danger btn-md">Reset</a>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+    <!-- MAIN CONTENT AREA ENDS -->
+</section>
+<input type="hidden" id="hdnUserType" value="@Model.UserTypeId" />
+<script>
+    indicateMe = "yes"
+    $(document).ready(function () {
+        debugger;
+        loadNavigation('Add', 'glRoleRes', 'plUser', 'tl', 'Master', 'Department', ' ');
+        $('.searchableselect').searchableselect();
+        $('#ddlUserType option[value=' + $('#hdnUserType').val()+']').attr("selected", "selected");
+        //--------------
+        //if ($('#hdnUserType').val() != "") {
+        //    $('#ddlUserType').val($('#hdnUserType').val());
+        //}
+        
+        //---------------
+        $("#Submit").click(function () {
+            debugger;
+            if ($('#ddlUserType').val() == "") {
+                swal("", "Please Select User Type", "warning");
+                $("#ddlUserType").focus();
+                return false;
+            }
+
+            if ($('#txtDepartment').val() == "") {
+                swal("", "Please Enter Department", "warning");
+                $("#txtDepartment").focus();
+                return false;
+            }
+        });
+        //----------------
+    });
+
+
+
+</script>

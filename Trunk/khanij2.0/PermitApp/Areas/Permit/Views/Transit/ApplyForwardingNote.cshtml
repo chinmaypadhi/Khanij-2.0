@@ -1,0 +1,510 @@
+﻿@model PermitEF.ForwardingNoteModel
+@{
+    ViewData["Title"] = "MergeEPermit";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+<script src=" https://cdn.datatables.net/1.10.24/js/jquery.dataTables.min.js"></script>
+<style>
+    @@media screen and (max-width: 1366px)
+     {
+        .note-sec .col-form-label {
+            height: 50px;
+        }
+     }
+    @@media screen and (max-width: 640px) {
+        .note-sec .col-form-label {
+            height: auto;
+        }
+    }
+</style>
+
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        @Html.Partial("_CMSnavigation")
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="#">
+                                Apply New Application
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="@Url.Content("~/Permit/Transit/FinalForwadingNote")">
+                                    Generated RTP Application
+                                </a>
+                        </li>
+
+                    </ul>
+                    @Html.Partial("_CMSutil")
+                </div>
+
+                <section class="box form-container">
+                    @using (Html.BeginForm("ApplyForwardingNote", "Transit", FormMethod.Post, new { enctype = "multipart/form-data", AUTOCOMPLETE = "Off", id = "frmEPermit" }))
+                    {
+                        @(Html.HiddenFor(model => model.isForwarded))
+                        @Html.HiddenFor(model => model.MineralGradeId)
+                        @Html.HiddenFor(x => x.MineralNatureId)
+                        @Html.HiddenFor(model => model.UnitId)
+                        @Html.HiddenFor(model => model.MineralId)
+                        @Html.HiddenFor(x => x.EndUser)
+                        @(Html.HiddenFor(model => model.LeaseValidity))
+                        <div class="content-body">
+                            <div class="bg-light p-3 shadow-sm mb-4">
+                                <div class="row">
+                                    <label class="col-lg-3 col-md-4 col-sm-12 col-form-label font-weight-bold">Mineral Name</label>
+                                    <div class="col-lg-9 col-md-8 col-sm-12">
+                                        <label class="form-control-plaintext">
+                                            <span class="colon">:</span>
+                                            <span id='pu'>@Model.MineralName</span>
+                                        </label>
+                                    </div>
+                                    <label class="col-lg-3 col-md-4 col-sm-12 col-form-label font-weight-bold">Mineral sender Name</label>
+                                    <div class="col-lg-9 col-md-8 col-sm-12">
+                                        <label class="form-control-plaintext">
+                                            <span class="colon">:</span>
+                                            @Html.DisplayFor(model => model.Consigner, new { @class = "plaintext", @readonly = "readonly" })
+                                        </label>
+
+                                    </div>
+                                    <label class="col-lg-3 col-md-4 col-sm-12 col-form-label font-weight-bold">Mineral sender Address</label>
+                                    <div class="col-lg-9 col-md-8 col-sm-12">
+                                        <label class="form-control-plaintext">
+                                            <span class="colon">:</span>
+                                            @Html.DisplayFor(model => model.Address, new { @class = "plaintext", @readonly = "readonly" })
+                                        </label>
+                                    </div>
+
+                                    <label class="col-lg-3 col-md-4 col-sm-12 col-form-label font-weight-bold">Mineral Receiver Address</label>
+                                    <div class="col-lg-9 col-md-8 col-sm-12">
+                                        <label class="form-control-plaintext">
+                                            <span class="colon">:</span>
+                                            <span id='Consignee'>@Model.AddressofConsignee</span>
+                                            @*@Html.DisplayFor(model => model.AddressofConsignee, new { @class = "plaintext", @readonly = "readonly" })*@
+                                            @* @(Html.TextBoxFor(model => model.AddressofConsignee, new { @class = "plaintext;", @readonly = "readonly" }))*@
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row note-sec">
+                                <div class="col-lg-12 col-md-12 col-sm-12">
+                                    <h5 class="text-brown font-weight-bold mt-0">Application for Railway Transit Pass</h5>
+                                </div>
+
+                                <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                    <label class="col-form-label font-weight-bolder">E-Permit Number<span class="text-danger">*</span></label>
+                                    @Html.DropDownListFor(model => model.BulkPermitId, ViewBag.PermitNumberLst as IEnumerable<SelectListItem>, "---Select---", new { @class = "form-control  searchableselect", autofocus = "autofocus" })
+                                </div>
+
+                                <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                    <label class="col-form-label font-weight-bolder">Mineral Receiver Name<span class="text-danger">*</span></label>
+                                    @Html.DropDownListFor(model => model.EndUserId, Enumerable.Empty<SelectListItem>(), "---Select---", new { @class = "form-control  searchableselect", autofocus = "autofocus" })
+                                </div>
+
+                                <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                    <label class="col-form-label font-weight-bolder">Name & address of railway siding<small> (where the mineral will be loaded)</small> <span class="text-danger">*</span></label>
+                                    @Html.DropDownListFor(model => model.RailwayId, ViewBag.RailSidingLst as IEnumerable<SelectListItem>, "---Select---", new { @class = "form-control  searchableselect", autofocus = "autofocus" })
+
+                                </div>
+                                <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                    <label class="col-form-label font-weight-bolder">EDRM No. / e-Demand Reference Id<span class="text-danger">*</span></label>
+                                    @(Html.TextBoxFor(model => model.EDRMNumber, new { @class = "form-control" }))
+                                    <small class="text-danger">Provide EDRM details for major minerals & e-Demand details for minor minerals</small>
+                                </div>
+
+
+                                <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                    <label class="col-form-label font-weight-bolder">EDRM / e-Demand Date<span class="text-danger">*</span></label>
+                                    <div class="input-group">
+                                        @(Html.TextBoxFor(model => model.EDRMDate, new { @class = "form-control datepicker", id = "EDRMDate" }))
+                                        <div class="input-group-prepend">
+                                            <label class="input-group-text" for="EDRMDate"><i class="icon-calendar-alt-solid"></i></label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                    <label class="col-form-label font-weight-bolder">Upload EDRM / e-Demand Copy<span class="text-danger">*</span></label>
+                                    
+                                    <div class="custom-file">
+                                        <input type="file" class="custom-file-input" id="Upload" name="flEDRMCopy" multiple>
+                                        <label class="custom-file-label" for="Upload">Choose Files</label>
+                                    </div>
+                                    @* <a href="@Url.Action("Download", "Application", new { name = Model.EDRMCopyPath, path = Model.EDRMCopyPath })" target="_blank" class="file-download-licensee">@((Model.EDRMCopyPath != null) ? Model.EDRMCopyPath : "")</a>*@
+                                </div>
+                                <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                    <label class="col-form-label font-weight-bolder">Quantity of Mineral (Tonne) in EDRM<span class="text-danger">*</span></label>
+                                    @(Html.TextBoxFor(model => model.EDRMQty, new { @class = "form-control", @type = "number" }))
+                                </div>
+                                <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                    <label class="col-form-label font-weight-bolder">Quantity of Mineral (Tonne)<span class="text-danger">*</span></label>
+                                    @(Html.TextBoxFor(model => model.ReqQty, new { @class = "form-control", @type = "number" }))
+                                </div>
+                                <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                    <label class="col-form-label font-weight-bolder">Name & address of destination railway siding<span class="text-danger">*</span></label>
+                                    @Html.DropDownListFor(model => model.DestinationRailwayId, ViewBag.RailDestSidingLst as IEnumerable<SelectListItem>, "---Select---", new { @class = "form-control searchableselect", autofocus = "autofocus" })
+                                </div>
+
+                                <div class="col-lg-12 mt-4">
+                                    @if (Model == null || Model.isForwarded == 1 || Model.isForwarded < 1 || Model.isForwarded == null)
+                                    {
+
+                                        <input type="button" style="width: 120px" title="Apply RTP" value="Apply RTP" class="btn btn-primary btn-md ml-0 waves-effect waves-light" onclick="return OnForwarding();" />
+
+                                        <input type="submit" title="Preview" value="Preview" name="cmdPreview" class="btn btn-primary" style="display: none;" id="btnPreview" />
+
+                                        <input type="button" title="Forward to DD/DMO" value="Forward to DD/DMO" class="btn btn-primary" style="display: none;" onclick="return OnForwarding();" />
+
+                                    }
+                                    else if (Model != null || Model.isForwarded != null || Model.isForwarded == 3)
+                                    {
+                                        <input type="submit" title="Preview" value="Preview" name="cmdPreview" class="btn btn-primary" id="btnPreview" />
+                                        // <input type="button" title="Apply RTP" value="Apply RTP" class="btn btn-primary" onclick="return OnApplyRTP();" />
+                                    }
+
+                                    else
+                                    {
+                                        <input type="button" title="Preview" value="Preview" class="btn btn-primary" />
+                                    }
+                                    @*<a href="javascript:void(0);" class="btn btn-primary btn-md ml-0 waves-effect waves-light">Apply RTP</a>
+                        <a href="#" class="btn btn-danger btn-md waves-effect waves-light">Reset</a>*@
+                                </div>
+
+
+                            </div>
+
+                        </div>
+
+                    }
+                </section>
+            </div>
+        </div>
+    </div>
+    <!-- MAIN CONTENT AREA ENDS -->
+</section>
+
+
+<script>
+    indicateMe = "yes"
+    backMe = "yes"
+    $(document).ready(function () {
+        loadNavigation('Add', 'glhelpdesk', 'plraiseticket', 'tl', 'Permit', 'Apply RTP', ' ');
+        $('.datetime').datetimepicker({
+            format: "DD/MM/YYYY"
+        }).keydown(false);
+    });
+</script>
+<script>
+    $(document).ready(function () {
+        $('.datepicker').datetimepicker({
+            format: 'LT',
+            format: 'DD-MM-YYYY',
+
+        });
+    });
+</script>
+<script>
+    var filesize = 0;
+    $('#Upload').bind('change', function () {
+
+        //this.files[0].size gets the size of your file.
+        filesize = this.files[0].size;
+       
+
+    });
+    //$('input[name="flEDRMCopy"]').bind('change', function () {
+    //    filesize = this.files[0].size;
+    //    return false;
+    //});
+    var StockQty = 0;
+    $(document).ready(function () {
+        $("#BulkPermitId").change(function () {
+
+            var BulkPermitId = $('#BulkPermitId').val();
+            if (BulkPermitId == "") {
+                BulkPermitId = 0;
+            }
+            //alert(RoleTypeId.toString());
+            $('#EndUserId').empty();
+            var v = "";
+            if (BulkPermitId != 0) {
+
+                $.ajax({
+                    type: "POST",
+                    url: "/Permit/Transit/GetPurchaseConsignee",
+                    data: { 'BulkPermitId': BulkPermitId },
+                    cache: false,
+                    //contentType: "application/json",
+                    datatype: "JSON",
+                    success: function (SList) {
+                        var opt = new Option('---Select---', 0);
+                        $('#EndUserId').append(opt).selectpicker('refresh');
+                        $.each(SList, function (i, item) {
+
+                            // console.log(item);
+                            var opt = new Option(item.PurchaserConsigneeName, item.PurchaserConsigneeId);
+                            $('#EndUserId').append(opt).selectpicker('refresh');
+                        });
+
+                    }
+                });
+            }
+            else {
+                $('#EndUserId').val("");
+                alert('Select Mineral Receiver');
+            }
+            if (BulkPermitId != 0) {
+
+                $.ajax({
+                    type: "POST",
+                    url: "/Permit/Transit/GetAvailableData",
+                    data: { 'BulkPermitId': BulkPermitId },
+                    cache: false,
+                    //contentType: "application/json",
+                    datatype: "JSON",
+                    success: function (SList) {
+                        $.each(SList, function (i, item) {
+                            $('#Consigner').val(item.Consigner);
+                            $('#Address').val(item.Address);
+                            $('#TelephoneNo').val(item.TelephoneNo).change();
+                            $('#GrantOrderDate').val(item.GrantOrderDate).change();
+                            $('#GrantOrderNo').val(item.GrantOrderNo).change();
+                            $('#LeaseFrom').val(item.LeaseFrom).change();
+                            $('#LeaseTo').val(item.LeaseTo).change();
+                            $('#UnitId').val(item.UnitId).change();
+                            $('#UnitName').val(item.UnitName).change();
+                            $('#MineralNatureId').val(item.MineralNatureId).change();
+                            $('#MineralNature').val(item.MineralNature).change();
+                            $('#MineralId').val(item.MineralID);
+                            $('#MineralName').val(item.MineralName);
+                            var pu = $("#pu");
+                            pu.empty();
+                            pu.append(item.MineralName);
+                            $('#MineralGradeId').val(item.MineralGradeId).change();
+                            $('#MineralGrade').val(item.MineralGrade).change();
+                            
+                        });
+
+                    }
+                });
+            }
+            if (BulkPermitId != 0) {
+
+                $.ajax({
+                    type: "POST",
+                    url: "/Permit/Transit/GetStockDetails",
+                    data: { 'BulkPermitId': BulkPermitId },
+                    cache: false,
+                    //contentType: "application/json",
+                    datatype: "JSON",
+                    success: function (SList) {
+                        $.each(SList, function (i, item) {
+                            StockQty = item.StockQty;
+                        });
+
+                    }
+                });
+            }
+        });
+        $("#EndUserId").change(function () {
+          
+            var EndUserId = $('#EndUserId').val();
+            var BulkPermitId = $('#BulkPermitId').val();
+            if (EndUserId == "") {
+                EndUserId = 0;
+            }
+            //alert(RoleTypeId.toString());
+            $('#AddressofConsignee').empty();
+            var v = "";
+            if (EndUserId != 0) {
+               
+                $.ajax({
+                    type: "POST",
+                    url: "/Permit/Transit/GetConsigneeAddress",
+                    data: { 'EndUserId': EndUserId, 'BulkPermitId': BulkPermitId},
+                    cache: false,
+                    //contentType: "application/json",
+                    datatype: "JSON",
+                   
+                    success: function (SList) {
+                     
+                        $.each(SList, function (i, item) {
+                            Consignee
+                            var Consignee = $("#Consignee");
+                            Consignee.empty();
+                            Consignee.append(item.Address);
+                        });
+
+                    }
+                    
+                });
+            }
+            else {
+                $('#AddressofConsignee').val("");
+                alert('Select Consignee Name');
+            }
+        });
+    });
+     function checkFields() {
+        
+        var valid = 1;
+        if (!blankFieldValidation("BulkPermitId", "e-Permit")) {
+            valid = 0;
+            return false;
+        }
+       
+         if (!DropDownValidation("EndUserId", "mineral receiver")) {
+            valid = 0;
+            return false;
+        }
+       
+         if (!DropDownValidation("RailwayId", "name and address of railway siding from where the mineral will be loaded.")) {
+             alert($("#RailwayId").val());
+             valid = 0;
+             return false;
+         }
+       
+         if (!DropDownValidation("MineralId", "mineral name.")) {
+             valid = 0;
+             return false;
+         }
+        
+         if (!DropDownValidation("MineralGradeId", "mineral grade.")) {
+             valid = 0;
+             return false;
+         }
+       
+         if (!blankFieldValidation("EDRMNumber", "EDRM Number")) {
+             valid = 0;
+             return false;
+         }
+
+       
+         if (!blankFieldValidation("EDRMDate", "EDRM Date")) {
+             valid = 0;
+             return false;
+         }
+       
+        if ($('#EDRMQty').val() == null || $('#EDRMQty').val() == "" || Number($('#EDRMQty').val()) == 0) {
+            valid = 0;
+            alert("please enter quantity of mineral in EDRM.");
+            return false;
+        }
+        if ($('#ReqQty').val() == null || $('#ReqQty').val() == "" || Number($('#ReqQty').val()) == 0) {
+            valid = 0;
+            alert("please enter quantity of mineral.");
+            return false;
+        }
+        else {
+            var vv = Number($('#ReqQty').val());
+            var edQty = Number($('#EDRMQty').val());
+            if (vv > Number(StockQty)) {
+                valid = 0;
+                alert("Quantity exceeding the available quantity of e-permit : " + StockQty + ".");
+                return false;
+            }
+            if (vv > edQty) {
+                valid = 0;
+                alert("Quantity exceeding the EDRM Quantity.");
+                return false;
+            }
+        }
+        if ($("#DestinationRailwayId").val() == null || $("#DestinationRailwayId").val() == "") {
+            valid = 0;
+            alert("please select name and address of destination railway siding.");
+            return false;
+        }
+        if ('@Model' != '' && '@Model.isForwarded' != null && '@Model.isForwarded' == 3) {
+            if ($('#NoofRTP').val() == null || $('#NoofRTP').val() == "") {
+                valid = 0;
+                alert("please enter no of RTP required.");
+                return false;
+            }
+        }
+         //if (!FileUploadValidation("flEDRMCopy", "EDRM Receipt")) {
+         //    valid = 0;
+         //    return false;
+         //}
+        if (filesize == 0) {
+            alert("Upload EDRM Receipt");
+            return false;
+        }
+        if (filesize > 2048000) {
+            alert(filesize);
+            alert("Upload file should be less then equal to 2 MB!");
+            return false;
+        }
+
+        return valid;
+         
+    }
+    function OnForwarding() {
+        
+        //var str = "MIAGCSqGSIb3DQEHAqCAMIACAQExCzAJBgUrDgMCGgUAMIAGCSqGSIb3DQEHAaCAJIAEGkRpZ2l0YWwgU2lnbmF0dXJlIFJlcXVpcmVkAAAAAAAAoIAwggaMMIIFdKADAgECAgpLrC6sAAAAAABPMA0GCSqGSIb3DQEBBQUAME0xEzARBgoJkiaJk_IsZAEZFgNjb20xFDASBgoJkiaJk_IsZAEZFgRpc3BsMSAwHgYDVQQDExdpc3BsLVdJTi1GTFU0V1hYNzdHOC1DQTAeFw0xNjA0MjYwNzQxNTJaFw0xNzA0MjYwNzQxNTJaMFgxEzARBgoJkiaJk_IsZAEZFgNjb20xFDASBgoJkiaJk_IsZAEZFgRpc3BsMREwDwYDVQQLEwhpbmZpbml1bTEYMBYGA1UEAxMPRW1tYW51ZWwgTWFjd2FuMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAssJVqojqxxGp9Si74R0j_cgGua13r5ct8qok2tM6PEImc0jX8Rn25wqwvyj7BJud_KL9VlXoyuXOjE14jW1ly4ajE7QeMLJtvOl0Dt26lX_TD2VVzouQs9BAL3UR2JHXflLNhkXlgi-e2jmKr9x-xPPcinSmjB9va1nNfn26ZibcJeSae3t8ZIvDueI_PAm1wia3pi-EJpgMzhepsmCoXVaUppbpiw6HxCEDVGIUHgUo2MJXNPKDH63JoClsgqg1aGaddFjYOOGyQ0J-ZGa0UTKMoPsKlfe5Agp5zepqTNwEUd7w7SCanUIn1hEAYEqMvgovOrUWF0S7ckO1jhQ_ZQIDAQABo4IDYTCCA10wFQYJKwYBBAGCNxQCBAgeBgBFAEYAUzAVBgNVHSUEDjAMBgorBgEEAYI3CgMEMA4GA1UdDwEB_wQEAwIFIDBEBgkqhkiG9w0BCQ8ENzA1MA4GCCqGSIb3DQMCAgIAgDAOBggqhkiG9w0DBAICAIAwBwYFKw4DAgcwCgYIKoZIhvcNAwcwHQYDVR0OBBYEFKQSKFqOoWq6Q6WBLTDlSE2vc96NMB8GA1UdIwQYMBaAFEO8-Ay6NxobRAZ9776_rBKwTz5lMIIBJwYDVR0fBIIBHjCCARowggEWoIIBEqCCAQ6GgcNsZGFwOi8vL0NOPWlzcGwtV0lOLUZMVTRXWFg3N0c4LUNBLENOPVdJTi1GTFU0V1hYNzdHOCxDTj1DRFAsQ049UHVibGljJTIwS2V5JTIwU2VydmljZXMsQ049U2VydmljZXMsQ049Q29uZmlndXJhdGlvbixEQz1pc3BsLERDPWNvbT9jZXJ0aWZpY2F0ZVJldm9jYXRpb25MaXN0P2Jhc2U_b2JqZWN0Q2xhc3M9Y1JMRGlzdHJpYnV0aW9uUG9pbnSGRmh0dHA6Ly93aW4tZmx1NHd4eDc3ZzguaXNwbC5jb20vQ2VydEVucm9sbC9pc3BsLVdJTi1GTFU0V1hYNzdHOC1DQS5jcmwwggE1BggrBgEFBQcBAQSCAScwggEjMIGzBggrBgEFBQcwAoaBpmxkYXA6Ly8vQ049aXNwbC1XSU4tRkxVNFdYWDc3RzgtQ0EsQ049QUlBLENOPVB1YmxpYyUyMEtleSUyMFNlcnZpY2VzLENOPVNlcnZpY2VzLENOPUNvbmZpZ3VyYXRpb24sREM9aXNwbCxEQz1jb20_Y0FDZXJ0aWZpY2F0ZT9iYXNlP29iamVjdENsYXNzPWNlcnRpZmljYXRpb25BdXRob3JpdHkwawYIKwYBBQUHMAKGX2h0dHA6Ly93aW4tZmx1NHd4eDc3ZzguaXNwbC5jb20vQ2VydEVucm9sbC9XSU4tRkxVNFdYWDc3RzguaXNwbC5jb21faXNwbC1XSU4tRkxVNFdYWDc3RzgtQ0EuY3J0MDMGA1UdEQQsMCqgKAYKKwYBBAGCNxQCA6AaDBhlbW1hbnVlbC5tYWN3YW5AaXNwbC5jb20wDQYJKoZIhvcNAQEFBQADggEBABmDUTEvUzpfF-NvUZzUdL2obdVEZG-Ut6saeqkAlHqXsCEq1UaAxblc5UCK4o_uynqrXPcN79FEca5W_Wh_EhgQNcu-zmP6Dpvmmy3FJvL3rfjNjP5EiZsQBMozhX3qLON2zl9um6B1av8vc89DXN0WY4Zwjb01SY6OeQoeQ9se16psREp-LTjHBf0Xj2VPh6q3y9k9sxZlBuTizRHvxQTnP4xFnMeJ9chwIrdjfJyGNoAIQmT0UuDOGIkMKgWz9c4J1XGi0arEI_DsjkGtV4vnHut7WrxzJylpcXIpUwAIizjWowZnOUT-7DqU9JaLWzXerwiAbHk6_teqzHZLO3EAADGCAeEwggHdAgEBMFswTTETMBEGCgmSJomT8ixkARkWA2NvbTEUMBIGCgmSJomT8ixkARkWBGlzcGwxIDAeBgNVBAMTF2lzcGwtV0lOLUZMVTRXWFg3N0c4LUNBAgpLrC6sAAAAAABPMAkGBSsOAwIaBQCgXTAYBgkqhkiG9w0BCQMxCwYJKoZIhvcNAQcBMBwGCSqGSIb3DQEJBTEPFw0xNzAxMDIxMDEwNTZaMCMGCSqGSIb3DQEJBDEWBBS4WhBDX6nZS_qehcLLxuPs51VEijANBgkqhkiG9w0BAQEFAASCAQCoXNNsgFF7m6rnoDMX9ACddc14xTQbu4LnPVKvSQuwG_92AlFy-9bXJnuWQwoSqAJDG_gJwN164fipklQdDje5FCmDFu9Th0cru7AdImY7z16auX2-YVOgve5NJPlLmmL5HLC0cFwFE_JCb5iM_fitLDSn8mvVccf_sOJFe7bzm_-oFYyDN9LYLYyfQlxtdLng6PmMWxBm0fO5tYrrFG6IttnYf0WEuV1vRqsqWTWlpQdYVGlwQJYmjqU10mWqWCVW1F65pwc3nTOwN5VqzoOMo0VjQ0LrNIWz64OHOvqjLBNrRBuquqFNtOCzHTmz2miV0ZJUqOSzD5pFRLLnvsIeAAAAAAAA";
+        var checkdata = checkFields();
+
+        if (checkdata == 1) {
+            $(".loader-wrap").show();
+            if (confirm("Before apply RTP application you need to apply your Digital Signature. Are you confirmed to apply RTP Application??")) {
+                var Postdata = 'action=signdoc' + "\n" + 'datatosign=Digital Signature Required' + "\n" + 'signaction=sign' + "\n" + 'filepath=' + "\n" + 'panNumberParam=' + "\n" + 'expirycheck=false' + "\n" + 'issuername=' + "\n" + 'certclass=1|2|3' + "\n" + 'certtype=ALL';
+                connection.send(Postdata);
+
+                connection.onerror = function (error) {
+                    alert('Please check the server connection: ' + error);
+                    alert(error);
+                };
+
+                connection.onmessage = function (e) { // when DSC is success then following function executed.
+                    if (e.data.indexOf("subProtocol") == -1) {
+                        $("#DSCResponse").val(e.data).change();
+                        $(".loader-wrap").show();
+                        $.ajax(
+                        {
+                            url: '@Url.Action("CheckVerifyResponse", "Transit", new { Area = "Permit" })',
+                            type: "POST",
+                            data: { contentType: "pkcs7", signDataBase64Encoded: e.data, responseType: "plain" },
+                            success: function (msg) {
+
+                                //alert(msg);
+                                if (msg == "SUCCESS") {
+                                    if ($("#BulkPermitId").val() == null || $("#BulkPermitId").val() != "") {
+                                        $("#isForwarded").val(1).change();
+                                        $("#frmEPermit").submit();
+                                    }
+                                }
+                            }
+                        });
+                    }
+                    else {
+                        alert(e.data);
+                    }
+                };
+            }
+            else {
+                return false;
+            }
+        }
+        else {
+            return false;
+        }
+    }
+
+    try {
+        var connection = new WebSocket('wss://localhost.emudhra.com:8080');
+        connection.onopen = function () {
+            console.log('Connection Opened');
+        };
+        connection.onerror = function (error) {
+        };
+        connection.onmessage = function (e) {
+            if (e.data.indexOf("subProtocol") == -1) {
+            }
+        };
+    }
+    catch (e) {
+        swal("", "No DSC Connection Found", "warning");
+    }
+
+</script>

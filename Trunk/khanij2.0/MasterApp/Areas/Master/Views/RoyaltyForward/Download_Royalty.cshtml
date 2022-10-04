@@ -1,0 +1,341 @@
+﻿@model MasterEF.RoyaltyForwardmaster
+@{
+    ViewData["Title"] = "Download_Royalty";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+
+<style>
+    #Calculation {
+        text-align: center;
+        position: absolute;
+        white-space: nowrap;
+        padding: 1em;
+        cursor: pointer;
+    }
+</style>
+<section class="content-header">
+    @* <h1>Download e-LTP Permit Application
+            <img src="@Url.Content("~/Images/1475779253_BT_printer.ico")" style="height:40px;width:40px;" onclick="getPDF('form')"  />
+
+        </h1>*@
+
+    @if (Model == null || (Model.RoyaltyCreaterFilePath == null || Model.RoyaltyCreaterFilePath == ""))
+    {
+        if (Model.RoyaltyId == null || Model.RoyaltyId == 0)
+        {
+            <h1>
+                Save Royalty Draft Copy
+                @*<img src="@Url.Content("~/Images/1475779253_BT_printer.ico")" style="height:40px;width:40px; cursor:pointer;" onclick="getPDF('form')" />*@
+            </h1>
+        }
+        else
+        {
+            <h1>
+                <span id="lblGenerate">Generate Royalty Application</span>
+                @*<img src="@Url.Content("~/Images/1475779253_BT_printer.ico")" style="height:40px;width:40px; cursor:pointer; " id="FNClick" onclick="getPDF2('form')" />*@
+            </h1>
+        }
+    }
+    else
+    {
+        <h1>
+            <span id="lblGenerate">Download Royalty Application</span>
+            <a target="_blank" class="btn btn-primary" href='@Model.RoyaltyCreaterFilePath'>Download</a>
+        </h1>
+
+    }
+
+</section>
+<section class="content">
+    <div class="row panel-heading-setting">
+        <div class="col-xs-12">
+            <table id="tablePRint" class="pdf-page table table-responsive" style="margin-bottom: 2px; margin-top: 15px; border: 0px solid black">
+
+                @(Html.HiddenFor(model => model.Type))
+                @(Html.HiddenFor(model => model.RoyaltyId))
+                @(Html.HiddenFor(model => model.RoyaltyCreaterFilePath))
+
+
+                <tr>
+                    <td>
+                        <table class="table table-responsive" style="margin-bottom: 2px; background-color: #F2F2F2">
+                            <tr>
+                                <th rowspan="2" style="text-align: center; border-top: 1px solid black; border-left: 1px solid black;">
+                                    @*<img id="imgLogo" src="@Url.Content("~/Images/CHHATTISGARHLOGO.png")" style="height: 100px; width: 100px;" alt="LOGO" />*@
+                                </th>
+                            </tr>
+                            <tr>
+                                <td style="border-top: 1px solid black; border-right: 1px solid black; text-align: center">
+                                    <span id="lead1" class="lead" style="font-size: 3vw; text-align: center">MINERAL RESOURCES DEPARTMENT</span>
+                                    <br />
+                                    <span id="lead2" class="lead" style="font-size: 1.5vw; text-align: center; color: red">GOVERNMENT OF CHHATTISGARH</span>
+                                    <br />
+                                    @*   <span id="lead3" class="lead" style="font-size: 1vw; text-align: center; color: red">(@(Html.DisplayFor(model => model.DistrictName))  District)</span>*@
+                                </td>
+                            </tr>
+                        </table>
+                        <table id="tablePRint2" class="pdf-page table table-responsive" style="margin-bottom: 10px; border: 1px solid black">
+                            @* <tr>
+                                    <td colspan="3" style="border-top: 1px solid black; text-align: center">
+                                        <span class="lead" style="font-size: 16px; text-align: center">Form-11
+                                            <br />
+                                            [See rule 4(6) (2)]
+                                            <br />
+                                            LTP-Permit Application
+                                        </span>
+                                    </td>
+                                </tr>*@
+                            <tr>
+                                <td style="border: 1px solid black; width: 5%; text-align: center">
+                                    <span>1</span>
+                                </td>
+                                <td style="border: 1px solid black; width: 45%;">
+                                    <span>Mineral Category</span>
+                                </td>
+                                <td style="border: 1px solid black; width: 50%;">
+                                    <span>@(Html.DisplayFor(model => model.MineralType))</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="border: 1px solid black; width: 5%; text-align: center">
+                                    <span>2</span>
+                                </td>
+                                <td style="border: 1px solid black; width: 45%;">
+                                    <span>Mineral Schedule</span>
+                                </td>
+                                <td style="border: 1px solid black; width: 50%;">
+                                    <span>@(Html.DisplayFor(model => model.MineralScheduleName))</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="border: 1px solid black; width: 5%; text-align: center">
+                                    <span>3</span>
+                                </td>
+                                <td style="border: 1px solid black; width: 45%;">
+                                    <span>Mineral Schedule Part</span>
+                                </td>
+                                <td style="border: 1px solid black; width: 50%;">
+                                    <span>@(Html.DisplayFor(model => model.MineralSchedulePart))</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="border: 1px solid black; width: 5%; text-align: center">
+                                    <span>4</span>
+                                </td>
+                                <td style="border: 1px solid black; width: 45%;">
+                                    <span>Mineral Name</span>
+                                </td>
+                                <td style="border: 1px solid black; width: 50%;">
+                                    <span>@(Html.DisplayFor(model => model.MineralName))</span>
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td style="border: 1px solid black; width: 5%; text-align: center">
+                                    <span>5</span>
+                                </td>
+                                <td style="border: 1px solid black; width: 45%;">
+                                    <span>Mineral Unit</span>
+                                </td>
+                                <td style="border: 1px solid black; width: 50%;">
+                                    <span>@(Html.DisplayFor(model => model.UnitName))</span>
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td style="border: 1px solid black; width: 5%; text-align: center">
+                                    <span>6</span>
+                                </td>
+                                <td style="border: 1px solid black; width: 45%;">
+                                    <span>Royalty Basis</span>
+                                </td>
+                                <td style="border: 1px solid black; width: 50%;">
+                                    <span>@(Html.DisplayFor(model => model.RoyaltyRateType))</span>
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td style="border: 1px solid black; width: 5%; text-align: center">
+                                    <span>7</span>
+                                </td>
+                                <td style="border: 1px solid black; width: 45%;">
+                                    <span>Mineral Form</span>
+                                </td>
+                                <td style="border: 1px solid black; width: 50%;">
+                                    <span>@(Html.DisplayFor(model => model.MineralNature))</span>
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td style="border: 1px solid black; width: 5%; text-align: center">
+                                    <span>8</span>
+                                </td>
+                                <td style="border: 1px solid black; width: 45%;">
+                                    <span>Mineral Grade</span>
+                                </td>
+                                <td style="border: 1px solid black; width: 50%;">
+                                    <span>@(Html.DisplayFor(model => model.MineralGrade))</span>
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td style="border: 1px solid black; width: 5%; text-align: center">
+                                    <span>9</span>
+                                </td>
+                                <td style="border: 1px solid black; width: 45%;">
+                                    <span>Royalty Rate</span>
+                                </td>
+                                <td style="border: 1px solid black; width: 50%;">
+                                    @if (Model != null && Model.CalculationType == "%")
+                                    {
+                                        <span>@(Html.DisplayFor(model => model.RoyaltyRate)) </span>
+                                        <span>% Of</span>
+                                        <span>@(Html.DisplayFor(model => model.AverageSalePrice))</span>
+                                    }
+                                    else
+                                    {
+
+                                        <span>@(Html.DisplayFor(model => model.RoyaltyRate)) </span>
+                                        <span>@(Html.DisplayFor(model => model.CalculationType))</span>
+
+                                    }
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td style="border: 1px solid black; width: 5%; text-align: center">
+                                    <span>10</span>
+                                </td>
+                                <td style="border: 1px solid black; width: 45%;">
+                                    <span>Royalty </span>
+                                </td>
+                                <td style="border: 1px solid black; width: 50%;">
+                                    @if (Model != null && Model.CalculationType == "%")
+                                    {
+                                        if (Model.MineralName.ToUpper().Contains("COAL"))
+                                        {
+                                            <span>@(Html.DisplayFor(model => model.CalculationType))</span>
+                                        }
+                                        else
+                                        {
+
+                                            var RoyaltyRate = String.Format("{0:0.00}", Convert.ToDecimal(Model.RoyaltyRate) * Convert.ToDecimal(Model.AverageSalePrice) / 100);
+
+                                            <span>@RoyaltyRate</span>
+                                        }
+                                    }
+                                    else
+                                    {
+
+                                        <span>@(Html.DisplayFor(model => model.RoyaltyRate)) </span>
+                                        <span>@(Html.DisplayFor(model => model.CalculationType))</span>
+
+
+                                    }
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="border: 1px solid black; width: 5%; text-align: center">
+                                    <span>11</span>
+                                </td>
+                                <td style="border: 1px solid black; width: 45%;">
+                                    <span>Rate Effective From</span>
+                                </td>
+                                <td style="border: 1px solid black; width: 50%;">
+                                    <span>@(Html.DisplayFor(model => model.RateEffectiveFrom))</span>
+                                </td>
+                            </tr>
+                            @*<tr>
+                                <td style="border: 1px solid black; width: 5%; text-align: center">
+                                    <span>12</span>
+                                </td>
+                                <td style="border: 1px solid black; width: 45%;">
+                                    <span>Royalty Rate Status</span>
+                                </td>
+                                <td style="border: 1px solid black; width: 50%;">
+                                    <span>@(Html.DisplayFor(model => model.IsActive))</span>
+                                </td>
+                            </tr>*@
+
+                            <tr>
+                                <td style="border: 1px solid black; width: 5%; text-align: center">
+                                    <span>12</span>
+                                </td>
+                                <td style="border: 1px solid black; width: 45%;">
+                                    <span>Remarks</span>
+                                </td>
+                                <td style="border: 1px solid black; width: 50%;">
+                                    <span>@(Html.DisplayFor(model => model.Remarks))</span>
+                                </td>
+                            </tr>
+
+                            @*  <tr>
+                                    <td style="border: 1px solid black; width: 5%; text-align: center">
+                                        <span>14</span>
+                                    </td>
+                                    <td style="border: 1px solid black; width: 45%;">
+                                        <span>Details Of Railway Receipt</span>
+                                    </td>
+                                    <td style="border: 1px solid black; width: 50%;">
+                                        <span>@(Html.DisplayFor(model => model.DetailOfRailwayReceipt))</span>
+                                    </td>
+                                </tr>*@
+                            <tr>
+                                <td style="border: 1px solid black; width: 5%; text-align: center">
+                                    <span>13</span>
+                                </td>
+                                <td style="border: 1px solid black; width: 45%;">
+                                    <span>Generated Date and Time</span>
+                                </td>
+                                <td style="border: 1px solid black; width: 50%;">
+                                    <span>@(System.DateTime.Now.ToString("dd/MM/yyyy hh:mm:ss tt"))</span>
+                                </td>
+                            </tr>
+                            <tr style="height: 90px">
+                                <td style="border: 1px solid black; width: 5%; text-align: center">
+                                    <span>14</span>
+                                </td>
+                                <td style="width: 45%; border-bottom: 1px solid black; border-top: 1px solid black; border-left: 1px solid black;">
+                                    <span>DSC</span>
+                                </td>
+                                <td style="border-bottom: 1px solid black; border-top: 1px solid black; border-right: 1px solid black; width: 50%;"></td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <div id="javaRequiredDiv">
+    </div>
+
+    @*<input id="SavePathName" type="hidden"
+        value="@Path.Combine(System.Web.HttpContext.Current.Server.MapPath(System.Configuration.ConfigurationManager.AppSettings["FNDSCCreateFilePATH"]))" />*@
+    <input id="fName" type="hidden" />
+    <input id="fid" type="hidden" />
+
+</section>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.22/pdfmake.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/0.4.1/html2canvas.min.js"></script>
+<script>
+    $(document).ready(function () {
+        fnPrintFrom();
+    });
+    function fnPrintFrom() {
+        html2canvas($('#tablePRint'), {
+            onrendered: function (canvas) {
+                var data = canvas.toDataURL();
+                var docDefinition = {
+                    content: [{
+                        image: data,
+                        width: 500
+                    }]
+                };
+                pdfMake.createPdf(docDefinition).download("Royalty.pdf");
+            }
+        });
+
+    }
+</script>
+

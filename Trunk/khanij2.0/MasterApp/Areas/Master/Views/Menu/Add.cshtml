@@ -1,0 +1,208 @@
+﻿@*// *********************************************************************************************************
+    //  View Name                : Add
+    //  Desciption               : To Add,Edit,Update,Delete Menu master details
+    //  Created By               : Lingaraj Dalai
+    //  Created On               : 29 Jan 2021
+    // ********************************************************************************************************
+*@
+@model MasterEF.Menumaster;
+@{
+    ViewData["Title"] = "Add";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+<script>
+    indicateMe = "yes"
+    $(document).ready(function () {
+        loadNavigation('Add', 'glRoleRes', 'plUser', 'tl', 'Master', 'Menu', ' ');
+        $('.searchableselect').searchableselect();
+        $("#Submit").click(function () {
+            if (!blankFieldValidation("MenuName", "Menu Name")) {
+                return false;
+            }
+            else if (!DropDownValidation("MmenuID", "Root Master")) {
+                return false;
+            }
+            else if (!blankFieldValidation("Area", "Area")) {
+                return false;
+            }
+            else if (!blankFieldValidation("Controller", "Controller")) {
+                return false;
+            }
+            else if (!blankFieldValidation("ActionName", "Action Name")) {
+                return false;
+            }
+            else if (!blankFieldValidation("Description", "Description")) {
+                return false;
+            }
+            else if (!blankFieldValidation("url", "url")) {
+                return false;
+            }
+        });
+    });
+    function CountAddress() {
+        $("#lblRemarks").text(200 - (document.getElementById("Description").value.length));
+    }
+</script>
+@if (ViewBag.msg != null)
+{
+<script>
+        var msg = '@ViewBag.msg'
+        if (msg == "1") {
+            swal("", "Menu added successfully.", "warning");
+            var url = '@Url.Action("Add", "Menu", new { Area = "master" })';
+            setTimeout(function () {
+                window.location.href = url
+            }, 5000);
+        }
+        else if (msg == "4") {
+            swal("", "Menu updated successfully.", "warning");
+            var url = '@Url.Action("ViewList", "Menu", new { Area = "master" })';
+            setTimeout(function () {
+                window.location.href = url
+            }, 5000);
+        }
+        else if (msg == "2") {
+            swal("", "Menu name already exist!", "warning");
+            var url = '@Url.Action("Add", "Menu", new { Area = "master" })';
+            setTimeout(function () {
+                window.location.href = url
+            }, 5000);
+        }
+        else {
+            swal("", "Menu add failure!", "warning");
+            var url = '@Url.Action("Add", "Menu", new { Area = "master" })';
+            setTimeout(function () {
+                window.location.href = url
+            }, 5000);
+        }
+</script>
+}
+@if (TempData["msg"] != null)
+{
+    <script>
+        swal("", '@TempData["msg"]', "success");
+    </script>
+}
+
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        <!-- MAIN CONTENT AREA STARTS -->
+        @Html.Partial("_CMSnavigation")
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="javascript:void(0);">
+                                Add
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="~/Master/Menu/ViewList">
+                                View
+                            </a>
+                        </li>
+                    </ul>
+                    @Html.Partial("_CMSutil")
+                    @*<uc1:util runat="server" ID="util" />*@
+                </div>
+                <section class="box form-container">
+                    <div class="content-body">
+                        @using (Html.BeginForm("Add", "Menu", FormMethod.Post, new { AUTOCOMPLETE = "Off", id = "form1" }))
+                        {
+                            @Html.AntiForgeryToken()
+                            <div class="row">
+                                <div class="col-lg-4 col-md-8">
+                                    <label class="col-form-label">Menu Name <span class="text-danger">*</span></label>
+                                    <div class="form-group">
+                                        @Html.TextBoxFor(m => m.MenuName, new { @class = "form-control", @autofocus = "autofocus", @width = "400" })
+                                        @Html.HiddenFor(m => m.MenuId)
+                                        <span class="text-danger">@Html.ValidationMessageFor(m => m.MenuName)</span>
+                                    </div>
+                                </div>
+                                <div class="col-lg-4 col-md-8">
+                                    <label class="col-form-label">Root Master <span class="text-danger">*</span></label>
+                                    <div class="form-group">
+                                        @Html.DropDownList("MmenuID", ViewBag.Parentmenu as IEnumerable<SelectListItem>, "Select Parent Menu", new { @class = "form-control searchableselect", autofocus = "autofocus" })
+                                        <span class="text-danger">@Html.ValidationMessageFor(m => m.MmenuID)</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-4 col-md-8">
+                                    <div class="form-group">
+                                        <label class="col-form-label">Area <span class="text-danger">*</span></label>
+                                        @Html.TextBoxFor(m => m.Area, new { @class = "form-control", @autofocus = "autofocus", @width = "400" })
+                                        <span class="text-danger">@Html.ValidationMessageFor(m => m.Area)</span>
+                                    </div>
+                                </div>
+                                <div class="col-lg-4 col-md-8">
+                                    <label class="col-form-label">Controller <span class="text-danger">*</span></label>
+                                    <div class="form-group">
+                                        @Html.TextBoxFor(m => m.Controller, new { @class = "form-control", @autofocus = "autofocus", @width = "400" })
+                                        <span class="text-danger">@Html.ValidationMessageFor(m => m.Controller)</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-4 col-md-8">
+                                    <label class="col-form-label">Action <span class="text-danger">*</span></label>
+                                    <div class="form-group">
+                                        @Html.TextBoxFor(m => m.ActionName, new { @class = "form-control", @autofocus = "autofocus", @width = "400" })
+                                        <span class="text-danger">@Html.ValidationMessageFor(m => m.ActionName)</span>
+                                    </div>
+                                </div>
+                                <div class="col-md-1">
+                                    <label class="col-form-label">Operation </label>
+                                    <div class="form-group">
+                                        @Html.CheckBoxFor(m => m.Operation, new { @class = "form-control", @autofocus = "autofocus" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-4 col-md-8">
+                                    <label class="col-form-label">Description <span class="text-danger">*</span></label>
+                                    <div class="form-group">
+                                        @Html.TextAreaFor(m => m.Description, new { @class = "form-control", @autofocus = "autofocus", @width = "400", @maxlength = "200", @rows = "3", @onkeyup = "CountAddress()" })
+                                        <small class="text-danger">Maximum <strong><label id="lblRemarks" class="col-form-label">200</label></strong> characters</small>
+                                    </div>
+                                </div>
+                                <div class="col-lg-4 col-md-8">
+                                    <label class="col-form-label">URL <span class="text-danger">*</span></label>
+                                    <div class="form-group">
+                                        @Html.TextBoxFor(m => m.url, new { @class = "form-control", @autofocus = "autofocus", @width = "400" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-4 col-md-8">
+                                    <label class="col-form-label">gif Icon </label>
+                                    <div class="form-group">
+                                        @Html.TextBoxFor(m => m.GifIcon, new { @class = "form-control", @autofocus = "autofocus", @width = "400" })
+                                    </div>
+                                </div>
+                                <div class="col-lg-4 col-md-8">
+                                    <label for="inputName" class="col-form-label">Status </label>
+                                    <div class="form-group">
+                                        @Html.RadioButtonFor(n => n.IsActive, true, new { @checked = true, @class = "custom-radio", id = "Rdbtn_Active" }) Active
+                                        @Html.RadioButtonFor(n => n.IsActive, false, new { @class = "custom-radio", id = "Rdbtn_Inactive" })Inactive
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12 col-sm-12">
+                                    <input type="submit" value='@ViewBag.Button' class="btn btn-primary btn-md ml-0" name="Submit" id="Submit" />
+                                    <a href="@Url.Content("~/master/Menu/Add")"
+                                       class="btn btn-danger btn-md"
+                                       title="Rest">Reset</a>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+</section>
+
+

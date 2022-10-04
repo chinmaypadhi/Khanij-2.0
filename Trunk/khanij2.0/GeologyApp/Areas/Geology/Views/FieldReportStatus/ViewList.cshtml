@@ -1,0 +1,206 @@
+﻿@*// *********************************************************************************************************
+    //  View Name                : ViewList
+    //  Desciption               : To View,Delete Field Report Status details
+    //  Created By               : Lingaraj Dalai
+    //  Created On               : 18 March 2021
+    // ********************************************************************************************************
+*@
+@model GeologyEF.FieldReportStatusmaster
+@using GeologyApp.Web
+@{
+    ViewData["Title"] = "ViewList";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+@if (TempData["msg"] != null)
+{
+    <script>
+        swal("",'@TempData["msg"]',"success");
+    </script>
+}
+<script>
+    $(document).ready(function () {
+        loadNavigation('ViewList', 'glgeology', 'plfierepsta', 'tl', 'Geology', 'Field Report Status', ' ');
+        $('.shorting-lnk').click(function () {
+            $('.shorting-lnk i').toggleClass('fa-sort-amount-up-alt fa-sort-amount-down-alt ');
+        });
+        $('.filter-dropdown').hide();
+        $('.filter-lnk').click(function () {
+            $(this).toggleClass('active');
+            $(this).siblings('.filter-dropdown').slideToggle();
+        });
+        $('.filter-btn').click(function () {
+            $(this).parent('.shorting-cell .filter-dropdown').slideUp();
+            if ($(this).parent().parent('.shorting-cell').find('.filter-lnk').hasClass('active')) {
+                $(this).parent().siblings('.filter-lnk').removeClass('active');
+            }
+        });
+    });
+    function onApproval(MPRId) {
+        if (confirm("Are you sure you want to submit to regional office?")) {
+            $.ajax({
+                url: '/Geology/FieldReportStatus/UpdateStatusOfReport_STOREGIONALOFFICE',
+                type: "POST",
+                data: { MPR_Id: MPRId },
+                success: function (data) {
+                    if (data == 1) {
+                        swal("", "Forward To Regional Office successfully", "success");
+                    }
+                    else {
+                        swal("", "Something went wrong. Please try again!", "error");
+                    }
+                    setTimeout(function () {
+                        window.location.href = "@Url.Action("ViewList", "FieldReportStatus", new { Area = "Geology" })";
+                    }, 5000);
+                }
+            })
+        }
+    }
+</script>
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        @Html.Partial("_CMSnavigation")
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link" href="~/Geology/FieldReportStatus/Add">
+                                Add
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="javascript:void(0);">
+                                View
+                            </a>
+                        </li>
+                    </ul>
+                    @Html.Partial("_CMSutil")
+                </div>
+                <section class="box form-container">
+                    <div class="content-body">
+                        <div class="legend-box">
+                            <ul class="d-flex mb-1 justify-content-end list-unstyled">
+                                <li><span class="bg-success"></span> Report Submitted</li>
+                                <li><span class="bg-warning"></span> Report Underprocess</li>
+                            </ul>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <table id="table-exports" class="table table-sm table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>Sl#</th>
+                                            <th>FPO Code</th>
+                                            <th>FPO Name</th>
+                                            <th>Report Type</th>
+                                            <th>Report Status</th>
+                                            <th>Status</th>
+                                            <th>Officer Name</th>
+                                            <th>Officer Designation</th>
+                                            <th>Officer's Mobile No.</th>
+                                            <th>Officer's Email Id</th>
+                                            <th class="noprint text-center">Field Report</th>
+                                            <th class="noprint text-center">Maps & Plates</th>
+                                            <th class="noprint text-center">Annexure</th>
+                                            <th>Regional Office</th>
+                                            <th width="100" class="noprint text-center">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @{ int i = 1;
+                                        }
+                                        @foreach (var b in ViewBag.ViewList)
+                                        {
+                                            var dyclass = b.ReportStatus_1 == "Report Submited" ? "active-row" : "inactive-row";
+                                            <tr class="@dyclass">
+                                                <td>
+                                                    @i
+                                                    @{ i++; }
+                                                </td>
+                                                <td>@b.FPO_Code</td>
+                                                <td>@b.FPO_Name</td>
+                                                <td>@b.ReportTypeName</td>
+                                                @if (b.ReportStatus_1 == "Report Submited")
+                                                {
+                                                    <td class="text-success">@b.ReportStatus_1</td>
+                                                }
+                                                else
+                                                {
+                                                    <td class="text-warning">@b.ReportStatus_1</td>
+                                                }
+                                                <td>@b.ReportStatusName</td>
+                                                <td>@b.ApplicantName</td>
+                                                <td>@b.OfficerDesignation</td>
+                                                <td>@b.OfficerMobileNo</td>
+                                                <td>@b.EmailId</td>
+                                                <td class="text-center noprint">
+                                                    @if (b.FIELD_REPORT_FILE_NAME != null)
+                                                    {
+                                                        <a href='~/@b.FIELD_REPORT_FILE_PATH' target="_blank" height='30' width='30'>
+                                                            <i class="icon-download-solid" aria-hidden="true">
+                                                            </i>
+                                                        </a>
+                                                    }
+                                                </td>
+                                                <td class="text-center noprint">
+                                                    @if (b.MAPS_PLATES_FILE_NAME != null)
+                                                    {
+                                                        <a href='~/@b.MAPS_PLATES_FILE_PATH' target="_blank" height='30' width='30'>
+                                                            <i class="icon-download-solid" aria-hidden="true">
+                                                            </i>
+                                                        </a>
+                                                    }
+                                                </td>
+                                                <td class="text-center noprint">
+                                                    @if (b.ANNEXURE_FILE_NAME != null)
+                                                    {
+                                                        <a href='~/@b.ANNEXURE_FILE_PATH' target="_blank" height='30' width='30'>
+                                                            <i class="icon-download-solid" aria-hidden="true">
+                                                            </i>
+                                                        </a>
+                                                    }
+                                                </td>
+                                                <td>@b.RegionalOfficeName</td>
+                                                <td class="text-center noprint">
+                                                    @if (b.ReportStatus == 3)
+                                                    {
+                                                        @*<a href="@Url.Content("~/Geology/FieldReportStatus/Add/")@b.MPR_ID"
+                                                            class="btn-floating btn-outline-primary btn-sm"
+                                                            title="Edit"><i class="icon-pencil-alt-solid"></i></a>*@
+                                                        <a href="@CustomQueryStringHelper.EncryptString("Geology","Add","FieldReportStatus",new {id=@b.MPR_ID })" class="btn-floating btn-outline-primary btn-sm" title="Edit">
+                                                            <i class="icon-pencil-alt-solid"></i>
+                                                        </a>
+                                                    }
+                                                    else
+                                                    {
+                                                        <a href="@CustomQueryStringHelper.EncryptString("Geology","Add","FieldReportStatus",new {id=@b.MPR_ID })" class="text-success btn-sm" title="Edit">
+                                                            <i class="icon-pencil-alt-solid"></i>
+                                                        </a>
+                                                        @*<a href="@Url.Content("~/Geology/FieldReportStatus/Add/")@b.MPR_ID"
+                                                               class="text-success btn-sm" title="Edit">
+                                                                <i class="icon-pencil-alt-solid"></i>
+                                                            </a>*@
+                                                        <a href="@CustomQueryStringHelper.EncryptString("Geology","Delete","FieldReportStatus",new {id=@b.MPR_ID })" class="text-danger btn-sm" title="Delete"
+                                                           onclick="return confirm('Are you sure to delete?')">
+                                                            <i class="icon-trash-alt-solid"></i>
+                                                        </a>
+                                                        @*<a href="@Url.Content("~/Geology/FieldReportStatus/Delete/")@b.MPR_ID"
+                                                            class="text-danger btn-sm" title="Delete"
+                                                            onclick="return confirm('Are you sure to delete?')"><i class="icon-trash-alt-solid"></i></a><br />*@
+                                                        <a id="@b.MPR_ID" onclick="onApproval(this.id)"
+                                                           class="text-success btn-sm">Submit To Regional Office</a>
+                                                    }
+                                                </td>
+                                            </tr>
+                                        }
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+</section>
+

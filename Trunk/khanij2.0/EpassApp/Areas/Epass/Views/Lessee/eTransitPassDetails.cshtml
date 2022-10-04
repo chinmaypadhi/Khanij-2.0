@@ -1,0 +1,212 @@
+﻿@model EpassEF.TransitpassCancelEF
+
+@{
+    ViewData["Title"] = "TP Cancel Request";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+
+<section class="wrapper main-wrapper row">
+    <div class="col-12" id="mainDiv">
+        @Html.Partial("_CMSnavigation")
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link" href="@Url.Content("~/Permit/lessee/ePermitApplication")">
+                                Apply e-permit
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="#">
+                                Saved Permit
+                            </a>
+                        </li>
+
+                    </ul>
+                    @Html.Partial("_CMSutil")
+                </div>
+
+                <section class="box form-container">
+                    @using (Html.BeginForm("eTransitPassDetails", "Lessee", FormMethod.Post, new { AUTOCOMPLETE = "Off", id = "form1" }))
+                    {
+
+                        @Html.Hidden("_TransitPassID", "", new { Id = "_TransitPassID" })
+                        @Html.Hidden("_BulkPermitNO", "", new { Id = "_BulkPermitNO" })
+                        <div class="content-body">
+
+                            <div class="row">
+                                <div class="col-sm-12">
+
+                                    <table id="table-exports" class="table table-sm table-bordered">
+                                        <thead>
+                                            <tr>
+
+                                                <th width="100">Sl No.</th>
+
+                                                <th>TransitPassNumber</th>
+                                                <th>VehicleNumber</th>
+                                                <th>BulkPermitNo</th>
+
+                                                <th>PurchaserConsigneeName</th>
+                                                <th>DateOfDispatch</th>
+                                                <th>MineralName</th>
+
+                                                <th>MineralNature</th>
+                                                <th>MineralGradeName</th>
+                                                <th>NetWeight_Qty</th>
+
+                                                <th>UnitName</th>
+                                                <th>TPMode</th>
+                                                <th>TripStatus</th>
+                                                <th>Re-Print Status</th>
+                                                <th></th>
+                                                <th>DD Remark</th>
+                                                <th>Submission Date time</th>
+                                                <th>Approve / Reject Date Time</th>
+                                                <th style="display:none;"></th>
+                                                <th style="display:none;"> </th>
+
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @{
+                                                int rowNo = 0;
+
+                                                @foreach (var b in ViewBag.ViewList)
+                                                {
+
+                                                    <tr>
+                                                        <td width="10">@(rowNo+=1)</td>
+
+                                                        <td><p class="m-0" id="TransitPassNumber">@b.TransitPassNo</p> </td>
+                                                        <td><p class="m-0" id="VehicleNumber">@b.VehicleNumber</p> </td>
+                                                        <td><p class="m-0" id="BulkPermitNo">@b.BulkPermitNo</p> </td>
+
+                                                        <td><p class="m-0" id="PurchaserConsigneeName">@b.PurchaserConsigneeName</p> </td>
+                                                        <td><p class="m-0" id="Mineral_DateOfDispatch">@b.DateOfDispatche</p> </td>
+                                                        <td><p class="m-0" id="MineralName">@b.MineralName</p> </td>
+
+                                                        <td><p class="m-0" id="MineralNature">@b.MineralNature</p> </td>
+                                                        <td><p class="m-0" id="MineralGradeName">@b.MineralGradeName</p> </td>
+                                                        <td><p class="m-0" id="NetWeight_Qty">@b.NetWeight</p> </td>
+
+                                                        <td><p class="m-0" id="UnitName">@b.UnitName</p> </td>
+                                                        <td><p class="m-0" id="TPMode">@b.TransportationMode</p> </td>
+                                                        <td><p class="m-0" id="TripStatus">@b.TripStatus</p> </td>
+                                                        <td><p class="m-0" id="RePrintStatus">@b.RePrintStatus</p> </td>
+                                                        <td>
+                                                            @if (b.TripStatus == "RUNNING")
+                                                            {
+
+                    @*<button type="button" class="btn btn-dark " data-toggle="modal">
+                                                        <a class="btn btn-dark " data-toggle="modal" data-target="#viewcalculation" onclick="onBtnCancelTPClick(@b.TransitPassNo);">
+                                                            TP Cancel
+                                                        </a>
+                                                    </button>*@
+                                                                <button type="button" class="btn btn-dark " data-toggle="modal" data-target="#viewcalculation" onclick="onBtnCancelTPClick('@b.TransitPassId','@b.BulkPermitNo')"> Cancel TP </button>
+
+                                                            }
+                                                            else
+                                                            {
+                                                                <a class="btn btn-download " data-toggle="modal1" data-target="#viewcalculation1">RePrint</a>
+                                                            }
+                                                        </td>
+                                                        <td><p class="m-0" id="Remarks">@b.Remarks</p> </td>
+                                                        <td><p class="m-0" id="CancellationDateTime">@b.CancellationDateTime</p> </td>
+                                                        <td><p class="m-0" id="ApproveRejectDateTime">@b.ApproveRejectDateTime</p> </td>
+
+                                                        <td style="display:none;">@b.TransitPassId</td>
+                                                        <td style="display:none;">@b.CancelStatus</td>
+
+                                                    </tr>
+                                                }
+                                            }
+                                        </tbody>
+
+                                    </table>
+
+
+
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </section>
+            </div>
+        </div>
+    </div>
+    <!-- MAIN CONTENT AREA ENDS -->
+</section>
+@*<uc1:footer runat="server" ID="footer" />*@
+<div class="modal fade" id="viewcalculation">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header p-2">
+                <h5 class="modal-title m-0">Remark</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+
+            </div>
+
+            <div class="modal-body">
+                <div class="row col-md-12">
+                    <textarea class="form-control" Id="txtRemarks"> </textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" id="modal-btn-si" onclick="onBtnSubmit();">Submit</button>
+                @*<button type="button" class="btn btn-primary" data-dismiss="modal" onclick="onBtnSubmit();">Submit</button>*@
+                <button type="button" class="btn btn-primary" id="modal-btn-no" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+@*---------------------------------------------*@
+<script>
+    var GpassId = "";
+    function onBtnCancelTPClick(passId, BulkpermitNO) {
+        $("#_TransitPassID").val(passId);
+        $("#_BulkPermitNO").val(BulkpermitNO);
+       }
+
+    function onBtnSubmit() {
+         var remarks = $('#txtRemarks').val();
+         var passid = $("#_TransitPassID").val();
+        var bulkpermitno = $("#_BulkPermitNO").val();
+        alert(passid, bulkpermitno);
+        if (remarks != "" && remarks != null) {
+            $.ajax({
+                type: "POST",
+                url: '@Url.Action("TPCancel", "Lessee", new { Area = "Epass" })' + '?Id=' + passid + '&Remarks=' + remarks + '&BulkPermitNO=' + bulkpermitno,
+                //data: '{Id: "' + passid + '",Remarks: "' + remarks + '",BulkPermitNO: "' + bulkpermitno + '"}',
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (result) {
+                    if (result != null) {
+                        if (result == 1) {
+                            alert("The e-Permit which is used in TP is merged with another one. So you can't request for cancel this TP.");
+                        }
+                        else if (result != "") {
+                            alert("Cancel TP request has been successfully submitted to respected DD .");
+                            $('#txtRemarks').val('');
+                            location.reload();
+                            
+                        }
+                        else {
+                            alert("Request not submitted. Please try later !");
+                        }
+                    }
+                }
+            });
+        }
+        else {
+            alert("Remarks required !");
+        }
+    }
+</script>

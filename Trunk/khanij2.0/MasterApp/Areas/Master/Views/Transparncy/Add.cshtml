@@ -1,0 +1,148 @@
+﻿@model MasterEF.Transparncymaster
+@{
+    ViewData["Title"] = "Add";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+@if (ViewBag.msg != null)
+{
+<script>
+
+ swal("",'@ViewBag.msg',"success");
+</script>
+}
+@if (TempData["msg"] != null)
+{
+    <script>
+        swal("",'@TempData["msg"]',"success");
+    </script>
+}
+
+@*<script>
+    $(document).ready(function () {
+        $("#Submit").click(function () {
+            if ($("#cke_1_contents iframe").contents().find("body").text() == "") {
+                swal("", "Please Enter Notice Text", "warning");
+                $('#NoticeText').focus();
+                return false;
+            }
+        });
+    });
+</script>*@
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        <!-- MAIN CONTENT AREA STARTS -->
+        @Html.Partial("_CMSnavigation")
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="javascript:void(0);">
+                                Add
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="~/Master/Transparncy/ViewList">
+                                View
+                            </a>
+                        </li>
+                    </ul>
+                    @Html.Partial("_CMSutil")
+                    @*<uc1:util runat="server" ID="util" />*@
+                </div>
+                <section class="box form-container">
+                    <div class="content-body">
+                        @using (Html.BeginForm("Add", "Transparncy", FormMethod.Post, new { enctype= "multipart/form-data", AUTOCOMPLETE = "Off", id = "form1" }))
+                        {
+                            @Html.AntiForgeryToken()
+                            @Html.HiddenFor(x => x.NoticeFileName)
+                            @Html.HiddenFor(x => x.NoticeFilePath)
+                            @Html.HiddenFor(x => x.ImageUrlPath)
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <div class="form-group row">
+                                        <label for="inputName" class="col-sm-4 col-form-label">Upload Image</label>
+                                        <div class="col-sm-7">
+                                            <div class="custom-file">
+                                                <input type="file" class="custom-file-input" id="selectedFile" name="selectedFile">
+                                                <label class="custom-file-label" for="customFile">Choose Files</label>
+                                            </div>
+
+                                            @if (Model.NoticeFileName != null)
+                                            {
+                                                <label class="form-control-plaintext">@(Model.NoticeFileName) <a href='~/@Model.NoticeFilePath' title="" class="ml-2" data-original-title="Download" target="_blank"><i class="icon-file-pdf-solid h5 text-danger"></i></a></label>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="form-group row">
+
+                                        <label for="inputLoginId" class="col-sm-2 col-form-label">Notice </label>
+                                        <div class="col-sm-10">
+                                            @Html.TextAreaFor(m => m.NoticeText, new { @class = "form-control", @autofocus = "autofocus", @width = "400", @maxlength = "500", id = "NoticeText" })
+                                            @Html.HiddenFor(m => m.DNId)
+                                            <span class="text-danger">@Html.ValidationMessageFor(m => m.NoticeText)</span>
+                                            <script src="https://cdn.ckeditor.com/4.15.1/standard/ckeditor.js"></script>
+                                            <script>
+                                                CKEDITOR.replace('NoticeText');
+                                            </script>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-6 col-12">
+                                    <div class="form-group row">
+                                        <label for="inputName" class="col-sm-4 col-form-label">Status <span class="text-danger">*</span></label>
+                                        <div class="col-sm-7">
+                                            <div class="py-2">
+                                                @Html.RadioButtonFor(n => n.IsActive, true, new { @checked = true, @class = "custom-radio", id = "Rdbtn_Active" })
+                                                <label class="radio-label">Active</label>
+                                                @Html.RadioButtonFor(n => n.IsActive, false, new { @class = "custom-radio", id = "Rdbtn_Inactive" })
+                                                <label class="radio-label">Inactive</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-6 col-12">
+                                    <div class="form-group row">
+                                        <label for="inputName" class="col-sm-4 col-form-label">Publish <span class="text-danger">*</span></label>
+                                        <div class="col-sm-7">
+                                            <div class="py-2">
+                                                @Html.RadioButtonFor(n => n.IsPublished, true, new { @checked = true, @class = "custom-radio", id = "Rdbtn_Active" })
+                                                <label class="radio-label">Publish</label>
+                                                @Html.RadioButtonFor(n => n.IsPublished, false, new { @class = "custom-radio", id = "Rdbtn_Inactive" })
+                                                <label class="radio-label">Un-Publish</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-6 offset-lg-2  offset-md-4">
+                                    <input type="submit" value='@ViewBag.Button' class="btn btn-primary btn-md ml-0" name="Submit" id="Submit" />
+                                    <a href="@Url.Content("~/master/Transparncy/Add")"
+                                       class="btn btn-danger btn-md"
+                                       title="Rest">Reset</a>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+</section>
+<script>
+    indicateMe = "yes"
+    $(document).ready(function () {
+        loadNavigation('Add', 'glRoleRes', 'plUser', 'tl', 'Master', 'Transparncy', ' ');
+    });
+</script>
+
+

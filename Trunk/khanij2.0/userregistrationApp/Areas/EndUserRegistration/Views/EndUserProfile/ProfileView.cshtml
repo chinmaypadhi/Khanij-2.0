@@ -1,0 +1,2204 @@
+﻿@*// *********************************************************************************************************
+    //  View Name                : ProfileView
+    //  Desciption               : Add EndUser Page
+    //  Created By               : Debaraj Swain
+    //  Created On               : 15 March 2021
+    // ********************************************************************************************************
+*@
+@model userregistrationEF.EndUserModel
+
+@{
+    ViewData["Title"] = "ProfileView";
+    Layout = "~/Views/Shared/_WebHeaderLayout.cshtml";
+}
+@inject Microsoft.Extensions.Options.IOptions<userregistrationEF.KeyList> metaOptions
+
+@{
+    var options = metaOptions.Value;
+}
+<div class="inner-naviagtion">
+    <div class="container">
+        <div class="">
+            <nav aria-label="breadcrumb mb-0">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="@options.HomeUrl"><span class="fas fa-home"></span></a></li>
+                    <li class="breadcrumb-item text-white" aria-current="page">Registrations</li>
+                    <li class="breadcrumb-item text-white" aria-current="page">End User</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+</div>
+<div class="inner-content">
+    <div class="container">
+
+
+
+        @using (Html.BeginForm("ProfileView", "EndUserProfile", FormMethod.Post, new { AUTOCOMPLETE = "Off", id = "form1", enctype = "multipart/form-data" }))
+        {
+
+            <div class="clearfix"></div>
+            <h3 class="heading">End User Registration</h3>
+
+            <div class="row">
+                <div class="col-lg-6 col-md-12 col-sm-12">
+                    <div class="form-group row">
+                        <label class="col-sm-4 col-form-label ">Registration Type<span class="text-danger">*</span></label>
+                        <div class="col-sm-7">
+                            <select class="form-control  searchableselect" id="NatureOfBusiness" name="NatureOfBusiness" onchange="onChangeRegistrationType()">
+                                <option value="0">Select</option>
+                                <option value="1">Industry</option>
+                                <option value="2">Trader Outside Chhattisgarh</option>
+                                <option value="3">Storage Depot Outside Chhattisgarh</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6 col-md-12 col-sm-12">
+                    <div class="form-group row" id="industrytype_toggle">
+                        <label class="col-sm-4 col-form-label ">Industry Type<span class="text-danger">*</span></label>
+                        <div class="col-sm-7">
+                            @Html.DropDownListFor(model => model.EUPTypeId, ViewBag.ViewIndustryList as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control", autofocus = "autofocus" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+
+                <div Class="col-lg-6 col-md-12 col-sm-12">
+                    <div class="form-group row">
+                        <label class="col-sm-4 col-form-label "> User Type<span class="text-danger">*</span></label>
+
+                        <div class="col-md-7">
+
+                            <div class="custom-control custom-radio custom-control-inline">
+                                @Html.RadioButtonFor(e => e.EndUserTypeStatus, "Individual/Proprietor", new { onchange = "onRadioChange()", @id = "Individual", @checked = "checked", @class = "custom-control-input" })
+                                <label class="custom-control-label" for="Individual">Individual/Proprietor</label>
+                            </div>
+                            <div class="custom-control custom-radio custom-control-inline">
+                                @Html.RadioButtonFor(e => e.EndUserTypeStatus, "Firm", new { onchange = "onRadioChange()", @id = "Firm", @class = "custom-control-input" })
+                                <label class="custom-control-label" for="Firm">Firm</label>
+                            </div>
+                            <div class="custom-control custom-radio custom-control-inline">
+                                @Html.RadioButtonFor(e => e.EndUserTypeStatus, "Association", new { onchange = "onRadioChange()", @id = "Association", @class = "custom-control-input" })
+                                <label class="custom-control-label" for="Association">Association</label>
+
+                            </div>
+                            <div class="custom-control custom-radio custom-control-inline">
+                                @Html.RadioButtonFor(e => e.EndUserTypeStatus, "Company", new { onchange = "onRadioChange()", @id = "Company", @class = "custom-control-input" })
+                                <label class="custom-control-label" for="Company">Company</label>
+
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div Class="col-lg-6 col-md-12 col-sm-12">
+                    <div class="form-group row" style="display: none;" id="firm_toggle">
+                        <label class="col-sm-4 col-form-label ">
+                            @(Html.LabelFor(model => model.Firm, "Firm as"))<br />
+                            दृढ़
+                            @(Html.ValidationMessageFor(x => x.Firm))
+                            <span class="text-danger">*</span>
+                        </label>
+                        <div class="col-md-7">
+                            <div class="custom-control custom-radio custom-control-inline">
+                                @Html.RadioButtonFor(e => e.Firm, "Partnership", new { onchange = "onRadioChange()", @id = "Partnership", @checked = "checked", @class = "custom-control-input" })
+
+                                <label class="custom-control-label" for="Partnership"> Partnership</label>
+                            </div>
+                            <div class="custom-control custom-radio custom-control-inline">
+
+                                @Html.RadioButtonFor(e => e.Firm, "Proprietary", new { onchange = "onRadioChange()", @id = "Proprietary", @class = "custom-control-input" })
+
+                                <label class="custom-control-label" for="Proprietary">Proprietary</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row" style="display: none;" id="company_toggle">
+
+
+                        <label class="col-sm-4 col-form-label ">
+                            @(Html.LabelFor(model => model.Company, "Company as"))
+                            @(Html.ValidationMessageFor(x => x.Company))
+                            <span class="text-danger">*</span>
+                        </label>
+                        <div class="col-md-7">
+                            <div class="custom-control custom-radio custom-control-inline">
+                                @Html.RadioButtonFor(e => e.Company, "Private", new { onchange = "onRadioChange()", @id = "Private", @checked = "checked", @class = "custom-control-input" })
+
+                                <label class="custom-control-label" for="Private"> Private</label>
+                            </div>
+                            <div class="custom-control custom-radio custom-control-inline">
+                                @Html.RadioButtonFor(e => e.Company, "PublicLimited", new { onchange = "onRadioChange()", @id = "PublicLimited", @class = "custom-control-input" })
+
+                                <label class="custom-control-label" for="PublicLimited">Public Limited</label>
+                            </div>
+                            <div class="custom-control custom-radio custom-control-inline">
+
+                                @Html.RadioButtonFor(e => e.Company, "PSU", new { onchange = "onRadioChange()", @id = "PSU", @class = "custom-control-input" })
+
+                                <label class="custom-control-label" for="PSU">PSU</label>
+                            </div>
+                            <div class="custom-control custom-radio custom-control-inline">
+                                @Html.RadioButtonFor(e => e.Company, "JointVenture", new { onchange = "onRadioChange()", @id = "JointVenture", @class = "custom-control-input" })
+
+                                <label class="custom-control-label" for="JointVenture">Joint Venture</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+
+            <div class="row">
+                <div class="col-lg-6 col-md-12 col-sm-12">
+                    <div class="form-group row">
+                        <label class="col-sm-4 col-form-label ">
+                            @(Html.LabelFor(model => model.ApplicantName, "Applicant's Name"))
+                            @(Html.ValidationMessageFor(model => model.ApplicantName))
+                            <span class="text-danger">*</span>
+                        </label>
+                        <div class="col-sm-7">
+                            @Html.TextBoxFor(m => m.ApplicantName, new { @class = "form-control", @maxlength = "100", onkeypress = "lettersOnly();" })
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-6 col-md-12 col-sm-12">
+                    <div class="form-group row">
+                        <label class="col-sm-4 col-form-label ">
+                            @(Html.LabelFor(model => model.EMailId, "E-mail ID"))
+                            @(Html.ValidationMessageFor(x => x.EMailId))
+                            <span class="text-danger">*</span>
+                        </label>
+                        <div class="col-md-7">
+                            @Html.TextBoxFor(m => m.EMailId, new { @class = "form-control" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-lg-6 col-md-12 col-sm-12">
+                    <div class="form-group row">
+                        <label class="col-sm-4 col-form-label ">
+                            @(Html.LabelFor(model => model.MobileNo, "Mobile Number"))
+                            @(Html.ValidationMessageFor(x => x.MobileNo))
+                            <span class="text-danger">*</span>
+                        </label>
+                        <div class="col-md-7 ">
+                            @Html.TextBoxFor(m => m.MobileNo, new { @class = "form-control", @maxlength = "10" })
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-6 col-md-12 col-sm-12">
+                    <div class="form-group row">
+                        <label class="col-sm-4 col-form-label ">
+                            @(Html.LabelFor(model => model.Designation, "Designation"))
+                            @(Html.ValidationMessageFor(x => x.Designation))
+                        </label>
+                        <div class="col-md-7 ">
+
+                            @Html.TextBoxFor(m => m.Designation, new { @class = "form-control", @maxlength = "50" })
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="row">
+                <div class="col-lg-6 col-md-12 col-sm-12">
+                    <div class="form-group row">
+                        <label class="col-sm-4 col-form-label ">
+                            @Html.Label("Mineral Name")
+                            <span class="text-danger">*</span>
+                        </label>
+                        <div class="col-md-7">
+                            <input type="hidden" class="Mid" id="Mid" name="MineralIdList" />
+                            <select multiple data-style="bg-white" class="form-control selectpicker" name="MineralCount" id="MineralId">
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-6 col-md-12 col-sm-12">
+                    <div class="form-group row">
+                        <label class="col-sm-4 col-form-label ">
+                            @Html.Label("Mineral Form")
+                            <span class="text-danger">*</span>
+                        </label>
+                        <div class="col-md-7">
+                            <input type="hidden" class="MFid" id="MFid" name="MineralFormIdList" />
+                            <select multiple data-style="bg-white" class="form-control selectpicker" name="MineralFormCount" id="MineralForm">
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="row">
+                <div class="col-lg-6 col-md-12 col-sm-12">
+                    <div class="form-group row">
+                        <label class="col-sm-4 col-form-label ">
+                            @Html.Label("Mineral Grade")
+                            <span class="text-danger">*</span>
+                        </label>
+                        <div class="col-md-7">
+                            <input type="hidden" class="MGid" id="MGid" name="MineralGradeIdList" />
+                            <select multiple data-style="bg-white" class="form-control selectpicker" name="MineralGradeCount" id="MineralGrade">
+                            </select>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-lg-6 col-md-12 col-sm-12" id="purpose_toggle">
+                    <div class="form-group row">
+                        <label class="col-sm-4 col-form-label ">
+                            @(Html.LabelFor(model => model.PurposeOfPurchaseMineral, "Purpose"))
+                            @(Html.ValidationMessageFor(model => model.PurposeOfPurchaseMineral))
+                            <span class="text-danger">*</span>
+                        </label>
+                        <div class="col-md-7 ">
+                            @Html.DropDownListFor(model => model.PurposeOfPurchaseMineral, ViewBag.ViewPuppose as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control", autofocus = "autofocus" })
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-6 col-md-12 col-sm-12" id="divOutstate">
+                    <div class="form-group row">
+                        <label class="col-sm-4 col-form-label ">
+                            @(Html.LabelFor(model => model.MineralUse, "Use of the Mineral"))
+                            @(Html.ValidationMessageFor(model => model.MineralUse))
+                            <span class="text-danger">*</span>
+                        </label>
+                        <div class="col-md-7 ">
+                            @Html.TextBoxFor(m => m.MineralUse, new { @class = "form-control", @maxlength = "50" })
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div id="individual_toggle">
+                <div class="row">
+                    <div class="col-lg-6 col-md-12 col-sm-12">
+                        <div class="form-group row">
+                            <label class="col-sm-4 col-form-label ">
+
+                                @(Html.Label("Aadhaar Card Number"))
+                                @(Html.ValidationMessageFor(model => model.AadhaarNumber))
+                                <span class="text-danger">*</span>
+                            </label>
+                            <div class="col-md-7 ">
+
+                                @Html.TextBoxFor(m => m.AadhaarNumber, new { @class = "form-control", @maxlength = "12" })
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="col-lg-6 col-md-12 col-sm-12">
+                        <div class="form-group row">
+                            <label class="col-sm-4 col-form-label ">
+                                @(Html.Label("Upload Aadhaar Card"))
+                                <span class="text-danger">*</span>
+                            </label>
+                            <div class="col-md-7 ">
+
+                                <div class="custom-file">
+                                    <input name="AAdharDocument" type="file" class="form-control custom-file-input" id="doc">
+                                    <label class="custom-file-label">Choose Files</label>
+
+                                </div>
+                                <small class="text-danger">Only <strong> jpg, jpeg, png, pdf, tif</strong> file types with size less than <strong>2 MB </strong> are allowed.</small>
+
+                            </div>
+                        </div>
+                    </div>
+
+
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-lg-6 col-md-12 col-sm-12">
+                    <div class="form-group row">
+                        <label class="col-sm-4 col-form-label ">
+                            @(Html.LabelFor(model => model.PAN, "PAN Card Number"))
+                            <span class="text-danger">*</span>
+                        </label>
+                        <div class="col-md-7 ">
+                            @Html.TextBoxFor(m => m.PAN, new { @class = "form-control", @maxlength = "10" })
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6 col-md-12 col-sm-12">
+                    <div class="form-group row">
+                        <label class="col-sm-4 col-form-label ">
+                            @(Html.Label("Upload PAN Card"))
+                            <span class="text-danger">*</span>
+                        </label>
+                        <div class="col-md-7 ">
+                            <div class="custom-file">
+                                <input name="PanDocument" type="file" class="form-control custom-file-input" id="docpan">
+                                <label class="custom-file-label">Choose Files</label>
+                            </div>
+                            <small class="text-danger">Only <strong> jpg, jpeg, png, pdf, tif</strong> file types with size less than <strong>2 MB </strong> are allowed.</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-lg-6 col-md-12 col-sm-12">
+                    <div class="form-group row">
+                        <label class="col-sm-4 col-form-label ">
+                            @(Html.LabelFor(model => model.TINNo, "Tin Number"))
+                        </label>
+                        <div class="col-md-7 ">
+
+                            @Html.TextBoxFor(m => m.TINNo, new { @class = "form-control", @maxlength = "11" })
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-6 col-md-12 col-sm-12">
+                    <div class="form-group row">
+                        <label class="col-sm-4 col-form-label ">
+                            @(Html.Label("Upload Document for Tin"))
+                        </label>
+                        <div class="col-md-7 ">
+                            <div class="custom-file">
+                                <input type="file" class="custom-file-input" id="docTin" name="TinDocument">
+                                <label class="custom-file-label" for="customFile">Choose Files</label>
+                            </div>
+                            <small class="text-danger">Only <strong> jpg, jpeg, png, pdf, tif</strong> file types with size less than <strong>2 MB </strong> are allowed.</small>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-lg-6 col-md-12 col-sm-12">
+                    <div class="form-group row">
+                        <label class="col-sm-4 col-form-label ">
+                            @(Html.LabelFor(model => model.GSTNO, "GST Number"))
+                        </label>
+                        <div class="col-md-7 ">
+                            @Html.TextBoxFor(m => m.GSTNO, new { @class = "form-control", @maxlength = "15" })
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-6 col-md-12 col-sm-12">
+                    <div class="form-group row">
+                        <label class="col-sm-4 col-form-label ">
+                            @(Html.Label("Upload Document for GST"))
+                        </label>
+                        <div class="col-md-7 ">
+                            <div class="custom-file">
+                                <input type="file" class="custom-file-input" id="docGST" name="GstDocument">
+                                <label class="custom-file-label" for="customFile">Choose Files</label>
+                            </div>
+                            <small class="text-danger">Only <strong> jpg, jpeg, png, pdf, tif</strong> file types with size less than <strong>2 MB </strong> are allowed.</small>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="divCompanyFirmAssociation" style="display: none;">
+                <div class="row">
+                    <div class="col-lg-6 col-md-12 col-sm-12">
+                        <div class="form-group row">
+                            <label class="col-sm-4 col-form-label ">
+
+                                @(Html.Label("Firm / Company registration copy"))
+                                <span class="text-danger">*</span>
+                            </label>
+                            <div class="col-md-7 ">
+                                <div class="custom-file">
+                                    <input type="file" class="custom-file-input" id="docregcopy" name="RcopyDocument">
+                                    <label class="custom-file-label" for="customFile">Choose Files</label>
+                                </div>
+                                <small class="text-danger">Only <strong> jpg, jpeg, png, pdf, tif</strong> file types with size less than <strong>2 MB </strong> are allowed.</small>
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-6 col-md-12 col-sm-12">
+                        <div style="display: none;">
+                            <div class="form-group row">
+                                <label class="col-sm-4 col-form-label ">
+                                    @(Html.Label("Affidavit (Rs 100)"))
+                                    <span class="text-danger">*</span>
+                                </label>
+                                <div class="col-md-7 ">
+                                    <div class="custom-file">
+                                        <input type="file" class="custom-file-input" id="docaffit" name="AffitDocument">
+                                        <label class="custom-file-label" for="customFile">Choose Files</label>
+                                    </div>
+                                    <small class="text-danger">Only <strong> jpg, jpeg, png, pdf, tif</strong> file types with size less than <strong>2 MB </strong> are allowed.</small>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="row">
+                    <div class="col-lg-6 col-md-12 col-sm-12">
+                        <div class="form-group row">
+                            <label class="col-sm-4 col-form-label ">
+
+                                @(Html.LabelFor(model => model.CompanyName, "Name of the Firm/Association/Company"))
+                                <span class="text-danger">*</span>
+                            </label>
+                            <div class="col-sm-7">
+                                @Html.TextBoxFor(m => m.CompanyName, new { @class = "form-control", @maxlength = "50" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-6 col-md-12 col-sm-12">
+                        <div class="form-group row">
+                            <label class="col-sm-4 col-form-label ">
+                                @(Html.LabelFor(model => model.ExciseRegNo, "Excise Duty Registration Number"))
+                                <span class="text-danger">*</span>
+                            </label>
+                            <div class="col-md-7 ">
+                                @Html.TextBoxFor(m => m.ExciseRegNo, new { @class = "form-control", @maxlength = "50" })
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="row">
+                <div class="col-lg-6 col-md-12 col-sm-12" id="OUTSIDE_ELECTRICITY_UPLOAD">
+                    <div class="form-group row">
+                        <label class="col-sm-4 col-form-label ">
+                            @(Html.Label("Electricity Bill of last 3 months"))
+                            <span class="text-danger">*</span>
+                        </label>
+                        <div class="col-md-7 ">
+                            <div class="custom-file">
+                                <input type="file" class="custom-file-input" id="docebill" name="EbillDocument">
+                                <label class="custom-file-label" for="customFile">Choose Files</label>
+                            </div>
+                            <small class="text-danger">Only <strong> jpg, jpeg, png, pdf, tif</strong> file types with size less than <strong>2 MB </strong> are allowed.</small>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-6 col-md-12 col-sm-12" id="OUTSIDE_CTO_UPLOAD">
+                    <div class="form-group row">
+                        <label class="col-sm-4 col-form-label ">
+                            @(Html.Label("CTO (Consent To Operate) Letter"))
+                            <span class="text-danger">*</span>
+                        </label>
+                        <div class="col-md-7 ">
+                            <div class="custom-file">
+                                <input type="file" class="custom-file-input" id="docCTO" name="CTODocument">
+                                <label class="custom-file-label" for="customFile">Choose Files</label>
+                            </div>
+                            <small class="text-danger">Only <strong> jpg, jpeg, png, pdf, tif</strong> file types with size less than <strong>2 MB </strong> are allowed.</small>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+
+                <div class="col-lg-6 col-md-12 col-sm-12" id="OUTSIDE_CTO_NUMBER">
+                    <div class="form-group row">
+                        <label class="col-sm-4 col-form-label ">
+                            @(Html.Label("CTO Approval Number"))
+                            <span class="text-danger">*</span>
+                        </label>
+                        <div class="col-md-7 ">
+                            @Html.TextBoxFor(m => m.CTOApprovalNumber, new { @class = "form-control", @maxlength = "50" })
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-6 col-md-12 col-sm-12" id="OUTSIDE_CTO_DATE">
+                    <div class="form-group row">
+                        <label class="col-sm-4 col-form-label ">
+                            @(Html.Label("CTO Order Date"))
+                            @(Html.ValidationMessageFor(model => model.CTOOrderDate))
+                            <span class="text-danger">*</span>
+                        </label>
+                        <div class="col-md-7 ">
+                            <div class="input-group">
+                                <input type="text" name="CTOOrderDate" class="form-control datepicker" id="CTOOrderDate">
+                                <div class="input-group-prepend">
+                                    <label class="input-group-text" for="inputDate1"><i class="far fa-calendar"></i></label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-lg-6 col-md-12 col-sm-12" id="OUTSIDE_CTO_FROM">
+                    <div class="form-group row">
+                        <label class="col-sm-4 col-form-label ">
+                            @(Html.Label("CTO Validity From"))
+                            @(Html.ValidationMessageFor(model => model.CTOValidityFrom))
+                            <span class="text-danger">*</span>
+                        </label>
+                        <div class="col-md-7 ">
+                            <div class="input-group">
+                                <input type="text" name="CTOValidityFrom" class="form-control datepicker" id="CTOValidityFrom">
+                                <div class="input-group-prepend">
+                                    <label class="input-group-text" for="inputDate1"><i class="far fa-calendar"></i></label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-6 col-md-12 col-sm-12" id="OUTSIDE_CTO_TO">
+                    <div class="form-group row">
+                        <label class="col-sm-4 col-form-label ">
+                            @(Html.Label("CTO Validity To"))
+                            @(Html.ValidationMessageFor(model => model.CTOValidityTo))
+                            <span class="text-danger">*</span>
+                        </label>
+                        <div class="col-md-7 ">
+                            <div class="input-group">
+                                <input type="text" name="CTOValidityTo" class="form-control datepicker" id="CTOValidityTo">
+                                <div class="input-group-prepend">
+                                    <label class="input-group-text" for="inputDate1"><i class="far fa-calendar"></i></label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-lg-6 col-md-12 col-sm-12">
+                    <div class="form-group row">
+                        <label class="col-sm-4 col-form-label ">
+                            @*<span class="text-danger">*</span>*@
+                            @(Html.Label("IBM Registration No"))
+                            @(Html.ValidationMessageFor(model => model.IBMRegistrationNo))
+                        </label>
+                        <div class="col-md-7 ">
+                            @Html.TextBoxFor(m => m.IBMRegistrationNo, new { @class = "form-control", @maxlength = "50" })
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6 col-md-12 col-sm-12">
+                </div>
+            </div>
+
+
+            <div class="row mt-4">
+                <div class="col-lg-12"><h4 class="text-primary">Plant Details</h4><hr></div>
+            </div>
+            <div class="row" id="detail_industrytype_toggle">
+                <div class="col-lg-6 col-md-12 col-sm-12">
+                    <div class="form-group row">
+                        <label for="inputMail" class="col-sm-4 col-form-label ">Address<span class="text-danger">*</span></label>
+                        <div class="col-sm-7">
+                            @Html.TextBoxFor(m => m.Address, new { @class = "form-control", @maxlength = "500", style = "height: 70px;" })
+                            <small class="text-danger">Maximum <strong>500</strong> characters</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6 col-md-12 col-sm-12">
+                    <div class="form-group row">
+                        <label for="inputMail" class="col-sm-4 col-form-label ">State<span class="text-danger">*</span></label>
+                        <div class="col-sm-7">
+                            @Html.DropDownListFor(model => model.StateId, ViewBag.ViewStateList as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control", autofocus = "autofocus" })
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6 col-md-12 col-sm-12">
+                    <div class="form-group row">
+                        <label for="inputMail" class="col-sm-4 col-form-label ">District<span class="text-danger">*</span></label>
+                        <div class="col-sm-7">
+                            <select name="DistrictID" id="DistrictID" class="form-control"></select>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6 col-md-12 col-sm-12">
+                    <div class="form-group row">
+                        <label for="inputMail" class="col-sm-4 col-form-label ">Pincode<span class="text-danger">*</span></label>
+                        <div class="col-sm-7">
+                            @Html.TextBoxFor(m => m.PinCode, new { @class = "form-control", @maxlength = "6", onkeypress = "numericOnly();" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mt-4">
+                <div class="col-lg-12"><h4 class="text-primary">Office Details</h4><hr></div>
+            </div>
+
+            <div class="row">
+                <div class="col-lg-6 col-md-12 col-sm-12">
+                    <div class="form-group row">
+                        <label for="inputMail" class="col-sm-4 col-form-label ">Address<span class="text-danger">*</span></label>
+                        <div class="col-sm-7">
+                            @Html.TextBoxFor(m => m.OfficeAddress, new { @class = "form-control", @maxlength = "500", style = "height: 70px;" })
+                            <small class="text-danger">Maximum <strong>500</strong> characters</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6 col-md-12 col-sm-12">
+                    <div class="form-group row">
+                        <label for="inputMail" class="col-sm-4 col-form-label ">State<span class="text-danger">*</span></label>
+                        <div class="col-sm-7">
+                            @Html.DropDownListFor(model => model.StateId_O, ViewBag.ViewStateList_O as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control", autofocus = "autofocus" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-6 col-md-12 col-sm-12">
+                    <div class="form-group row">
+                        <label for="inputMail" class="col-sm-4 col-form-label ">District<span class="text-danger">*</span></label>
+                        <div class="col-sm-7">
+                            <select name="DistrictID_O" id="DistrictID_O" class="form-control"></select>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6 col-md-12 col-sm-12">
+                    <div class="form-group row">
+                        <label for="inputMail" class="col-sm-4 col-form-label ">Pincode<span class="text-danger">*</span></label>
+                        <div class="col-sm-7">
+                            @Html.TextBoxFor(m => m.PinCode_O, new { @class = "form-control", @maxlength = "6", onkeypress = "numericOnly();" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row ">
+                <div class="col-lg-6 col-md-12 col-sm-12">
+                    <div class="form-group row">
+                        <label for="inputMail" class="col-sm-4 col-form-label ">Security Question<span class="text-danger">*</span></label>
+                        <div class="col-sm-7">
+                            @Html.DropDownListFor(model => model.SQuestionId, ViewBag.ViewSQ as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control", autofocus = "autofocus" })
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6 col-md-12 col-sm-12">
+                    <div class="form-group row">
+                        <label for="inputMail" class="col-sm-4 col-form-label ">Answer<span class="text-danger">*</span></label>
+                        <div class="col-sm-7">
+                            @Html.TextBoxFor(m => m.SQAnswer, new { @class = "form-control", @maxlength = "30" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row" id="DivLatitudeLongitude">
+                <div class="col-lg-6 col-md-12 col-sm-12">
+                    <div class="form-group row">
+                        <label for="inputMail" class="col-sm-4 col-form-label ">Latitude<span class="text-danger">*</span></label>
+                        <div class="col-sm-7">
+                            @Html.TextBoxFor(m => m.Latitude, new { @class = "form-control", @maxlength = "30" })
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6 col-md-12 col-sm-12">
+                    <div class="form-group row">
+                        <label for="inputMail" class="col-sm-4 col-form-label ">Longitude<span class="text-danger">*</span></label>
+                        <div class="col-sm-7">
+                            @Html.TextBoxFor(m => m.Longitude, new { @class = "form-control", @maxlength = "30" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-6 col-md-12 col-sm-12">
+                    <div class="form-group row">
+                        <label for="inputMail" class="col-sm-4 col-form-label ">Enter Captcha<span class="text-danger">*</span></label>
+                        <div class="col-sm-7">
+                            @Html.TextBoxFor(m => m.captcha, new { @class = "form-control", @maxlength = "20" })
+                        </div>
+
+
+                    </div>
+                </div>
+
+                <div class="col-lg-6 col-md-12 col-sm-12 offset-lg-0 offset-md-4">
+                    <div class="form-group row">
+                        <div class="row col-sm-6 pl-4 captch-box">
+
+
+                            <div id="capt1" class="form-control col-sm-5 rounded-0"></div>
+                            <label class="input-group-text rounded-0" for="inputDate1"> <a href="javascript:;" onclick="updateCaptcha();"><i class="fas fa-sync-alt"></i></a> </label>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            <div class="row">
+
+                <div class="col-lg-4 offset-lg-2 offset-md-4">
+                    <input type="button" class="btn btn-success col-sm-4 mb-lg-0 mb-md-3" id="btnsendOtp" value="Send OTP">
+
+                </div>
+                <div class="col-lg-6 col-md-12 col-sm-12">
+                    <div class="form-group row">
+                        <label for="inputMail" class="col-sm-4 col-form-label ">Enter OTP<span class="text-danger">*</span></label>
+                        <div class="col-sm-7">
+                            @Html.TextBox("VerifyOTP", null, new { @class = "form-control", id = "VerifyOTP", @maxlength = "10" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row form-group" id="divIagree">
+                <div class="col-sm-12">
+                    <label>
+                        @Html.CheckBox("chkIagree", false, new { @id = "chkIagree" })
+
+                        <span class="text-danger">
+                            <strong>Declaration </strong>- I declare that all the information given above is true as per my knowledge and belief.
+                            I am aware that if any of the above information is found to be false or untrue, there may be penalty / penalty under the appropriate rules.
+                            The Mineral Resources Department will not be responsible for authenticating any of the above information.
+                        </span><br />
+                    </label>
+
+
+                </div>
+            </div>
+
+            <div id="divMakePayment" style="display: none; height: 450px;">
+                <div class="row">
+                    <div class="col-md-3"></div>
+                    <div class="col-md-9">
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <div class="col-md-offset-3 col-md-5 ">
+                                    <span class="lead">
+                                        Payment Information
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-9 col-md-4 col-xs-12">
+                            <div class="row">
+                                <div class="col-xs-12">
+                                    <div class="col-md-7 ">
+                                        @(Html.LabelFor(model => model.TransactionalID, "Transactional ID"))
+                                    </div>
+                                    <div class="col-md-5 ">
+                                        @(Html.DisplayFor(model => model.TransactionalID))
+                                        @(Html.HiddenFor(model => model.TransactionalID))
+                                    </div>
+                                </div>
+                            </div>
+                            <hr style="margin-top: 0px;" />
+                            <div class="row">
+                                <div class="col-xs-12">
+                                    <div class="col-md-7 ">
+                                        @(Html.LabelFor(model => model.RegistrationFees, "Registration Fees"))
+                                    </div>
+                                    <div class="col-md-5 ">
+                                        Rs. @(Html.DisplayFor(model => model.RegistrationFees))
+                                        @(Html.HiddenFor(model => model.RegistrationFees))
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-lg-9 col-md-4 col-sm-12 col-xs-12 bhoechie-tab-container">
+                                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 bhoechie-tab-menu">
+                                    <div class="list-group">
+                                        <a href="#" class="list-group-item active text-center" id="divOnlineOption">
+                                            Online Payment
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="col-lg-9 col-md-9 col-sm-9 col-xs-9 bhoechie-tab">
+                                    <!-- Online payment section -->
+                                    <div class="bhoechie-tab-content active">
+                                        <div class="row" id="divPaymentOptionOnline">
+                                            <div class="col-lg-12 col-md-12 col-xs-12">
+                                                <div id="divOnlineChallanDetails">
+                                                    <div class="col-xs-12">
+
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- Offlineline payment section -->
+
+                                </div>
+                            </div>
+                            <br />
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-offset-5 col-xs-7 col-md-7">
+                        <div class="col-sm-12">
+                            <input type="button" value="Back" id="btnBack" onclick="showDivRegistration();" class="btn btn-primary" style="background: #583B2C none repeat scroll 0 0;" />
+                            <input type="button" value="Payment" id="btnPayment" class="btn btn-primary" style="background: #583B2C none repeat scroll 0 0;" />
+                            @*</div>*@
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row" id="divButtons">
+                <div class="col-xs-12 col-md-12 col-lg-12 text-center">
+
+                    <button class="btn btn-success" id="btnNext2">Submit</button>
+                    <input type="reset" value="Clear" id="bReset" class="btn btn-danger" style="margin-right: 10px;" onclick="@("window.location.href='" + @Url.Action("ProfileView", "EndUserProfile") + "'")    ;" />
+                </div>
+            </div>
+
+
+
+        }
+
+    </div>
+</div>
+
+@{if (ViewBag.AckMessage == "1")
+    {
+        <script>
+        swal("", "You have successfully applied for Registration with Khanij Online Portal. @ViewBag.SuccessMessage. Please check your e-mail for details of registration.", "success");
+        </script>
+    }
+    else if (ViewBag.AckMessage == "2")
+    {
+        <script>
+            swal("", "aptcha value miss match !", "warning");
+        </script>
+    }
+    else if (ViewBag.AckMessage == "0")
+    {
+        <script>
+            swal("", "Registration not done! Provide all the mandatory information & upload documents with size less than 2 MB. !", "warning");
+        </script>
+    }
+    else if (ViewBag.AckMessage == "3")
+    {
+        <script>
+            swal("", "This mobile number or email id is already existed ! please try to register with new number or email id.", "warning");
+        </script>
+    }
+    else if (ViewBag.AckMessage == "4")
+    {
+        <script>
+            swal("", "This pan card number is already existed ! please try to register with new pan card number. !", "warning");
+        </script>
+    }
+}
+
+<script>
+
+    $(document).ready(function () {
+        $('.selectpicker').selectpicker();
+        $('.searchableselect').searchableselect();
+        onRadioChange();
+        $('#DivLatitudeLongitude').hide();
+        $('.datepicker').datetimepicker({
+            minDate: new Date(),
+            format: 'LT',
+            format: 'DD-MM-YYYY'
+            //daysOfWeekDisabled: [0, 6],
+        });
+        updateCaptcha();
+        MineralName();
+        $("#MineralId").on("change", function () {
+            debugger;
+            GetMineralFormByMineral();
+
+        });
+
+        $("#MineralForm").on("change", function () {
+            //var MinFID = $(this).val();
+            //$(".MFid").val(MinFID);
+            //var formIDList = $(".MFid").val();
+            //var MIDList = $(".Mid").val();
+            GetMineralGradeByMineralForm();
+
+        });
+
+        $("#StateId").change(function () {
+            var SID = $('#StateId').val();
+            if (SID == "") {
+                SID = 0;
+            }
+
+
+            $('#DistrictID').empty();
+            var v = "";
+
+            if (StateId != 0) {
+
+                $.ajax({
+                    type: "POST",
+                    url: "/EndUserRegistration/EndUserProfile/GetDistrictList",
+                    data: { 'stateID': SID },
+                    cache: false,
+
+                    datatype: "JSON",
+                    success: function (SList) {
+
+                        $.each(SList, function (i, item) {
+                            $('#DistrictID').append('<option value="' + item.districtId + '">' + item.districtName + '</option>');
+
+                        });
+
+                    }
+
+
+                });
+            }
+            else {
+                swal("", "Select Grade !", "warning");
+            }
+
+        });
+
+
+        $("#StateId_O").change(function () {
+            var SID = $('#StateId_O').val();
+            if (SID == "") {
+                SID = 0;
+            }
+
+            $('#DistrictID_O').empty();
+            var v = "";
+
+            if (StateId != 0) {
+
+                $.ajax({
+                    type: "POST",
+                    url: "/EndUserRegistration/EndUserProfile/GetDistrictList_O",
+                    data: { 'stateID': SID },
+                    cache: false,
+
+                    datatype: "JSON",
+                    success: function (SList) {
+
+                        $.each(SList, function (i, item) {
+                            $('#DistrictID_O').append('<option value="' + item.districtId_O + '">' + item.districtName_O + '</option>');
+
+                        });
+
+                    }
+
+
+                });
+            }
+            else {
+                swal("", "Select Grade !", "warning");
+            }
+
+        });
+
+        $('#doc').on("change", function () {
+            debugger;
+            var label = $(this).siblings('.custom-file-label');
+            var files = $(this)[0].files;
+            var Size = files[0].size;
+            if (Size < 2048000) {
+                label.html(files[0].name);
+                Aadhaar_FileSize = files.length;
+            }
+            else {
+                swal("", "Please make sure your Aadhar Doc is less than 2 MB!", "warning");
+                $('#doc').focus();
+
+            }
+
+        });
+
+        $('#docpan').on("change", function () {
+            var label = $(this).siblings('.custom-file-label');
+            var files = $(this)[0].files;
+            var Size = files[0].size;
+            if (Size < 2048000) {
+                label.html(files[0].name);
+                PAN_FileSize = files.length;
+            }
+            else {
+                swal("", "Please make sure your Pan Doc is less than 2 MB!", "warning");
+                $('#docpan').focus();
+
+            }
+        });
+
+        $('#docTin').on("change", function () {
+            var label = $(this).siblings('.custom-file-label');
+            var files = $(this)[0].files;
+            var Size = files[0].size;
+            if (Size < 2048000) {
+                label.html(files[0].name);
+            }
+            else {
+                swal("", "Please make sure your Pan Doc is less than 2 MB!", "warning");
+                $('#docTin').focus();
+
+            }
+        });
+
+        $('#docGST').on("change", function () {
+            var label = $(this).siblings('.custom-file-label');
+            var files = $(this)[0].files;
+            var Size = files[0].size;
+            if (Size < 2048000) {
+                label.html(files[0].name);
+            }
+            else {
+                swal("", "Please make sure your GST Doc is less than 2 MB!", "warning");
+                $('#docGST').focus();
+
+            }
+        });
+
+        $('#docregcopy').on("change", function () {
+            var label = $(this).siblings('.custom-file-label');
+            var files = $(this)[0].files;
+            var Size = files[0].size;
+            if (Size < 2048000) {
+                label.html(files[0].name);
+                Registration_FileSize = files.length;
+            }
+            else {
+                swal("", "Please make sure your Reg. Doc is less than 2 MB!", "warning");
+                $('#docregcopy').focus();
+
+            }
+        });
+
+        $('#docaffit').on("change", function () {
+            var label = $(this).siblings('.custom-file-label');
+            var files = $(this)[0].files;
+            var Size = files[0].size;
+            if (Size < 2048000) {
+                label.html(files[0].name);
+            }
+            else {
+                swal("", "Please make sure your Reg. Doc is less than 2 MB!", "warning");
+                $('#docaffit').focus();
+
+            }
+        });
+
+        $('#docebill').on("change", function () {
+            debugger;
+            var label = $(this).siblings('.custom-file-label');
+            var files = $(this)[0].files;
+            var Size = files[0].size;
+            if (Size < 2048000) {
+                Electricity_FileSize = files.length;
+                label.html(files[0].name);
+            }
+            else {
+                swal("", "Please make sure your Reg. Doc is less than 2 MB!", "warning");
+                $('#docebill').focus();
+
+            }
+        });
+
+        $('#docCTO').on("change", function () {
+            var label = $(this).siblings('.custom-file-label');
+            var files = $(this)[0].files;
+            var Size = files[0].size;
+            if (Size < 2048000) {
+                label.html(files[0].name);
+                CTO_FileSize = files.length;
+            }
+            else {
+                swal("", "Please make sure your Reg. Doc is less than 2 MB!", "warning");
+                $('#docCTO').focus();
+
+            }
+
+        });
+
+
+
+        if ($('input[name="chkIagree"]:checked').length > 0) {
+            $('#divButtons').show();
+            $(this).attr('checked', true);
+        }
+        else {
+            $('#divButtons').hide();
+            $(this).attr('checked', false);
+        }
+        $(".NatureOfBusiness").hide();
+
+        $("#StateId").change(function () {
+            if ($(this).val() == 7) {
+                $(".NatureOfBusiness").hide();
+            }
+            else {
+                $(".NatureOfBusiness").show();
+            }
+
+        });
+
+        $('#Designation').keypress(function (e) {
+            var regex = new RegExp("^[a-zA-Z ]+$");
+            var str = String.fromCharCode(!e.charCode ? e.which : e.charCode);
+            if (regex.test(str)) {
+                return true;
+            }
+
+            e.preventDefault();
+            return false;
+        });
+
+        $('#AadhaarNumber').keypress(function (e) {
+            var regex = new RegExp("^[0-9]+$");
+            var str = String.fromCharCode(!e.charCode ? e.which : e.charCode);
+            if (regex.test(str)) {
+                return true;
+            }
+
+            e.preventDefault();
+            return false;
+        });
+
+        $('#BussinessActivity').keypress(function (e) {
+            var regex = new RegExp("^[a-zA-Z ]+$");
+            var str = String.fromCharCode(!e.charCode ? e.which : e.charCode);
+            if (regex.test(str)) {
+                return true;
+            }
+
+            e.preventDefault();
+            return false;
+        });
+
+        $('#PurposeOfPurchaseMineral').keypress(function (e) {
+            var regex = new RegExp("^[a-zA-Z ]+$");
+            var str = String.fromCharCode(!e.charCode ? e.which : e.charCode);
+            if (regex.test(str)) {
+                return true;
+            }
+
+            e.preventDefault();
+            return false;
+        });
+
+        $('#ExciseRegNo').keypress(function (e) {
+            var regex = new RegExp("^[a-zA-Z0-9]+$");
+            var str = String.fromCharCode(!e.charCode ? e.which : e.charCode);
+            if (regex.test(str)) {
+                return true;
+            }
+
+            e.preventDefault();
+            return false;
+        });
+
+        $('#PAN').keypress(function (e) {
+            var regex = new RegExp("^[a-zA-Z0-9]+$");
+            var str = String.fromCharCode(!e.charCode ? e.which : e.charCode);
+            if (regex.test(str)) {
+                return true;
+            }
+
+            e.preventDefault();
+            return false;
+        });
+
+        $('#TINNo').keypress(function (e) {
+            var regex = new RegExp("^[a-zA-Z0-9]+$");
+            var str = String.fromCharCode(!e.charCode ? e.which : e.charCode);
+            if (regex.test(str)) {
+                return true;
+            }
+
+            e.preventDefault();
+            return false;
+        });
+
+        $("#PinCode").keydown(function (e) {
+            // Allow: backspace, delete, tab, escape, enter and .
+            if ($.inArray(e.keyCode, [46, 8, 9, 27, 13, 110, 190]) !== -1 ||
+                // Allow: Ctrl+A, Command+A
+                (e.keyCode === 65 && (e.ctrlKey === true || e.metaKey === true)) ||
+                // Allow: home, end, left, right, down, up
+                (e.keyCode >= 35 && e.keyCode <= 40)) {
+                // let it happen, don't do anything
+                return;
+            }
+            // Ensure that it is a number and stop the keypress
+            if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) {
+                e.preventDefault();
+            }
+        });
+
+        $("#MobileNo").keydown(function (e) {
+            // Allow: backspace, delete, tab, escape, enter and .
+            if ($.inArray(e.keyCode, [46, 8, 9, 27, 13, 110, 190]) !== -1 ||
+                // Allow: Ctrl+A, Command+A
+                (e.keyCode === 65 && (e.ctrlKey === true || e.metaKey === true)) ||
+                // Allow: home, end, left, right, down, up
+                (e.keyCode >= 35 && e.keyCode <= 40)) {
+                // let it happen, don't do anything
+                return;
+            }
+            // Ensure that it is a number and stop the keypress
+            if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) {
+                e.preventDefault();
+            }
+        });
+
+        $('#Latitude').keypress(function (event) {
+            return isNumber(event, this)
+        });
+
+        $('#longitude').keypress(function (event) {
+            return isNumber(event, this)
+        });
+
+
+
+    });
+
+    function MineralName() {
+        $.ajax({
+            url: "/EndUserRegistration/EndUserProfile/GetMineralList",
+            data: {},
+            dataType: 'json',
+            type: 'post',
+            success: function (data) {
+                debugger;
+                $('#MineralId').html('');
+                var row = "";
+
+                $.each(data, function (ind, item) {
+                    row += "<option value='" + item.id + "'>" + item.text + "</option>";
+                });
+                $('#MineralId').html(row).selectpicker('refresh');
+            },
+            error: function (err) {
+
+            }
+        });
+    }
+
+    function GetMineralFormByMineral() {
+        debugger;
+        var selectedItem = [];
+        selectedItem = $('#MineralId').val();
+        if (selectedItem.length > 0) {
+
+            for (var i = 0; i < selectedItem.length; i++) {
+                $('#MineralForm').html('');
+                $.ajax({
+                    url: "/EndUserRegistration/EndUserProfile/GetMineralFormList",
+                    data: { 'MinID': selectedItem[i] },
+                    dataType: 'json',
+                    type: 'post',
+                    success: function (data) {
+                        debugger;
+
+                        var row = $('#MineralForm').html();
+                        $.each(data, function (ind, item) {
+                            row += "<option value='" + item.id + "'>" + item.text + "</option>";
+                        });
+                        $('#MineralForm').html(row).selectpicker('refresh');
+                        //Edit Time Check Mineral Form String
+                        //if ($('#hdnMineralFormString').val() == "")
+                        //    changeMineralList(this.event);
+                        //else {
+                        //    //This section used for View
+                        //    var MineralFormString = $('#hdnMineralFormString').val().split(',');
+                        //    $('.MineralForm').selectpicker('val', MineralFormString);
+                        //    $('.MineralForm').change();
+                        //}
+
+                    },
+                    error: function (err) {
+
+                    }
+                });
+            }
+        }
+        else {
+            $('#MineralGrade').html(row).selectpicker('refresh');
+            $('#MineralGrade').html(row).selectpicker('refresh');
+
+        }
+    }
+
+    function GetMineralGradeByMineralForm() {
+        var selectedItem = [];
+        selectedItem = $('#MineralId').val();
+        var selectedItemMineralNatureId = [];
+        selectedItemMineralNatureId = $('#MineralForm').val();
+
+        if (selectedItemMineralNatureId.length > 0 && selectedItem.length > 0) {
+
+            $.ajax({
+                url: "/EndUserRegistration/EndUserProfile/GetMineralGradeList",
+                data: { 'MineralForm': selectedItem.toString(), 'MineralNatureId': selectedItemMineralNatureId.toString() },
+                dataType: 'json',
+                type: 'post',
+                success: function (data) {
+                    debugger;
+                    $('#MineralGrade').html('');
+                    var row = "";
+                    $.each(data, function (ind, item) {
+                        row += "<option value='" + item.id + "'>" + item.text + "</option>";
+                    });
+                    $('#MineralGrade').html(row).selectpicker('refresh');
+
+                    //if ($('#hdnMineralGradeString').val() != "") {
+                    //    //This section used for View
+                    //    var MineralGradeString = $('#hdnMineralGradeString').val().split(',');
+                    //    $('#MineralGradeId').selectpicker('val', MineralGradeString);
+
+                    //}
+
+
+                },
+                error: function (err) {
+
+                }
+            });
+        }
+        else {
+            $('#MineralGrade').html(row).selectpicker('refresh');
+
+        }
+    }
+
+    function updateCaptcha() {
+
+        $.ajax({
+            url: "/EndUserRegistration/EndUserProfile/CaptchaImage",
+            data: {},
+            dataType: 'json',
+            type: 'post',
+            success: function (data) {
+                $("#capt1").html(data);
+            },
+            error: function (err) {
+                alert(err);
+            }
+        });
+    };
+
+
+     var filesize = 0;
+
+
+    $("#btnNext2").click(function () {
+        debugger;
+        var validatable = CheckValidation();
+        return validatable;
+    });
+
+
+    var Aadhaar_FileSize = 0;
+    var PAN_FileSize = 0;
+    var Electricity_FileSize = 0;
+    var Registration_FileSize = 0;
+    var Affidavit_FileSize = 0;
+    var CTO_FileSize = 0;
+
+
+
+    function CheckValidation() {
+        debugger;
+        var from = document.getElementById("CTOValidityFrom").value.split('-').reverse().join('-'); //$("#CTOValidityFrom").val();
+        var to = document.getElementById("CTOValidityTo").value.split('-').reverse().join('-'); //$("#CTOValidityTo").val();
+        if (from != "" && to != "") {
+            if (Date.parse(from) > Date.parse(to)) {
+                swal("", "Invalid Date Range.To Date must be greater than From Date", "warning");
+                return false;
+            }
+        }
+
+        if (!blankFieldValidation("NatureOfBusiness", "Registration Type")) {
+            return false;
+        }
+
+       var SelectedVal_1 = $("#NatureOfBusiness").val();
+        if (SelectedVal_1 == '1' || SelectedVal_1 == 'Industry' || SelectedVal_1 == '2' || SelectedVal_1 == 'Trader Outside Chhattisgarh' || SelectedVal_1 == '3' || SelectedVal_1 == 'Storage Depot Outside Chhattisgarh') {
+            
+        } else {
+            swal("", "Please select a valid Registration Type. !", "warning");
+            $("#NatureOfBusiness").focus();
+            return false;
+        }
+
+        var SelectedVal_1 = $("#NatureOfBusiness").val();
+        if (SelectedVal_1 == '1' || SelectedVal_1 == 'Industry') {
+
+            if (!DropDownValidation("EUPTypeId", "Industry Type")) {
+                return false;
+            }
+            var SelectedVal = $("#EUPTypeId").val();
+            if (SelectedVal == '12') {
+                if (!DropDownValidation("Other_IndustryType", "Industry Type")) {
+                    return false;
+                }
+
+            }
+
+        }
+
+        if (!blankFieldValidation("ApplicantName", "Applicant Name")) {
+            return false;
+        }
+
+        if (CheckSpaceAtFirstPlaceAndLastPlace($("#ApplicantName").val())==false) {
+            swal("", "Please Check Applicant Name For Spaces at Beginning And End Place", "warning");
+            $("#ApplicantName").focus();
+            return false;
+        }
+
+        if (!blankFieldValidation("EMailId", "Email Id")) {
+            return false;
+        }
+
+        if (ValidateEmailAddress(document.getElementById("EMailId")) == false) {
+            swal("", "Please Enter Valid EmailId", "warning");
+            $("#EMailId").focus();
+            return false;
+        }
+
+
+        if (!blankFieldValidation("MobileNo", "Mobile No.")) {
+            return false;
+        }
+
+        if ($("#Designation").val() != "") {
+            if (CheckSpaceAtFirstPlaceAndLastPlace($("#Designation").val()) == false) {
+                swal("", "Please Check Designation For Spaces at Beginning And End Place", "warning");
+                $("#Designation").focus();
+                return false;
+            }
+        }
+
+        if (!blankFieldValidation("MineralId", "Mineral Name")) {
+            $("#MineralId").focus();
+            return false;
+        }
+        if (!DropDownValidation("MineralForm", "Mineral Form")) {
+            return false;
+        }
+        if (!DropDownValidation("MineralGrade", "Mineral Grade")) {
+            return false;
+        }
+
+        var SelectedVal = $("#NatureOfBusiness").val();
+        if (SelectedVal == '1' || SelectedVal == 'Industry') {
+
+            if (!DropDownValidation("PurposeOfPurchaseMineral", "Purpose")) {
+                return false;
+            }
+
+        }
+        if ($('#MineralUse').val() != "") {
+            if (CheckSpaceAtFirstPlaceAndLastPlace($("#MineralUse").val()) == false) {
+                swal("", "Please Check Use of the Mineral For Spaces at Beginning And End Place", "warning");
+                $("#MineralUse").focus();
+                return false;
+            }
+        }
+            var SelectedRadioVal = $("input[name='EndUserTypeStatus']:checked").val()
+            if (SelectedRadioVal == 'Individual/Proprietor') {
+
+
+                if (!blankFieldValidation("AadhaarNumber", "Aadhaar Card Number")) {
+                    return false;
+                }
+                if ($("#AadhaarNumber").val().length != 12) {
+                    swal("", "Please Enter Valid Aadhaar Card Number !", "warning");
+                    $('input[name="AadhaarNumber"]').focus();
+                    return false;
+                }
+
+                if (Aadhaar_FileSize == 0) {
+                    swal("", "Aadhaar Card is required. !", "warning");
+                    $('input[name="AAdharDocument"]').focus();
+                    return false;
+                }
+
+            }
+            else {
+
+                if (Registration_FileSize == 0) {
+                    swal("", "Firm / Company Registration Copy is required. !", "warning");
+                    $('input[name="RcopyDocument"]').focus();
+                    return false;
+                }
+                if (!blankFieldValidation("CompanyName", "Name of the Firm/Association/Company")) {
+                    return false;
+                }
+
+            }
+
+        if (!blankFieldValidation("PAN", "PAN")) {
+            return false;
+        }
+        if ($("#PAN").val().length != 10) {
+            swal("", "Please Enter Valid PAN Number !", "warning");
+            $('input[name="PAN"]').focus();
+            return false;
+        }
+
+        if ($("#TINNo").val() != "") {
+            if ($("#TINNo").val().length != 11) {
+                swal("", "Please Enter Valid Tin Number !", "warning");
+                $('input[name="TINNo"]').focus();
+                return false;
+            }
+        }
+        if ($("#GSTNO").val() != "") {
+            if ($("#GSTNO").val().length != 15) {
+                swal("", "Please Enter Valid GST Number !", "warning");
+                $('input[name="GSTNO"]').focus();
+                return false;
+            }
+        }
+
+        if (CheckSpaceAtFirstPlaceAndLastPlace($("#GSTNO").val()) == false) {
+            swal("", "Please Check GST Number For Spaces at Beginning And End Place", "warning");
+            $("#GSTNO").focus();
+            return false;
+        }
+
+
+        if (PAN_FileSize == 0) {
+            swal("", "PAN Card is required. !", "warning");
+            $('input[name="PanDocument"]').focus();
+            return false;
+        }
+
+
+
+
+        var SelectedVal_1 = $("#NatureOfBusiness").val();
+        if (SelectedVal_1 == '1' || SelectedVal_1 == 'Industry') {
+
+            if (Electricity_FileSize == 0) {
+                swal("", "Electricity Bill of last 3 months is required. !", "warning");
+                $('input[name="EbillDocument"]').focus();
+                return false;
+            }
+
+            if (CTO_FileSize == 0 ) {
+                swal("", "CTO (Consent To Operate) Letter is required. !", "warning");
+                $('input[name="CTODocument"]').focus();
+                return false;
+            }
+
+            if (!blankFieldValidation("CTOApprovalNumber", "CTO Approval Number")) {
+                return false;
+            }
+
+            if (CheckSpaceAtFirstPlaceAndLastPlace($("#CTOApprovalNumber").val()) == false) {
+                swal("", "Please Check CTO Approval Number For Spaces at Beginning And End Place", "warning");
+                $("#CTOApprovalNumber").focus();
+                return false;
+            }
+
+            if (!blankFieldValidation("CTOOrderDate", "CTO Order Date")) {
+                return false;
+            }
+            if (!blankFieldValidation("CTOValidityFrom", "CTO Validity From")) {
+                return false;
+            }
+            if (!blankFieldValidation("CTOValidityTo", "CTO Validity To")) {
+                return false;
+            }
+        }
+
+
+
+        if ($('#IBMRegistrationNo').val() != "") {
+            if (CheckSpaceAtFirstPlaceAndLastPlace($("#MineralUse").val()) == false) {
+                swal("", "Please Check IBM Registration No For Spaces at Beginning And End Place", "warning");
+                $("#IBMRegistrationNo").focus();
+                return false;
+            }
+        }
+
+
+        var SelectedVal = $("#NatureOfBusiness").val();
+        if (SelectedVal == '1' || SelectedVal == 'Industry') {
+
+            if (!blankFieldValidation("Address", "Plant Address")) {
+                return false;
+            }
+
+            if (CheckSpaceAtFirstPlaceAndLastPlace($("#Address").val()) == false) {
+                swal("", "Please Check Plant Address For Spaces at Beginning And End Place", "warning");
+                $("#Address").focus();
+                return false;
+            }
+
+            if (!DropDownValidation("StateId", "State")) {
+                return false;
+            }
+            if (!DropDownValidation("DistrictId", "District")) {
+                return false;
+            }
+            if (!blankFieldValidation("PinCode", "Pin Code")) {
+                return false;
+            }
+        }
+
+
+        if (!blankFieldValidation("OfficeAddress", "Office Address")) {
+            return false;
+        }
+        if (CheckSpaceAtFirstPlaceAndLastPlace($("#OfficeAddress").val()) == false) {
+            swal("", "Please Check Office Address For Spaces at Beginning And End Place", "warning");
+            $("#OfficeAddress").focus();
+            return false;
+        }
+
+        if (!DropDownValidation("StateId_O", "State[Office Address]")) {
+            return false;
+        }
+
+
+        var SelectedVal = $("#NatureOfBusiness").val();
+        if (SelectedVal != '1' && SelectedVal != 'Industry') {
+
+            var SelectedVal_1 = $("#StateId_O").val();
+            if (SelectedVal_1 == "7" || SelectedVal_1 == "Chhattisgarh") {
+                swal("", "Select state other than Chhattisgarh - REGISTRATION NOT ALLOWED. [Office Address] !", "warning");
+                $('input[name="StateId_O"]').focus();
+                return false;
+            }
+        }
+        if (!DropDownValidation("DistrictId_O", "District[Office Address]")) {
+            return false;
+        }
+        if (!blankFieldValidation("PinCode_O", "Pin Code[Office Address]")) {
+            return false;
+        }
+        if (!DropDownValidation("SQuestionId", "Question")) {
+            return false;
+        }
+        if (!blankFieldValidation("SQAnswer", "Answer")) {
+            return false;
+        }
+        if (CheckSpaceAtFirstPlaceAndLastPlace($("#SQAnswer").val()) == false) {
+            swal("", "Please Check SQAnswer For Spaces at Beginning And End Place", "warning");
+            $("#SQAnswer").focus();
+            return false;
+        }
+
+        if (SelectedVal_1 != '2' && SelectedVal_1!='') {
+            if (!blankFieldValidation("Latitude", "Latitude")) {
+                return false;
+            }
+            if (!blankFieldValidation("longitude", "Longitude")) {
+                return false;
+            }
+        }
+
+        if (!blankFieldValidation("captcha", "captcha")) {
+            return false;
+        }
+
+        if ($("#capt1").html() != $("#captcha").val()) {
+            swal("", "Invalid captcha !", "warning");
+            $("#captcha").focus();
+            updateCaptcha();
+            return false;
+        }
+        return true;
+    }
+
+    //$("#btnNext").click(function () {
+
+    //    if (validatable.validate()) {
+    //        $('#divRegistration').hide();
+    //        $('#divRegistrationPartTwo').hide();
+    //        $('#divRegistrationThree').hide();
+    //        $('#divIagree').hide();
+    //        $('#divButtons').hide();
+    //        $('#divOutstate').hide();
+
+    //        $('#divMakePayment').show();
+
+    //        $('#btnMakePayment').removeClass("btn btn-sm btn-default");
+    //        $('#btnMakePayment').addClass("btn btn-sm btn-blue-alt");
+
+    //        $('#btnRegistration').removeClass("btn btn-sm btn-blue-alt");
+    //        $('#btnRegistration').addClass("btn btn-sm btn-success");
+    //    }
+    //});
+
+
+
+    $('input[name="Document"]').bind('change', function () {
+        filesize = this.files[0].size;
+        return false;
+    });
+
+    $("#btnPayment").click(function () {
+
+        var isValid = 0;
+        if ($("#divOnlineOption").hasClass("active") == true) {
+            $("#PaymentMode").val(1); // set online payment mode
+
+            var bank = $("input:radio[name='BankSelection']:checked").val();
+            if (bank == "HDFC") {
+                $("#PaymentBank").val("HDFC");
+                if (confirm('Are you sure to make payment ?')) {
+                    $("#__EUAntiForgeryForm").submit();
+                }
+            }
+            else if (bank == "ICICI") {
+                $("#PaymentBank").val("ICICI");
+                if (confirm('Are you sure to make payment ?')) {
+                    $("#__EUAntiForgeryForm").submit();
+                }
+
+            }
+            else if (bank == "SBI") {
+
+                $("#PaymentBank").val("SBI");
+                if (confirm('Are you sure to make payment ?')) {
+                    $("#__EUAntiForgeryForm").submit();
+                }
+            }
+            else {
+                swal("", "Please select bank to make payment !", "warning");
+                return false;
+
+            }
+        }
+        else {
+            $("#PaymentMode").val(0); // set offline mode value
+            if ($("#ChallanNumber").val()) {
+                if ($("#ChallanDate").val()) {
+                    if ($('input[name="Document"]').val() != "") {
+                        if (confirm('Are you sure to make payment ?')) {
+                            if (filesize < 2048000) {
+                                $("#__EUAntiForgeryForm").submit();
+                            }
+                            else {
+                                swal("", "Please make sure your file is less than 2 MB !", "warning");
+                                return false;
+                            }
+                        }
+                    }
+                    else {
+                        swal("", "Please select file !", "warning");
+                        return false;
+                    }
+                }
+                else {
+                    $("#ChallanDate").focus();
+                }
+            }
+            else {
+                $("#ChallanNumber").focus();
+            }
+        }
+    });
+
+    function onRadioChange() {
+        debugger;
+        var SelectedRadioVal = $("input[name='EndUserTypeStatus']:checked").val()
+        debugger;
+        if (SelectedRadioVal == 'Firm') {
+            $('#divCompanyFirmAssociation').show();
+            $("#company_toggle").hide();
+            $("#firm_toggle").show();
+            $("#individual_toggle").hide();
+        }
+        else if (SelectedRadioVal == 'Company') {
+            $('#divCompanyFirmAssociation').show();
+            $("#firm_toggle").hide();
+            $("#company_toggle").show();
+            $("#individual_toggle").hide();
+        }
+        else if (SelectedRadioVal == 'Association') {
+            $("#firm_toggle").hide();
+            $("#company_toggle").hide();
+            $('#divCompanyFirmAssociation').show();
+            $("#individual_toggle").hide
+        }
+        else {
+            $('#divCompanyFirmAssociation').hide();
+            $("#firm_toggle").hide();
+            $("#company_toggle").hide();
+            $("#individual_toggle").show();
+        }
+    }
+
+    //$(document).ready(function () {
+    //    $('#divRegistration').show();
+    //    $('#divRegistrationPartTwo').show();
+    //    $('#divButtons').hide();
+
+    //    $("#industrytype_toggle").hide();
+    //    $("#Other_industrytype_toggle").hide();
+    //    $("#detail_industrytype_toggle").show();
+
+    //    $("#OUTSIDE_ELECTRICITY_UPLOAD").show();
+    //    $("#OUTSIDE_CTO_UPLOAD").show();
+    //    $("#OUTSIDE_CTO_NUMBER").show();
+    //    $("#OUTSIDE_CTO_DATE").show();
+    //    $("#OUTSIDE_CTO_FROM").show();
+    //    $("#OUTSIDE_CTO_TO").show();
+
+    //    $("div.bhoechie-tab-menu>div.list-group>a").click(function (e) {
+    //        e.preventDefault();
+    //        $(this).siblings('a.active').removeClass("active");
+    //        $(this).addClass("active");
+    //        var index = $(this).index();
+    //        $("div.bhoechie-tab>div.bhoechie-tab-content").removeClass("active");
+    //        $("div.bhoechie-tab>div.bhoechie-tab-content").eq(index).addClass("active");
+    //    });
+
+
+
+    //});
+
+    //function showDivRegistration() {
+    //    $('#divMakePayment').hide();
+    //    $('#divRegistration').show();
+    //    $('#divRegistrationPartTwo').show();
+    //    $('#divRegistrationThree').show();
+    //    $('#divIagree').show();
+    //    $('#divButtons').show();
+
+    //    $('#btnMakePayment').removeClass("btn btn-sm btn-blue-alt");
+    //    $('#btnMakePayment').addClass("btn btn-sm btn-default");
+
+    //    $('#btnRegistration').removeClass("btn btn-sm btn-success");
+    //    $('#btnRegistration').addClass("btn btn-sm btn-blue-alt");
+    //}
+
+
+
+    $('#chkIagree').click(function () {
+        if (CheckValidation() != false) {
+            if ($('#VerifyOTP').val() != "") {
+
+                $.ajax({
+
+                    url: '@Url.Action("VerifyOTP", "EndUserProfile")',
+                    data: {
+                        OTP: $('#VerifyOTP').val(),
+                        MobileNumber: $("#MobileNo").val(),
+                        EmailID: $("#EMailId").val()
+                    },
+                    success: function (result) {
+                        if (result == "SUCCESS") {
+                            if ($('input[name="chkIagree"]:checked').length > 0) {
+                                $('#divButtons').show();
+                                $(this).attr('checked', true);
+                            }
+                            else {
+                                $('#divButtons').hide();
+                                ChangeCheckBoxStatus();
+
+                            }
+                        }
+                        else if (result == "REQUIRED") {
+                            swal("", "Please enter mobile number and e-mail and OTP !", "warning");
+                            $('#divButtons').hide();
+                            ChangeCheckBoxStatus();
+                        }
+                        else {
+                            swal("", "This is an InValid OTP.Please send another OTP and try again !", "warning");
+                            $('#divButtons').hide();
+                            ChangeCheckBoxStatus();
+                        }
+                    },
+                    error: function (result) {
+                        swal("", "OTP Verification failed.Please try again !", "warning");
+                        $('#divButtons').hide();
+                        ChangeCheckBoxStatus();
+                    }
+                });
+            }
+            else {
+                $('#divButtons').hide();
+                $('input[type="checkbox"]').prop('checked', false);
+                swal("", "Please Enter OTP", "warning");
+                $("#VerifyOTP").focus();
+                return false;
+            }
+        }
+        else {
+            $('#divButtons').hide();
+            ChangeCheckBoxStatus();
+        }
+    });
+
+    function ChangeCheckBoxStatus() {
+        if ($('input[type="checkbox"]').is(':checked') == true) {
+            $('input[type="checkbox"]').prop('checked', false);
+        }
+    }
+
+    $("#MobileNo").focusout(function () {
+        $('#VerifyOTP').val('');
+        $('#divButtons').hide()
+    });
+
+    $("#EMailId").focusout(function () {
+        $('#VerifyOTP').val('');
+        $('#divButtons').hide()
+    });
+
+    function onChangeRegistrationType(e) {
+
+
+        var SelectedVal = $("#NatureOfBusiness").val();
+
+        $("#industrytype_toggle").hide();
+        $("#detail_industrytype_toggle").hide();
+        $("#purpose_toggle").hide();
+        $("#Other_industrytype_toggle").hide();
+
+        $("#OUTSIDE_ELECTRICITY_UPLOAD").hide();
+        $("#OUTSIDE_CTO_UPLOAD").hide();
+        $("#OUTSIDE_CTO_NUMBER").hide();
+        $("#OUTSIDE_CTO_DATE").hide();
+        $("#OUTSIDE_CTO_FROM").hide();
+        $("#OUTSIDE_CTO_TO").hide();
+
+        if (SelectedVal == '1' || SelectedVal == 'Industry') {
+            $("#industrytype_toggle").show();
+            $("#detail_industrytype_toggle").show();
+            $("#purpose_toggle").show();
+
+            $("#OUTSIDE_ELECTRICITY_UPLOAD").show();
+            $("#OUTSIDE_CTO_UPLOAD").show();
+            $("#OUTSIDE_CTO_NUMBER").show();
+            $("#OUTSIDE_CTO_DATE").show();
+            $("#OUTSIDE_CTO_FROM").show();
+            $("#OUTSIDE_CTO_TO").show();
+        }
+
+        if (SelectedVal == '2' || SelectedVal=='') {
+            $('#DivLatitudeLongitude').hide();
+           $('#Latitude').val('');
+           $('#Longitude').val('');
+        }
+        else {
+            $('#DivLatitudeLongitude').show();
+            $('#Latitude').val('');
+            $('#Longitude').val('');
+        }
+
+    }
+
+    //function onChangeDistrict(e) {
+    //    var districtwidget = e.sender;
+    //    if (districtwidget.value() && districtwidget.select() === -1) {
+    //        districtwidget.value(""); //reset widget
+    //    }
+    //}
+
+    $("#btnsendOtp").click(function () {
+
+        if (CheckValidation() != false) {
+            var mobileNumber = $("#MobileNo").val();
+            var EmailID = $("#EMailId").val();
+
+            if (mobileNumber == "") {
+                swal("", "Please enter mobile number !", "warning");
+                $('#MobileNo').focus();
+                return false;
+            }
+            else {
+                $.ajax({
+
+                    url: "/EndUserRegistration/EndUserProfile/SendOTP",
+                    dataType: "json",
+                    type: "POST",
+                    data: {
+                        MobileNumber: mobileNumber,
+                        EmailID: EmailID
+                    },
+                    success: function (data) {
+                        console.log(data);
+                        if (data != null) {
+
+                            if (data == "SUCCESS") {
+                                swal("", "Enter Verification Code received on submitted Mobile/Email Id", "success");
+                            }
+                            else {
+                                alert(data);
+                            }
+                        }
+                    }
+                })
+            }
+        }
+    });
+
+    //Start code: Add font size
+    var min = 12;
+    var max = 18;
+    var reset = 15;
+
+    function increaseFontSize() {
+        var p = document.getElementsByTagName('body');
+        for (i = 0; i < p.length; i++) {
+            if (p[i].style.fontSize) {
+                var s = parseInt(p[i].style.fontSize.replace("px", ""));
+            } else {
+                var s = 15;
+            }
+            if (s != max) {
+                s += 1;
+            }
+            p[i].style.fontSize = s + "px"
+        }
+    }
+
+    function decreaseFontSize() {
+        var p = document.getElementsByTagName('body');
+        for (i = 0; i < p.length; i++) {
+            if (p[i].style.fontSize) {
+                var s = parseInt(p[i].style.fontSize.replace("px", ""));
+            } else {
+                var s = 15;
+            }
+            if (s != min) {
+                s -= 1;
+            }
+            p[i].style.fontSize = s + "px"
+        }
+    }
+
+    function reSetFontSize() {
+        var p = document.getElementsByTagName('body');
+        for (i = 0; i < p.length; i++) {
+            if (p[i].style.fontSize) {
+                var s = parseInt(p[i].style.fontSize.replace("px", ""));
+            } else {
+                var s = 15;
+            }
+            if (s != reset) {
+                s = 15;
+            }
+            p[i].style.fontSize = s + "px"
+        }
+    }
+    //End code: Add font size
+
+    function numericOnly() {
+        debugger;
+        var keycode = event.which;
+        if (!(event.shiftKey == false && (keycode == 8 || keycode == 37 || keycode == 39 || (keycode >= 48 && keycode <= 57)))) {
+            event.preventDefault();
+            return false;
+        }
+    }
+
+    var specialKeys = new Array();
+    specialKeys.push(8); //Backspace
+    function numericdotOnly(elementRef) {
+        var keyCodeEntered = (event.which) ? event.which : (window.event.keyCode) ? window.event.keyCode : -1;
+        if ((keyCodeEntered >= 48) && (keyCodeEntered <= 57)) {
+            return true;
+        }
+        // '.' decimal point...
+        else if (keyCodeEntered == 46) {
+            // Allow only 1 decimal point ('.')...
+            if ((elementRef.value) && (elementRef.value.indexOf('.') >= 0))
+                return false;
+            else
+                return true;
+        }
+        return false;
+    }
+
+    function lettersOnly() {
+        var regex = new RegExp("^[a-zA-Z ]+$");
+        var key = String.fromCharCode(!event.charCode ? event.which : event.charCode);
+        if (!regex.test(key)) {
+            event.preventDefault();
+            return false;
+        }
+    }
+
+    function CheckSpaceAtFirstPlaceAndLastPlace(str) {
+        var regex = /^(?!\s)(?![\s\S]*\s$)[a-zA-Z0-9\s()-]+$/;
+        return regex.test(str);
+    }
+
+    $("#EMailId").keydown(function (evt) {
+        debugger;
+        evt = (evt) ? evt : window.event;
+        var charCode = (evt.which) ? evt.which : evt.keyCode;
+        if (charCode == 32) {
+            return false;
+        }
+        return true;
+
+    });
+
+    function ValidateEmailAddress(inputText) {
+        debugger;
+        var mailformat = /^\w+([\.-]?\w+)@@\w+([\.-]?\w+)(\.\w{2,3})+$/;
+        if (inputText.value.match(mailformat)) {
+            inputText.focus();
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+
+    // THE SCRIPT THAT CHECKS IF THE KEY PRESSED IS A NUMERIC OR DECIMAL VALUE.
+    function isNumber(evt, element) {
+
+        var charCode = (evt.which) ? evt.which : event.keyCode
+
+        if (
+            (charCode != 45 || $(element).val().indexOf('-') != -1) &&      // “-” CHECK MINUS, AND ONLY ONE.
+            (charCode != 46 || $(element).val().indexOf('.') != -1) &&      // “.” CHECK DOT, AND ONLY ONE.
+            (charCode < 48 || charCode > 57))
+            return false;
+
+        return true;
+    }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+

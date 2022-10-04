@@ -1,0 +1,491 @@
+﻿@model EpassEF.TPCancelModelEF
+@{
+    ViewData["Title"] = "Receiving of request for cancellation of TP";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+
+<section class="wrapper main-wrapper row">
+    <div class="col-12" id="mainDiv">
+        @Html.Partial("_CMSnavigation")
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link" href="@Url.Content("~/Permit/lessee/ePermitApplication")">
+                                Home
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="#">
+                                Receiving of request for cancellation of TP
+                            </a>
+                        </li>
+
+                    </ul>
+                    @Html.Partial("_CMSutil")
+                </div>
+
+                <section class="box form-container">
+                    @using (Html.BeginForm("eTransitPassDetails", "Lessee", FormMethod.Post, new { AUTOCOMPLETE = "Off", id = "form1" }))
+                    {
+
+                        @Html.Hidden("_TransitPassID", "", new { Id = "_TransitPassID" })
+                        @Html.Hidden("_CancellationId", "", new { Id = "_CancellationId" })
+                        @Html.Hidden("_TpType", "", new { Id = "_TpType" })
+                        @Html.Hidden("_TransitPassNo", "", new { Id = "_TransitPassNo" })
+                        <div class="content-body">
+
+                            <div class="row">
+                                <div class="col-sm-12">
+
+                                    <table id="table-exports" class="table table-sm table-bordered">
+                                        <thead>
+                                            <tr>
+
+                                                <th width="100">Sl No.</th>
+                                                <th>Transit Pass No.</th>
+                                                <th>Bulk Permit No.</th>
+                                                <th>Source User Code</th>
+                                                <th>Desination User Code</th>
+                                                <th>Source User Name</th>
+                                                <th>Dest User Name</th>
+                                                <th>Source Address</th>
+                                                <th>Desination Address</th>
+                                                <th>Transportaion Mode</th>
+                                                <th>Vehicle</th>
+                                                <th>Net Weight</th>
+                                                <th>Dispatch Time</th>
+                                                <th>Print Count</th>
+                                                <th>Submission Date time</th>
+                                                <th>Approve / Reject Date Time</th>
+                                                <th>User Remarks</th>
+                                                <th>DD Remarks </th>
+                                                <th>Trip Status </th>
+                                                <th>  </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @{
+                                                int rowNo = 0;
+                                                @foreach (var b in ViewBag.ViewList)
+                                                {
+
+                                                    <tr>
+                                                        <td width="10">@(rowNo+=1)</td>
+                                                        <td><p class="m-0" id="TransitPassNumber">@b.TransitPassId</p> </td>
+                                                        <td><p class="m-0" id="BulkPermitNo">@b.BulkPermitNo</p> </td>
+                                                        <td><p class="m-0" id="SourceUserCode">@b.SourceUserCode</p> </td>
+                                                        <td><p class="m-0" id="SourceUserCode">@b.DesinationUserCode</p> </td>
+                                                        <td><p class="m-0" id="SourceUserName">@b.SourceUserName</p> </td>
+                                                        <td><p class="m-0" id="DestUserName">@b.DestUserName</p> </td>
+                                                        <td><p class="m-0" id="SourceAddress">@b.SourceAddress</p> </td>
+                                                        <td><p class="m-0" id="DesinationAddress">@b.DesinationAddress</p> </td>
+                                                        <td><p class="m-0" id="TransportaionMode">@b.TransportaionMode</p> </td>
+                                                        <td><p class="m-0" id="VehicleNo">@b.VehicleNo</p> </td>
+                                                        <td><p class="m-0" id="NetWeight">@b.NetWeight</p> </td>
+                                                        <td><p class="m-0" id="TPDispatchTime">@b.TPDispatchTime</p> </td>
+                                                        <td><p class="m-0" id="RePrintCount">@b.RePrintCount</p> </td>
+                                                        <td><p class="m-0" id="CancellationDateTime">@b.CancellationDateTime</p> </td>
+                                                        <td><p class="m-0" id="ApproveRejectDateTime">@b.ApproveRejectDateTime</p> </td>
+                                                        <td><p class="m-0" id="UserRemarks">@b.UserRemarks</p> </td>
+                                                        <td><p class="m-0" id="DDRemarks">@b.DDRemarks</p> </td>
+                                                        <td><p class="m-0" id="TripStatus">@b.TripStatus</p> </td>
+                                                        <td>
+                                                            <button type="button" class="btn btn-dark " data-toggle="modal" data-target="#viewcalculation" onclick="onBtnCancelTPClick('@b.CancellationId','@b.TransitPassId','@b.TpType','@b.TransitPassNo')"> Take Action </button>
+                                                        </td>
+
+                                                    </tr>
+                                                }
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </section>
+            </div>
+        </div>
+    </div>
+    <!-- MAIN CONTENT AREA ENDS -->
+</section>
+@*<uc1:footer runat="server" ID="footer" />*@
+<div class="modal fade" id="viewcalculation">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header p-2">
+                <h5 class="modal-title m-0">Remark</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+
+            </div>
+
+            <div class="modal-body">
+                <div class="row col-md-12">
+                    <textarea class="form-control" Id="txtRemarks"> </textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" id="modal-btn-si" onclick="onBtnApprove();">Approve</button>
+                <button type="button" class="btn btn-default" id="modal-btn-si" onclick="onBtnReject();">Reject</button>
+                @*<button type="button" class="btn btn-primary" data-dismiss="modal" onclick="onBtnSubmit();">Submit</button>*@
+                <button type="button" class="btn btn-primary" id="modal-btn-no" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+
+@*---------------------------------------------*@
+<script>
+    $(document).ready(function () {
+        $('#txtRemarks').val('');
+    });
+</script>
+<script>
+    function onBtnCancelTPClick(CancellationId, TransitPassId, TpType, TransitPassNo) {
+        $("#_TransitPassID").val(TransitPassId);
+        $("#_CancellationId").val(CancellationId);
+        $("#_TpType").val(TpType);
+        $("#_TransitPassNo").val(TransitPassNo);
+    }
+        
+    function onBtnApprove() {
+    var remarks = $('#txtRemarks').val();
+    var passid = $("#_TransitPassID").val();
+    var CancellationId = $("#_CancellationId").val();
+    var transitpassno = $("#_TransitPassNo").val();
+    var TpType = $("#_TpType").val();
+        var Actionname = "Approve";
+    if (remarks != "" && remarks != null) {
+
+        if (confirm("Before revoke you need to apply your Digital Signature. Are you confirmed to apply Digital Signature?")) {
+
+            //It's Temp bases
+            //fnTPCancel(TpType, passid, remarks, CancellationId, "Approve", transitpassno);
+
+
+            var Postdata = 'action=signdoc' + "\n" + 'datatosign=Digital Signature Required' + "\n" + 'signaction=sign' + "\n" + 'filepath=' + "\n" + 'panNumberParam=' + "\n" + 'expirycheck=false' + "\n" + 'issuername=' + "\n" + 'certclass=1|2|3' + "\n" + 'certtype=ALL';
+            connection.send(Postdata);
+
+            connection.onerror = function (error) {
+                alert('Please check the server connection: ' + error);
+                alert(error);
+            };
+
+            connection.onmessage = function (e) { // when DSC is success then following function executed.
+                if (e.data.indexOf("subProtocol") == -1) {
+                    $("#DSCResponse").val(e.data).change();
+                    $.ajax(
+                    {
+                        url: '@Url.Action("CheckVerifyResponse", "DSCResponseVerify", new { Area = "Epass" })',
+                        type: "POST",
+                        data: { contentType: "pkcs7", signDataBase64Encoded: e.data, responseType: "plain" },
+                        success: function (msg) {
+                            if (msg == "SUCCESS") {
+                                fnTPCancel(TpType, passid, remarks, CancellationId, Actionname, transitpassno);
+                            }
+                        }
+                    });
+                }
+                else {
+                    art(e.data);
+                }
+            };
+        }
+    }
+    else {
+        alert("Remarks required !");
+    }
+}
+
+function onBtnReject() {
+    var remarks = $('#txtRemarks').val();
+    var passid = $("#_TransitPassID").val();
+    var CancellationId = $("#_CancellationId").val();
+    var transitpassno = $("#_TransitPassNo").val();
+    var TpType = $("#_TpType").val();
+    var Actionname = "Reject";
+    if (remarks != "" && remarks != null) {
+        if (confirm("Before reject you need to apply your Digital Signature. Are you confirmed to apply Digital Signature?")) {
+
+            debugger;
+
+            var Postdata = 'action=signdoc' + "\n" + 'datatosign=Digital Signature Required' + "\n" + 'signaction=sign' + "\n" + 'filepath=' + "\n" + 'panNumberParam=' + "\n" + 'expirycheck=false' + "\n" + 'issuername=' + "\n" + 'certclass=1|2|3' + "\n" + 'certtype=ALL';
+            connection.send(Postdata);
+
+            connection.onerror = function (error) {
+                alert('Please check the server connection: ' + error);
+                alert(error);
+            };
+
+            connection.onmessage = function (e) { // when DSC is success then following function executed.
+                if (e.data.indexOf("subProtocol") == -1) {
+                    $("#DSCResponse").val(e.data).change();
+                    $.ajax(
+                    {
+                        url: '@Url.Action("CheckVerifyResponse", "DSCResponseVerify", new { Area = "Epass" })',
+                        type: "POST",
+                        data: { contentType: "pkcs7", signDataBase64Encoded: e.data, responseType: "plain" },
+                        success: function (msg) {
+                            if (msg == "SUCCESS") {
+                                fnTPCancel(TpType, passid, remarks, CancellationId, Actionname , transitpassno);
+                            }
+                        }
+                    });
+                }
+                else {
+                    alert(e.data);
+                }
+            };
+        }
+    }
+    else {
+        alert("Remarks required !");
+    }
+}
+
+    function fnTPCancel(TpType, passid, remarks, CancellationId, Actionname, transit_Pass_No) {
+        if (TpType == "TP") {
+           
+            $.ajax({
+                type: "POST",
+                url: '@Url.Action("CancleTPApproval", "AdminUtility", new { Area = "Epass" })' + '?Id=' + passid + '&Remarks=' + remarks + '&NameAction=' + Actionname + '&CancellationId=' + CancellationId +  '&PassNo=' + transit_Pass_No,
+              // data: '{Id: "' + passid + '",Remarks: "' + remarks + '",CancellationId: "' + CancellationId + '",Action: "' + Actionname + '",PassNo: "' + transit_Pass_No + '" }',
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (result) {
+
+                    if (result != null) {
+                        
+                        if (result == 1) {
+                            alert("The e-Permit which is used in TP is merged with another one. So you can't approved the request for cancel this TP.");
+                        }
+                        else if (result != "") {
+                            if (Actionname == "Approve") {
+                                alert("Transit pass has been cancelled successfully.");
+                                location.reload();
+                            }
+                            else if (Actionname == "Reject") {
+                                alert("Transit pass has been rejected successfully.");
+                                location.reload();
+                            }
+                            $('#txtRemarks').val('');
+                           
+                        }
+                        else {
+                            alert("Record Not updated. Please try later !");
+                        }
+                    }
+                    location.reload();
+                }
+            });
+        }
+        else if (TpType == "LTP") {
+            $.ajax({
+                type: "POST",
+                url: '@Url.Action("CancleLTP", "AdminUtility", new { Area = "Admin" })',
+                data: '{Id: "' + passid + '",Remarks: "' + remarks + '",CancellationId: "' + CancellationId + '",Action: "' + Action + '",PassNo: "' + transit_Pass_No + '" }',
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (result) {
+                    if (result != null) {
+                        if (result != "") {
+                            if (Action == "Approve") {
+                                alert("Transit pass has been cancelled successfully.");
+                                OnRefreshGrid();
+                            }
+                            else if (Action == "Reject") {
+                                alert("Transit pass has been rejected successfully.");
+                                OnRefreshGrid();
+                            }
+                            $('#txtRemarks').val('');
+                        } else {
+                            alert("Record Not updated. Please try later !");
+                        }
+                    }
+                }
+            });
+        }
+        else if (TpType == "RPTP") {
+            $.ajax({
+                type: "POST",
+                url: '@Url.Action("CancleRPTPPass", "AdminUtility", new { Area = "Admin" })',
+                data: '{Id: "' + passid + '",Remarks: "' + remarks + '",CancellationId: "' + CancellationId + '",Action: "' + Action + '",PassNo: "' + transit_Pass_No + '" }',
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (result) {
+                    if (result != null) {
+                        if (result != "") {
+                            if (Action == "Approve") {
+                                alert("Transit pass has been cancelled successfully.");
+                                OnRefreshGrid();
+                            }
+                            else if (Action == "Reject") {
+                                alert("Transit pass has been rejected successfully.");
+                                OnRefreshGrid();
+                            }
+                            $('#txtRemarks').val('');
+                        } else {
+                            alert("Record Not updated. Please try later !");
+                        }
+                    }
+                }
+            });
+        }
+        else if (TpType == "END USE RPTP") {
+            $.ajax({
+                type: "POST",
+                url: '@Url.Action("CancleENDUSERRPTPPass", "AdminUtility", new { Area = "Admin" })',
+                data: '{Id: "' + passid + '",Remarks: "' + remarks + '",CancellationId: "' + CancellationId + '",Action: "' + Action + '",PassNo: "' + transit_Pass_No + '" }',
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (result) {
+                    if (result != null) {
+                        if (result != "") {
+                            if (Action == "Approve") {
+                                alert("Transit pass has been cancelled successfully.");
+                                OnRefreshGrid();
+                            }
+                            else if (Action == "Reject") {
+                                alert("Transit pass has been rejected successfully.");
+                                OnRefreshGrid();
+                            }
+                            $('#txtRemarks').val('');
+                        } else {
+                            alert("Record Not updated. Please try later !");
+                        }
+                    }
+                }
+            });
+        }
+        else if (TpType == "RTP Application") {
+            $.ajax({
+                type: "POST",
+                url: '@Url.Action("CancleRTPApp", "AdminUtility", new { Area = "Admin" })',
+                data: '{Id: "' + passid + '",Remarks: "' + remarks + '",CancellationId: "' + CancellationId + '",Action: "' + Action + '",PassNo: "' + transit_Pass_No + '" }',
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (result) {
+                    if (result != null) {
+                        if (result != "") {
+                            if (Action == "Approve") {
+                                alert("RTP Application has been cancelled successfully.");
+                                OnRefreshGrid();
+                            }
+                            else if (Action == "Reject") {
+                                alert("RTP Application has been rejected successfully.");
+                                OnRefreshGrid();
+                            }
+                            $('#txtRemarks').val('');
+                        } else {
+                            alert("Record Not updated. Please try later !");
+                        }
+                    }
+                }
+            });
+        }
+        else if (TpType == "END USE RTP Application") {
+            $.ajax({
+                type: "POST",
+                url: '@Url.Action("CancleENDUSERRTPApp", "AdminUtility", new { Area = "Admin" })',
+                data: '{Id: "' + passid + '",Remarks: "' + remarks + '",CancellationId: "' + CancellationId + '",Action: "' + Action + '",PassNo: "' + transit_Pass_No + '" }',
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (result) {
+                    if (result != null) {
+                        if (result != "") {
+                            if (Action == "Approve") {
+                                alert("RTP Application has been cancelled successfully.");
+                                OnRefreshGrid();
+                            }
+                            else if (Action == "Reject") {
+                                alert("RTP Application has been rejected successfully.");
+                                OnRefreshGrid();
+                            }
+                            $('#txtRemarks').val('');
+                        } else {
+                            alert("Record Not updated. Please try later !");
+                        }
+                    }
+                }
+            });
+        }
+        else if (TpType == "RTP Pass") {
+            $.ajax({
+                type: "POST",
+                url: '@Url.Action("CancleRTPPass", "AdminUtility", new { Area = "Admin" })',
+                data: '{Id: "' + passid + '",Remarks: "' + remarks + '",CancellationId: "' + CancellationId + '",Action: "' + Action + '",PassNo: "' + transit_Pass_No + '" }',
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (result) {
+                    if (result != null) {
+                        if (result == 3) {
+                            if (TpType == "RTP Application") {
+                                alert("The RTP Application is print and close. So you can not perform cancel operation.");
+                            }
+                            else if (TpType == "RTP Pass") {
+                                alert("The RTP Pass is not cancelled due to RTP Application is print and close.");
+                            }
+                        }
+                        else if (result != "") {
+                            if (Action == "Approve") {
+                                alert("RTP Application has been cancelled successfully.");
+                                OnRefreshGrid();
+                            }
+                            else if (Action == "Reject") {
+                                alert("RTP Application has been rejected successfully.");
+                                OnRefreshGrid();
+                            }
+                            $('#txtRemarks').val('');
+                        }
+                        else {
+                            alert("Record Not updated. Please try later !");
+                        }
+                    }
+                }
+            });
+        }
+        else if (TpType == "END USE RTP Pass") {
+            $.ajax({
+                type: "POST",
+                url: '@Url.Action("CancleENDUSERTPPass", "AdminUtility", new { Area = "Admin" })',
+                data: '{Id: "' + passid + '",Remarks: "' + remarks + '",CancellationId: "' + CancellationId + '",Action: "' + Action + '",PassNo: "' + transit_Pass_No + '" }',
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (result) {
+                    if (result != null) {
+                        if (result == 3) {
+                            if (TpType == "END USE RTP Application") {
+                                alert("The RTP Application is print and close. So you can not perform cancel operation.");
+                            }
+                            else if (TpType == "END USE RTP Pass") {
+                                alert("The RTP Pass is not cancelled due to RTP Application is print and close.");
+                            }
+                        }
+                        else if (result != "") {
+                            if (Action == "Approve") {
+                                alert("RTP pass has been cancelled successfully.");
+                                OnRefreshGrid();
+                            }
+                            else if (Action == "Reject") {
+                                alert("RTP pass has been rejected successfully.");
+                                OnRefreshGrid();
+                            }
+                            $('#txtRemarks').val('');
+                        }
+                        else {
+                            alert("Record Not updated. Please try later !");
+                        }
+                    }
+                }
+            });
+        }
+}
+
+</script>

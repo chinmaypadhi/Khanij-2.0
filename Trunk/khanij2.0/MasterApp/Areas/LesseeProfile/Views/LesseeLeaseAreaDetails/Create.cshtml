@@ -1,0 +1,1306 @@
+﻿@*// *********************************************************************************************************
+    //  View Name                : Create
+    //  Desciption               : To Save and Update, Forward to DD, Delete Lesee Lease Area Details
+    //  Created By               : Lingaraj Dalai
+    //  Created On               : 21 July 2021
+    // ********************************************************************************************************
+*@
+@model MasterEF.LeaseAreaViewModel;
+@using MasterEF;
+@using MasterApp.Web;
+@using Microsoft.AspNetCore.Mvc;
+@using  Microsoft.AspNetCore.Http;
+@inject IHttpContextAccessor HttpContextAccessor
+@{
+    ViewData["Title"] = "Create";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+    UserLoginSession profile = HttpContextAccessor.HttpContext.Session.Get<UserLoginSession>(KeyHelper.UserKey);
+    //profile.MineralTypeName = "Major Mineral";
+    //profile.MineralName = "NON COAL";
+}
+<link rel="stylesheet" href="~/CMScss/leaflet.css" />
+<script src="~/CMSjs/kml-covertor.js"></script>
+<script src="~/CMSjs/leaflet.js"></script>
+<link rel="stylesheet" href="https://cdn.rawgit.com/openlayers/openlayers.github.io/master/en/v5.3.0/css/ol.css" type="text/css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/0.4.2/leaflet.draw.css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/0.4.2/leaflet.draw.js"></script>
+@if (TempData["Message"] != null)
+{
+<script>
+        swal("",'@TempData["Message"]',"success");
+</script>
+}
+<script>
+    indicateMe = "yes"
+    backMe = "yes"
+    $(document).ready(function () {
+        $('.searchableselect').searchableselect();
+        loadNavigation('Create', 'glUIS', 'pllesseprof', 'tl', 'Lessee Profile', 'Lease Information Details', ' ');
+        $('.datepicker').datetimepicker({
+            format: 'LT',
+            format: 'DD-MMM-YYYY',
+            daysOfWeekDisabled: [],
+            widgetPositioning: {
+                horizontal: 'auto',
+                vertical: 'bottom'
+            }
+        });
+        AreaType();
+        if ($("#hfWorkDate").val() != "") {
+            $("#inputPermissionDate").val($("#hfWorkDate").val());
+        }
+        if ($("#hfAgreementDate").val() != "") {
+            $("#inputAgreementDate").val($("#hfAgreementDate").val());
+        }
+        //--------------
+        if ($('#hfStateId').val() != "") {
+            $('#ddlState').val($('#hfStateId').val());
+            BindDistrictData();
+        }
+        //---------------
+        $('#ddlState').change(function () {
+            debugger;
+            BindDistrictData();
+        });
+        //--------------------------------
+        $('#DistrictID').change(function () {
+            debugger;
+            BindTehsilData();
+            BindBlockData();
+        });
+        //----------------------------------
+        $('#TehsilID').change(function () {
+            debugger;
+            BindVillageData();
+        });
+        /*Bind District details*/
+        function BindDistrictData() {
+            debugger;
+            if ($('#ddlState').val() != "") {
+                $.ajax({
+                    url: '/LesseeProfile/LesseeLeaseAreaDetails/GetDistrictdetailsByRegionId',
+                    data: { 'StateId': $('#ddlState').val() },
+                    dataType: 'json',
+                    type: 'post',
+                    success: function (data) {
+                        debugger;
+                        $('#DistrictID').html('');
+                        $('#DistrictID').append("<option value=''>Select</option>");
+                        $.each(data, function (ind, item) {
+                            $('#DistrictID').append("<option value='" + item.districtId + "'>" + item.districtName + "</option>");
+                        });
+                        if ($('#hfDistrictId').val() != "") {
+                            $('#DistrictID').val($('#hfDistrictId').val());
+                            BindTehsilData();
+                            BindBlockData();
+                        }
+                        if ($('#DistrictID').val() ==null) {
+                            $('#DistrictID').html('');
+                            $('#DistrictID').append("<option value=''>Select</option>");
+                            $.each(data, function (ind, item) {
+                                $('#DistrictID').append("<option value='" + item.districtId + "'>" + item.districtName + "</option>");
+                            });
+                        }
+                    },
+                    error: function (err) {
+                    }
+                });
+                BindLeaseLandDistrictData();
+            }
+            else {
+                $('#DistrictID').html('');
+                $('#DistrictID').append("<option value=''>Select</option>");
+                $('#TehsilID').html('');
+                $('#TehsilID').append("<option value=''>Select</option>");
+                $('#VillageID').html('');
+                $('#VillageID').append("<option value=''>Select</option>");
+            }
+        }
+        /*Bind Tehsil data*/
+        function BindTehsilData() {
+            debugger;
+            if ($('#DistrictID').val() != "") {
+                $.ajax({
+                    url: '/LesseeProfile/LesseeLeaseAreaDetails/GetTehsildetailsByDistrictId',
+                    data: { 'DistrictId': $('#DistrictID').val() },
+                    dataType: 'json',
+                    type: 'post',
+                    success: function (data) {
+                        debugger;
+                        var row = "";
+                        $('#TehsilID').html('');
+                        row += "<option value=''>Select</option>";
+                        $.each(data, function (ind, item) {
+                            row += "<option value='" + item.tehsilID + "'>" + item.tehsilName + "</option>";
+                        });
+                        $('#TehsilID').html(row);
+                        if ($("#hfTehsilId").val() != "") {
+                            $("#TehsilID").val($("#hfTehsilId").val());
+                            BindVillageData();
+                            BindLeaseLandVillageData();
+                        }
+                        if ($("#TehsilID").val() == null) {
+                            $('#TehsilID').html('');
+                            $('#TehsilID').append("<option value=''>Select</option>");
+                            $.each(data, function (ind, item) {
+                                $('#TehsilID').append("<option value='" + item.tehsilID + "'>" + item.tehsilName + "</option>");
+                            });
+                        }
+                    },
+                    error: function (err) {
+                    }
+                });
+            }
+            else {
+                $('#TehsilID').html('');
+                $('#TehsilID').append("<option value=''>Select</option>");
+                $('#VillageID').html('');
+                $('#VillageID').append("<option value=''>Select</option>");
+            }
+        }
+        /*Bind Vilage data*/
+        function BindVillageData() {
+            debugger;
+            if ($('#TehsilID').val() != "") {
+                $.ajax({
+                    url: '/LesseeProfile/LesseeLeaseAreaDetails/GetVillagedetailsByTehsilId',
+                    data: { 'TehsilID': $('#TehsilID').val() },
+                    dataType: 'json',
+                    type: 'post',
+                    success: function (data) {
+                        debugger;
+                        var row = "";
+                        $('#VillageID').html('');
+                        row += "<option value=''>Select</option>";
+                        $.each(data, function (ind, item) {
+                            row += "<option value='" + item.villageID + "'>" + item.villageName + "</option>";
+                        });
+                        $('#VillageID').html(row);
+                        if ($("#hfVillageId").val() != "") {
+                            $("#VillageID").val($("#hfVillageId").val());
+                        }
+                        if ($("#VillageID").val() == null) {
+                            $('#VillageID').html('');
+                            $('#VillageID').append("<option value=''>Select</option>");
+                            $.each(data, function (ind, item) {
+                                $('#VillageID').append("<option value='" + item.villageID + "'>" + item.villageName + "</option>");
+                            });
+                        }
+                    },
+                    error: function (err) {
+                    }
+                });
+            }
+            else {
+                $('#VillageID').html('');
+                $('#VillageID').append("<option value=''>Select</option>");
+            }
+        }
+        /*Bind Block data*/
+        function BindBlockData() {
+            debugger;
+            if ($('#DistrictID').val() != "") {
+                $.ajax({
+                    url: '/LesseeProfile/LesseeLeaseAreaDetails/GetBlockdetailsByDistrictId',
+                    data: { 'DistrictId': $('#DistrictID').val() },
+                    dataType: 'json',
+                    type: 'post',
+                    success: function (data) {
+                        debugger;
+                        var row = "";
+                        $('#BlockId').html('');
+                        row += "<option value=''>Select</option>";
+                        $.each(data, function (ind, item) {
+                            row += "<option value='" + item.blockId + "'>" + item.blockName + "</option>";
+                        });
+                        $('#BlockId').html(row);
+                        if ($("#hfBlockId").val() != "") {
+                            $("#BlockId").val($("#hfBlockId").val());
+                        }
+                        if ($("#BlockId").val() == null) {
+                            $('#BlockId').html('');
+                            $('#BlockId').append("<option value=''>Select</option>");
+                            $.each(data, function (ind, item) {
+                                $('#BlockId').append("<option value='" + item.blockId + "'>" + item.blockName + "</option>");
+                            });
+                        }
+                    },
+                    error: function (err) {
+                    }
+                });
+            }
+            else {
+                $('#TehsilID').html('');
+                $('#TehsilID').append("<option value=''>Select</option>");
+                $('#VillageID').html('');
+                $('#VillageID').append("<option value=''>Select</option>");
+            }
+        }
+          //For Disabling all DOM if  is  Forwarded to DD/DMO and Approval is Pending
+         if (@Model.STATUS != null && @Model.STATUS != "") {
+            if (@Model.STATUS == 1) {
+                $('.form-control').css("pointer-events", "none");
+                $('.btnsave').hide();
+            }
+        }
+        else {
+            $('.btnsave').show();
+        }
+        //----------------------------------
+        $('#LEASELAND_DISRICT_ID').change(function () {
+            debugger;
+            BindLeaseLandBlockData();
+        });
+        /****************** FILE UPLOAD ********************************/
+        $('input[name="COORDINATES_PILLARS"]').bind('change', function () {
+            $("input[type='Submit']").attr('disabled', false);
+            $("input[name='cmd']").attr('disabled', false);
+            filesize = this.files[0].size;
+            var val = $(this).val().toLowerCase(),
+                regex = new RegExp("(.*?)\.(xls|xlsx)$");
+            if (!(regex.test(val))) {
+                swal("", ".docx, .tif,.jpeg,.jpg,.png,.pdf  type is not an allowed file type. You can use only .xls,.xlsx types of file(s). ", "warning");
+                this.value = '';
+                $("input[type='Submit']").attr('disabled', true);
+                $("input[name='cmd']").attr('disabled', true);
+                return false;
+            }
+            else if (filesize > 10048000) {
+                swal("", "File size must be 10 MB !", "warning");
+                $("input[type='Submit']").attr('disabled', true);
+                $("input[name='cmd']").attr('disabled', true);
+                return false;
+            }
+            else {
+                var fileName = $(this).val().split("\\").pop();
+                $(this).next('.custom-file-label').html(fileName);
+            }
+            return false;
+        });
+        //$('input[name="LEASE_AREA_MAP"]').bind('change', function () {
+        //    $("input[type='Submit']").attr('disabled', false);
+        //    $("input[name='cmd']").attr('disabled', false);
+        //    filesize = this.files[0].size;
+        //    var val = $(this).val().toLowerCase(),
+        //        regex = new RegExp("(.*?)\.(kmz|kml)$");
+        //    if (!(regex.test(val))) {
+        //        swal("", ".docx,.tif,.xls,.jpeg,.jpg,.png  type is not an allowed file type. You can use only .kmz, .kml types of file(s). ", "warning");
+        //        this.value = '';
+        //        $("input[type='Submit']").attr('disabled', true);
+        //        $("input[name='cmd']").attr('disabled', true);
+        //        return false;
+        //    }
+        //    else if (filesize > 10048000) {
+        //        swal("", "File size must be 10 MB !", "warning");
+        //        $("input[type='Submit']").attr('disabled', true);
+        //        $("input[name='cmd']").attr('disabled', true);
+        //        return false;
+        //    }
+        //    else {
+        //        var fileName = $(this).val().split("\\").pop();
+        //        $(this).next('.custom-file-label').html(fileName);
+        //        //KMLFile(this, $(this).val());
+        //    }
+        //    return false;
+        //});
+        $('input[name="DEMARCATION_REPORT_DGPS_GPS_TOTAL_STATION_SURVEY_REPORT_COORDINATES"]').bind('change', function () {
+            $("input[type='Submit']").attr('disabled', false);
+            $("input[name='cmd']").attr('disabled', false);
+            filesize = this.files[0].size;
+            var val = $(this).val().toLowerCase(),
+                regex = new RegExp("(.*?)\.(jpeg|jpg|pdf)$");
+            if (!(regex.test(val))) {
+                swal("", ".docx, tif,xls  type is not an allowed file type. You can use only pdf, jpg, jpeg types of file(s). ", "warning");
+                this.value = '';
+                $("input[type='Submit']").attr('disabled', true);
+                $("input[name='cmd']").attr('disabled', true);
+                return false;
+            }
+            else if (filesize > 2048000) {
+                swal("", "File size must be 2 MB !", "warning");
+                $("input[type='Submit']").attr('disabled', true);
+                $("input[name='cmd']").attr('disabled', true);
+                return false;
+            }
+            else {
+                var fileName = $(this).val().split("\\").pop();
+                $(this).next('.custom-file-label').html(fileName);
+            }
+            return false;
+        });
+        $('input[name="WORKING_PERMISSION_COPY"]').bind('change', function () {
+            $("input[type='Submit']").attr('disabled', false);
+            $("input[name='cmd']").attr('disabled', false);
+            filesize = this.files[0].size;
+            var val = $(this).val().toLowerCase(),
+                regex = new RegExp("(.*?)\.(jpeg|jpg|pdf)$");
+            if (!(regex.test(val))) {
+                swal("", ".docx, tif,xls  type is not an allowed file type. You can use only pdf, jpg, jpeg types of file(s). ", "warning");
+                this.value = '';
+                $("input[type='Submit']").attr('disabled', true);
+                $("input[name='cmd']").attr('disabled', true);
+                return false;
+            }
+            else if (filesize > 2048000) {
+                swal("", "File size must be 2 MB !", "warning");
+                $("input[type='Submit']").attr('disabled', true);
+                $("input[name='cmd']").attr('disabled', true);
+                return false;
+            }
+            else {
+                var fileName = $(this).val().split("\\").pop();
+                $(this).next('.custom-file-label').html(fileName);
+            }
+            return false;
+        });
+      /******************************************************************/
+        /*Show hide controls for Minor/Major-Coal,NonCoal*/
+        var mineraltypename = '@profile.MineralTypeName';
+       /* if (mineraltypename == "Minor Mineral") {*/
+            $('.divMajor').hide();
+        //}
+        //else {
+        //    $('.divMinor').hide();
+        //}
+        ForestRangeType();
+        BindLandValues();
+        ChangeValueAll();
+        $('.common').change(function () {
+            $('#lblTotalLandArea').val(parseFloat("0" + $('#LandForest').val()) + parseFloat("0" + $('#LandRevenueForest').val()) + parseFloat("0" + $('#LandRevenueGovernmentLand').val()) + parseFloat("0" + $('#LandPrivateTribal').val()) + parseFloat("0" + $('#LandPrivateNonTribal').val()));
+        });
+        ForestRange();
+        ForestChangeProtected();
+        ForestChangeRevenue();
+    });
+    function Validate() {
+        var mineraltypename = '@profile.MineralTypeName';
+        var Iss = false;
+        if (!DropDownValidation("ddlState", "State")) {
+            $('#Lease-tab').trigger('click');
+            return false;
+        }
+        if (!DropDownValidation("DistrictID", "District")) {
+            $('#Lease-tab').trigger('click');
+            return false;
+        }
+        if (!DropDownValidation("BlockId", "Block")) {
+            $('#Lease-tab').trigger('click');
+            return false;
+        }
+        if (!DropDownValidation("TehsilID", "Tehsil")) {
+            $('#Lease-tab').trigger('click');
+            return false;
+        }
+        if (mineraltypename != "Minor Mineral") {
+            if (!DropDownValidation("VillageID", "Village")) {
+                $('#Lease-tab').trigger('click');
+                return false;
+            }
+        }
+        if (mineraltypename == "Minor Mineral" && $("input[name='FOREST_RANGE']:checked").val() == "Revenue") {
+            if (!blankFieldValidation("COMPARTMENT_NUMBER", "Compartment Number")) {
+                $('#Lease-tab').trigger('click');
+                return false;
+            }
+        }
+        if (mineraltypename != "Minor Mineral") {
+            if (!blankFieldValidation("Forest", "Forest")) {
+                $('#Lease-tab').trigger('click');
+                return false;
+            }
+            if (!blankFieldValidation("RevenueForest", "Revenue Forest")) {
+                $('#Lease-tab').trigger('click');
+                return false;
+            }
+            if (!blankFieldValidation("RevenueGovernmentLand", "Revenue Government Land")) {
+                $('#Lease-tab').trigger('click');
+                return false;
+            }
+            if (!blankFieldValidation("PrivateTribal", "Private Tribal")) {
+                $('#Lease-tab').trigger('click');
+                return false;
+            }
+            if (!blankFieldValidation("PrivateNonTribal", "Private Non Tribal")) {
+                $('#Lease-tab').trigger('click');
+                return false;
+            }
+        }
+        if (!blankFieldValidation("Nistar", "Nistar")) {
+            $('#Lease-tab').trigger('click');
+            return false;
+        }
+        if (!blankFieldValidation("AREA_IN_HECT", "Area in Hectare")) {
+            $('#Area-tab').trigger('click');
+            return false;
+        }
+        if (!blankFieldValidation("TOPOSHEET_NO", "Toposheet Number")) {
+            $('#Area-tab').trigger('click');
+            return false;
+        }
+        if (!blankFieldValidation("inputAgreementDate", "Agreement Date")) {
+            $('#Area-tab').trigger('click');
+            return false;
+        }
+        //if (mineraltypename != "Minor Mineral") {
+        //    if (!DropDownValidation("LAND_ID", "Area Type")) {
+        //        $('#Land-tab').trigger('click');
+        //        return false;
+        //    }
+        //    if (!blankFieldValidation("LEASELAND_AREA", "Area/Rakaba (Hectare )")) {
+        //        $('#Land-tab').trigger('click');
+        //        return false;
+        //    }
+        //}
+        if (mineraltypename == "Minor Mineral") {
+            if (!blankFieldValidation("LandForest", "Forest")) {
+                $('#Land-tab').trigger('click');
+                return false;
+            }
+            if (!blankFieldValidation("LandRevenueForest", "Revenue Forest")) {
+                $('#Land-tab').trigger('click');
+                return false;
+            }
+            if (!blankFieldValidation("LandRevenueGovernmentLand", "Revenue Government Land")) {
+                $('#Land-tab').trigger('click');
+                return false;
+            }
+            if (!blankFieldValidation("LandPrivateTribal", "Private Tribal")) {
+                $('#Land-tab').trigger('click');
+                return false;
+            }
+            if (!blankFieldValidation("LandPrivateNonTribal", "Private Non Tribal")) {
+                $('#Land-tab').trigger('click');
+                return false;
+            }
+        }
+        if (!blankFieldValidation("LEASELAND_SURFACE_RIGHT_AREA", "Surface Right Area (Hectare)")) {
+            $('#Land-tab').trigger('click');
+            return false;
+        }
+        if (mineraltypename != "Minor Mineral") {
+            if (!blankFieldValidation("Map", "LEASELAND_MAP")) {
+                $('#Land-tab').trigger('click');
+                return false;
+            }
+        }
+        Iss = true;
+        return Iss;
+    }
+    function AreaType(e) {
+        if ($("input[name='LEASELAND_AREA_TYPE']:checked").val() == "Forest") {
+            //$("#divForest").show();
+            $("#divNonForest").hide();
+            $("#LEASELAND_AREA_SUB_TYPE").val($("#hfAreatype").val());
+        }
+        else {
+            //$("#divNonForest").show();
+            $("#divForest").hide();
+            $("#LEASELAND_AREA_NF_SUB_TYPE").val($("#hfAreatype").val());
+        }
+    }
+    /*Bind Lease Land District details*/
+    function BindLeaseLandDistrictData() {
+        debugger;
+        if ($('#ddlState').val() != "") {
+            $.ajax({
+                url: '/LesseeProfile/LesseeLeaseAreaDetails/GetLeaseLandDistrictdetailsByRegionId',
+                data: { 'StateId': $('#ddlState').val() },
+                dataType: 'json',
+                type: 'post',
+                success: function (data) {
+                    debugger;
+                    var row = "";
+                    $('#LEASELAND_DISRICT_ID').html('');
+                    row += "<option value=''>Select</option>";
+                    $.each(data, function (ind, item) {
+                        row += "<option value='" + item.leaselanD_DISRICT_ID + "'>" + item.leaselanD_DISRICT_NAME + "</option>";
+                    });
+                    $('#LEASELAND_DISRICT_ID').html(row);
+                    if ($("#hfLeaseLandDistrictId").val() != "") {
+                        $("#LEASELAND_DISRICT_ID").val($("#hfLeaseLandDistrictId").val());
+                        BindLeaseLandBlockData();
+                    }
+                    if ($('#LEASELAND_DISRICT_ID').val() == null) {
+                        $('#LEASELAND_DISRICT_ID').html('');
+                        $('#LEASELAND_DISRICT_ID').append("<option value=''>Select</option>");
+                        $.each(data, function (ind, item) {
+                            $('#LEASELAND_DISRICT_ID').append("<option value='" + item.leaselanD_DISRICT_ID + "'>" + item.leaselanD_DISRICT_NAME + "</option>");
+                        });
+                    }
+                },
+                error: function (err) {
+                }
+            });
+        }
+        else {
+            var row = "";
+            $('#LEASELAND_DISRICT_ID').html('');
+            row += "<option value=''>Select</option>";
+            $('#LEASELAND_DISRICT_ID').html(row);
+        }
+    }
+    /*Bind Lease Land Vilage data*/
+    function BindLeaseLandVillageData() {
+        debugger;
+        if ($('#TehsilID').val() != "") {
+            $.ajax({
+                url: '/LesseeProfile/LesseeLeaseAreaDetails/GetLeaseLandVillagedetailsByTehsilId',
+                data: { 'TehsilID': $('#TehsilID').val() },
+                dataType: 'json',
+                type: 'post',
+                success: function (data) {
+                    debugger;
+                    var row = "";
+                    $('#LEASELAND_VILLAGE_ID').html('');
+                    row += "<option value=''>Select</option>";
+                    $.each(data, function (ind, item) {
+                        row += "<option value='" + item.leaselanD_VILLAGE_ID + "'>" + item.leaselanD_VILLAGE_NAME + "</option>";
+                    });
+                    $('#LEASELAND_VILLAGE_ID').html(row);
+                    if ($("#hfLeaseLandVillageId").val() != "") {
+                        $("#LEASELAND_VILLAGE_ID").val($("#hfLeaseLandVillageId").val());
+                    }
+                    if ($('#LEASELAND_VILLAGE_ID').val() == null) {
+                        $('#LEASELAND_VILLAGE_ID').html('');
+                        $('#LEASELAND_VILLAGE_ID').append("<option value=''>Select</option>");
+                        $.each(data, function (ind, item) {
+                            $('#LEASELAND_VILLAGE_ID').append("<option value='" + item.leaselanD_VILLAGE_ID + "'>" + item.leaselanD_VILLAGE_NAME + "</option>");
+                        });
+                    }
+                },
+                error: function (err) {
+                }
+            });
+        }
+        else {
+            var row = "";
+            $('#LEASELAND_VILLAGE_ID').html('');
+            row += "<option value=''>Select</option>";
+            $('#LEASELAND_VILLAGE_ID').html(row);
+        }
+    }
+    /*Bind Lease Land Block data*/
+    function BindLeaseLandBlockData() {
+        debugger;
+        if ($('#LEASELAND_DISRICT_ID').val() != "") {
+            $.ajax({
+                url: '/LesseeProfile/LesseeLeaseAreaDetails/GetLeaseLandBlockdetailsByDistrictId',
+                data: { 'DistrictId': $('#LEASELAND_DISRICT_ID').val() },
+                dataType: 'json',
+                type: 'post',
+                success: function (data) {
+                    debugger;
+                    var row = "";
+                    $('#LEASELAND_BLOCK_ID').html('');
+                    row += "<option value=''>Select</option>";
+                    $.each(data, function (ind, item) {
+                        row += "<option value='" + item.leaselanD_BLOCK_ID + "'>" + item.leaselanD_BLOCK_NAME + "</option>";
+                    });
+                    $('#LEASELAND_BLOCK_ID').html(row);
+                    if ($("#hfLeaseLandBlockId").val() != "") {
+                        $("#LEASELAND_BLOCK_ID").val($("#hfLeaseLandBlockId").val());
+                    }
+                    if ($("#LEASELAND_BLOCK_ID").val() == null) {
+                        $('#LEASELAND_BLOCK_ID').html('');
+                        $('#LEASELAND_BLOCK_ID').append("<option value=''>Select</option>");
+                        $.each(data, function (ind, item) {
+                            $('#LEASELAND_BLOCK_ID').append("<option value='" + item.leaselanD_BLOCK_ID + "'>" + item.leaselanD_BLOCK_NAME + "</option>");
+                        });
+                    }
+                },
+                error: function (err) {
+                }
+            });
+        }
+        else {
+            var row = "";
+            $('#LEASELAND_BLOCK_ID').html('');
+            row += "<option value=''>Select</option>";
+            $('#LEASELAND_BLOCK_ID').html(row);
+        }
+    }
+    function ForestRangeType(e) {
+        if ($("input[name='FOREST_RANGE']:checked").val() == "Revenue") {
+            $("#divCompartment").show();
+        }
+        else {
+            $("#divCompartment").hide();
+        }
+    }
+    function ChangeValueAll() {
+        $('#lblTotalLandArea').val(parseFloat("0" + $('#LandForest').val()) + parseFloat("0" + $('#LandRevenueForest').val()) + parseFloat("0" + $('#LandRevenueGovernmentLand').val()) + parseFloat("0" + $('#LandPrivateTribal').val()) + parseFloat("0" + $('#LandPrivateNonTribal').val()));
+    }
+    function BindLandValues() {
+        $("#LandForest").val($("#hfForest").val());
+        $("#LandRevenueForest").val($("#hfRevenueForest").val());
+        $("#LandRevenueGovernmentLand").val($("#hfRevenueGovernmentLand").val());
+        $("#LandPrivateTribal").val($("#hfPrivateTribal").val());
+        $("#LandPrivateNonTribal").val($("#hfPrivateNonTribal").val());
+    }
+    /*DSC*/
+     function OnForwarding(btnAction) {
+        var Type;
+        if (btnAction == 'Forward To DD') {
+            Type = 'forward';
+        }
+        if (confirm("Before " + Type + " you need to apply your Digital Signature. Are you confirmed to " + Type + " Profile??")) {
+                var Postdata = 'action=signdoc' + "\n" + 'datatosign=Digital Signature Required' + "\n" + 'signaction=sign' + "\n" + 'filepath=' + "\n" + 'panNumberParam=' + "\n" + 'expirycheck=false' + "\n" + 'issuername=' + "\n" + 'certclass=1|2|3' + "\n" + 'certtype=ALL';
+                connection.send(Postdata);
+                connection.onerror = function (error) {
+                    swal("",'Please check the server connection: ' + error+'',"warning");
+                    swal("",error,"warning");
+                };
+                connection.onmessage = function (e) { // when DSC is success then following function executed.
+                    if (e.data.indexOf("subProtocol") == -1) {
+                        //alert(e.data);
+                        $("#DSCResponse").val(e.data).change();
+                        $.ajax(
+                            {
+                               url: '@Url.Action("CheckVerifyResponse", "LesseeDetails", new { Area = "LesseeProfile" })',
+                                type: "POST",
+                                data: { contentType: "pkcs7", signDataBase64Encoded: e.data, responseType: "plain" },
+                                success: function (msg) {
+                                    if (msg == "SUCCESS") {
+                                        if (btnAction == "Forward To DD") {
+                                            $("#SubResion").val("Forward To DD");
+                                        }
+                                        $("#form1").submit();
+                                    }
+                                }
+                            });
+                    }
+                    else {
+                        alert(e.data);
+                    }
+                };
+            }
+            else {
+                return false;
+            }
+    }
+    try {
+        var connection = new WebSocket('wss://localhost.emudhra.com:8080');
+        connection.onopen = function () {
+            console.log('Connection Opened');
+        };
+        connection.onerror = function (error) {
+        };
+        connection.onmessage = function (e) {
+            if (e.data.indexOf("subProtocol") == -1) {
+            }
+        };
+    }
+    catch (e) {
+        swal("", "No DSC Connection Found", "warning");
+    }
+    /*End DSC*/
+    function NextArea() {
+        $('#Area').trigger('click');
+        $('[href="#Area"]').tab('show');
+        $("#Area").show();
+        $('#Lease').hide();
+        $('#Land').hide();
+        $("#step2").addClass('active');
+        $("#step1").removeClass('active');
+        $("#step3").removeClass('active');
+    }
+    function NextLand() {
+        $('#Land').trigger('click');
+        $('[href="#Land"]').tab('show');
+        $("#Land").show();
+        $('#Area').hide();
+        $('#Lease').hide();
+        $("#step3").addClass('active');
+        $("#step1").removeClass('active');
+        $("#step2").removeClass('active');
+    }
+    function BackArea() {
+        $('#Land').trigger('click');
+        $('[href="#Land"]').tab('show');
+        $("#Land").show();
+        $("#Lease").hide();
+        $('#Area').hide();
+        $("#step3").addClass('active');
+        $("#step1").removeClass('active');
+        $("#step2").removeClass('active');
+    }
+    function BackLease() {
+        $('#Area').trigger('click');
+        $('[href="#Area"]').tab('show');
+        $("#Area").show();
+        $("#Lease").hide();
+        $('#Land').hide();
+        $("#step2").addClass('active');
+        $("#step1").removeClass('active');
+        $("#step3").removeClass('active');
+    }
+    function BackLand() {
+        $('#Lease').trigger('click');
+        $('[href="#Lease"]').tab('show');
+        $("#Lease").show();
+        $("#Land").hide();
+        $('#Area').hide();
+        $("#step1").addClass('active');
+        $("#step2").removeClass('active');
+        $("#step3").removeClass('active');
+    }
+    function ForestRange() {
+        if ($("#hfFOREST_RANGE").val() == "Protected,Revenue")
+        {
+            $("#IsForestRangeProtected").attr("checked", "checked");
+            $("#IsForestRangeRevenue").attr("checked", "checked");
+        }
+        else if ($("#hfFOREST_RANGE").val() == "Protected") {
+            $("#IsForestRangeProtected").attr("checked", "checked");
+        }
+        else {
+            $("#IsForestRangeRevenue").attr("checked", "checked");
+        }
+    }
+    function ForestChangeProtected() {
+        if ($('#IsForestRangeProtected').is(":checked") == true) {
+            $("#divProtected").show();
+        }
+        else {
+            $("#divProtected").hide();
+        }
+    }
+    function ForestChangeRevenue() {
+        if ($('#IsForestRangeRevenue').is(":checked") == true) {
+            $("#divRevenue").show();
+            $("#divCompartment").show();
+        }
+        else {
+            $("#divRevenue").hide();
+            $("#divCompartment").hide();
+        }
+    }
+    function KMLFile(myFile, fileName) {
+        debugger;
+        var file = myFile.files[0];
+        var inputSpatialFormat = 'KML';
+        var outputSpatialFormat = 'GEOJSON';
+        var inputSpatialFileIs;
+        const spatialFormatBtn = document.getElementById('File11');
+        var outputText = document.getElementById("outputText");
+        //setSpatialFileIs(inputSpatialFormat, spatialFormatBtn, true);
+        //function setSpatialFileIs(spatialFormat, spatialFormatBtn, isInput) {
+        //    debugger;
+        //    let formatVal = spatialFormat;
+        //    //let fileName = file.name;
+        //    fileName = fileName.split("\\")[2];
+        //    let n = fileName.lastIndexOf(".");
+        //    fileName = fileName.substring(0, n);
+        //    let outputFormatVal = outputSpatialFormat;
+        //    if (!window.FileReader) {
+        //        swal("", "Your browser does not support HTML5 'FileReader' function required to open a file.", "warning");
+        //        return false;
+        //    } else {
+        //        let fileis = file;
+        //        let fileredr = new FileReader();
+        //        fileredr.onload = function (fle) {
+        //            let filecont = fle.target.result;
+        //            inputSpatialFileIs = filecont;
+        //        };
+        //        if (formatVal == "KML" || formatVal == "GEOJSON") {
+        //            fileredr.readAsText(fileis);
+        //        }
+        //    }
+        //}
+        let formatVal = inputSpatialFormat;
+        fileName = fileName.split("\\")[2];
+        let n = fileName.lastIndexOf(".");
+        fileName = fileName.substring(0, n);
+        //let outputFormatVal = outputSpatialFormat;
+        if (!window.FileReader) {
+            swal("", "Your browser does not support HTML5 'FileReader' function required to open a file.", "warning");
+            return false;
+        } else {
+            let fileis = file;
+            let fileredr = new FileReader();
+            //fileredr.onload = function (file) {
+            //    let filecont = file.target.result;
+            //    inputSpatialFileIs = filecont;
+            //};
+
+
+            if (formatVal == "KML" || formatVal == "GEOJSON") {
+                fileredr.readAsText(fileis);
+            }
+
+        }
+        let outputFormatVal = outputSpatialFormat;
+        (async () => {
+            debugger;
+            let inputGeoJSONObj = KMLStrtoGeoJSON(inputSpatialFileIs);
+            if (outputFormatVal == "GEOJSON") {
+                outputText.value = JSON.stringify(inputGeoJSONObj, undefined, 2);
+            }
+        })();
+
+    }
+</script>
+<script>
+    $(document).ready(function () {
+        var inputSpatialFormat = 'KML';
+        var outputSpatialFormat = 'GEOJSON';
+        var inputSpatialFileIs;
+        const spatialFormatBtn = document.getElementById('LEASE_AREA_MAP');
+        var outputText = document.getElementById("outputText");
+        spatialFormatBtn.onchange = () => {
+            debugger;
+            $("input[type='Submit']").attr('disabled', false);
+            $("input[name='cmd']").attr('disabled', false);
+            if (spatialFormatBtn.files.length > 0) {
+                const fsize = spatialFormatBtn.files.item(0).size;
+                if (fsize > 10048000) {
+                    swal("", "File size must be 10 MB !", "warning");
+                    $("input[type='Submit']").attr('disabled', true);
+                    $("input[name='cmd']").attr('disabled', true);
+                    return false;
+                }
+            }
+            setSpatialFileIs(inputSpatialFormat, spatialFormatBtn, true);
+        }
+        function setSpatialFileIs(spatialFormat, spatialFormatBtn, isInput) {
+            debugger;
+            let formatVal = spatialFormat;
+            let fileName = spatialFormatBtn.value;
+            fileName = fileName.split("\\")[2];
+            $('#custom-file-label').html(fileName);
+            let n = fileName.lastIndexOf(".");
+            fileName = fileName.substring(0, n);
+            let outputFormatVal = outputSpatialFormat;
+            if (!window.FileReader) {
+                swal("", "Your browser does not support HTML5 'FileReader' function required to open a file.", "warning");
+                return false;
+            } else {
+                let fileis = spatialFormatBtn.files[0];
+                let fileredr = new FileReader();
+                fileredr.onload = function (fle) {
+                    let filecont = fle.target.result;
+                    inputSpatialFileIs = filecont;
+                    if (ValidateExtension()) {
+                        let outputFormatVal = outputSpatialFormat;
+                        (async () => {
+                            debugger;
+                            let inputGeoJSONObj = KMLStrtoGeoJSON(inputSpatialFileIs);
+                            if (outputFormatVal == "GEOJSON") {
+                                outputText.value = JSON.stringify(inputGeoJSONObj, undefined, 2);
+                            }
+                        })();
+                    }
+                };
+                if (formatVal == "KML" || formatVal == "GEOJSON") {
+                    fileredr.readAsText(fileis);
+                }
+            }
+        };
+    });
+    function ValidateExtension() {
+        var allowedFiles = [".kml"];
+        var fileUpload = document.getElementById("LEASE_AREA_MAP");
+        var regex = new RegExp("([a-zA-Z0-9\s_\\.\-:])+(" + allowedFiles.join('|') + ")$");
+        if (!regex.test(fileUpload.value.toLowerCase())) {
+            swal("", ".docx,.tif,.xls,.jpeg,.jpg,.png  type is not an allowed file type. You can use only .kml types of file(s). ", "warning");
+            return false;
+        }
+        return true;
+    }
+</script>
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        <!-- MAIN CONTENT AREA STARTS -->
+        @Html.Partial("_CMSnavigation")
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="javascript:void(0);">
+                                Add
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="~/LesseeProfile/LesseeLeaseAreaDetails/ViewList">
+                                View
+                            </a>
+                        </li>
+                    </ul>
+                    @Html.Partial("_CMSutil")
+                </div>
+                <section class="box form-container">
+                    <div class="content-body">
+                        @using (Html.BeginForm("Create", "LesseeLeaseAreaDetails", FormMethod.Post, new { AUTOCOMPLETE = "Off", id = "form1", enctype = "multipart/form-data" }))
+                        {
+                        @(Html.HiddenFor(model => model.SubResion))
+                        @(Html.HiddenFor(model => model.SubApprove))
+                        @(Html.HiddenFor(model => model.SubReject))
+                        @Html.AntiForgeryToken()
+                        @Html.HiddenFor(model => model.LICENSE_AREA_ID)
+                        @Html.HiddenFor(x => x.CREATED_BY)
+                        @Html.HiddenFor(model => model.STATUS, new { id = "hdnStatus" })
+                        <ul class="nav nav-tabs progresstab" id="myTab" role="tablist">
+                            <li class="startstep active" id="step1">
+                                <a id="Lease-tab" data-toggle="tab" href="#Lease" role="tab" aria-controls="Lease" aria-selected="true" onclick="BackLand()">Lease Location</a>
+                            </li>
+                            <li id="step2">
+                                <a id="Area-tab" data-toggle="tab" href="#Area" role="tab" aria-controls="Area" aria-selected="false" onclick="BackLease()">Area in Hectare</a>
+                            </li>
+                            <li id="step3">
+                                <a id="Land-tab" data-toggle="tab" href="#Land" role="tab" aria-controls="Land" aria-selected="false" onclick="BackArea()">Lease Land Details</a>
+                            </li>
+                        </ul>
+                        <div class="tab-content" id="myTabContent">
+                            <div href="#Lease" class="tab-pane fade show active" id="Lease" role="tabpanel" aria-labelledby="Lease-tab">
+                                <h5 class="text-brown font-weight-bold">Lease Location</h5>
+                                <div class="row">
+                                    <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                        <label class="col-form-label font-weight-bolder">State <span class="text-danger">*</span></label>
+                                        @Html.DropDownListFor(m => m.StateId, ViewBag.State as IEnumerable<SelectListItem>, "Select", new { @class = "form-control searchableselect", autofocus = "autofocus", @id = "ddlState" })
+                                        @Html.HiddenFor(m => m.StateId, new { @id = "hfStateId" })
+                                        @Html.ValidationMessageFor(m => m.StateId, "", new { @class = "text-danger" })
+                                    </div>
+                                    <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                        <label class="col-form-label font-weight-bolder">District <span class="text-danger">*</span></label>
+                                        <select id="DistrictID" name="DistrictId" Class="form-control searchableselect">
+                                            <option value="">Select</option>
+                                        </select>
+                                        @Html.HiddenFor(m => m.DistrictId, new { @id = "hfDistrictId" })
+                                        @Html.ValidationMessageFor(m => m.DistrictId, "", new { @class = "text-danger" })
+                                    </div>
+                                    <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                        <label class="col-form-label font-weight-bolder">Block <span class="text-danger">*</span></label>
+                                        <select id="BlockId" name="BlockId" Class="form-control searchableselect">
+                                            <option value="">Select</option>
+                                        </select>
+                                        @Html.HiddenFor(m => m.BlockId, new { @id = "hfBlockId" })
+                                        @Html.ValidationMessageFor(m => m.BlockId, "", new { @class = "text-danger" })
+                                    </div>
+                                    <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                        <label class="col-form-label font-weight-bolder">Tehsil <span class="text-danger">*</span></label>
+                                        <select id="TehsilID" name="TehsilID" Class="form-control searchableselect">
+                                            <option value="">Select</option>
+                                            @{
+                                                    List<LeaseAreaViewModel> lstTehsil = (List<LeaseAreaViewModel>)ViewData["Tehsil"];
+                                                    if (lstTehsil != null)
+                                                    {
+                                                        foreach (var item in lstTehsil)
+                                                        {
+                                                <option value="@item.TehsilID">@item.TehsilName</option>
+                                                        }
+                                                    }
+                                            }
+                                        </select>
+                                        @Html.HiddenFor(m => m.TehsilID, new { @id = "hfTehsilId" })
+                                        @Html.ValidationMessageFor(m => m.TehsilID, "", new { @class = "text-danger" })
+                                    </div>
+                                    <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                        <label for="inputLoginId" class="col-form-label font-weight-bolder">Vidhan Sabha</label>
+                                        @Html.DropDownListFor(m => m.VidhanSabhaId, ViewBag.VidhanSabha as IEnumerable<SelectListItem>, "Select", new { @class = "form-control searchableselect", autofocus = "autofocus" })
+                                        @Html.HiddenFor(m => m.VidhanSabhaId, new { @id = "hfVidhanSabhaId" })
+                                    </div>
+                                    <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                        <label for="inputLoginId" class="col-form-label font-weight-bolder">Lok Sabha</label>
+                                        @Html.DropDownListFor(m => m.LokSabhaId, ViewBag.LokSabha as IEnumerable<SelectListItem>, "Select", new { @class = "form-control searchableselect", autofocus = "autofocus" })
+                                        @Html.HiddenFor(m => m.LokSabhaId, new { @id = "hfLokSabha" })
+                                    </div>
+                                    <div class="col-lg-4 col-md-6 col-sm-12 form-group divMinor">
+                                        <label class="col-form-label font-weight-bolder">Forest Range </label>
+                                        <div class="py-2">
+                                            @*@Html.RadioButtonFor(model => model.FOREST_RANGE, "Protected", new { id = "Protected", onchange = "ForestRangeType(this)", @class = "custom-radio", @checked = true }) Protected(Hectare)
+                                                @Html.RadioButtonFor(model => model.FOREST_RANGE, "Revenue", new { id = "Revenue", onchange = "ForestRangeType(this)", @class = "custom-radio" }) Revenue(Hectare)*@
+                                            @Html.CheckBoxFor(m => m.IsForestRangeProtected, new { @onchange = "ForestChangeProtected()" }) Protected
+                                            @Html.CheckBoxFor(m => m.IsForestRangeRevenue, new { @onchange = "ForestChangeRevenue()" }) Revenue
+                                            @Html.HiddenFor(m => m.FOREST_RANGE, new { @id = "hfFOREST_RANGE" })
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-4 col-md-6 col-sm-12 form-group" id="divProtected">
+                                        <label for="inputLoginId" class="col-form-label font-weight-bolder">Protected <small>(in Hectare)</small></label>
+                                        @Html.TextBoxFor(x => x.ForestRangeProtected, new { @maxlength = "20", @class = "form-control" })
+                                    </div>
+                                    <div class="col-lg-4 col-md-6 col-sm-12 form-group" id="divRevenue">
+                                        <label for="inputLoginId" class="col-form-label font-weight-bolder">Revenue <small>(in Hectare)</small></label>
+                                        @Html.TextBoxFor(x => x.ForestRangeRevenue, new { @maxlength = "20", @class = "form-control" })
+                                    </div>
+                                    <div class="col-lg-4 col-md-6 col-sm-12 form-group divMinor" id="divCompartment" style="display:none;">
+                                        <label for="inputLoginId" class="col-form-label font-weight-bolder">Compartment Number</label>
+                                        @Html.TextBoxFor(x => x.COMPARTMENT_NUMBER, new { @maxlength = "50", @class = "form-control" })
+                                    </div>
+                                    <div class="col-lg-4 col-md-6 col-sm-12 form-group divMajor">
+                                        <label class="col-form-label font-weight-bolder">Village / Forest Range <span class="text-danger">*</span></label>
+                                        <select id="VillageID" name="VillageID" Class="form-control searchableselect">
+                                            @{
+                                                    List<LeaseAreaViewModel> lstVillage = (List<LeaseAreaViewModel>)ViewData["Village"];
+                                                    if (lstVillage != null)
+                                                    {
+                                                        foreach (var item in lstVillage)
+                                                        {
+                                                <option value="@item.VillageID">@item.VillageName</option>
+                                                        }
+                                                    }
+                                            }
+                                        </select>
+                                        @Html.HiddenFor(m => m.VillageID, new { @id = "hfVillageId" })
+                                    </div>
+                                    <div class="col-lg-4 col-md-6 col-sm-12 form-group divMajor">
+                                        <label for="inputLoginId" class="col-form-label font-weight-bolder">Block Forest Range</label>
+                                        @Html.TextBoxFor(x => x.BLOCK_FOREST_RANGE, new { @class = "form-control" })
+                                    </div>
+                                    <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                        <label for="inputLoginId" class="col-form-label font-weight-bolder">Pin Code</label>
+                                        @Html.TextBoxFor(x => x.PIN_CODE, new { @maxlength = "6", @class = "form-control", @onkeypress = "return inputLimiter(event,'Numbers')" })
+                                    </div>
+                                    <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                        <label class="col-form-label font-weight-bolder">Police Station</label>
+                                        @Html.TextBoxFor(x => x.POLICE_STATION, new { @maxlength = "50", @class = "form-control" })
+                                    </div>
+                                    <div class="col-lg-4 col-md-6 col-sm-12 form-group divMajor">
+                                        <label class="col-form-label font-weight-bolder">Gram Panchayat</label>
+                                        @Html.TextBoxFor(x => x.GRAM_PANCHAYAT, new { @maxlength = "50", @class = "form-control" })
+                                    </div>
+                                    <div class="col-lg-4 col-md-6 col-sm-12 form-group divMajor">
+                                        <label for="inputLoginId" class="col-form-label font-weight-bolder">Forest <span class="text-danger">*</span></label>
+                                        @(Html.TextBoxFor(model => model.Forest, new { @maxlength = "20", @class = "form-control", @onkeypress="return inputLimiter(event,'Decimal')" }))
+
+                                    </div>
+                                    <div class="col-lg-4 col-md-6 col-sm-12 form-group divMajor">
+                                        <label class="col-form-label font-weight-bolder">Revenue Forest <span class="text-danger">*</span></label>
+                                        @(Html.TextBoxFor(model => model.RevenueForest, new { @maxlength = "20",@class = "form-control", @onkeypress="return inputLimiter(event,'Decimal')" }))
+
+                                    </div>
+                                    <div class="col-lg-4 col-md-6 col-sm-12 form-group divMajor">
+                                        <label class="col-form-label font-weight-bolder">Revenue Government Land <span class="text-danger">*</span></label>
+                                        @(Html.TextBoxFor(model => model.RevenueGovernmentLand, new { @maxlength = "20",@class = "form-control",@onkeypress="return inputLimiter(event,'Decimal')" }))
+
+                                    </div>
+                                    <div class="col-lg-4 col-md-6 col-sm-12 form-group divMajor">
+                                        <label class="col-form-label font-weight-bolder">Private Tribal <span class="text-danger">*</span></label>
+                                        @(Html.TextBoxFor(model => model.PrivateTribal, new { @maxlength = "20",@class = "form-control", @onkeypress="return inputLimiter(event,'Decimal')" }))
+
+                                    </div>
+                                    <div class="col-lg-4 col-md-6 col-sm-12 form-group divMajor">
+                                        <label class="col-form-label font-weight-bolder">Private Non Tribal <span class="text-danger">*</span></label>
+                                        @(Html.TextBoxFor(model => model.PrivateNonTribal, new { @maxlength = "20",@class = "form-control", @onkeypress="return inputLimiter(event,'Decimal')" }))
+
+                                    </div>
+                                    <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                        <label class="col-form-label font-weight-bolder">Nistar <span class="text-danger">*</span></label>
+                                        @(Html.TextBoxFor(model => model.Nistar, new { @maxlength = "20",@class = "form-control", @onkeypress="return inputLimiter(event,'Decimal')" }))
+                                        @Html.ValidationMessageFor(m => m.Nistar, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                                <div class="row mt-4">
+                                    <div class="col-sm-12 text-center">
+                                        <a class="btn btn-primary btn-md ml-0 waves-effect waves-light btnNext" onclick="NextArea()">Next</a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div href="#Area" class="tab-pane fade" id="Area" role="tabpanel" aria-labelledby="Area-tab">
+                                <h5 class="text-brown font-weight-bold">Area in Hectare</h5>
+                                <div class="row">
+                                    <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                        <label class="col-form-label font-weight-bolder">Area in Hectare <span class="text-danger">*</span></label>
+                                        @Html.TextBoxFor(x => x.AREA_IN_HECT, new { @maxlength = "20", @class = "form-control", @onkeypress = "return inputLimiter(event,'Decimal')" })
+                                    </div>
+                                    <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                        <label class="col-form-label font-weight-bolder">Topo sheet Number <span class="text-danger">*</span></label>
+                                        @Html.TextBoxFor(x => x.TOPOSHEET_NO, new { @maxlength = "20", @class = "form-control", @onkeypress = "return inputLimiter(event,'Numbers')" })
+                                    </div>
+                                    <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                        <label class="col-form-label font-weight-bolder">Co-ordinates of all Pillars</label>
+                                        <div class="custom-file">
+                                            <input type="file" class="custom-file-input" id="File11" name="COORDINATES_PILLARS">
+                                            <label class="custom-file-label" for="customFile">Choose Files</label>
+                                            <small class="text-danger">Files type <strong>(.xls,.xlsx)</strong> with maximum <strong>10 MB</strong></small>
+                                        </div>
+                                        @if (Model.FILE_COORDINATES_PILLARS == null || Model.FILE_COORDINATES_PILLARS == "")
+                                            {
+                                        <label class="form-control-plaintext">Sample Download <a href="~/Upload/Lessee/COORDINATES_PILLARS/CoordinatePillars.xlsx" title="" class="ml-2" data-original-title="Download" target="_blank"><i class="icon-file-excel-solid h5 text-success"></i></a></label>
+                                            }
+                                        @if (Model.FILE_COORDINATES_PILLARS != null && Model.FILE_COORDINATES_PILLARS != "")
+                                            {
+                                        <label class="form-control-plaintext">@(Model.FILE_COORDINATES_PILLARS) <a href='~/@Model.PATH_COORDINATES_PILLARS' title="" class="ml-2" data-original-title="Download" target="_blank"><i class="icon-file-excel-solid h5 text-success"></i></a></label>
+                                            }
+                                    </div>
+                                    <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                        <label class="col-form-label font-weight-bolder">Upload Lease Area Map</label>
+                                        <div class="custom-file">
+                                            @*<input type="file" class="custom-file-input" id="File11" name="LEASE_AREA_MAP">*@
+                                            <input type="file" class="custom-file-input" accept=".kml" id="LEASE_AREA_MAP" name="LEASE_AREA_MAP" />
+                                            <label class="custom-file-label" for="customFile" id="custom-file-label">Choose Files</label>
+                                            <small class="text-danger">Files type <strong>(.kml)</strong> with maximum <strong>10 MB</strong></small>
+                                            <input type="hidden" id="outputText" name="DATA_LEASE_AREA_MAP" value="@Model.DATA_LEASE_AREA_MAP" />
+                                        </div>
+                                        @if (Model.FILE_LEASE_AREA_MAP != null && Model.FILE_LEASE_AREA_MAP != "")
+                                            {
+                                        <label class="form-control-plaintext">@(Model.FILE_LEASE_AREA_MAP) <a href='~/LesseeProfile/LesseeLeaseAreaDetails/ViewKml' title="" class="ml-2" data-original-title="View Map" target="_blank"><i class="icon-map-marked-alt-solid h5 text-danger"></i></a></label>
+                                            }
+                                    </div>
+                                    <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                        <label class="col-form-label font-weight-bolder">Demarcation / DGPS / GPS / Total Station Survey Report / Coordinates </label>
+                                        <div class="custom-file">
+                                            <input type="file" class="custom-file-input" id="File11" name="DEMARCATION_REPORT_DGPS_GPS_TOTAL_STATION_SURVEY_REPORT_COORDINATES">
+                                            <label class="custom-file-label" for="customFile">Choose Files</label>
+                                            <small class="text-danger">Files type <strong>(.jpg , .jpeg , .pdf)</strong> with maximum <strong>2MB</strong></small>
+                                        </div>
+                                        @if (Model.DEMARCATION_REPORT_DGPS_GPS_TOTAL_STATION_SURVEY_REPORT_COORDINATES_FILE_NAME != null && Model.DEMARCATION_REPORT_DGPS_GPS_TOTAL_STATION_SURVEY_REPORT_COORDINATES_FILE_NAME != "")
+                                            {
+                                        <label class="form-control-plaintext">@(Model.DEMARCATION_REPORT_DGPS_GPS_TOTAL_STATION_SURVEY_REPORT_COORDINATES_FILE_NAME) <a href='~/@Model.DEMARCATION_REPORT_DGPS_GPS_TOTAL_STATION_SURVEY_REPORT_COORDINATES_FILE_PATH' title="" class="ml-2" data-original-title="Download" target="_blank"><i class="icon-file-pdf-solid h5 text-danger"></i></a></label>
+                                            }
+                                    </div>
+                                    <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                        <label for="inputLoginId" class="col-form-label font-weight-bolder">Working Permission Date</label>
+                                        <div class="input-group">
+                                            <input type="text" class="form-control datepicker" id="inputPermissionDate" name="WORKING_PERMISSION_DATE">
+                                            <div class="input-group-prepend">
+                                                <label class="input-group-text" for="inputPermissionDate"><i class="icon-calendar-alt-solid"></i></label>
+                                            </div>
+                                            @Html.HiddenFor(m => m.WORKING_PERMISSION_DATE, new { @id = "hfWorkDate" })
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                        <label class="col-form-label font-weight-bolder">Working permission Copy</label>
+                                        <div class="custom-file">
+                                            <input type="file" class="custom-file-input" id="File8" name="WORKING_PERMISSION_COPY">
+                                            <label class="custom-file-label" for="customFile">Choose Files</label>
+                                            <small class="text-danger">Files type <strong>(.jpg , .jpeg , .pdf)</strong> with maximum <strong>2MB</strong></small>
+                                        </div>
+                                        @if (Model.WORKING_PERMISSION_COPY_NAME != null && Model.WORKING_PERMISSION_COPY_NAME != "")
+                                            {
+                                        <label class="form-control-plaintext">@(Model.WORKING_PERMISSION_COPY_NAME) <a href='~/@Model.WORKING_PERMISSION_COPY_PATH' title="" class="ml-2" data-original-title="Download" target="_blank"><i class="icon-file-pdf-solid h5 text-danger"></i></a></label>
+                                            }
+                                    </div>
+                                    <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                        <label for="inputLoginId" class="col-form-label font-weight-bolder">Agreement Date <span class="text-danger">*</span></label>
+                                        <div class="input-group">
+                                            <input type="text" class="form-control datepicker" id="inputAgreementDate" name="DATE_OF_EXECUTION">
+                                            <div class="input-group-prepend">
+                                                <label class="input-group-text" for="inputAgreementDate"><i class="icon-calendar-alt-solid"></i></label>
+                                            </div>
+                                            @Html.HiddenFor(m => m.DATE_OF_EXECUTION, new { @id = "hfAgreementDate" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row mt-4">
+                                    <div class="col-sm-12 text-center">
+                                        <a class="btn btn-dark btn-md ml-0 waves-effect waves-light btnPrevious" onclick="BackLand()">Previous</a>
+                                        <a class="btn btn-primary btn-md ml-0 waves-effect waves-light btnNext" onclick="NextLand()">Next</a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div href="#Land" class="tab-pane fade" id="Land" role="tabpanel" aria-labelledby="Land-tab">
+                                <h5 class="text-brown font-weight-bold">Lease Land Details</h5>
+                                <div class="row">
+                                    <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                        <label class="col-form-label font-weight-bolder">District</label>
+                                        <select id="LEASELAND_DISRICT_ID" name="LEASELAND_DISRICT_ID" Class="form-control">
+                                            <option value="">Select</option>
+                                        </select>
+                                        @Html.HiddenFor(m => m.LEASELAND_DISRICT_ID, new { @id = "hfLeaseLandDistrictId" })
+                                    </div>
+                                    <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                        <label class="col-form-label font-weight-bolder">Block</label>
+                                        <select id="LEASELAND_BLOCK_ID" name="LEASELAND_BLOCK_ID" Class="form-control">
+                                            <option value="">Select</option>
+                                        </select>
+                                        @Html.HiddenFor(m => m.LEASELAND_BLOCK_ID, new { @id = "hfLeaseLandBlockId" })
+                                    </div>
+                                    <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                        <label class="col-form-label font-weight-bolder">Village</label>
+                                        <select id="LEASELAND_VILLAGE_ID" name="LEASELAND_VILLAGE_ID" Class="form-control">
+                                            <option value="">Select</option>
+                                        </select>
+                                        @Html.HiddenFor(m => m.LEASELAND_VILLAGE_ID, new { @id = "hfLeaseLandVillageId" })
+                                    </div>
+                                    <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                        <label class="col-form-label font-weight-bolder">Gram Panchayat</label>
+                                        @Html.TextBoxFor(x => x.LEASELAND_GP, new { @maxlength = "50", @class = "form-control" })
+                                    </div>
+                                    <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                        <label class="col-form-label font-weight-bolder">Patwari Circle Number</label>
+                                        @Html.TextBoxFor(x => x.LEASELAND_BASRA_NO, new { @maxlength = "20", @class = "form-control", @onkeypress = "return inputLimiter(event,'Numbers')" })
+                                    </div>
+                                    <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                        <label class="col-form-label font-weight-bolder">Patwari Halka Number</label>
+                                        @Html.TextBoxFor(x => x.LEASELAND_DHARANADIKAR, new { @maxlength = "20", @class = "form-control", @onkeypress = "return inputLimiter(event,'Numbers')" })
+                                    </div>
+                                    <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                        <label class="col-form-label font-weight-bolder">Khasra No</label>
+                                        @Html.TextBoxFor(x => x.LEASELAND_KHASRA_NO, new { @maxlength = "20", @class = "form-control", @onkeypress = "return inputLimiter(event,'Numbers')" })
+                                    </div>
+                                    <div class="col-lg-4 col-md-6 col-sm-12 form-group divMajor">
+                                        <label class="col-form-label font-weight-bolder">Area Type/Land Information <span class="text-danger">*</span></label>
+                                        @*@Html.RadioButtonFor(model => model.LEASELAND_AREA_TYPE, "Forest", new { id = "Forest", onchange = "AreaType(this)", @class = "custom-radio" }) Forest
+                                            @Html.RadioButtonFor(model => model.LEASELAND_AREA_TYPE, "Non Forest", new { id = "Non Forest", onchange = "AreaType(this)", @class = "custom-radio", @checked = true }) Non Forest*@
+                                        @Html.DropDownListFor(m => m.LAND_ID, ViewBag.Land as IEnumerable<SelectListItem>, "Select", new { @class = "form-control", autofocus = "autofocus" })
+                                        @Html.HiddenFor(m => m.LEASELAND_AREA_TYPE, new { @id = "hfLEASELAND_AREA_TYPE" })
+                                    </div>
+                                    <div class="col-lg-4 col-md-6 col-sm-12 form-group divMinor">
+                                        <label for="inputLoginId" class="col-form-label font-weight-bolder">Forest (Hectare) <span class="text-danger">*</span></label>
+                                        @(Html.TextBoxFor(model => model.LandForest, new {  @maxlength = "20",@class = "form-control common", @onchange = "ChangeValueAll()",@onkeypress="return inputLimiter(event,'Decimal')"}))
+
+                                        @Html.HiddenFor(m => m.Forest, new { @id = "hfForest" })
+                                    </div>
+                                    <div class="col-lg-4 col-md-6 col-sm-12 form-group divMinor">
+                                        <label class="col-form-label font-weight-bolder">Revenue Forest (Hectare) <span class="text-danger">*</span></label>
+                                        @(Html.TextBoxFor(model => model.LandRevenueForest, new { @maxlength = "20",@class = "form-control common", @onkeypress="return inputLimiter(event,'Decimal')",@onchange = "ChangeValueAll()" }))
+
+                                        @Html.HiddenFor(m => m.RevenueForest, new { @id = "hfRevenueForest" })
+                                    </div>
+                                    <div class="col-lg-4 col-md-6 col-sm-12 form-group divMinor">
+                                        <label class="col-form-label font-weight-bolder">Revenue Government Land (Hectare) <span class="text-danger">*</span></label>
+                                        @(Html.TextBoxFor(model => model.LandRevenueGovernmentLand, new {  @class = "form-control common",@onchange = "ChangeValueAll()",@onkeypress="return inputLimiter(event,'Decimal')" }))
+
+                                        @Html.HiddenFor(m => m.RevenueGovernmentLand, new { @id = "hfRevenueGovernmentLand" })
+                                    </div>
+                                    <div class="col-lg-4 col-md-6 col-sm-12 form-group divMinor">
+                                        <label class="col-form-label font-weight-bolder">Private Tribal (Hectare) <span class="text-danger">*</span></label>
+                                        @(Html.TextBoxFor(model => model.LandPrivateTribal, new { @maxlength = "20",@class = "form-control common", @onkeypress="return inputLimiter(event,'Decimal')",@onchange = "ChangeValueAll()" }))
+
+                                        @Html.HiddenFor(m => m.PrivateTribal, new { @id = "hfPrivateTribal" })
+                                    </div>
+                                    <div class="col-lg-4 col-md-6 col-sm-12 form-group divMinor">
+                                        <label class="col-form-label font-weight-bolder">Private Non Tribal (Hectare) <span class="text-danger">*</span></label>
+                                        @(Html.TextBoxFor(model => model.LandPrivateNonTribal, new { @maxlength = "20",@class = "form-control common",@onchange = "ChangeValueAll()",@onkeypress="return inputLimiter(event,'Decimal')" }))
+
+                                        @Html.HiddenFor(m => m.PrivateNonTribal, new { @id = "hfPrivateNonTribal" })
+                                    </div>
+                                    <div class="col-lg-4 col-md-6 col-sm-12 form-group divMinor">
+                                        <label class="col-form-label font-weight-bolder">Total Land Area/Rakaba (Hectare) <span class="text-danger">*</span></label>
+                                        <input type="text" id="lblTotalLandArea" readonly="readonly" class="form-control"><br><br>
+                                    </div>
+                                    <div class="col-lg-4 col-md-6 col-sm-12 form-group divMajor">
+                                        <label class="col-form-label font-weight-bolder">Area/Rakaba (Hectare ) <span class="text-danger">*</span></label>
+                                        @Html.TextBoxFor(x => x.LEASELAND_AREA, new { @maxlength = "20", @class = "form-control", @onkeypress = "return inputLimiter(event,'Decimal')" })
+                                    </div>
+                                    <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                        <label class="col-form-label font-weight-bolder">Surface Right Area (Hectare) <span class="text-danger">*</span></label>
+                                        @Html.TextBoxFor(x => x.LEASELAND_SURFACE_RIGHT_AREA, new { @maxlength = "20", @class = "form-control", @onkeypress = "return inputLimiter(event,'Decimal')" })
+                                    </div>
+                                    <div class="col-lg-4 col-md-6 col-sm-12 form-group divMajor">
+                                        <label class="col-form-label font-weight-bolder">Map <span class="text-danger">*</span></label>
+                                        @Html.TextBoxFor(x => x.LEASELAND_MAP, new { @maxlength = "50", @class = "form-control" })
+                                    </div>
+                                </div>
+                                <div class="row mt-4">
+                                    <div class="col-sm-12 text-center">
+                                        <a class="btn btn-dark btn-md ml-0 waves-effect waves-light btnPrevious" onclick="BackLease()">Previous</a>
+                                        @if (Model.STATUS != 5)
+                                            {
+                                        <input type="submit" id="Submit" value="Save & Update" class="btn btn-success btn-md ml-0 waves-effect waves-light btnsave" onclick="return Validate()">
+                                        <input type="submit" value="Delete" class="btn btn-danger btn-md ml-0 waves-effect waves-light btndelete" id="Delete" name="delete" onclick="return confirm('Are you sure to delete?')" style="display:none;" />
+                                        <input type="button" title="Forward to DD" value="Forward To DD" name="cmd" class="btn btn-warning text-dark btn-md waves-effect waves-light ml-0 btnsave" onclick="if (Validate()) { return OnForwarding('Forward To DD'); }" />
+                                            }
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        }
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+</section>
+

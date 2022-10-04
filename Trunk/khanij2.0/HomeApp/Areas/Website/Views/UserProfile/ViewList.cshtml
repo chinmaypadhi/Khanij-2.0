@@ -1,0 +1,173 @@
+﻿@*// *********************************************************************************************************
+    //  View Name                : Add
+    //  Desciption               : To View,Edit,Update,Delete Website User Profile Details in view
+    //  Created By               : Lingaraj Dalai
+    //  Created On               : 05 Nov 2021
+    // ********************************************************************************************************
+*@
+@model IEnumerable<HomeEF.ViewUserProfileModel>
+@using HomeApp.Web; 
+@{
+    ViewData["Title"] = "ViewList";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+@if (TempData["Message"] != null)
+{
+    <script>
+        var vv = '@TempData["Message"]';
+        if (vv == 1) {
+            swal("", "User Profile updated successfully.", "success");
+        }
+        else if (vv == 2) {
+            swal("","User Profile already exists.","warning");
+        }
+        else if (vv == 3){
+            swal("", "Something Errror occured. Please Try After Sometime!!", "error");
+        }
+        else if (vv == 4) {
+            swal("", "User Profile Deleted Sucessfully!!", "success");
+        }
+    </script>
+}
+<script>
+    deleteMe = "yes";
+    $(document).ready(function () {
+        loadNavigation('ViewList', 'glhelpdesk', 'plraiseticket', 'tl', 'CMS', 'User Profile', ' ');
+        $('.searchableselect').searchableselect();
+        $('#datatable').DataTable();
+        $('.shorting-lnk').click(function () {
+            $('.shorting-lnk i').toggleClass('fa-sort-amount-up-alt fa-sort-amount-down-alt ');
+        });
+        $("#ckbCheckAll").click(function () {
+            $(".checkBoxClass").prop('checked', $(this).prop('checked'));
+        });
+        $("#deleteIcon").click(function () {
+            var idsToSend = new Array();
+                $('table [type="checkbox"]').each(function () {
+                    if ($(this).is(':checked')) {
+                        idsToSend.push($(this).val());
+                    }
+                });
+            if (idsToSend.length <= 0) {
+                swal("", "Please select User Profile to Delete !", "warning");
+                return false;
+            }
+            else {
+                if (confirm("Are you sure to Delete?")) {
+                    $.ajax({
+                        type: "POST",
+                        url: "/Website/UserProfile/Delete",
+                        data: {
+                            arr: JSON.stringify(idsToSend)
+                        },
+                        dataType: "json",
+                        success: function (result) {
+                            if (result == 4) {
+                                swal("", "UserProfile Deleted Sucessfully!!", "success");
+                            }
+                            else {
+                                swal("", "Something Errror occured. Please Try After Sometime!!", "error");
+                            }
+                              setTimeout(function () {
+                                window.location.href = '@Url.Action("ViewList", "UserProfile", new { Area = "Website" })'
+                            }, 10000);
+                        }
+                    });
+                    idsToSend = [];
+                }
+            }
+        });
+    });
+</script>
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        @Html.Partial("_CMSnavigation")
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link " href="~/Website/UserProfile/Add">
+                                Add
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="~/Website/UserProfile/ViewList">
+                                View
+                            </a>
+                        </li>
+                    </ul>
+                    @Html.Partial("_util")
+                </div>
+                <section class="box form-container">
+                    <div class="content-body">
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div id="viewtable">
+                                    <table id="datatable" class="table table-sm table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th width="20px" class="text-center noprint">
+                                                    <input type="checkbox" id="ckbCheckAll">
+                                                </th>
+                                                <th width="20px">Sl#</th>
+                                                <th>User Details</th>
+                                                <th>Mobile No.</th>
+                                                <th>Office Ext. No.</th>
+                                                <th>Email Id</th>
+                                                <th>User Id</th>
+                                                <th>Password</th>
+                                                <th width="40" class="text-center noprint">Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @{
+                                                var count = 0;
+                                                foreach (var item in Model)
+                                                {
+                                                    count++;
+                                                    <tr>
+                                                        <td class="text-center noprint">
+                                                            <input type="checkbox" class="checkBoxClass" id='chkData' value="@item.INT_UPROFILE_ID">
+                                                        </td>
+                                                        <td>
+                                                            @count
+                                                        </td>
+                                                        <td>
+                                                            <img src="~/@item.VCH_PHOTO_PATH" width="50" height="50" />
+                                                            <small class="d-block"><strong>@item.VCH_NAME</strong></small>
+                                                            <small class="d-block">@item.VCH_DESIGNATION</small>
+                                                            <small class="d-block">@item.VCH_DEPARTMENT</small>
+                                                        </td>
+                                                        <td>@item.VCH_MOBILE_NO</td>
+                                                        <td>@item.VCH_OFC_EXTN_NO</td>
+                                                        <td>@item.VCH_EMAIL_ID</td>
+                                                        <td>@item.VCH_USER_ID</td>
+                                                        <td>@item.VCH_PASSWORD</td>
+                                                        <td class="text-center noprint">
+                                                            @*<a href="@CustomQueryStringHelper.EncryptString("Website", "Add", "UserProfile", new { id = item.INT_UPROFILE_ID })" class="text-success btn-sm">
+            <i class="icon-pencil-alt-solid"></i>
+        </a>*@
+                                                            <a href="/Website/UserProfile/Add/@item.INT_UPROFILE_ID" class="text-success btn-sm">
+                                                                <i class="icon-pencil-alt-solid"></i>
+                                                            </a>
+                                                        </td>
+                                                    </tr>
+                                                }
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+    <!-- MAIN CONTENT AREA ENDS -->
+</section>
+
+
+

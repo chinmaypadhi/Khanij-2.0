@@ -1,0 +1,232 @@
+﻿@*// *********************************************************************************************************
+    //  View Name                : Create
+    //  Desciption               : To Save and Update, Forward to DD, Delete Lesee IBM Details
+    //  Created By               : Lingaraj Dalai
+    //  Created On               : 26 July 2021
+    // ********************************************************************************************************
+*@
+@model MasterEF.LesseeIBMDetailsViewModel
+@{
+    ViewData["Title"] = "Create";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+@if (TempData["Message"] != null)
+{
+    <script>
+        swal("",'@TempData["Message"]',"success");
+    </script>
+}
+<script>
+    indicateMe = "yes"
+    backMe = "yes"
+    $(document).ready(function () {
+        loadNavigation('Create', 'glUIS', 'pllesseprof', 'tl', 'Lessee Profile', 'IBM Details', ' ');
+        $('.datepicker').datetimepicker({
+            format: 'LT',
+            format: 'DD-MMM-YYYY',
+            daysOfWeekDisabled: [],
+            widgetPositioning: {
+                horizontal: 'auto',
+                vertical: 'bottom'
+            }
+        }).keydown(false);
+        if ($("#hdnIBM_APPLICATON_DATE").val() != "") {
+            $("#inputIMBRegDate").val($("#hdnIBM_APPLICATON_DATE").val());
+        }
+        //For Disabling all DOM if  is  Forwarded to DD/DMO and Approval is Pending
+        if (@Model.STATUS != null && @Model.STATUS != "") {
+            if (@Model.STATUS == 1) {
+                $('.form-control').css("pointer-events", "none");
+                $('.btnsave').hide();
+            }
+        }
+        else {
+            $('.btnsave').show();
+        }
+        /*****************************FILE UPLOAD**************************************************/
+        $('input[type="file"]').bind('change', function () {
+            $("input[type='Submit']").attr('disabled', false);
+            $("input[name='cmd']").attr('disabled', false);
+            filesize = this.files[0].size;
+            var val = $(this).val().toLowerCase(),
+                regex = new RegExp("(.*?)\.(jpeg|jpg|pdf)$");
+            if (!(regex.test(val))) {
+                swal("", ".docx, tif,xls  type is not an allowed file type. You can use only pdf, jpg, jpeg types of file(s). ", "warning");
+                this.value = '';
+                $("input[type='Submit']").attr('disabled', true);
+                $("input[name='cmd']").attr('disabled', true);
+                return false;
+            }
+            else if (filesize > 2048000) {
+                swal("", "File size must be 2 MB !", "warning");
+                $("input[type='Submit']").attr('disabled', true);
+                $("input[name='cmd']").attr('disabled', true);
+                return false;
+            }
+            else {
+                var fileName = $(this).val().split("\\").pop();
+                $(this).next('.custom-file-label').html(fileName);
+            }
+            return false;
+        });
+/******************************************************************************************/
+});
+</script>
+<script>
+    function Validate() {
+        var Iss = false;
+        if (!blankFieldValidation("IBM_NUMBER", "IBM Mine Code")) {
+            return false;
+        }
+        else if (!blankFieldValidation("IBM_REGISTRATION_NUMBER", "IBM Registration Number")) {
+            return false;
+        }
+        else if (!blankFieldValidation("inputIMBRegDate", "IBM Registration Date")) {
+            return false;
+        }
+        Iss = true;
+        return Iss;
+    }
+    function OnForwarding(btnAction) {
+        var Type;
+        if (btnAction == 'Forward To DD') {
+            Type = 'forward';
+        }
+        if (confirm("Before " + Type + " you need to apply your Digital Signature. Are you confirmed to " + Type + " Profile??")) {
+                var Postdata = 'action=signdoc' + "\n" + 'datatosign=Digital Signature Required' + "\n" + 'signaction=sign' + "\n" + 'filepath=' + "\n" + 'panNumberParam=' + "\n" + 'expirycheck=false' + "\n" + 'issuername=' + "\n" + 'certclass=1|2|3' + "\n" + 'certtype=ALL';
+                connection.send(Postdata);
+                connection.onerror = function (error) {
+                    swal("",'Please check the server connection: ' + error+'',"warning");
+                    swal("",error,"warning");
+                };
+                connection.onmessage = function (e) { // when DSC is success then following function executed.
+                    if (e.data.indexOf("subProtocol") == -1) {
+                        //alert(e.data);
+                        $("#DSCResponse").val(e.data).change();
+                        $.ajax(
+                            {
+                               url: '@Url.Action("CheckVerifyResponse", "LesseeDetails", new { Area = "LesseeProfile" })',
+                                type: "POST",
+                                data: { contentType: "pkcs7", signDataBase64Encoded: e.data, responseType: "plain" },
+                                success: function (msg) {
+                                    if (msg == "SUCCESS") {
+                                        if (btnAction == "Forward To DD") {
+                                            $("#SubResion").val("Forward To DD");
+                                        }
+                                        $("#form1").submit();
+                                    }
+                                }
+                            });
+                    }
+                    else {
+                        alert(e.data);
+                    }
+                };
+            }
+            else {
+                return false;
+            }
+    }
+    try {
+        var connection = new WebSocket('wss://localhost.emudhra.com:8080');
+        connection.onopen = function () {
+            console.log('Connection Opened');
+        };
+        connection.onerror = function (error) {
+        };
+        connection.onmessage = function (e) {
+            if (e.data.indexOf("subProtocol") == -1) {
+            }
+        };
+    }
+    catch (e) {
+        swal("", "No DSC Connection Found", "warning");
+    }
+</script>
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        <!-- MAIN CONTENT AREA STARTS -->
+        @Html.Partial("_CMSnavigation")
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="javascript:void(0);">
+                                Add
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="~/LesseeProfile/LesseeIBMDetails/ViewList">
+                                View
+                            </a>
+                        </li>
+                    </ul>
+                    @Html.Partial("_CMSutil")
+                </div>
+                <section class="box form-container">
+                    <div class="content-body">
+                        @using (Html.BeginForm("Create", "LesseeIBMDetails", FormMethod.Post, new { AUTOCOMPLETE = "Off", id = "form1", enctype = "multipart/form-data" }))
+                        {
+                        @(Html.HiddenFor(model => model.SubResion))
+                        @(Html.HiddenFor(model => model.SubApprove))
+                        @(Html.HiddenFor(model => model.SubReject))
+                        @(Html.HiddenFor(model => model.LICENSEE_IBM_ID))
+                        @Html.HiddenFor(x => x.CREATED_BY)
+                        @Html.HiddenFor(model => model.STATUS, new { id = "hdnStatus" })
+                        @Html.AntiForgeryToken()
+                        <h5 class="text-brown font-weight-bold mt-0 mb-4">IBM Details</h5>
+                        <div class="row">
+                            <div class="col-lg-3 col-md-6 col-sm-12 form-group">
+                                <label class="col-form-label pt-0 font-weight-bolder">IBM Mine Code <span class="text-danger">*</span></label>
+                                @(Html.TextBoxFor(x => x.IBM_NUMBER, new { @maxlength = "50", @class = "form-control" }))
+                                @Html.ValidationMessageFor(m => m.IBM_NUMBER, "", new { @class = "text-danger" })
+                            </div>
+                            <div class="col-lg-3 col-md-6 col-sm-12 form-group">
+                                <label class="col-form-label pt-0 font-weight-bolder">IBM Registration Number <span class="text-danger">*</span></label>
+                                @(Html.TextBoxFor(x => x.IBM_REGISTRATION_NUMBER, new { @maxlength = "50", @class = "form-control" }))
+                                @Html.ValidationMessageFor(m => m.IBM_REGISTRATION_NUMBER, "", new { @class = "text-danger" })
+                            </div>
+                            <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                <label class="col-form-label pt-0 font-weight-bolder">IBM Registration Date <span class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control datepicker" id="inputIMBRegDate" name="IBM_APPLICATON_DATE">
+                                    <div class="input-group-prepend">
+                                        <label class="input-group-text" for="inputIMBRegDate"><i class="icon-calendar-alt-solid"></i></label>
+                                    </div>
+                                    @Html.HiddenFor(x => x.IBM_APPLICATON_DATE, new { @id = "hdnIBM_APPLICATON_DATE" })
+                                    @Html.ValidationMessageFor(m => m.IBM_APPLICATON_DATE, "", new { @class = "text-danger" })
+                                </div>
+                            </div>
+                            <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                <label for="inputLoginId" class="col-form-label font-weight-bolder">Upload Registration Form</label>
+                                <div class="custom-file">
+                                    <input type="file" class="custom-file-input" id="File3" name="IBM_REGISTRATION_FORM">
+                                    <label class="custom-file-label" for="customFile">Choose Files</label>
+                                    <small class="text-danger">Files type <strong>(.jpg , .jpeg , .pdf)</strong> with maximum <strong>2MB</strong></small>
+                                </div>
+                                @if (Model.FILE_IBM_REGISTRATION_FORM != null && Model.FILE_IBM_REGISTRATION_FORM != "")
+                                    {
+                                <label class="form-control-plaintext">@(Model.FILE_IBM_REGISTRATION_FORM) <a href='~/@Model.IBM_REGISTRATION_FORM_PATH' title="" class="ml-2" data-original-title="Download Registration Form" target="_blank"><i class="icon-file-pdf-solid h5 text-danger"></i></a></label>
+                                    }
+                            </div>
+                        </div>
+                        <div class="row mt-4">
+                            <div class="col-sm-12 text-center">
+                                @if (Model.STATUS != 5)
+                                {
+                                <input type="submit" id="Submit" value="Save & Update" class="btn btn-success btn-md ml-0 waves-effect waves-light btnsave" onclick="return Validate()">
+                                <input type="submit" value="Delete" class="btn btn-danger btn-md ml-0 waves-effect waves-light btndelete" id="Delete" name="delete" onclick="return confirm('Are you sure to delete?')" style="display:none;"/>
+                                <input type="button" title="Forward to DD" value="Forward To DD" name="cmd" class="btn btn-warning text-dark btn-md waves-effect waves-light ml-0 btnsave" onclick="if (Validate()) { return OnForwarding('Forward To DD'); }" />
+                                }
+                            </div>
+                        </div>
+                        }
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+</section>
+
+

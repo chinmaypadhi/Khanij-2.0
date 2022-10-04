@@ -1,0 +1,93 @@
+﻿@*// *********************************************************************************************************
+    //  View Name                : ViewKml
+    //  Desciption               : To View uploaded KML file i map of Lesee Lease Area Details
+    //  Created By               : Lingaraj Dalai
+    //  Created On               : 20 April 2022
+    // ********************************************************************************************************
+*@
+@model MasterEF.LeaseAreaViewModel;
+@{
+    ViewData["Title"] = "ViewKml";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+<html>
+<head>
+    <link rel="stylesheet" href="~/CMScss/leaflet.css" />
+    <script src="~/CMSjs/kml-covertor.js"></script>
+    <script src="~/CMSjs/leaflet.js"></script>
+    <link rel="stylesheet" href="https://cdn.rawgit.com/openlayers/openlayers.github.io/master/en/v5.3.0/css/ol.css" type="text/css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/0.4.2/leaflet.draw.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/0.4.2/leaflet.draw.js"></script>
+    <meta name="viewport" content="initial-scale=1.0">
+    <meta charset="utf-8">
+</head>
+<body>
+    @Html.HiddenFor(m => m.DATA_LEASE_AREA_MAP, new { id = "hfDATA_LEASE_AREA_MAP" })
+    <div id="map" style="height:250px;" class="mapSection h-100"></div>
+    <script>
+        backMe = "yes"
+        var outputText;
+        $(document).ready(function () {    
+            loadNavigation('ViewKml', 'glUIS', 'pllesseprof', 'tl', 'Lessee Profile', 'Lease Information Details', ' ');
+            if ($("#hfDATA_LEASE_AREA_MAP").val() != "" || $("#hfDATA_LEASE_AREA_MAP").val() != null) {
+                outputText = $("#hfDATA_LEASE_AREA_MAP").val();
+            }
+            var container = L.DomUtil.get('map');
+            if (container != null) {
+                container._leaflet_id = null;
+            }
+            var map = L.map('map').setView([10.310910, 77.937563], 5);
+            var googleroad = L.tileLayer('https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
+                attribution: '&copy; <a href="https://www.google.com/maps/@@13.0011956,77.5963159,15z">Google Map</a> contributors'
+            }).addTo(map);
+
+            // FeatureGroup is to store editable layers
+            var drawnItems = new L.FeatureGroup();
+            map.addLayer(drawnItems);
+            var drawControl = new L.Control.Draw({
+                edit: {
+                    featureGroup: drawnItems
+                }
+            });
+            map.addControl(drawControl);
+            if (outputText) {
+                var drawnItems = L.geoJson(JSON.parse(outputText)).addTo(map); // draw map
+            }
+            map.on('draw:created', function (event) {
+                var layer = event.layer,
+                    feature = layer.feature = layer.feature || {};
+
+                feature.type = feature.type || "Feature";
+                var props = feature.properties = feature.properties || {};
+                drawnItems.addLayer(layer);
+
+            });
+        });
+        // function initialiseMap(){
+        var map = L.map('map').setView([10.310910, 77.937563], 5);
+        var googleroad = L.tileLayer('https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
+            attribution: '&copy; <a href="https://www.google.com/maps/@@13.0011956,77.5963159,15z">Google Map</a> contributors'
+        }).addTo(map);
+        // FeatureGroup is to store editable layers
+        var drawnItems = new L.FeatureGroup();
+        map.addLayer(drawnItems);
+        var drawControl = new L.Control.Draw({
+            edit: {
+                featureGroup: drawnItems
+            }
+        });
+        map.addControl(drawControl);
+        if (outputText) {
+            var drawnItems = L.geoJson(JSON.parse(outputText)).addTo(map);
+        }
+        map.on('draw:created', function (event) {
+            var layer = event.layer,
+                feature = layer.feature = layer.feature || {};
+
+            feature.type = feature.type || "Feature";
+            var props = feature.properties = feature.properties || {};
+            drawnItems.addLayer(layer);
+        });
+    </script>
+</body>
+</html>

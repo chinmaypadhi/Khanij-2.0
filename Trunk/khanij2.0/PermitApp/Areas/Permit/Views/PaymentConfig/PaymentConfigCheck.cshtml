@@ -1,0 +1,237 @@
+﻿@model PermitEF.ePermitModel
+@using PermitEF;
+@using PermitApp.Web;
+@using PermitApp.Helper
+@using Microsoft.Extensions.Configuration;
+@using  Microsoft.AspNetCore.Http;
+@{
+    ViewData["Title"] = "PaymentConfigCheck";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+<script src=" https://cdn.datatables.net/1.10.24/js/jquery.dataTables.min.js"></script>
+@inject IHttpContextAccessor HttpContextAccessor
+@{
+    UserLoginSession profile = HttpContextAccessor.HttpContext.Session.Get<UserLoginSession>(KeyHelper.UserKey);
+}
+
+
+<style>
+    @@media screen and (max-width: 768px) 
+    {
+        .colon {
+            display: block;
+        }
+    }
+    @@media screen and (max-width: 640px) {
+        .colon {
+            display: none;
+        }
+    }
+</style>
+
+
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        @Html.Partial("_CMSnavigation")
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="#">
+                                Config Check
+                            </a>
+                        </li>
+                    </ul>
+                    @Html.Partial("_CMSutil")
+                </div>
+
+                <section class="box form-container">
+                    @using (Html.BeginForm("PaymentConfigCheck", "PaymentConfig", FormMethod.Post, new { enctype = "multipart/form-data", AUTOCOMPLETE = "Off", id = "frmEPermit" }))
+                    {
+                        @Html.HiddenFor(s => s.command)
+                        @Html.HiddenFor(s => s.GeneratedBy)
+                        <div class="content-body">
+                            <div class="bg-light p-3 shadow-sm mb-4">
+                                <div class="row">
+                                    <label class="col-lg-3 col-md-4 col-sm-12 col-form-label font-weight-bold">Name of Lessee</label>
+                                    <div class="col-lg-3 col-md-8 col-sm-12">
+                                        <label class="form-control-plaintext">
+                                            <span class="colon">:</span>
+                                            <span id='pu'>@Model.LesseeName</span>
+                                        </label>
+                                    </div>
+                                    <label class="col-lg-3 col-md-4 col-sm-12 col-form-label font-weight-bold">Mineral Name</label>
+                                    <div class="col-lg-3 col-md-8 col-sm-12">
+                                        <label class="form-control-plaintext">
+                                            <span class="colon">:</span>
+                                            <span id='pu'>@Model.MineralName</span>
+                                        </label>
+                                    </div>
+                                    <label class="col-lg-3 col-md-4 col-sm-12 col-form-label font-weight-bold">Permitted Quantity @*<small>(MT)</small>*@</label>
+                                    <div class="col-lg-3 col-md-8 col-sm-12">
+                                        <label class="form-control-plaintext">
+                                            <span class="colon">:</span>
+                                            <span id='Consignee'>@Model.ProductionCap</span>
+                                        </label>
+                                    </div>
+                                    <label class="col-lg-3 col-md-4 col-sm-12 col-form-label font-weight-bold">Permit Taken</label>
+                                    <div class="col-lg-3 col-md-8 col-sm-12">
+                                        <label class="form-control-plaintext">
+                                            <span class="colon">:</span>
+                                            <span id='Consignee'>@Model.Production</span>
+                                        </label>
+                                    </div>
+                                    <label class="col-lg-3 col-md-4 col-sm-12 col-form-label font-weight-bold">Dispatched</label>
+                                    <div class="col-lg-3 col-md-8 col-sm-12">
+                                        <label class="form-control-plaintext">
+                                            <span class="colon">:</span>
+                                            <span id='Consignee'>@Model.Dispatch</span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-12 col-md-12 col-sm-12">
+                                    <h5 class="text-brown font-weight-bold">Clearances</h5>
+                                </div>
+
+                                <div class="col-lg-6 col-md-12">
+
+                                    <div class="table-responsive">
+
+
+                                        <table id="datatable" class="table table-sm table-bordered">
+                                            <thead>
+                                                <tr>
+                                                    <th width="30px">Sl#</th>
+                                                    <th>Clearance Type</th>
+                                                    <th width="80px">Status</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+
+                                                @{ int i = 1;
+
+                                                }
+                                                @foreach (var b in ViewBag.ViewList)
+                                                {
+                                                    <tr>
+                                                        <td>@i</td>
+
+                                                        <td>@b.RiderDescription</td>
+                                                        <td>
+                                                            @if (b.RiderValid == 1)
+                                                            {
+
+
+                                                                <img src="~/CMSimg/Yes.png" height="15px" width="15px" />
+
+                                                            }
+                                                            else
+                                                            {
+                                                                <p class="m-0">
+                                                                    <img src="~/CMSimg/No.png" height="15px" width="15px" />
+
+                                                                </p>
+                                                            }
+                                                        </td>
+                                                    </tr>
+                                                    i++;
+                                                }
+
+
+                                            </tbody>
+                                        </table>
+
+                                    </div>
+
+                                </div>
+                                <div class="col-lg-12 mt-2">
+                                    @{
+                                        int count = 0;
+                                    }
+                                    @foreach (var b in ViewBag.ViewList)
+                                    {
+
+                                        @if (b.RiderValid == 1)
+                                        {
+                                            count = 1;
+
+                                        }
+                                        else
+                                        {
+                                            count = 2;
+                                            break;
+
+                                        }
+                                    }
+
+                                    @if (count == 1)
+                                    {
+                                        <input type="submit" title="Next" value="Next" name="btnNext" class="btn btn-primary btn-md ml-0" id="btnNext" />
+                                    }
+
+                                </div>
+
+
+                            </div>
+
+                        </div>
+
+                    }
+                </section>
+            </div>
+        </div>
+    </div>
+   
+    <!-- MAIN CONTENT AREA ENDS -->
+</section>
+@*<uc1:footer runat="server" ID="footer" />*@
+
+<script>
+    backMe = "yes"
+    $(document).ready(function () {
+        loadNavigation('ViewList', 'glhelpdesk', 'plraiseticket', 'tl', 'Payment', 'Config Check', ' ');
+        $('.searchableselect').searchableselect();
+      
+        $('.shorting-lnk').click(function () {
+            $('.shorting-lnk i').toggleClass('fa-sort-amount-up-alt fa-sort-amount-down-alt ');
+        });
+        $('.filter-dropdown').hide();
+        $('.filter-lnk').click(function () {
+            $(this).toggleClass('active');
+            $(this).siblings('.filter-dropdown').slideToggle();
+        });
+        $('.filter-btn').click(function () {
+            $(this).parent('.shorting-cell .filter-dropdown').slideUp();
+            if ($(this).parent().parent('.shorting-cell').find('.filter-lnk').hasClass('active')) {
+                $(this).parent().siblings('.filter-lnk').removeClass('active');
+            }
+        });
+       
+    });
+</script>
+<script>
+    $(document).ready(function () {
+        $('.datepicker').datetimepicker({
+            format: 'LT',
+            format: 'DD-MM-YYYY',
+
+        });
+    });
+    @*$("#btnNext").click(function () {
+        if (@profile.MineralName== "COAL") {
+            window.location.href = '@Url.Action("CoalEPermit", "CoalEPermit", new { Area = "Permit" })';
+        }
+        else {
+            window.location.href = "/Permit/Lessee/ePermitApplication";
+        }
+    });*@
+     if ('@TempData["SuccMessage"]' != '' && '@TempData["SuccMessage"]' != null) {
+
+    swal("",'@TempData["SuccMessage"]',"success");
+    }
+</script>
+

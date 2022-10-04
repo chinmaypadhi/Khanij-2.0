@@ -1,0 +1,1083 @@
+﻿@*// *********************************************************************************************************
+    //  View Name                : PartOne
+    //  Desciption               : Add Part1 of FOrm1 F1
+    //  Created By               : Debaraj Swain
+    //  Created On               : 30 Jun 2021
+    // ********************************************************************************************************
+*@
+@model ReturnEF.GetFormF1DetailsModel
+@{
+    ViewData["Title"] = "ProfileView";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+}
+@*<link rel="stylesheet" href="~/css/bootstrap-datetimepicker.min.css" type="text/css" />
+<script src="~/js/moment.min.js"></script>
+<script src="~/js/bootstrap-datetimepicker.min.js"></script>
+<script src='@Url.Content("~/js/sweetalert.min.js")'></script>
+<script src="~/js/specialChar.js"></script>
+<script src="~/js/CSMValidation.js"></script>*@
+<script>
+    $(document).ready(function () {
+        $('.datepicker').datetimepicker({
+            format: 'LT',
+            format: 'DD-MM-YYYY',
+            daysOfWeekDisabled: [],
+        });
+    });
+</script>
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        <!-- MAIN CONTENT AREA STARTS -->
+        @Html.Partial("_CMSnavigation")
+        <div class="row">
+            <div class="col-12">
+
+
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="@Url.Action("PartOne", "eReturnProcess", new {MonthYear=@TempData["M_Y"] })">
+                                Part 1
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="partTwo">
+
+                                Part 2
+                            </a>
+                        </li>
+
+                    </ul>
+                    @Html.Partial("_CMSutil")
+                </div>
+
+
+                <section class="box form-container">
+                    <div class="content-body">
+                        @using (Html.BeginForm("AddPartOneF1", "eReturnProcess", FormMethod.Post, new { @id = "FormF1Part1", @enctype = "multipart/form-data" }))
+                        {
+                            <div class="text-center text-dark">
+                                <h6 class="font-weight-bold"> </h6>
+                                <h6 class="font-weight-bold">Monthly Return <small>(Form F-1)</small></h6>
+                                <p class="font-weight-normal mb-0">
+                                    To be used for minerals other than Copper, Gold, Lead, Pyrites,Tin,
+                                    Tungsten, Zinc and precious and semi-precious stones
+                                </p>
+                                <h6 class="font-weight-bold">General And Labour <small>(Part – I)</small></h6>
+
+                            </div>
+
+
+
+                            <ul class="nav nav-tabs progressbar border-0" id="myTab" role="tablist">
+                                <li class="startstep activestep1">
+                                    <a class="active" id="first-tab" data-toggle="tab" href="#MD" role="tab" aria-controls="first" aria-selected="true">Details of Mine</a>
+                                </li>
+                                <li>
+                                    <a id="second-tab" data-toggle="tab" href="#LAD" role="tab" aria-controls="second" aria-selected="false">Name & address of Lessee/Owner</a>
+                                </li>
+                                <li>
+                                    <a id="third-tab" data-toggle="tab" href="#RRP" role="tab" aria-controls="third" aria-selected="false"> Details of Rent/ Royalty/Dead/DMF/NMET</a>
+                                </li>
+                                <li>
+                                    <a id="four-tab" data-toggle="tab" href="#DWM" role="tab" aria-controls="four" aria-selected="false">Details on working of mine</a>
+                                </li>
+                                <li>
+                                    <a id="five-tab" data-toggle="tab" href="#ADE" role="tab" aria-controls="five" aria-selected="false"> Average Daily Employment</a>
+                                </li>
+                            </ul>
+                            <div class="tab-content" id="myTabContent">
+                                @Html.HiddenFor(m => m.MineralID)
+                                @Html.HiddenFor(m => m.Flag)
+
+                                <input type="hidden" value="@ViewBag.Month_Year" name="Month_Year" id="Month_Year" />
+                                <div class="tab-pane fade show active" id="MD" role="tabpanel" aria-labelledby="first-tab">
+
+                                    <h5 class="text-brown font-weight-bold">1 Details of the Mine </h5>
+                                    <div class="form-group row">
+                                        <div class="col-sm-4">
+                                            <label class="col-form-label font-weight-bolder">Registration No.<small> (allotted by IBM)</small> </label>
+                                            @Html.TextBoxFor(m => m.Registrationnumber, new { @class = "form-control" })
+                                        </div>
+                                        <div class="col-sm-4">
+                                            <label class="col-form-label font-weight-bolder">Mine Code<small> (allotted by IBM)</small></label>
+                                            @Html.TextBoxFor(m => m.MINE_CODE, new { @class = "form-control" })
+                                        </div>
+                                        <div class="col-sm-4">
+                                            <label class="col-form-label font-weight-bolder">Name of the Mineral</label>
+                                            @Html.TextBoxFor(m => m.MineralName, new { @class = "form-control" })
+                                        </div>
+
+                                    </div>
+
+                                    <div class="form-group row">
+                                        <div class="col-sm-4">
+                                            <label class="col-form-label font-weight-bolder">Name of Mine</label>
+                                            @Html.TextBoxFor(m => m.MineName, new { @class = "form-control" })
+                                        </div>
+                                        <div class="col-sm-4">
+                                            <label for="inputLoginId" class="col-form-label font-weight-bolder">Name(s) of other mineral(s)</label>
+                                            @Html.TextBoxFor(m => m.OtherMineral, new { @class = "form-control" })
+                                        </div>
+
+
+                                    </div>
+
+                                    <h5 class="text-brown font-weight-bold">Location of the mine</h5>
+
+                                    <div class="form-group row">
+                                        <div class="col-sm-3">
+                                            <label class="col-form-label font-weight-bolder">Village</label>
+                                            @Html.TextBoxFor(m => m.LesseeVillageName, new { @class = "form-control" })
+                                        </div>
+                                        <div class="col-sm-3">
+                                            <label class="col-form-label font-weight-bolder">Post Office</label>
+                                            @Html.TextBoxFor(m => m.MinePostOffice, new { @class = "form-control" })
+                                        </div>
+                                        <div class="col-sm-3">
+                                            <label for="inputLoginId" class="col-form-label font-weight-bolder">Tahsil/Taluk</label>
+                                            @Html.TextBoxFor(m => m.MineTehsil, new { @class = "form-control" })
+                                        </div>
+                                        <div class="col-sm-3">
+                                            <label class="col-form-label font-weight-bolder">District</label>
+                                            @Html.TextBoxFor(m => m.MineDistrict, new { @class = "form-control" })
+                                        </div>
+
+                                    </div>
+
+                                    <div class="form-group row">
+                                        <div class="col-sm-3">
+                                            <label class="col-form-label font-weight-bolder">State</label>
+                                            @Html.TextBoxFor(m => m.MineState, new { @class = "form-control" })
+                                        </div>
+                                        <div class="col-sm-3">
+                                            <label class="col-form-label font-weight-bolder">PIN Code</label>
+                                            @Html.TextBoxFor(m => m.MinePinCode, new { @maxlength = "6", @class = "form-control MinePinCode" })
+                                        </div>
+                                        <div class="col-sm-3">
+                                            <label class="col-form-label font-weight-bolder">Fax No.</label>
+                                            @Html.TextBoxFor(m => m.MineFaxNo, new { @class = "form-control" })
+                                        </div>
+                                        <div class="col-sm-3">
+                                            <label class="col-form-label font-weight-bolder">E-mail Id</label>
+                                            @Html.TextBoxFor(m => m.MineEmailID, new { @class = "form-control" })
+                                        </div>
+                                    </div>
+
+
+                                    <div class="row">
+                                        <div class="col-sm-3">
+                                            <label class="col-form-label font-weight-bolder">Mobile No.</label>
+                                            @Html.TextBoxFor(m => m.MineMobileNo, new { @class = "form-control" })
+                                        </div>
+                                        <div class="col-sm-3">
+                                            <label class="col-form-label font-weight-bolder">Phone No.</label>
+                                            @Html.TextBoxFor(m => m.MinePhoneNo, new { @class = "form-control" })
+                                        </div>
+                                    </div>
+
+
+                                    <div class="row mt-3">
+                                        <div class="col-sm-12 text-center">
+                                            <a id="second-tab" data-toggle="tab" href="#LAD" class="btn btn-primary btn-md ml-0 waves-effect waves-light btnNext" role="tab" aria-controls="second" aria-selected="false">Next</a>
+                                        </div>
+                                    </div>
+
+
+
+                                </div>
+                                <div class="tab-pane fade" id="LAD" role="tabpanel" aria-labelledby="second-tab">
+                                    <h5 class="text-brown font-weight-bold"> 2 Name and address of Lessee/Owner (along with fax no and e-mail)</h5>
+                                    <div class="form-group row">
+                                        <div class="col-sm-3">
+                                            <label class="col-form-label font-weight-bolder">Name of Lessee/Owner</label>
+                                            @Html.TextBoxFor(m => m.LesseeName, new { @class = "form-control" })
+                                        </div>
+                                        <div class="col-sm-3">
+                                            <label class="col-form-label font-weight-bolder">District</label>
+                                            @Html.TextBoxFor(m => m.LesseeDistrictName, new { @class = "form-control" })
+                                        </div>
+                                        <div class="col-sm-3">
+                                            <label class="col-form-label font-weight-bolder">State</label>
+                                            @Html.TextBoxFor(m => m.LesseeStateName, new { @class = "form-control" })
+                                        </div>
+                                        <div class="col-sm-3">
+                                            <label for="inputLoginId" class="col-form-label font-weight-bolder">PIN Code</label>
+                                            @Html.TextBoxFor(m => m.LesseePinCode, new { @maxlength = "6", @class = "form-control LesseePinCode" })
+                                        </div>
+
+
+                                    </div>
+
+                                    <div class="form-group row">
+                                        <div class="col-sm-6">
+                                            <label class="col-form-label font-weight-bolder">Address</label>
+                                            @Html.TextBoxFor(m => m.LesseeAddress, new { @class = "form-control" })
+                                            <small class="text-danger">Maximum <strong>500</strong> characters</small>
+                                        </div>
+                                        <div class="col-sm-3">
+                                            <label for="inputLoginId" class="col-form-label font-weight-bolder">Fax No.</label>
+                                            @Html.TextBoxFor(m => m.LesseeFaxNo, new { maxlength = "6", @class = "form-control" })
+                                        </div>
+                                        <div class="col-sm-3">
+                                            <label class="col-form-label font-weight-bolder">E-mail</label>
+                                            @Html.TextBoxFor(m => m.LesseeEmailID, new { @class = "form-control" })
+                                        </div>
+
+
+
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-sm-3">
+                                            <label class="col-form-label font-weight-bolder">Mobile No.</label>
+                                            @Html.TextBoxFor(m => m.LesseeMobileNo, new { @class = "form-control" })
+                                        </div>
+                                    </div>
+                                    <div class="row mt-3">
+                                        <div class="col-sm-12 text-center">
+                                            <a id="second-tab" data-toggle="tab" href="#MD" class="btn btn-dark btn-md ml-0 waves-effect waves-light btnPrevious" role="tab" aria-controls="second" aria-selected="false">Previous</a>
+                                            <a id="third-tab" data-toggle="tab" href="#RRP" class="btn btn-primary btn-md ml-0 waves-effect waves-light btnNext" role="tab" aria-controls="third" aria-selected="false"> Next</a>
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <div class="tab-pane fade" id="RRP" role="tabpanel" aria-labelledby="third-tab">
+
+                                    <h5 class="text-brown font-weight-bold">3 Details of Rent/ Royalty / Dead Rent/ DMF /NMET amount paid in the month</h5>
+                                    @Html.HiddenFor(m => m.Flag)
+                                    @Html.HiddenFor(m => m.Details_Id)
+                                    @Html.HiddenFor(m => m.Wages_Id)
+                                    <div class="form-group row">
+                                        <div class="col-sm-4">
+                                            <label class="col-form-label font-weight-bolder">Rent paid (Rs)</label>
+                                            @Html.TextBoxFor(m => m.Rentpaid, new { @class = "form-control" })
+                                        </div>
+                                        <div class="col-sm-4">
+                                            <label class="col-form-label font-weight-bolder">Royalty paid (Rs)</label>
+                                            @Html.TextBoxFor(m => m.Royaltypaid, new { @class = "form-control", @readonly = "readonly" })
+                                        </div>
+                                        <div class="col-sm-4">
+                                            <label class="col-form-label font-weight-bolder">Dead Rent paid (Rs)</label>
+                                            @Html.TextBoxFor(m => m.DeadRentpaid, new { @class = "form-control" })
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-sm-4">
+                                            <label class="col-form-label font-weight-bolder">Payment made to the DMF (Rs)</label>
+                                            @Html.TextBoxFor(m => m.DMFPaid, new { @class = "form-control", @readonly = "readonly" })
+                                        </div>
+                                        <div class="col-sm-4">
+                                            <label for="inputLoginId" class="col-form-label font-weight-bolder">Payment made to the NMET (Rs)</label>
+                                            @Html.TextBoxFor(m => m.NMETPaid, new { @class = "form-control", @readonly = "readonly" })
+                                        </div>
+
+                                    </div>
+
+                                    <div class="row mt-3">
+                                        <div class="col-sm-12 text-center">
+                                            <a id="third-tab" data-toggle="tab" href="#LAD" class="btn btn-dark btn-md ml-0 waves-effect waves-light btnPrevious" role="tab" aria-controls="third" aria-selected="false"> Previous</a>
+                                            <a id="third-tab" data-toggle="tab" href="#DWM" class="btn btn-primary btn-md ml-0 waves-effect waves-light btnNext" role="tab" aria-controls="third" aria-selected="false"> Next</a>
+
+                                        </div>
+                                    </div>
+
+
+                                </div>
+                                <div class="tab-pane fade" id="DWM" role="tabpanel" aria-labelledby="four-tab">
+                                    <h5 class="text-brown font-weight-bold">4 Details on working of mine</h5>
+
+                                    <div class="form-group row mt-2">
+                                        <div class="col-sm-6">
+                                            <div class="form-group row">
+                                                <label for="dropdownDepart" class="col-sm-5 col-form-label font-weight-bolder"> (i) Number of days the mine worked:</label>
+                                                <div class="col-sm-6">
+                                                    @Html.TextBoxFor(m => m.NoOfDaysMineWork, new { maxlength = "2", @class = "form-control" })
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-sm-12"> <label class="col-form-label pt-0 font-weight-bolder">Reasons for work stoppage in the mine during the month (due to strike, lockout, heavy rain, non-availability of labour, transport bottleneck, lack of demand, uneconomic operations, etc.) and the number of days of work stoppage for each reason separately</label></div>
+                                        <div class="col-sm-12">
+                                            <div class="table-responsive">
+
+                                                <table border="1" id="MiningWork" class="table" style="margin-top: 15px; width: 100%">
+                                                    <thead>
+                                                        <tr>
+                                                            <th style="border-color: black;">Reasons</th>
+                                                            <th style="border-color: black;">No. of days</th>
+
+                                                        </tr>
+                                                    </thead>
+                                                    <tr id="tr_MiningWork">
+                                                        <td>
+                                                            <input type="hidden" name="Work_Id" value="@Model.Work_Id" />
+                                                            <input type="text" class="form-control" value="@Model.Reason" name="Reason">
+                                                        </td>
+                                                        <td>
+                                                            <input type="number" id="NoOfDaysWorkStop" value="@Model.NoOfDaysWorkStop" name="NoOfDaysWorkStop" class="form-control" onfocusout="return ValidateTextBox(event);" />*
+                                                        </td>
+                                                    </tr>
+
+                                                </table>
+                                                <input type="button" value="Add Row" onclick="addRow('MiningWork')" />
+                                                <input type="button" name="" value="Remove Row" onclick="RemoveRow('MiningWork');">
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                    <div class="row mt-3">
+                                        <div class="col-sm-12 text-center">
+                                            <a id="third-tab" data-toggle="tab" href="#RRP" class="btn btn-dark btn-md ml-0 waves-effect waves-light btnPrevious" role="tab" aria-controls="third" aria-selected="false"> Previous</a>
+                                            <a id="third-tab" data-toggle="tab" href="#ADE" class="btn btn-primary btn-md ml-0 waves-effect waves-light btnNext" role="tab" aria-controls="third" aria-selected="false"> Next</a>
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <div class="tab-pane fade" id="ADE" role="tabpanel" aria-labelledby="five-tab">
+                                    <h5 class="text-brown font-weight-bold">5 Average Daily Employment and Total Salary/Wages paid #</h5>
+                                    <div class="table-responsive">
+                                        <table class="table table-sm table-bordered mt-3">
+                                            <tbody>
+                                                <tr>
+                                                    <th rowspan="2" class="font-weight-bolder text-center">Work place</th>
+                                                    <th colspan="2" class="font-weight-bolder text-center">Direct</th>
+                                                    <th colspan="2" class="font-weight-bolder text-center">Contract</th>
+                                                    <th colspan="2" class="font-weight-bolder text-center">Total Salary/Wages (Rs)</th>
+                                                </tr>
+                                                <tr>
+                                                    <th class="font-weight-bolder text-center">Male</th>
+                                                    <th class="font-weight-bolder text-center">Female</th>
+                                                    <th class="font-weight-bolder text-center">Male</th>
+                                                    <th class="font-weight-bolder text-center">Female</th>
+                                                    <th class="font-weight-bolder text-center">Direct</th>
+                                                    <th class="font-weight-bolder text-center">Contract</th>
+                                                </tr>
+                                                <tr>
+                                                    <td class="font-weight-bolder">Below ground</td>
+                                                    <td>@Html.TextBoxFor(m => m.DirectMale1, new { @class = "form-control", @onkeypress = "return blockSpecialChar(event);" })</td>
+                                                    <td>@Html.TextBoxFor(m => m.DirectFemale1, new { @class = "form-control", @onkeypress = "return blockSpecialChar(event);" })</td>
+                                                    <td>@Html.TextBoxFor(m => m.ContractMale1, new { @class = "form-control", @onkeypress = "return blockSpecialChar(event);" })</td>
+                                                    <td>@Html.TextBoxFor(m => m.ContractFemale1, new { @class = "form-control", @onkeypress = "return blockSpecialChar(event);" })</td>
+                                                    <td>@Html.TextBoxFor(m => m.TotalWagesMale1, new { @class = "form-control", @onkeypress = "return blockSpecialChar(event);" })</td>
+                                                    <td>@Html.TextBoxFor(m => m.TotalWagesFeMale1, new { @class = "form-control", @onkeypress = "return blockSpecialChar(event);" })</td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="font-weight-bolder">Opencast</td>
+                                                    <td>@Html.TextBoxFor(m => m.DirectMale2, new { @class = "form-control", @onkeypress = "return blockSpecialChar(event);" })</td>
+                                                    <td>@Html.TextBoxFor(m => m.DirectFemale2, new { @class = "form-control", @onkeypress = "return blockSpecialChar(event);" })</td>
+                                                    <td>@Html.TextBoxFor(m => m.ContractMale2, new { @class = "form-control", @onkeypress = "return blockSpecialChar(event);" })</td>
+                                                    <td>@Html.TextBoxFor(m => m.ContractFemale2, new { @class = "form-control", @onkeypress = "return blockSpecialChar(event);" })</td>
+                                                    <td>@Html.TextBoxFor(m => m.TotalWagesMale2, new { @class = "form-control", @onkeypress = "return blockSpecialChar(event);" })</td>
+                                                    <td>@Html.TextBoxFor(m => m.TotalWagesFeMale2, new { @class = "form-control", @onkeypress = "return blockSpecialChar(event);" })</td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="font-weight-bolder">Above ground</td>
+                                                    <td>@Html.TextBoxFor(m => m.DirectMale3, new { @class = "form-control", @onkeypress = "return blockSpecialChar(event);" })</td>
+                                                    <td>@Html.TextBoxFor(m => m.DirectFemale3, new { @class = "form-control", @onkeypress = "return blockSpecialChar(event);" })</td>
+                                                    <td>@Html.TextBoxFor(m => m.ContractMale3, new { @class = "form-control", @onkeypress = "return blockSpecialChar(event);" })</td>
+                                                    <td>@Html.TextBoxFor(m => m.ContractFemale3, new { @class = "form-control", @onkeypress = "return blockSpecialChar(event);" })</td>
+                                                    <td>@Html.TextBoxFor(m => m.TotalWagesMale3, new { @class = "form-control", @onkeypress = "return blockSpecialChar(event);" })</td>
+                                                    <td>@Html.TextBoxFor(m => m.TotalWagesFeMale3, new { @class = "form-control", @onkeypress = "return blockSpecialChar(event);" })</td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="font-weight-bolder">Total</td>
+                                                    <td>@Html.TextBoxFor(m => m.TotalDirectMale, new { @class = "form-control", @readonly = "readonly" })</td>
+                                                    <td>@Html.TextBoxFor(m => m.TotalDirectFemale, new { @class = "form-control", @readonly = "readonly" })</td>
+                                                    <td>@Html.TextBoxFor(m => m.TotalContractMale, new { @class = "form-control", @readonly = "readonly" })</td>
+                                                    <td>@Html.TextBoxFor(m => m.TotalContractFemale, new { @class = "form-control", @readonly = "readonly" })</td>
+                                                    <td>@Html.TextBoxFor(m => m.TotalMaleWages, new { @class = "form-control", @readonly = "readonly" })</td>
+                                                    <td>@Html.TextBoxFor(m => m.TotalFeMaleWages, new { @class = "form-control", @readonly = "readonly" })</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <div class="row mt-3">
+                                        <div class="col-sm-12 text-center">
+                                            <a id="third-tab" data-toggle="tab" href="#DWM" class="btn btn-dark btn-md ml-0 waves-effect waves-light btnPrevious" role="tab" aria-controls="third" aria-selected="false"> Previous</a>
+                                            <input type="submit" value="Save" id="btnSave" class="btn btn-success btn-md ml-0 waves-effect waves-light btnsave" onclick="return FormF1();">
+                                            <input type="button" value="Update" id="btnUpdateMine" style="display: none" class="btn btn-secondary btn-md ml-0 waves-effect waves-light btnsave" onclick="return OnUpdate();">
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </section>
+
+            </div>
+
+            <div>
+
+            </div>
+        </div>
+
+
+
+    </div>
+</section>
+<script>
+    //$(function () {
+    //    $("form").kendoValidator();
+    //});
+
+    var totalRowsCount = 1;
+    function addRow(tableID) {
+        debugger;
+        if (parseInt(totalRowsCount) < parseInt(5)) {
+            var table = document.getElementById(tableID);
+
+            var rowCount = table.rows.length;
+            var row = table.insertRow(rowCount);
+
+            var colCount = table.rows[1].cells.length;
+
+            for (var i = 0; i < colCount; i++) {
+
+                if (i == colCount - 1)
+                { }
+                else
+                {
+                    var newcell = row.insertCell(i);
+                    var newcell2 = row.insertCell(i + 1);
+                    if (i == 0) {
+                        newcell.innerHTML = table.rows[1].cells[i].innerHTML; //rowCount;
+                        newcell2.innerHTML = table.rows[1].cells[i + 1].innerHTML;
+                    }
+                    else {
+                        newcell.innerHTML = table.rows[1].cells[i].innerHTML;
+                    }
+
+                    switch (newcell.childNodes[0].type) {
+                        case "text":
+                            newcell.childNodes[0].value = "";
+                            break;
+
+                    }
+                }
+            }
+            totalRowsCount = totalRowsCount + 1;
+        }
+    }
+
+    var rws;
+    function RemoveRow(obj) {
+        totalRowsCount = totalRowsCount - 1;
+
+        var Rowslength = document.getElementById("MiningWork").getElementsByTagName("tr").length;
+
+        if (Rowslength != 2)
+            document.getElementById("MiningWork").deleteRow(Rowslength - 1);
+    }
+
+    $('MiningWork').on('click', 'input[type="button"]', function (e) {
+        $(this).closest('tr').remove()
+    })
+
+
+    function blockSpecialChar(e) {
+        var k = e.keyCode;
+        //(k > 64 && k < 91) || (k > 96 && k < 123) || k == 8 || (k >= 48 && k <= 57)
+        return (k == 8 || (k >= 48 && k <= 57));
+    }
+
+    $(document).ready(function () {
+        $("#NoOfDaysMineWork").keydown(function (e) {
+            // Allow: backspace, delete, tab, escape, enter and .
+            if ($.inArray(e.keyCode, [46, 8, 9, 27, 13, 110, 190]) !== -1 ||
+                // Allow: Ctrl+A, Command+A
+                (e.keyCode === 65 && (e.ctrlKey === true || e.metaKey === true)) ||
+                // Allow: home, end, left, right, down, up
+                (e.keyCode >= 35 && e.keyCode <= 40)) {
+                // let it happen, don't do anything
+                return;
+            }
+            // Ensure that it is a number and stop the keypress
+            if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) {
+                e.preventDefault();
+            }
+        });
+
+
+
+        function PartTwoOnClick() {
+            debugger;
+            if (partTwoProceedFlag > 0) {
+            }
+            else {
+                e.preventDefault();
+                swal("", "Please fill Part I first !", "warning");
+                return false;
+            }
+        }
+
+        $("#NoOfDaysWorkStop").keydown(function (e) {
+            // Allow: backspace, delete, tab, escape, enter and .
+            if ($.inArray(e.keyCode, [46, 8, 9, 27, 13, 110, 190]) !== -1 ||
+                // Allow: Ctrl+A, Command+A
+                (e.keyCode === 65 && (e.ctrlKey === true || e.metaKey === true)) ||
+                // Allow: home, end, left, right, down, up
+                (e.keyCode >= 35 && e.keyCode <= 40)) {
+                // let it happen, don't do anything
+                return;
+            }
+            // Ensure that it is a number and stop the keypress
+            if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) {
+                e.preventDefault();
+            }
+        });
+    })
+
+    $('#F1Part1').click(function () {
+        var MY = $('#Month_Year').val()
+        if (MY != null && MY != "") {
+            window.location.href = '@Url.Action("GeteReturnFormOneDetails", "eReturnProcess", new { Area = "eReturn" })?Month_Year=' + MY;
+    }
+    else {
+            swal("", "Please Select Month and Years", "warning");
+    }
+    });
+
+
+
+
+    function FormF1() {
+        debugger;
+    var DM1 = $("#DirectMale1").val();
+    var DM2 = $("#DirectMale2").val();
+    var DM3 = $("#DirectMale3").val();
+
+
+    var DF1 = $("#DirectFemale1").val();
+    var DF2 = $("#DirectFemale2").val();
+    var DF3 = $("#DirectFemale3").val();
+
+    var CM1 = $("#ContractMale1").val();
+    var CM2 = $("#ContractMale2").val();
+    var CM3 = $("#ContractMale3").val();
+
+    var CF1 = $("#ContractFemale1").val();
+    var CF2 = $("#ContractFemale2").val();
+    var CF3 = $("#ContractFemale3").val();
+
+    var TWM1 = $("#TotalWagesMale1").val();
+    var TWM2 = $("#TotalWagesMale2").val();
+    var TWM3 = $("#TotalWagesMale3").val();
+
+    var TWF1 = $("#TotalWagesFeMale1").val();
+    var TWF2 = $("#TotalWagesFeMale2").val();
+    var TWF3 = $("#TotalWagesFeMale3").val();
+
+
+
+
+        if (!blankFieldValidation("Month_Year", "Month Year")) {
+            return false;
+        }
+        if (!blankFieldValidation("MinePinCode", "PinCode")) {
+            return false;
+        }
+        if (!blankFieldValidation("LesseePinCode", "Lessee PinCode")) {
+            return false;
+        }
+        if (!blankFieldValidation("NoOfDaysMineWork", "No Of Days Mine Work")) {
+            return false;
+        }
+        if (!blankFieldValidation("NoOfDaysMineWork", "No Of Days Mine Work")) {
+            return false;
+        }
+
+
+    else if (DM1 == "" && DM2 == "" && DM3 == "") {
+            swal("", "Atleast one entry is mandatory in (Average Daily Employment and Total Salary/Wages paid)", "warning");
+        return false;
+    }
+    else {
+        if (DM1 != "") {
+            if (DF1 == "" || CM1 == "" || CF1 == "" || TWM1 == "" || TWF1 == "") {
+                swal("", "Fill all the Below ground details", "warning");
+                return false;
+            }
+        }
+        if (DM2 != "") {
+            if (DF2 == "" || CM2 == "" || CF2 == "" || TWM2 == "" || TWF2 == "") {
+                swal("", "Fill all the Opencast details", "warning");
+                return false;
+            }
+        }
+
+        if (DM3 != "") {
+            if (DF3 == "" || CM3 == "" || CF3 == "" || TWM3 == "" || TWF3 == "") {
+                swal("", "Fill all the Above ground details", "warning");
+                return false;
+            }
+        }
+
+        if (confirm("Are you want to Save Part one ?")) {
+            $("#FormF1Part1").submit();
+        }
+        else {
+            return false;
+        }
+    }
+
+}
+
+</script>
+
+
+<script>
+
+    $(document).ready(function () {
+        ViewReturn();
+        GetRoyalty();
+    })
+
+    function ValidateTextBox() {
+        var reson_Data = document.getElementsByName("Reason");
+        var NoOfDaysWorkStop_Data = document.getElementsByName("NoOfDaysWorkStop");
+        for (var i = 0; i < NoOfDaysWorkStop_Data.length; i++) {
+            if (parseFloat(NoOfDaysWorkStop_Data[i].value) > 0) {
+
+                if (reson_Data[i].value == '') {
+                    alert('Reasons required');
+                    $(reson_Data[i]).focus();
+                    return false;
+
+                }
+
+            }
+
+        }
+
+
+    }
+
+    var partTwoProceedFlag = 0;
+
+    function ViewReturn() {
+        var selectedMonthYear = $("#Month_Year").val();
+
+        $.ajax({
+            type: "GET",
+            url: '@Url.Action("GetReturn", "eReturnProcess", new { Area = "eReturn_NonCoal" })',
+            data: { Month_Year: selectedMonthYear },
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            beforeSend: function () {
+                var varValue = 1;
+            },
+            success: function (data) {
+                debugger;
+                if (data.details_Id != null && data.details_Id != "") {
+
+                    partTwoProceedFlag = 1;
+                    $("#partTwo").attr("onclick", "PartTwoOnClick()");
+                    $("#partTwo").attr("href", "PartTwo?MonthYear=@TempData["M_Y"]");
+                    $("#btnUpdateMine").show();
+                    $("#btnSave").hide();
+                    $("#Details_Id").val(data.details_Id);
+                    $("#Wages_Id").val(data.wages_Id);
+                    $('#MinePostOffice').val(data.minePostOffice);
+                    $("#MineFaxNo").val(data.mineFaxNo);
+                    $("#LesseeFaxNo").val(data.lesseeFaxNo);
+                    $("#Rentpaid").val(data.rentpaid);
+                    $('#DeadRentpaid').val(data.deadRentpaid);
+                    $("#NoOfDaysMineWork").val(data.noOfDaysMineWork);
+                    $("#DirectMale1").val(data.directMale1);
+                    $("#DirectMale2").val(data.directMale2);
+                    $("#DirectMale3").val(data.directMale3);
+                    $("#DirectFemale1").val(data.directFemale1);
+                    $("#DirectFemale2").val(data.directFemale2);
+                    $("#DirectFemale3").val(data.directFemale3);
+                    $("#ContractMale1").val(data.contractMale1);
+                    $("#ContractMale2").val(data.contractMale2);
+                    $("#ContractMale3").val(data.contractMale3);
+                    $("#ContractFemale1").val(data.contractFemale1);
+                    $("#ContractFemale2").val(data.contractFemale2);
+                    $("#ContractFemale3").val(data.contractFemale3);
+                    $("#TotalWagesMale1").val(data.totalWagesMale1);
+                    $("#TotalWagesFeMale1").val(data.totalWagesFeMale1);
+                    $("#TotalWagesMale2").val(data.totalWagesMale2);
+                    $("#TotalWagesFeMale2").val(data.totalWagesFeMale2);
+                    $("#TotalWagesMale3").val(data.totalWagesMale3);
+                    $("#TotalWagesFeMale3").val(data.totalWagesFeMale3);
+                    $("#TotalDirectMale").val(data.totalDirectMale);
+                    $("#TotalDirectFemale").val(data.totalDirectFemale);
+                    $("#TotalContractMale").val(data.totalContractMale);
+                    $("#TotalContractFemale").val(data.totalContractFemale);
+                    $("#TotalMaleWages").val(data.totalMaleWages);
+                    $("#TotalFeMaleWages").val(data.totalFeMaleWages);
+                    $("#Registrationnumber").val(data.registrationnumber);
+                    $("#MINE_CODE").val(data.minE_CODE);
+                    $("#MineralName").val(data.mineralName);
+                    $("#MineName").val(data.mineName);
+                    $("#MineAddress").val(data.mineAddress);
+                    $("#MineVillage").val(data.mineVillage);
+                    $("#MineDistrict").val(data.mineDistrict);
+                    $("#MineState").val(data.mineState);
+                    $("#MineTehsil").val(data.mineTehsil);
+                    $("#MinePinCode").val(data.minePinCode);
+                    $("#MineEmailID").val(data.mineEmailID);
+                    $("#MineMobileNo").val(data.mineMobileNo);
+                    $("#MinePhoneNo").val(data.minePhoneNo);
+                    $("#LesseeName").val(data.lesseeName);
+                    $("#LesseeAddress").val(data.lesseeAddress);
+                    $("#LesseeStateName").val(data.lesseeStateName);
+                    $("#LesseeDistrictName").val(data.lesseeDistrictName);
+                    $("#LesseePinCode").val(data.lesseePinCode);
+                    $("#LesseeEmailID").val(data.lesseeEmailID);
+                    $("#LesseeMobileNo").val(data.lesseeMobileNo);
+                    $('#tr_MiningWork').remove();
+                    for (var i = 0 ; i < data.mineWork.length; i++) {
+                        $('#MiningWork').append('<tr><td><input type="hidden" id="Work_Id" name="Work_Id" value="' + data.mineWork[i].work_Id + '" /><input type="text" id="Reason" name="Reason" class="k-textbox" value="' + data.mineWork[i].reason + '"/></td><td><input type="number" id="NoOfDaysWorkStop" name="NoOfDaysWorkStop" value="' + data.mineWork[i].noOfDaysWorkStop + '" class="k-textbox" onfocusout = "return ValidateTextBox(event);" /></td></tr>');
+
+                    }
+
+                }
+                else { $("#btnUpdateMine").hide(); }
+            }
+
+        });
+    }
+
+    function GetRoyalty() {
+        var selectedMonthYear = $("#Month_Year").val();
+        $.ajax({
+            type: "GET",
+            url: '@Url.Action("GetLesseeMonthRentRoyaltyDetails", "eReturnProcess", new { Area = "eReturn_NonCoal" })',
+            data: { Month_Year: selectedMonthYear },
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            beforeSend: function () {
+                var varValue = 1;
+            },
+            success: function (data) {
+                if (data.Royaltypaid != null && data.Royaltypaid != "") {
+                    $('#Royaltypaid').val(data.Royaltypaid);
+                    $("#DMFPaid").val(data.DMFPaid);
+                    $("#NMETPaid").val(data.NMETPaid);
+                }
+                else {
+                    $('#Royaltypaid').val(0);
+                    $("#DMFPaid").val(0);
+                    $("#NMETPaid").val(0);
+                }
+
+            }
+        });
+    }
+
+    function OnUpdate() {
+        debugger;
+        var DM1 = $("#DirectMale1").val();
+        var DM2 = $("#DirectMale2").val();
+        var DM3 = $("#DirectMale3").val();
+
+
+        var DF1 = $("#DirectFemale1").val();
+        var DF2 = $("#DirectFemale2").val();
+        var DF3 = $("#DirectFemale3").val();
+
+        var CM1 = $("#ContractMale1").val();
+        var CM2 = $("#ContractMale2").val();
+        var CM3 = $("#ContractMale3").val();
+
+        var CF1 = $("#ContractFemale1").val();
+        var CF2 = $("#ContractFemale2").val();
+        var CF3 = $("#ContractFemale3").val();
+
+        var TWM1 = $("#TotalWagesMale1").val();
+        var TWM2 = $("#TotalWagesMale2").val();
+        var TWM3 = $("#TotalWagesMale3").val();
+
+        var TWF1 = $("#TotalWagesFeMale1").val();
+        var TWF2 = $("#TotalWagesFeMale2").val();
+        var TWF3 = $("#TotalWagesFeMale3").val();
+
+        if (ValidateTextBox() == false) {
+            $("#ADE").removeClass("active");
+            $("#DWM").addClass("tab-pane fade in active");
+            return false;
+
+        }
+
+        if ($("#Month_Year").val() == "") {
+            $("#Month_Year").focus();
+            swal("", "Please Select Month_Year!", "warning");
+            return false;
+        }
+        else if ($("#NoOfDaysWorkStop").val() == "") {
+            swal("", "Please Enter No Of Days Mine Work Stop..", "warning");
+            return false;
+        }
+
+        else {
+            $("#Flag").val(1);
+            $("#FormF1Part1").submit();
+        }
+
+    }
+</script>
+<script>
+
+    function TextChangeDirectMale() {
+
+        var DirectMale1 = $("#DirectMale1").val();
+        if (DirectMale1 == "") {
+            DirectMale1 = 0;
+        }
+        var DirectMale2 = $("#DirectMale2").val();
+        if (DirectMale2 == "") {
+            DirectMale2 = 0;
+        }
+        var DirectMale3 = $("#DirectMale3").val();
+        if (DirectMale3 == "") {
+            DirectMale3 = 0;
+        }
+        var SUM = Number(DirectMale1) + Number(DirectMale2) + Number(DirectMale3);
+        $("#TotalDirectMale").val(SUM);
+
+    }
+
+    function TextChangeDirectFeMale() {
+
+        var DirectFemale1 = $("#DirectFemale1").val();
+        if (DirectFemale1 == "") {
+            DirectFemale1 = 0;
+        }
+        var DirectFemale2 = $("#DirectFemale2").val();
+        if (DirectFemale2 == "") {
+            DirectFemale2 = 0;
+        }
+        var DirectFemale3 = $("#DirectFemale3").val();
+        if (DirectFemale3 == "") {
+            DirectFemale3 = 0;
+        }
+        var SUM = Number(DirectFemale1) + Number(DirectFemale2) + Number(DirectFemale3);
+        $("#TotalDirectFemale").val(SUM);
+
+    }
+
+    function TextChangeContractMale() {
+
+        var ContractMale1 = $("#ContractMale1").val();
+        if (ContractMale1 == "") {
+            ContractMale1 = 0;
+        }
+        var ContractMale2 = $("#ContractMale2").val();
+        if (ContractMale2 == "") {
+            ContractMale2 = 0;
+        }
+        var ContractMale3 = $("#ContractMale3").val();
+        if (ContractMale3 == "") {
+            ContractMale3 = 0;
+        }
+        var SUM = Number(ContractMale1) + Number(ContractMale2) + Number(ContractMale3);
+        $("#TotalContractMale").val(SUM);
+
+    }
+
+    function TextChangeContractFeMale() {
+
+        var ContractFemale1 = $("#ContractFemale1").val();
+        if (ContractFemale1 == "") {
+            ContractFemale1 = 0;
+        }
+        var ContractFemale2 = $("#ContractFemale2").val();
+        if (ContractFemale2 == "") {
+            ContractFemale2 = 0;
+        }
+        var ContractFemale3 = $("#ContractFemale3").val();
+        if (ContractFemale3 == "") {
+            ContractFemale3 = 0;
+        }
+        var SUM = Number(ContractFemale1) + Number(ContractFemale2) + Number(ContractFemale3);
+        $("#TotalContractFemale").val(SUM);
+    }
+
+
+    function TextChangeTotalMaleWages() {
+
+        var TotalWagesMale1 = $("#TotalWagesMale1").val();
+        if (TotalWagesMale1 == "") {
+            TotalWagesMale1 = 0;
+        }
+        var TotalWagesMale2 = $("#TotalWagesMale2").val();
+        if (TotalWagesMale2 == "") {
+            TotalWagesMale2 = 0;
+        }
+        var TotalWagesMale3 = $("#TotalWagesMale3").val();
+        if (TotalWagesMale3 == "") {
+            TotalWagesMale3 = 0;
+        }
+        var SUM = Number(TotalWagesMale1) + Number(TotalWagesMale2) + Number(TotalWagesMale3);
+        $("#TotalMaleWages").val(SUM);
+    }
+
+    function TextChangeTotalFeMaleWages() {
+
+        var TotalWagesFeMale1 = $("#TotalWagesFeMale1").val();
+        if (TotalWagesFeMale1 == "") {
+            TotalWagesFeMale1 = 0;
+        }
+        var TotalWagesFeMale2 = $("#TotalWagesFeMale2").val();
+        if (TotalWagesFeMale2 == "") {
+            TotalWagesFeMale2 = 0;
+        }
+        var TotalWagesFeMale3 = $("#TotalWagesFeMale3").val();
+        if (TotalWagesFeMale3 == "") {
+            TotalWagesFeMale3 = 0;
+        }
+        var SUM = Number(TotalWagesFeMale1) + Number(TotalWagesFeMale2) + Number(TotalWagesFeMale3);
+        $("#TotalFeMaleWages").val(SUM);
+    }
+
+
+    $("#DirectMale1").on("change", function () {
+        TextChangeDirectMale();
+    });
+
+    $("#DirectMale2").on("change", function () {
+        TextChangeDirectMale()
+    });
+
+    $("#DirectMale3").on("change", function () {
+        TextChangeDirectMale();
+    });
+
+    $("#DirectFemale1").on("change", function () {
+        TextChangeDirectFeMale();
+    });
+
+    $("#DirectFemale2").on("change", function () {
+        TextChangeDirectFeMale();
+    });
+
+    $("#DirectFemale3").on("change", function () {
+        TextChangeDirectFeMale();
+    });
+
+    $("#ContractMale1").on("change", function () {
+        TextChangeContractMale();
+
+    });
+
+    $("#ContractMale2").on("change", function () {
+        TextChangeContractMale();
+    });
+
+    $("#ContractMale3").on("change", function () {
+        TextChangeContractMale();
+    });
+
+    $("#ContractFemale1").on("change", function () {
+        TextChangeContractFeMale();
+    });
+
+    $("#ContractFemale2").on("change", function () {
+        TextChangeContractFeMale();
+    });
+
+    $("#ContractFemale3").on("change", function () {
+        TextChangeContractFeMale();
+    });
+
+
+    $("#TotalWagesMale1").on("change", function () {
+        TextChangeTotalMaleWages();
+    });
+
+    $("#TotalWagesMale2").on("change", function () {
+        TextChangeTotalMaleWages();
+    });
+
+    $("#TotalWagesMale3").on("change", function () {
+        TextChangeTotalMaleWages();
+    });
+
+
+    $("#TotalWagesFeMale1").on("change", function () {
+        TextChangeTotalFeMaleWages();
+    });
+
+    $("#TotalWagesFeMale2").on("change", function () {
+        TextChangeTotalFeMaleWages();
+    });
+
+    $("#TotalWagesFeMale3").on("change", function () {
+        TextChangeTotalFeMaleWages();
+    });
+
+
+
+    $("#MineFaxNo").keydown(function (e) {
+        // Allow: backspace, delete, tab, escape, enter and .
+        if ($.inArray(e.keyCode, [46, 8, 9, 27, 13, 110, 190]) !== -1 ||
+            // Allow: Ctrl+A, Command+A
+            (e.keyCode === 65 && (e.ctrlKey === true || e.metaKey === true)) ||
+            // Allow: home, end, left, right, down, up
+            (e.keyCode >= 35 && e.keyCode <= 40)) {
+            // let it happen, don't do anything
+            return;
+        }
+        // Ensure that it is a number and stop the keypress
+        if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) {
+            e.preventDefault();
+        }
+    });
+
+    $("#LesseeFaxNo").keydown(function (e) {
+        // Allow: backspace, delete, tab, escape, enter and .
+        if ($.inArray(e.keyCode, [46, 8, 9, 27, 13, 110, 190]) !== -1 ||
+            // Allow: Ctrl+A, Command+A
+            (e.keyCode === 65 && (e.ctrlKey === true || e.metaKey === true)) ||
+            // Allow: home, end, left, right, down, up
+            (e.keyCode >= 35 && e.keyCode <= 40)) {
+            // let it happen, don't do anything
+            return;
+        }
+        // Ensure that it is a number and stop the keypress
+        if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) {
+            e.preventDefault();
+        }
+    });
+
+    $("#MinePinCode").keydown(function (e) {
+        // Allow: backspace, delete, tab, escape, enter and .
+        if ($.inArray(e.keyCode, [46, 8, 9, 27, 13, 110, 190]) !== -1 ||
+            // Allow: Ctrl+A, Command+A
+            (e.keyCode === 65 && (e.ctrlKey === true || e.metaKey === true)) ||
+            // Allow: home, end, left, right, down, up
+            (e.keyCode >= 35 && e.keyCode <= 40)) {
+            // let it happen, don't do anything
+            return;
+        }
+        // Ensure that it is a number and stop the keypress
+        if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) {
+            e.preventDefault();
+        }
+    });
+
+    $("#LesseePinCode").keydown(function (e) {
+        // Allow: backspace, delete, tab, escape, enter and .
+        if ($.inArray(e.keyCode, [46, 8, 9, 27, 13, 110, 190]) !== -1 ||
+            // Allow: Ctrl+A, Command+A
+            (e.keyCode === 65 && (e.ctrlKey === true || e.metaKey === true)) ||
+            // Allow: home, end, left, right, down, up
+            (e.keyCode >= 35 && e.keyCode <= 40)) {
+            // let it happen, don't do anything
+            return;
+        }
+        // Ensure that it is a number and stop the keypress
+        if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) {
+            e.preventDefault();
+        }
+    });
+
+</script>

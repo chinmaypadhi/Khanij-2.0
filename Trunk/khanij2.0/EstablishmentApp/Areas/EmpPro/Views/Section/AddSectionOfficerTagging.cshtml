@@ -1,0 +1,134 @@
+﻿@model EstablishmentEf.SectionOfficerTaggingEF
+@{
+    ViewData["Title"] = "AddSectionOfficerTagging";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+
+
+@if (TempData["msg"] != null)
+{
+    <script>
+        var vv = '@TempData["msg"]';
+        if (vv == 1) {
+            swal("", "Section Officer tagging successfully.", "success");
+        }
+        else if (vv == 2) {
+            swal("", "Section Officer tagging already exists.", "warning");
+        }
+        else if (vv == 3) {
+            swal("", "Data updated sucessfully", "success");
+        }
+        else if (vv == 4) {
+            swal("", "Data deleted sucessfully", "success");
+        }
+        else {
+            swal("", "Something Errror occured. Please Try After Sometime!!", "error");
+        }
+    </script>
+
+    TempData["msg"] = null;
+
+}
+<script>
+    $(document).ready(function () {
+        $("#Submit").click(function () {
+
+            if (!DropDownValidation("IntSectionId", "Section")) {
+                return false;
+            }
+            if (!DropDownValidation("intSectionOfficerId", "Section Officer")) {
+                return false;
+            }
+            if (!blankFieldValidation("intSectionOfficerId2", "Section Officer2")) {
+                return false;
+            }
+
+        });
+
+    });
+</script>
+
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+
+        @Html.Partial("_navigation")
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="javascript:void(0);">
+                                Add Section Officer Tagging
+                            </a>
+                        </li>
+                        <li class="nav-item">
+
+                            <a class="nav-link" href="@Url.Content("~/EmpPro/Section/ViewSectionOfficerTagging")">
+                                View Section Officer Tagging
+                            </a>
+                        </li>
+                    </ul>
+
+                    @Html.Partial("_util")
+                </div>
+
+                <section class="box form-container">
+                    <div class="content-body">
+                        @using (Html.BeginForm("AddSectionOfficerTagging", "Section", FormMethod.Post, new { AUTOCOMPLETE = "Off", id = "form1" }))
+                        {
+                            @Html.AntiForgeryToken();
+                            <div class="row">
+                                <div class="col-lg-6">
+                                    <div class="form-group row">
+                                        <label class="col-lg-4 col-md-4 col-sm-12 col-form-label font-weight-bolder">Section<span class="text-danger">*</span></label>
+                                        <div class="col-lg-7 col-md-6 col-sm-12">
+                                            @Html.DropDownListFor(m => m.IntSectionId, ViewBag.Section as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control form-control-sm searchableselect" })
+                                            @Html.HiddenFor(m => m.IntId)
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group row">
+                                        <label class="col-lg-4 col-md-4 col-sm-12 col-form-label font-weight-bolder">Section Officer<span class="text-danger">*</span></label>
+                                        <div class="col-lg-7 col-md-6 col-sm-12">
+                                            @Html.DropDownListFor(m => m.intSectionOfficerId, ViewBag.SectionOfficer as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control form-control-sm searchableselect" })
+
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label class="col-lg-4 col-md-4 col-sm-12 col-form-label font-weight-bolder">Section Officer2<span class="text-danger">*</span></label>
+                                        <div class="col-lg-7 col-md-6 col-sm-12">
+                                            @Html.DropDownListFor(m => m.intSectionOfficerId2, ViewBag.SectionOfficer2 as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control form-control-sm searchableselect" })
+
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                                <div class="col-lg-12 offset-lg-2 offset-md-4 mb-3">
+                                    <input type="submit" id="Submit" name="Submit" value='@ViewBag.Button' class="btn btn-primary btn-md ml-0" />
+                                    @*<input type="reset" id="Reset" value="Reset" class="btn btn-danger btn-md" />*@
+                                    <a href="~/EmpPro/Section/AddSectionOfficerTagging" class="btn btn-danger btn-md">Reset</a>
+                                </div>
+
+                            </div>
+                        }
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+    <!-- MAIN CONTENT AREA ENDS -->
+</section>
+<script>
+    indicateMe = "yes"
+
+    $(document).ready(function () {
+        loadNavigation('AddSectionOfficerTagging', 'glholiday', 'plappleav', 'tl', 'Leave', 'AddSectionOfficerTagging', ' ');
+        //$('.searchableselect').searchableselect();
+
+
+    });
+</script>
+
+

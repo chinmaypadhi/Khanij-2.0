@@ -1,0 +1,343 @@
+﻿@*// *********************************************************************************************************
+    //  View Name                : ViewList
+    //  Desciption               : To View Lesee Lease Area Details
+    //  Created By               : Lingaraj Dalai
+    //  Created On               : 22 July 2021
+    // ********************************************************************************************************
+*@
+@model MasterEF.LeaseAreaViewModel;
+@using MasterEF;
+@using MasterApp.Web;
+@using  Microsoft.AspNetCore.Http;
+@inject IHttpContextAccessor HttpContextAccessor
+@{
+    ViewData["Title"] = "ViewList";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+    UserLoginSession profile = HttpContextAccessor.HttpContext.Session.Get<UserLoginSession>(KeyHelper.UserKey);
+    //profile.MineralTypeName = "Major Mineral";
+    //profile.MineralName = "NON COAL";
+}
+<script>
+    backMe = "yes"
+    $(document).ready(function () {
+        loadNavigation('ViewList', 'glUIS', 'pllesseprof', 'tl', 'Lessee Profile', 'Lease Information Details', ' ');
+        /*Show hide controls for Minor/Major-Coal,NonCoal*/
+        var mineraltypename = '@profile.MineralTypeName';
+/*        if (mineraltypename == "Minor Mineral") {*/
+            $('.divMajor').hide();
+        //}
+        //else {
+        //    $('.divMinor').hide();
+        //}
+
+	 if (@profile.UserTypeId!= 7) { /*Other than Lessee Login*/
+            $("#navlinkAdd").hide(); //Hide Add tab
+            $(".ml-3").hide(); //Hide Edit button
+        }
+    });
+</script>
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        <!-- MAIN CONTENT AREA STARTS -->
+        @Html.Partial("_CMSnavigation")
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link" id="navlinkAdd" href="~/LesseeProfile/LesseeLeaseAreaDetails/Create">
+                                Add
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="javascript:void(0);">
+                                View
+                            </a>
+                        </li>
+                    </ul>
+                    @Html.Partial("_CMSutil")
+                </div>
+                <section class="box form-container">
+                    <div class="content-body">
+                        <div class="message-heading">
+                            <h5 class="font-weight-bold text-brown">Lease Location</h5>
+                            <div>
+                                <a href="javascript:void(0);" class="btn-dark btn-sm log-btn" data-val="collapsefillter1">Log Report<i class="icon-angle-down-solid"></i></a>
+                                <a href="@CustomQueryStringHelper.EncryptString("LesseeProfile","Create","LesseeLeaseAreaDetails",new {id=Model.CREATED_BY })" class="btn-success btn-sm ml-3" data-original-title="Edit"><i class="icon-pencil-alt-solid"></i></a>
+                            </div>
+                        </div>
+                        <div class="message-highlighter">
+                            <div class="row">
+                                <label class="col-lg-3 col-md-4 col-sm-12 col-form-label">State</label>
+                                <div class="col-lg-9 col-md-8 col-sm-12">
+                                    <label class="form-control-plaintext"><span class="colon">:</span>@Model.StateName</label>
+                                </div>
+                                <label class="col-lg-3 col-md-4 col-sm-12 col-form-label">District</label>
+                                <div class="col-lg-9 col-md-8 col-sm-12">
+                                    <label class="form-control-plaintext"><span class="colon">:</span>@Model.DistrictName</label>
+                                </div>
+                                <label class="col-lg-3 col-md-4 col-sm-12 col-form-label">Block</label>
+                                <div class="col-lg-9 col-md-8 col-sm-12">
+                                    <label class="form-control-plaintext"><span class="colon">:</span>@Model.BlockName</label>
+                                </div>
+                                <label class="col-lg-3 col-md-4 col-sm-12 col-form-label">Tehsil</label>
+                                <div class="col-lg-9 col-md-8 col-sm-12">
+                                    <label class="form-control-plaintext"><span class="colon">:</span>@Model.TehsilName</label>
+                                </div>
+                                <label class="col-lg-3 col-md-4 col-sm-12 col-form-label">Vidhan Sabha</label>
+                                <div class="col-lg-9 col-md-8 col-sm-12">
+                                    <label class="form-control-plaintext"><span class="colon">:</span>@Model.VidhanSabha</label>
+                                </div>
+                                <label class="col-lg-3 col-md-4 col-sm-12 col-form-label">Lok Sabha</label>
+                                <div class="col-lg-9 col-md-8 col-sm-12">
+                                    <label class="form-control-plaintext"><span class="colon">:</span>@Model.LokSabha</label>
+                                </div>
+                                <label class="col-lg-3 col-md-4 col-sm-12 col-form-label divMinor">Forest Range</label>
+                                <div class="col-lg-9 col-md-8 col-sm-12 divMinor">
+                                    <label class="form-control-plaintext"><span class="colon">:</span>@Model.FOREST_RANGE</label>
+                                </div>
+                                @if (Model.FOREST_RANGE == "Protected")
+                                {
+                                    <label class="col-lg-3 col-md-4 col-sm-12 col-form-label divMinor">Protected <small>(in Hectare)</small></label>
+                                    <div class="col-lg-9 col-md-8 col-sm-12 divMinor">
+                                        <label class="form-control-plaintext"><span class="colon">:</span>@Model.ForestRangeProtected</label>
+                                    </div>
+                                }
+                                @if (Model.FOREST_RANGE == "Revenue")
+                                {
+                                    <label class="col-lg-3 col-md-4 col-sm-12 col-form-label divMinor">Revenue <small>(in Hectare)</small></label>
+                                    <div class="col-lg-9 col-md-8 col-sm-12 divMinor">
+                                        <label class="form-control-plaintext"><span class="colon">:</span>@Model.ForestRangeRevenue</label>
+                                    </div>
+                                    <label class="col-lg-3 col-md-4 col-sm-12 col-form-label divMinor">Compartment Number</label>
+                                    <div class="col-lg-9 col-md-8 col-sm-12 divMinor">
+                                        <label class="form-control-plaintext"><span class="colon">:</span>@Model.COMPARTMENT_NUMBER</label>
+                                    </div>
+                                }
+                                @if (Model.FOREST_RANGE == "Protected,Revenue")
+                                {
+                                    <label class="col-lg-3 col-md-4 col-sm-12 col-form-label divMinor">Protected <small>(in Hectare)</small></label>
+                                    <div class="col-lg-9 col-md-8 col-sm-12 divMinor">
+                                        <label class="form-control-plaintext"><span class="colon">:</span>@Model.ForestRangeProtected</label>
+                                    </div>
+                                    <label class="col-lg-3 col-md-4 col-sm-12 col-form-label divMinor">Revenue <small>(in Hectare)</small></label>
+                                    <div class="col-lg-9 col-md-8 col-sm-12 divMinor">
+                                        <label class="form-control-plaintext"><span class="colon">:</span>@Model.ForestRangeRevenue</label>
+                                    </div>
+                                    <label class="col-lg-3 col-md-4 col-sm-12 col-form-label divMinor">Compartment Number</label>
+                                    <div class="col-lg-9 col-md-8 col-sm-12 divMinor">
+                                        <label class="form-control-plaintext"><span class="colon">:</span>@Model.COMPARTMENT_NUMBER</label>
+                                    </div>
+                                }
+                                <label class="col-lg-3 col-md-4 col-sm-12 col-form-label divMajor">Village/Forest Range</label>
+                                <div class="col-lg-9 col-md-8 col-sm-12 divMajor">
+                                    <label class="form-control-plaintext"><span class="colon">:</span>@Model.VillageName</label>
+                                </div>
+                                <label class="col-lg-3 col-md-4 col-sm-12 col-form-label divMajor">Block Forest Range</label>
+                                <div class="col-lg-9 col-md-8 col-sm-12 divMajor">
+                                    <label class="form-control-plaintext"><span class="colon">:</span>@Model.BLOCK_FOREST_RANGE</label>
+                                </div>
+                                <label class="col-lg-3 col-md-4 col-sm-12 col-form-label">Pin Code</label>
+                                <div class="col-lg-9 col-md-8 col-sm-12">
+                                    <label class="form-control-plaintext"><span class="colon">:</span>@Model.PIN_CODE</label>
+                                </div>
+                                <label class="col-lg-3 col-md-4 col-sm-12 col-form-label">Police Station</label>
+                                <div class="col-lg-9 col-md-8 col-sm-12">
+                                    <label class="form-control-plaintext"><span class="colon">:</span>@Model.POLICE_STATION</label>
+                                </div>
+                                <label class="col-lg-3 col-md-4 col-sm-12 col-form-label divMajor">Gram Panchayat</label>
+                                <div class="col-lg-9 col-md-8 col-sm-12 divMajor">
+                                    <label class="form-control-plaintext"><span class="colon">:</span>@Model.GRAM_PANCHAYAT</label>
+                                </div>
+                                <label class="col-lg-3 col-md-4 col-sm-12 col-form-label divMajor">Forest</label>
+                                <div class="col-lg-9 col-md-8 col-sm-12 divMajor">
+                                    <label class="form-control-plaintext"><span class="colon">:</span>@Model.Forest</label>
+                                </div>
+                                <label class="col-lg-3 col-md-4 col-sm-12 col-form-label divMajor">Revenue Forest</label>
+                                <div class="col-lg-9 col-md-8 col-sm-12 divMajor">
+                                    <label class="form-control-plaintext"><span class="colon">:</span>@Model.RevenueForest</label>
+                                </div>
+                                <label class="col-lg-3 col-md-4 col-sm-12 col-form-label divMajor">Revenue Government Land</label>
+                                <div class="col-lg-9 col-md-8 col-sm-12 divMajor">
+                                    <label class="form-control-plaintext"><span class="colon">:</span>@Model.RevenueGovernmentLand</label>
+                                </div>
+                                <label class="col-lg-3 col-md-4 col-sm-12 col-form-label divMajor">Private Tribal</label>
+                                <div class="col-lg-9 col-md-8 col-sm-12 divMajor">
+                                    <label class="form-control-plaintext"><span class="colon">:</span>@Model.PrivateTribal</label>
+                                </div>
+                                <label class="col-lg-3 col-md-4 col-sm-12 col-form-label divMajor">Private Non Tribal</label>
+                                <div class="col-lg-9 col-md-8 col-sm-12 divMajor">
+                                    <label class="form-control-plaintext"><span class="colon">:</span>@Model.PrivateNonTribal</label>
+                                </div>
+                                <label class="col-lg-3 col-md-4 col-sm-12 col-form-label">Nistar</label>
+                                <div class="col-lg-9 col-md-8 col-sm-12">
+                                    <label class="form-control-plaintext"><span class="colon">:</span>@Model.Nistar</label>
+                                </div>
+                            </div>
+                            <ul class='timeline custom-scroll log-box' id='collapsefillter1'>
+                                @Html.Raw((String)ViewBag.tableLA)
+                            </ul>
+                        </div>
+                        <div class="message-heading">
+                            <h5 class="font-weight-bold text-brown">Area <small>(in Hectare)</small></h5>
+                            <div>
+                                <a href="javascript:void(0);" class="btn-dark btn-sm log-btn" data-val="collapsefillter2">Log Report<i class="icon-angle-down-solid"></i></a>
+                                <a href="@CustomQueryStringHelper.EncryptString("LesseeProfile","Create","LesseeLeaseAreaDetails",new {id=Model.CREATED_BY })" class="btn-success btn-sm ml-3" data-original-title="Edit"><i class="icon-pencil-alt-solid"></i></a>
+                            </div>
+                        </div>
+                        <div class="message-highlighter">
+                            <div class="row">
+                                <label class="col-lg-3 col-md-4 col-sm-12 col-form-label">Area <small>(in Hectare)</small></label>
+                                <div class="col-lg-9 col-md-8 col-sm-12">
+                                    <label class="form-control-plaintext"><span class="colon">:</span>@Model.AREA_IN_HECT</label>
+                                </div>
+                                <label class="col-lg-3 col-md-4 col-sm-12 col-form-label">Toposheet Number</label>
+                                <div class="col-lg-9 col-md-8 col-sm-12">
+                                    <label class="form-control-plaintext"><span class="colon">:</span>@Model.TOPOSHEET_NO</label>
+                                </div>
+                                <label class="col-lg-3 col-md-4 col-sm-12 col-form-label">Co-ordinates of all Pillars</label>
+                                <div class="col-lg-9 col-md-8 col-sm-12">
+                                    <label class="form-control-plaintext">
+                                        <span class="colon">:</span>@Model.FILE_COORDINATES_PILLARS
+                                        @if (Model.FILE_COORDINATES_PILLARS != null && Model.FILE_COORDINATES_PILLARS != "")
+                                        {
+                                            <a href='~/@Model.PATH_COORDINATES_PILLARS' title="" class="ml-2" data-original-title="Download" target="_blank"><i class="icon-file-excel-solid h5 text-success"></i></a>
+                                        }
+                                    </label>
+                                </div>
+                                <label class="col-lg-3 col-md-4 col-sm-12 col-form-label">Lease Area Map</label>
+                                <div class="col-lg-9 col-md-8 col-sm-12">
+                                    <label class="form-control-plaintext">
+                                        <span class="colon">:</span>@Model.FILE_LEASE_AREA_MAP
+                                        @if (Model.FILE_LEASE_AREA_MAP != null && Model.FILE_LEASE_AREA_MAP != "")
+                                        {
+                                            <a href='~/LesseeProfile/LesseeLeaseAreaDetails/ViewKml' title="" class="ml-2" data-original-title="View Map" target="_blank"><i class="icon-map-marked-alt-solid h5 text-danger"></i></a>
+                                        }
+                                    </label>
+                                </div>
+                                <label class="col-lg-3 col-md-4 col-sm-12 col-form-label">Demarcation</label>
+                                <div class="col-lg-9 col-md-8 col-sm-12">
+                                    <label class="form-control-plaintext">
+                                        <span class="colon">:</span>@Model.DEMARCATION_REPORT_DGPS_GPS_TOTAL_STATION_SURVEY_REPORT_COORDINATES_FILE_NAME
+                                        @if (Model.DEMARCATION_REPORT_DGPS_GPS_TOTAL_STATION_SURVEY_REPORT_COORDINATES_FILE_NAME != null && Model.DEMARCATION_REPORT_DGPS_GPS_TOTAL_STATION_SURVEY_REPORT_COORDINATES_FILE_NAME != "")
+                                        {
+                                            <a href='~/@Model.DEMARCATION_REPORT_DGPS_GPS_TOTAL_STATION_SURVEY_REPORT_COORDINATES_FILE_PATH' title="" class="ml-2" data-original-title="Download" target="_blank"><i class="icon-file-pdf-solid h5 text-danger"></i></a>
+                                        }
+                                    </label>
+                                </div>
+                                <label class="col-lg-3 col-md-4 col-sm-12 col-form-label">Working Permission Date</label>
+                                <div class="col-lg-9 col-md-8 col-sm-12">
+                                    <label class="form-control-plaintext"><span class="colon">:</span>@Model.WORKING_PERMISSION_DATE</label>
+                                </div>
+                                <label class="col-lg-3 col-md-4 col-sm-12 col-form-label">Working permission Copy</label>
+                                <div class="col-lg-9 col-md-8 col-sm-12">
+                                    <label class="form-control-plaintext">
+                                        <span class="colon">:</span>@Model.WORKING_PERMISSION_COPY_NAME
+                                        @if (Model.WORKING_PERMISSION_COPY_NAME != null && Model.WORKING_PERMISSION_COPY_NAME != "")
+                                        {
+                                            <a href='~/@Model.WORKING_PERMISSION_COPY_PATH' title="" class="ml-2" data-original-title="Download" target="_blank"><i class="icon-file-pdf-solid h5 text-danger"></i></a>
+                                        }
+                                    </label>
+                                </div>
+                                <label class="col-lg-3 col-md-4 col-sm-12 col-form-label">Agreement Date</label>
+                                <div class="col-lg-9 col-md-8 col-sm-12">
+                                    <label class="form-control-plaintext"><span class="colon">:</span>@Model.DATE_OF_EXECUTION</label>
+                                </div>
+                                <label class="col-lg-3 col-md-4 col-sm-12 col-form-label">Remarks</label>
+                                <div class="col-lg-9 col-md-8 col-sm-12">
+                                    <label class="form-control-plaintext"><span class="colon">:</span>@Model.Remarks</label>
+                                </div>
+                            </div>
+                            <ul class='timeline custom-scroll log-box' id='collapsefillter2'>
+                                @Html.Raw((String)ViewBag.tableLB)
+                            </ul>
+                        </div>
+                        <div class="message-heading">
+                            <h5 class="font-weight-bold text-brown">Lease Land Details</h5>
+                            <div>
+                                <a href="javascript:void(0);" class="btn-dark btn-sm log-btn" data-val="collapsefillter3">Log Report<i class="icon-angle-down-solid"></i></a>
+                                <a href="@CustomQueryStringHelper.EncryptString("LesseeProfile","Create","LesseeLeaseAreaDetails",new {id=Model.CREATED_BY })" class="btn-success btn-sm ml-3" data-original-title="Edit"><i class="icon-pencil-alt-solid"></i></a>
+                            </div>
+                        </div>
+                        <div class="message-highlighter">
+                            <div class="row">
+                                <label class="col-lg-3 col-md-4 col-sm-12 col-form-label">District</label>
+                                <div class="col-lg-9 col-md-8 col-sm-12">
+                                    <label class="form-control-plaintext"><span class="colon">:</span>@Model.LEASELAND_DISRICT_NAME</label>
+                                </div>
+                                <label class="col-lg-3 col-md-4 col-sm-12 col-form-label">Block</label>
+                                <div class="col-lg-9 col-md-8 col-sm-12">
+                                    <label class="form-control-plaintext"><span class="colon">:</span>@Model.LEASELAND_BLOCK_NAME</label>
+                                </div>
+                                <label class="col-lg-3 col-md-4 col-sm-12 col-form-label">Village</label>
+                                <div class="col-lg-9 col-md-8 col-sm-12">
+                                    <label class="form-control-plaintext"><span class="colon">:</span>@Model.LEASELAND_VILLAGE_NAME</label>
+                                </div>
+                                <label class="col-lg-3 col-md-4 col-sm-12 col-form-label">Gram Panchayat</label>
+                                <div class="col-lg-9 col-md-8 col-sm-12">
+                                    <label class="form-control-plaintext"><span class="colon">:</span>@Model.LEASELAND_GP</label>
+                                </div>
+                                <label class="col-lg-3 col-md-4 col-sm-12 col-form-label">Patwari Circle Number</label>
+                                <div class="col-lg-9 col-md-8 col-sm-12">
+                                    <label class="form-control-plaintext"><span class="colon">:</span>@Model.LEASELAND_BASRA_NO</label>
+                                </div>
+                                <label class="col-lg-3 col-md-4 col-sm-12 col-form-label">Patwari Halka Number</label>
+                                <div class="col-lg-9 col-md-8 col-sm-12">
+                                    <label class="form-control-plaintext"><span class="colon">:</span>@Model.LEASELAND_DHARANADIKAR</label>
+                                </div>
+                                <label class="col-lg-3 col-md-4 col-sm-12 col-form-label">Khasra No </label>
+                                <div class="col-lg-9 col-md-8 col-sm-12">
+                                    <label class="form-control-plaintext"><span class="colon">:</span>@Model.LEASELAND_KHASRA_NO</label>
+                                </div>
+                                <label class="col-lg-3 col-md-4 col-sm-12 col-form-label divMajor">AreaType/Land Information</label>
+                                <div class="col-lg-9 col-md-8 col-sm-12 divMajor">
+                                    <label class="form-control-plaintext"><span class="colon">:</span>@Model.LEASELAND_AREA_TYPE</label>
+                                </div>
+                                <label class="col-lg-3 col-md-4 col-sm-12 col-form-label divMinor">Forest <small>(in Hectare)</small></label>
+                                <div class="col-lg-9 col-md-8 col-sm-12 divMinor">
+                                    <label class="form-control-plaintext"><span class="colon">:</span>@Model.Forest</label>
+                                </div>
+                                <label class="col-lg-3 col-md-4 col-sm-12 col-form-label divMinor">Revenue Forest <small>(in Hectare)</small></label>
+                                <div class="col-lg-9 col-md-8 col-sm-12 divMinor">
+                                    <label class="form-control-plaintext"><span class="colon">:</span>@Model.RevenueForest</label>
+                                </div>
+                                <label class="col-lg-3 col-md-4 col-sm-12 col-form-label divMinor">Revenue Government Land <small>(in Hectare)</small></label>
+                                <div class="col-lg-9 col-md-8 col-sm-12 divMinor">
+                                    <label class="form-control-plaintext"><span class="colon">:</span>@Model.RevenueGovernmentLand</label>
+                                </div>
+                                <label class="col-lg-3 col-md-4 col-sm-12 col-form-label divMinor">Private Tribal <small>(in Hectare)</small></label>
+                                <div class="col-lg-9 col-md-8 col-sm-12 divMinor">
+                                    <label class="form-control-plaintext"><span class="colon">:</span>@Model.PrivateTribal</label>
+                                </div>
+                                <label class="col-lg-3 col-md-4 col-sm-12 col-form-label divMinor">Private Non Tribal <small>(in Hectare)</small></label>
+                                <div class="col-lg-9 col-md-8 col-sm-12 divMinor">
+                                    <label class="form-control-plaintext"><span class="colon">:</span>@Model.PrivateNonTribal</label>
+                                </div>
+                                @*<label class="col-lg-3 col-md-4 col-sm-12 col-form-label">Area Sub Type</label>
+        <div class="col-lg-9 col-md-8 col-sm-12">
+            <label class="form-control-plaintext"><span class="colon">:</span>@Model.LEASELAND_AREA_SUB_TYPE</label>
+        </div>*@
+                                <label class="col-lg-3 col-md-4 col-sm-12 col-form-label divMajor">Area/Rakaba <small>(in Hectare)</small></label>
+                                <div class="col-lg-9 col-md-8 col-sm-12 divMajor">
+                                    <label class="form-control-plaintext"><span class="colon">:</span>@Model.LEASELAND_AREA</label>
+                                </div>
+                                <label class="col-lg-3 col-md-4 col-sm-12 col-form-label">Surface Right Area <small>(in Hectare)</small></label>
+                                <div class="col-lg-9 col-md-8 col-sm-12">
+                                    <label class="form-control-plaintext"><span class="colon">:</span>@Model.LEASELAND_SURFACE_RIGHT_AREA</label>
+                                </div>
+                                <label class="col-lg-3 col-md-4 col-sm-12 col-form-label divMajor">Map</label>
+                                <div class="col-lg-9 col-md-8 col-sm-12 divMajor">
+                                    <label class="form-control-plaintext"><span class="colon">:</span>@Model.LEASELAND_MAP</label>
+                                </div>
+                            </div>
+                            <ul class='timeline custom-scroll log-box' id='collapsefillter3'>
+                                @Html.Raw((String)ViewBag.tableLC)
+                            </ul>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+</section>
+

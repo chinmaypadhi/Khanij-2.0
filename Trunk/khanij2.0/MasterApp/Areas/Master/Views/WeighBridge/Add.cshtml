@@ -1,0 +1,176 @@
+﻿@model MasterEF.WeighBridgemaster
+@{
+    ViewData["Title"] = "Add";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+
+@if (ViewBag.msg != null)
+{
+    <script>
+ swal("",'@ViewBag.msg',"success");
+    </script>
+}
+@if (TempData["msg"] != null)
+{
+    <script>
+        swal("",'@TempData["msg"]',"success");
+    </script>
+}
+
+<script>
+    $(document).ready(function () {
+        $("#Submit").click(function () {
+            debugger;
+            if ($('#WeighBridgeName').val() == "") {
+                swal("", "Please Enter WeighBridge Name", "warning");
+                $('#WeighBridgeName').focus();
+                return false;
+            }
+            else if ($('#DistrictID').val() == "") {
+                swal("", "Please Select District", "warning");
+                $('#DistrictID').focus();
+                return false;
+            }
+            else if ($('#Address').val() == "") {
+                swal("", "Please Enter Address", "warning");
+                $('#Address').focus();
+                return false;
+            }
+            else if ($('#UserName').val() == "") {
+                swal("", "Please Enter User Name", "warning");
+                $('#UserName').focus();
+                return false;
+            }
+            else if ($('#Password').val() == "") {
+                swal("", "Please Enter Password", "warning");
+                $('#Password').focus();
+                return false;
+            }
+        });
+    });
+    function lettersOnly() {
+        var regex = new RegExp("^[a-zA-Z ]+$");
+        var key = String.fromCharCode(!event.charCode ? event.which : event.charCode);
+        if (!regex.test(key)) {
+            event.preventDefault();
+            return false;
+        }
+    }
+</script>
+
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        <!-- MAIN CONTENT AREA STARTS -->
+        @Html.Partial("_CMSnavigation")
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="javascript:void(0);">
+                                Add
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="~/Master/WeighBridge/ViewList">
+                                View
+                            </a>
+                        </li>
+                    </ul>
+                    @Html.Partial("_CMSutil")
+                    @*<uc1:util runat="server" ID="util" />*@
+                </div>
+
+                <section class="box form-container">
+                    <div class="content-body">
+                        @using (Html.BeginForm("Add", "WeighBridge", FormMethod.Post, new { AUTOCOMPLETE = "Off", id = "form1" }))
+                        {
+                            <div class="row">
+                                <div class="col-lg-6 col-12">
+                                    <div class="form-group row">
+                                        <label for="inputLoginId" class="col-sm-4 col-form-label">WeighBridge Name <span class="text-danger">*</span></label>
+                                        <div class="col-sm-7">
+                                            @Html.TextBoxFor(m => m.WeighBridgeName, new { @class = "form-control", @autofocus = "autofocus", onkeypress = "return lettersOnly(event)" })
+                                            @Html.HiddenFor(m => m.WeighBridgeId)
+                                            <span class="text-danger">@Html.ValidationMessageFor(m => m.WeighBridgeName)</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-6 col-12">
+                                    <div class="form-group row">
+                                        <label for="inputLoginId" class="col-sm-4 col-form-label">District Name<span class="text-danger">*</span></label>
+                                        <div class="col-sm-7">
+                                            @Html.DropDownList("DistrictID", ViewBag.Districts as IEnumerable<SelectListItem>, "Select", new { @class = "form-control", autofocus = "autofocus" })
+                                            <span class="text-danger">@Html.ValidationMessageFor(m => m.DistrictID)</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-6 col-12">
+                                    <div class="form-group row">
+                                        <label for="inputLoginId" class="col-sm-4 col-form-label">Address <span class="text-danger">*</span></label>
+                                        <div class="col-sm-7">
+                                            @Html.TextAreaFor(m => m.Address, new { @class = "form-control", @autofocus = "autofocus" })
+                                            <span class="text-danger">@Html.ValidationMessageFor(m => m.Address)</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-6 col-12">
+                                    <div class="form-group row">
+                                        <label for="inputLoginId" class="col-sm-4 col-form-label">User Name <span class="text-danger">*</span></label>
+                                        <div class="col-sm-7">
+                                            @Html.TextBoxFor(m => m.UserName, new { @class = "form-control", @autofocus = "autofocus" })
+                                            <span class="text-danger">@Html.ValidationMessageFor(m => m.UserName)</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-6 col-12">
+                                    <div class="form-group row">
+                                        <label for="inputLoginId" class="col-sm-4 col-form-label">Password <span class="text-danger">*</span></label>
+                                        <div class="col-sm-7">
+                                            @Html.TextBoxFor(m => m.Password, new { @class = "form-control", @type = "password", @autofocus = "autofocus" })
+                                            @*@Html.PasswordFor(m => m.Password, new { @class = "form-control", @autofocus = "autofocus" })*@
+                                            @*<input type="password" class="form-control" name="Password" value="@Model.Password" />*@
+                                            <span class="text-danger">@Html.ValidationMessageFor(m => m.Password)</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-6 col-12">
+                                    <div class="form-group row">
+                                        <label for="inputName" class="col-sm-4 col-form-label">Status <span class="text-danger">*</span></label>
+                                        <div class="col-sm-7">
+                                            <div class="py-2">
+                                                @Html.RadioButtonFor(n => n.IsActive, true, new { @checked = true, @class = "custom-radio", id = "Rdbtn_Active" })
+                                                <label class="radio-label">Active</label>
+                                                @Html.RadioButtonFor(n => n.IsActive, false, new { @class = "custom-radio", id = "Rdbtn_Inactive" })
+                                                <label class="radio-label">Inactive</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-6 offset-lg-2 offset-md-4">
+                                    <input type="submit" value='@ViewBag.Button' class="btn btn-primary btn-md ml-0" name="Submit" id="Submit" />
+                                    <a href="@Url.Content("~/master/WeighBridge/Add")"
+                                       class="btn btn-danger btn-md"
+                                       title="Rest">Reset</a>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+</section>
+<script>
+    indicateMe = "yes"
+    $(document).ready(function () {
+        loadNavigation('Add', 'glRoleRes', 'plUser', 'tl', 'Master', 'Weighbridge', ' ');
+    });
+</script>

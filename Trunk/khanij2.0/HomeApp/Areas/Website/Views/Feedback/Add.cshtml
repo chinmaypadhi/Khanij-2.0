@@ -1,0 +1,131 @@
+﻿@*// *********************************************************************************************************
+    //  View Name                : Add
+    //  Desciption               : To Save and Update Website Feedback Details
+    //  Created By               : Prakash Chandra Biswal
+    //  Created On               : 21 Oct 2021
+    // ********************************************************************************************************
+*@
+@model HomeEF.AddFeedbackModel
+@{
+    ViewData["Title"] = "Add";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+@if (TempData["Message"] != null)
+{
+    <script>
+        swal("",'@TempData["Message"]',"success");
+    </script>
+}
+<script>
+    indicateMe = "yes"
+    $(document).ready(function () {
+        $('.searchableselect').searchableselect();
+        loadNavigation('Add', 'glhelpdesk', 'plraiseticket', 'tl', 'CMS', 'Feedback', ' ');
+    });
+
+    
+    function Validate() {
+        debugger;
+        var Iss = false;
+        
+        if (!blankFieldValidation("FULL_NAME", "Full Name")) {
+            return false;
+        }
+        else if (!blankFieldValidation("MAIL_ID", "E Mail")) {
+            return false;
+        }
+        else if (!ValidateEmail($('#MAIL_ID').val())) {
+            swal("", "Please Enter valid Email Id", "warning");
+            return false;
+        }
+        else if (!blankFieldValidation("FEEDBACK", "Feedback")) {
+            return false;
+        }
+        
+        Iss = true;
+        return Iss;
+    }
+</script>
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        @Html.Partial("_CMSnavigation")
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="javascript:void(0);">
+                                Add
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="~/Website/Feedback/ViewList">
+                                View
+                            </a>
+                        </li>
+                    </ul>
+                    @Html.Partial("_util")
+                </div>
+                <section class="box form-container">
+                    <div class="content-body">
+                        <h5 class="text-brown font-weight-bold mt-0"> Feedback Details</h5>
+                        @using (Html.BeginForm("Add", "Feedback", FormMethod.Post, new { enctype = "multipart/form-data", AUTOCOMPLETE = "Off", id = "form1" }))
+                        {
+                            <div class="row">
+
+                                <div class="col-lg-6 col-12">
+                                    <div class="form-group row">
+                                        <div class="col-lg-7 col-md-7 col-sm-12">
+                                            <label class="col-form-label pt-0 font-weight-bolder">Name <span class="text-danger">*</span></label>
+                                            @Html.TextBoxFor(m => m.FULL_NAME, new { @class = "form-control", @rows = "5", @autofocus = "autofocus", Onkeypress = "return inputLimiter(event,'NameCharactersAndNumbers')" })
+                                            @Html.ValidationMessageFor(m => m.FULL_NAME, "", new { @class = "text-danger" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 col-12">
+                                    <div class="form-group row">
+                                        <div class="col-lg-7 col-md-7 col-sm-12">
+                                            <label class="col-form-label pt-0 font-weight-bolder">E Mail <span class="text-danger">*</span></label>
+                                            @Html.TextBoxFor(m => m.MAIL_ID, new { @class = "form-control", @rows = "5", @autofocus = "autofocus" })
+                                            @Html.ValidationMessageFor(m => m.MAIL_ID, "", new { @class = "text-danger" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 col-12">
+                                    <div class="form-group row">
+                                        <div class="col-lg-7 col-md-7 col-sm-12">
+                                            <label class="col-form-label pt-0 font-weight-bolder">Feed Back <span class="text-danger">*</span></label>
+                                            @Html.TextBoxFor(m => m.FEEDBACK, new { @class = "form-control", @rows = "5", @autofocus = "autofocus", Onkeypress = "return inputLimiter(event,'NameCharactersAndNumbers')" })
+                                            @Html.ValidationMessageFor(m => m.FEEDBACK, "", new { @class = "text-danger" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 col-12">
+                                    <div class="form-group row">
+                                        <div class="col-lg-7 col-md-7 col-sm-12">
+                                            <label class="col-form-label pt-0 font-weight-bolder">Status</label>
+                                            @Html.RadioButtonFor(n => n.BIT_STATUS, true, new { @checked = true, @class = "custom-radio", id = "Rdbtn_Active" })
+                                            <label class="radio-label">Active</label>
+                                            @Html.RadioButtonFor(n => n.BIT_STATUS, false, new { @class = "custom-radio", id = "Rdbtn_Inactive" })
+                                            <label class="radio-label">Inactive</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12 col-sm-12">
+                                    <input type="submit" value='@ViewBag.Button' name="Submit" class="btn btn-success btn-md ml-0 waves-effect waves-light  btnsave" id="Submit" onclick="return Validate()">
+                                    <a href="~/Website/Feedback/Add" class="btn btn-danger btn-md ml-0 waves-effect waves-light btncancel">Cancel</a>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+    <!-- MAIN CONTENT AREA ENDS -->
+</section>
+
+

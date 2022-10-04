@@ -1,0 +1,108 @@
+﻿@model MasterEF.LicenseeTypeMaster
+@{
+    ViewData["Title"] = "ViewList";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+@using MasterApp.Web;
+@if (ViewBag.msg != null)
+{
+    <script>
+          swal("", "@ViewBag.msg", "success");
+    </script>
+}
+<script>
+    $(document).ready(function () {
+        loadNavigation('ViewList', 'glRoleRes', 'plUser', 'tl', 'Master', 'Licensee Type', ' ');
+        $('.searchableselect').searchableselect();
+    });
+</script>
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        @Html.Partial("_CMSnavigation")
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link" href="~/Master/LicenseeType/Add">
+                                Add
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="javascript:void(0);">
+                                View
+                            </a>
+                        </li>
+                    </ul>
+                    @Html.Partial("_CMSutil")
+                </div>
+                <section class="box form-container">
+                    <div class="content-body">
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="legend-box">
+                                    <ul class="d-flex mb-1 justify-content-end list-unstyled">
+                                        <li><span class="bg-success"></span> Active</li>
+                                        <li><span class="bg-warning"></span> Inactive</li>
+                                    </ul>
+                                </div>
+                                <table id="table-exports" class="table table-sm table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th width="30">Sl#</th>
+                                            <th>
+
+                                                License Type
+                                            </th>
+
+                                            <th>
+                                                Status
+                                            </th>
+                                            <th width="100" class="noprint text-center">Edit</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @{ int i = 1;
+                                        }
+                                        @foreach (var b in ViewBag.ViewList)
+                                        {
+                                            var dyclass = @b.Status == "Active" ? "active-row" : "inactive-row";
+
+                                            <tr class="@dyclass">
+                                                <td>@i</td>
+                                                @*<td>@b.CompanyId </td>*@
+                                                <td>@b.LicenseeTypeName </td>
+
+                                                @if (@b.Status == "Active")
+                                                {
+                                                    <td class="text-success">@b.Status</td>
+                                                }
+                                                else
+                                                {
+                                                    <td class="text-orange">@b.Status</td>
+                                                }
+                                                <td class="noprint text-center">
+                                                    <a href="@CustomQueryStringHelper.EncryptString("Master","Add","LicenseeType",new {id=b.LicenseeTypeId })"
+                                                       class="btn-floating btn-outline-primary btn-sm"
+                                                       title="Edit"><i class="icon-pencil-alt-solid"></i></a>
+                                                    <a href="@CustomQueryStringHelper.EncryptString("Master","Delete","LicenseeType",new {id=b.LicenseeTypeId })"
+                                                       class="btn-floating btn-outline-danger btn-sm"
+                                                       title="Delete" onclick="return confirm('Are you sure to Delete?')"><i class="icon-trash-alt-solid"></i></a>
+
+                                                </td>
+                                            </tr>
+                                            i++;
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+    <!-- MAIN CONTENT AREA ENDS -->
+</section>
+

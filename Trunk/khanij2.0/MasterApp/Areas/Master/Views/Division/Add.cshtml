@@ -1,0 +1,133 @@
+﻿@model MasterEF.RegionalModel
+@using MasterEF
+@{
+    ViewData["Title"] = "Add";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+@if (ViewBag.msg != null)
+{
+    <script>
+ swal("",'@ViewBag.msg',"success");
+    </script>
+}
+@if (TempData["msg"] != null)
+{
+    <script>
+        swal("",'@TempData["msg"]',"success");
+    </script>
+}
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        @Html.Partial("_CMSnavigation")
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item"><a class="nav-link active" href="/Master/Division/Add">Add</a></li>
+                        <li class="nav-item"><a class="nav-link" href="/Master/Division/ViewList">View</a></li>
+                    </ul>
+                    @Html.Partial("_CMSutil")
+                </div>
+                <section class="box form-container">
+                    <div class="content-body">
+                        <form action="Add" method="post" id="form1" autocomplete="off">
+                            @Html.AntiForgeryToken()
+                            <div class="row">
+                                <div class="col-lg-6 col-12">
+                                    <div class="form-group row">
+                                        <label for="inputLoginId" class="col-sm-4 col-form-label">State Name<span class="text-danger">*</span></label>
+                                        <div class="col-sm-7">
+                                            <select id="ddlState" name="StateID" title="State Name" class="form-control searchableselect">
+                                                <option value="">Select</option>
+                                                @{
+                                                    List<RegionalModel> lstregionalModels = (List<RegionalModel>)ViewData["State"];
+                                                    if (lstregionalModels != null)
+                                                    {
+                                                        foreach (var item in lstregionalModels)
+                                                        {
+                                                            if (item.StateID == Model.StateID)
+                                                            {
+                                                                <option selected="selected" value="@item.StateID">@item.StateName</option>
+                                                            }
+                                                            else
+                                                            {
+                                                                <option value="@item.StateID">@item.StateName</option>
+                                                            }
+
+                                                        }
+                                                    }
+                                                }
+                                            </select>
+                                            <span class="text-danger">@Html.ValidationMessageFor(m => m.StateID)</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 col-12">
+                                    <div class="form-group row">
+                                        <label for="inputName" class="col-sm-4 col-form-label">Division <span class="text-danger">*</span></label>
+                                        <div class="col-sm-7">
+                                            <input type="text" id="txtDivision" name="RegionalName" title="Division" value="@Model.RegionalName" class="form-control" Onkeypress="return inputLimiter(event,'NameCharacters')" />
+                                            <input type="hidden" id="hdnRegionalID" name="RegionalID" value="@Model.RegionalID" />
+                                            <span class="text-danger">@Html.ValidationMessageFor(m => m.RegionalName)</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 col-12">
+                                    <div class="form-group row">
+                                        <label for="inputName" class="col-sm-4 col-form-label">Status <span class="text-danger">*</span></label>
+                                        <div class="col-sm-7">
+                                            <div class="py-2">
+                                                @Html.RadioButtonFor(n => n.IsActive, true, new { @checked = true, @class = "custom-radio", id = "Rdbtn_Active" })
+                                                <label class="radio-label">Active</label>
+                                                @Html.RadioButtonFor(n => n.IsActive, false, new { @class = "custom-radio", id = "Rdbtn_Inactive" })
+                                                <label class="radio-label">Inactive</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6 offset-lg-2 offset-md-4">
+                                    <input type="submit" value='@ViewBag.Button' class="btn btn-primary btn-md ml-0" name="Submit" id="Submit" />
+                                    <a href="/Master/Division/Add" class="btn btn-danger btn-md">Reset</a>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+    <!-- MAIN CONTENT AREA ENDS -->
+</section>
+<input type="hidden" id="hdnStateId" value="@Model.StateID" />
+<script>
+    indicateMe = "yes"
+    $(document).ready(function () {
+        $('.searchableselect').searchableselect();
+        debugger;
+        loadNavigation('Add', 'glRoleRes', 'plUser', 'tl', 'Master', 'Division', ' ');
+        //--------------
+        if ($('#hdnStateId').val() != "") {
+            $('#ddlState').val($('#hdnStateId').val());
+        }
+        //---------------
+        $("#Submit").click(function () {
+            debugger;
+            if ($('#ddlState').val() == "") {
+                swal("", "Please Select State", "warning");
+                $("#ddlState").focus();
+                return false;
+            }
+
+            if ($('#txtDivision').val() == "") {
+                swal("", "Please Enter Division", "warning");
+                $("#txtDivision").focus();
+                return false;
+            }
+
+        });
+        //-----------------------
+    });
+
+</script>
+

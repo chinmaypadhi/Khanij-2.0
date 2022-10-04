@@ -1,0 +1,173 @@
+﻿@*// *********************************************************************************************************
+    //  View Name                : SubmitedInspectionReportList
+    //  Desciption               : View submitted inspection report
+    //  Created By               : Debaraj Swain
+    //  Created On               : 28 May 2021
+    // ********************************************************************************************************
+*@
+@using SupportApp.Web;
+@model SupportEF.InspectionModel
+@{
+    ViewData["Title"] = "Submitted Inspection Report";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+<section class="wrapper main-wrapper row">
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('.datetime').datetimepicker({
+                format: 'LT',
+                format: "DD/MM/YYYY",
+            });
+        });
+    </script>
+    <div class="col-12">
+        @Html.Partial("_CMSnavigation")
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item mr-md-1">
+                            <a class="nav-link active" href="@Url.Action("SubmitedInspectionReportList", "Inspection")">
+                                Submitted Inspection Report
+                            </a>
+                        </li>
+                    </ul>
+                    @Html.Partial("_CMSutil")
+                </div>
+                <section class="box form-container">
+                    @using (Html.BeginForm("SubmitedInspectionReportList", "Inspection", FormMethod.Post, new { AUTOCOMPLETE = "Off", id = "form1" }))
+                    {
+                        <div class="search-box">
+                            <div class="searchform px-3 pt-3">
+                                <div class="row">
+                                    <div class="col-sm-4">
+                                        <div class="form-group row">
+                                            <label for="inputText" class="col-sm-3 col-form-label">
+                                                From Date
+                                            </label>
+                                            <div class="col-sm-8">
+                                                <div class="input-group-prepend">
+                                                    <input type="text" class="form-control datetime" name="FromDate" value="@ViewBag.fromdate" onkeypress="return isNumber(event)" />
+                                                    <label class="input-group-text" for="inputDate1"><i class="icon-calendar-alt-solid"></i></label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <div class="form-group row">
+                                            <label for="inputText" class="col-sm-3 col-form-label">
+                                                To Date
+                                            </label>
+
+                                            <div class="col-sm-8">
+                                                <div class="input-group-prepend">
+                                                    <input type="text" class="form-control datetime" name="ToDate" value="@ViewBag.todate" onkeypress="return isNumber(event)" />
+                                                    <label class="input-group-text" for="inputDate1"><i class="icon-calendar-alt-solid"></i></label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-1">
+                                        <div class="form-group row ">
+                                            <div class="col-sm-9 offset-md-3">
+                                                <input type="submit" value="Show" class="btn btn-primary btn-md ml-0" name="Show1" id="Show1" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    }
+                    <div class="content-body pt-0">
+                        <div class="legend-box">
+                            <ul class="d-flex mb-1 justify-content-end list-unstyled">
+                                <li><span class="bg-success"></span> Active</li>
+                                <li><span class="bg-warning"></span> Inactive</li>
+                            </ul>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <table id="table-exports" class="table table-sm table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>Sr. No</th>
+                                            <th>District</th>
+                                            <th>User Type</th>
+                                            <th>Report Heading</th>
+                                            <th>Date of Inspection</th>
+                                            <th>Inspection By</th>
+                                            <th>User Code</th>
+                                            <th>User Name</th>
+                                            <th>Date of Submission</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @if (ViewBag.AllReport != null)
+                                        {
+                                        @foreach (var b in ViewBag.AllReport)
+                                        {
+                                            <tr class="active-row">
+
+                                                <td><p class="m-0">@b.SRNO</p> </td>
+                                                <td><p class="m-0">@b.LesseeLicenseeDistrict <input type="hidden" id="hfInspectionIDID" name="ComplainedID" value=@b.insId /></p> </td>
+                                                <td><p class="m-0">@b.LesseeLicenseeUserTypeName</p> </td>
+                                                <td class="noprint">
+                                                    <p class="m-0">
+                                                        @*<a href="@Url.Content("~/Inspection/Inspection/SubmitInspectionReport/")@b.insId" class="btn btn-primary btn-md ml-0" title="View Report">@b.insSubject</a>*@
+                                                        <a href="@CustomQueryStringHelper.EncryptString("Inspection", "SubmitInspectionReport", "Inspection", new { id = @b.insId })" class="btn btn-primary btn-md ml-0" title="View Report">@b.insSubject</a>
+                                                    </p>
+                                                </td>
+                                                <td><p class="m-0">@b.InspectionDate</p> </td>
+                                                <td><p class="m-0">@b.inspectorName</p> </td>
+                                                <td><p class="m-0">@b.LesseeCode</p> </td>
+                                                <td><p class="m-0">@b.LesseeName</p> </td>
+                                                <td><p class="m-0">@b.SubmitedDate</p> </td>
+                                            </tr>
+                                        }
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+</section>
+<script>
+    function isNumber(evt) {
+        evt = (evt) ? evt : window.event;
+        var charCode = (evt.which) ? evt.which : evt.keyCode;
+        if (charCode > 31 && (charCode < 48 || charCode > 57)) {
+            return false;
+        }
+        return true;
+    }
+</script>
+<script>
+    $(document).ready(function () {
+        loadNavigation('ViewPaymentHead', 'glTMng', 'plpaymenthead', 'tl', 'Inspection', 'Submitted Inspection Report', ' ');
+        $('.searchableselect').searchableselect();
+        $('.shorting-lnk').click(function () {
+            $('.shorting-lnk i').toggleClass('fa-sort-amount-up-alt fa-sort-amount-down-alt ');
+        });
+        $('.filter-dropdown').hide();
+        $('.filter-lnk').click(function () {
+            $(this).toggleClass('active');
+            $(this).siblings('.filter-dropdown').slideToggle();
+        });
+        $('.filter-btn').click(function () {
+            $(this).parent('.shorting-cell .filter-dropdown').slideUp();
+            if ($(this).parent().parent('.shorting-cell').find('.filter-lnk').hasClass('active')) {
+                $(this).parent().siblings('.filter-lnk').removeClass('active');
+            }
+
+        });
+    });
+</script>
+
+
+

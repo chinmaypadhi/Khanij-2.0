@@ -1,0 +1,234 @@
+﻿@model PermitEF.ePermitModel
+@{
+    ViewData["Title"] = "MergeEPermit";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<script src=" https://cdn.datatables.net/1.10.24/js/jquery.dataTables.min.js"></script>
+
+
+<section class="wrapper main-wrapper row">
+    <div class="col-12" id="mainDiv">
+        @Html.Partial("_navigation")
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="#">
+                                Closing of e-Permit List
+                            </a>
+                        </li>
+
+                    </ul>
+                    @Html.Partial("_util")
+                </div>
+
+                <section class="box form-container">
+                    @using (Html.BeginForm("List", "MergePermit", FormMethod.Post, new { AUTOCOMPLETE = "Off", id = "form1" }))
+                    {
+                        
+
+
+
+                        <div class="search-box">
+                <div class="searchform px-3 py-3">
+                    <div class="row">
+                        <div class="col-sm-4">
+                            <div class="form-group row">
+                                <label for="inputText" class="col-sm-4 col-form-label">
+                                    Mineral Grade
+                                </label>
+                                <div class="col-sm-8">
+                                   
+
+                                      
+                                            @Html.DropDownListFor(model => model.MineralGradeId, ViewBag.MineralGradeLst as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control form-group", autofocus = "autofocus" })
+                                       
+                                   
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="form-group row">
+                                <label for="inputText" class="col-sm-3 col-form-label">
+                                    From Date
+                                </label>
+                                <div class="col-sm-8">
+                                    <div class="input-group">
+                                        @Html.TextBoxFor(model => model.FromDATE, "", new { @class = "form-control datepicker", placeholder = "DD/MMM/YYYY", autofocus = "autofocus", @maxlength = "20", @id = "FromDate", @autocomplete = "off" })
+                                        <div class="input-group-prepend">
+                                            <div class="input-group-text"><i class="icon-calendar-alt"></i></div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="form-group row">
+                                <label for="inputText" class="col-sm-3 col-form-label">
+                                    To Date
+                                </label>
+                                <div class="col-sm-8">
+                                    <div class="input-group">
+
+                                        @Html.TextBoxFor(model => model.ToDATE, "", new { @class = "form-control datepicker", placeholder = "DD/MMM/YYYY", autofocus = "autofocus", @maxlength = "20", @id = "ToDate", @autocomplete = "off" })
+                                        <div class="input-group-prepend">
+                                            <div class="input-group-text"><i class="icon-calendar-alt"></i></div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                        <div class="col-sm-2">
+                            <button type="submit" class="btn btn-sm btn-success" id="btnSubmit" onclick="GetDataByParameter()">Search</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+                        <div class="content-body pt-0">
+
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <table id="table-exports" class="table table-sm table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th width="30">Sl#</th>
+                                                <th>e-Permit Number</th>
+                                                <th>Mineral Name</th>
+                                                <th>Mineral Form</th>
+                                                <th>Mineral Grade</th>
+                                                @*<th>Unit</th>*@
+                                                <th>Quantity(MT)</th>
+                                                <th>Pending Quantity(MT)</th>
+                                                <th>Action</th>
+                                            </tr>
+                                        </thead>
+
+                                        <tbody>
+                                            @{ int i = 1;
+                                            }
+                                            @foreach (var b in ViewBag.ViewList)
+                                            {
+
+                                                <tr class="active-row">
+                                                    <td>@i</td>
+                                                    <td><p class="m-0">@b.BulkPermitNo</p> </td>
+                                                    <td><p class="m-0" id="MineralName">@b.MineralName</p> </td>
+                                                    <td><p class="m-0" id="MineralNature">@b.MineralNature</p> </td>
+                                                    <td><p class="m-0" id="MineralGradeName">@b.MineralGradeName</p> </td>
+                                                    @*<td><p class="m-0">@b.UnitName</p> </td>*@
+                                                    <td><p class="m-0">@b.ApprovedQty</p> </td>
+                                                    <td><p class="m-0">@b.PendingQty</p> </td>
+
+                                                    <td><button type='button' onClick='redirectToRPTP(@b.PendingQty,@b.MineralId,@b.MineralGradeId,@b.MineralNatureId,@b.BulkPermitId)' class='btn btn-danger btn-sm '>Close e-Permit</button></td>
+
+                                                </tr>
+                                                i++;
+                                            }
+                                        </tbody>
+                                    </table>
+
+
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </section>
+            </div>
+        </div>
+    </div>
+    <!-- MAIN CONTENT AREA ENDS -->
+</section>
+
+
+<script>
+   
+    $(document).ready(function () {
+        loadNavigation('ViewList', 'glhelpdesk', 'plraiseticket', 'tl', 'E-Permit', 'Closing of e-permit', ' ');
+        $('.searchableselect').searchableselect();
+        $('.shorting-lnk').click(function () {
+            $('.shorting-lnk i').toggleClass('fa-sort-amount-up-alt fa-sort-amount-down-alt ');
+        });
+        $('.filter-dropdown').hide();
+        $('.filter-lnk').click(function () {
+            $(this).toggleClass('active');
+            $(this).siblings('.filter-dropdown').slideToggle();
+        });
+        $('.filter-btn').click(function () {
+            $(this).parent('.shorting-cell .filter-dropdown').slideUp();
+            if ($(this).parent().parent('.shorting-cell').find('.filter-lnk').hasClass('active')) {
+                $(this).parent().siblings('.filter-lnk').removeClass('active');
+            }
+        });
+       
+    });
+</script>
+<script>
+    $(document).ready(function () {
+        $('.datepicker').datetimepicker({
+            format: 'LT',
+            format: 'DD-MM-YYYY',
+
+        });
+    });
+</script>
+@*<style type="text/css">
+    .dataTables_filter {
+        display: none;
+    }
+
+    .legend-box ul {
+        position: relative;
+        top: 34px;
+    }
+</style>*@
+<script>
+    function GetDataByParameter() {
+        $("#ePermitList").data("kendoGrid").dataSource.read();
+        $("#ePermitList").data("kendoGrid").refresh();
+
+        $("#demo").css("right", "0");
+        $("#demo_settings").css("right", "-350px");
+        $("#demo").removeClass("open");
+    }
+    function redirectToRPTP(avqty, miid, mgid, mfid, bpid) {
+    var MId = miid;
+    var MGId = mgid;
+    var MNId = mfid;
+    var AQty = avqty;
+    var BPID = bpid;
+
+    if (parseFloat(AQty) > 0) {
+        if (confirm("Are you sure to close this e-Permit ? \n\nNote: Pending Quantity will be reverted back in your stock.")) {
+            $.ajax({
+                type: "GET",
+                url: '@Url.Action("StopRPTPPermit", "MergePermit")',
+                data: { mineralid: MId, mineralGradeid: MGId, mineralFormid: MNId, pendingQty: AQty, bulkpermitid: BPID },
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (result) {
+                    if (result) {
+                        alert("This e-Permit has been successfully closed and Your pending quantity (" + AQty + ") has been reverted in your stock.");
+                        window.location.href = '@Url.Action("List", "MergePermit")';
+                        //OnRefreshGrid();
+                    }
+                    else {
+                        alert("e-Permit has not been closed. Please try again !");
+                        window.location.href = '@Url.Action("List", "MergePermit")';
+                       // OnRefreshGrid();
+                    }
+                }
+            });
+        }
+    }
+    else {
+        alert("You have no any balance qty for Stop RPTP !");
+        return false;
+    }
+    }
+    
+</script>

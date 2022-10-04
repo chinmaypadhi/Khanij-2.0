@@ -1,0 +1,101 @@
+﻿@model IEnumerable<MasterEF.CompanyMaster>
+@{
+    ViewData["Title"] = "ViewList";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+@using MasterApp.Web;
+@if (TempData["msg"] != null)
+{
+    <script>
+        swal("", '@TempData["msg"]',"success");
+    </script>
+}
+<script>
+    
+    $(document).ready(function () {
+        loadNavigation('ViewList', 'glRoleRes', 'plUser', 'tl', 'Master', 'Company', ' ');
+        $('.searchableselect').searchableselect();
+    });
+</script>
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        @Html.Partial("_CMSnavigation")
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link" href="~/Master/Company/Add">
+                                Add
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="javascript:void(0);">
+                                View
+                            </a>
+                        </li>
+                    </ul>
+                    @Html.Partial("_CMSutil")
+                </div>
+                <section class="box form-container">
+                    <div class="content-body ">
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="legend-box">
+                                    <ul class="d-flex mb-1 justify-content-end list-unstyled">
+                                        <li><span class="bg-success"></span> Active</li>
+                                        <li><span class="bg-warning"></span> Inactive</li>
+                                    </ul>
+                                </div>
+                                <table id="table-exports" class="table table-sm table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th width="30"> Sl#</th>
+
+                                            <th>Company Name</th>
+                                            <th>
+                                                Status
+                                            </th>
+
+                                            <th width="100" class="noprint text-center">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+
+                                        @{ int i = 1;
+                                        }
+                                        @foreach (var item in Model)
+                                        {
+                                            var dyclass = @item.ActiveStatus == "Active" ? "active-row" : "inactive-row";
+
+                                            <tr class="@dyclass">
+                                                <td>@i</td>
+
+                                                <td>@item.CompanyName </td>
+                                                <td>@item.ActiveStatus</td>
+
+                                                <td class="noprint text-center">
+                                                    <a href="@CustomQueryStringHelper.EncryptString("Master","Add","Company",new {id=item.CompanyId })"
+                                                       class="btn-floating btn-outline-primary btn-sm"
+                                                       title="Edit"><i class="icon-pencil-alt-solid"></i></a>
+                                                    <a href="@CustomQueryStringHelper.EncryptString("Master","Delete","Company",new {id=item.CompanyId })"
+                                                       class="btn-floating btn-outline-danger btn-sm"
+                                                       title="Delete" onclick="return confirm('Are you sure to Delete?')"><i class="icon-trash-alt-solid"></i></a>
+
+                                                </td>
+                                            </tr>
+                                            i++;
+                                        }
+
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+</section>
+

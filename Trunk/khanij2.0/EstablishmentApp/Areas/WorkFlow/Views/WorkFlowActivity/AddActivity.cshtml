@@ -1,0 +1,251 @@
+﻿@*// *********************************************************************************************************
+    //  View Name                : Add workflow activity
+    //  Desciption               : To Add work flow activity
+    //  Created By               : Suresh kumar behera
+    //  Created On               : 15-feb-2021
+    // ********************************************************************************************************
+*@
+@model EstablishmentEf.ActivityEF
+@{
+    ViewData["Title"] = "AddActivity";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+
+
+@if (TempData["msg"] != null)
+{
+    <script>
+        var vv = '@TempData["msg"]';
+        if (vv == 1) {
+            swal("", "Activity saved successfully.", "success");
+        }
+        else if (vv == 2) {
+            swal("", "Activity allready exists.", "warning");
+        }
+        else if (vv == 3) {
+            swal("", "Activity updated sucessfully", "success");
+        }
+        else if (vv == 4) {
+            swal("", "Activity  deleted sucessfully", "success");
+        }
+        else {
+            swal("", "Something Errror occured. Please Try After Sometime!!", "error");
+        }
+    </script>
+
+    TempData["msg"] = null;
+
+}
+<script>
+    $(document).ready(function () {
+        indicateMe = "yes"
+        loadNavigation('AddActivity', 'glholiday', 'plappleav', 'tl', 'Work Flow', 'Add Activity', ' ');
+
+        $("#ModuleId").change(function () {
+            $.ajax({
+                type: "POST",
+                url: '@Url.Content("~/WorkFlow/WorkFlowActivity/BindSubMudule")',
+
+                data: {
+                    "ModuleId": $('#ModuleId').val()
+                },
+                dataType: "json",
+                success: function (data) {
+
+                    $("#SubModuleId").empty();
+
+                    var ops = '<option value="">--Select--</option>';
+                    for (var i = 0; i < data.length; i++) {
+                        ops += '<option value="' + data[i].value + '">' + data[i].text + '</option>';
+                    }
+
+                    $("#SubModuleId").html(ops);
+
+                },
+                error: function () {
+                    alert('Error');
+
+                }
+            });
+
+        });
+
+        /*  $("#divNotificationType *").hide();
+        if ($("#RequiredNotification").val() == 'True') {
+            $("#divNotificationType *").show();
+
+        }
+        else {
+            $("#divNotificationType *").hide();
+            $("select#NotificationType").prop('selectedIndex', 0);
+        }*/
+
+        $('input[type=radio][name=RequiredNotification]').change(function () {
+            if (this.value == 'True') {
+                $("#divNotificationType *").show();
+
+            }
+            else if (this.value == 'False') {
+                $("#divNotificationType *").hide();
+                $("select#NotificationType").prop('selectedIndex', 0);
+            }
+        });
+
+
+        $("#Submit").click(function () {
+
+            if (!DropDownValidation("ModuleId", "Module")) {
+                return false;
+            }
+            if (!DropDownValidation("SubModuleId", "Sub-Module")) {
+                return false;
+            }
+            if (!blankFieldValidation("ActivityName", "Activity Name")) {
+                return false;
+            }
+            if (!DropDownValidation("ActionId", "Action")) {
+                return false;
+            }
+            if (!DropDownValidation("WorkSpecefic", "WorkSpecefic")) {
+                return false;
+            }
+            if ($("#Rdbtn_Yes").is(":checked")) {
+
+                if (!DropDownValidation("NotificationType", "NotificationType")) {
+                    return false;
+                }
+            }
+            if (parseInt($("#Step").val()) <= 0) {
+                swal("", "Enter the Step", "warning");
+                return false;
+            }
+
+        });
+
+        $("#Reset").click(function () {
+            window.location = "@Url.Content("~/WorkFlow/WorkFlowActivity/AddActivity/")"
+        });
+
+        if (parseInt($("#hidActivityId").val()) > 0) {
+         
+            //----notification--
+
+            if ($("#Rdbtn_Yes").is(":checked")) {
+                $("#divNotificationType *").show();
+            }
+            else {
+                $("#divNotificationType *").hide();
+            }
+            //---end notification
+
+        
+
+        }
+    });
+
+
+</script>
+
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+
+        @*@Html.Partial("_navigation")*@
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="javascript:void(0);">
+                                Add Activity
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="@Url.Content("~/WorkFlow/WorkFlowActivity/ViewActivity")">
+                                View Activity
+                            </a>
+                        </li>
+                    </ul>
+
+                </div>
+
+                <section class="box form-container">
+                    <div class="content-body">
+                        @using (Html.BeginForm("AddActivity", "WorkFlowActivity", FormMethod.Post, new { AUTOCOMPLETE = "Off", id = "form1" }))
+                        {
+                            @Html.AntiForgeryToken();
+                            <div class="row">
+                                <div class="col-lg-6">
+
+                                    <div class="form-group row">
+                                        <label class="col-lg-4 col-md-4 col-sm-12 col-form-label font-weight-bolder">Module Name<span class="text-danger">*</span></label>
+                                        <div class="col-lg-7 col-md-6 col-sm-12">
+                                            @Html.DropDownListFor(m => m.ModuleId, ViewBag.Module as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control form-control-sm searchableselect" })
+                                            @Html.HiddenFor(m => m.ActivityId, new { @id = "hidActivityId" })
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label class="col-lg-4 col-md-4 col-sm-12 col-form-label font-weight-bolder">Sub-Module Name<span class="text-danger">*</span></label>
+                                        <div class="col-lg-7 col-md-6 col-sm-12">
+                                            @Html.DropDownListFor(m => m.SubModuleId, ViewBag.SubModule as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control form-control-sm searchableselect" })
+
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label class="col-lg-4 col-md-4 col-sm-12 col-form-label font-weight-bolder">Process/Activity<span class="text-danger">*</span></label>
+                                        <div class="col-lg-7 col-md-6 col-sm-12">
+                                            <div class="input-group">
+                                                @Html.TextBoxFor(m => m.ActivityName, new { @class = "form-control", @maxlength = 200 })
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label class="col-lg-4 col-md-4 col-sm-12 col-form-label font-weight-bolder">Action<span class="text-danger">*</span></label>
+                                        <div class="col-lg-7 col-md-6 col-sm-12">
+                                            @Html.DropDownListFor(m => m.ActionId, ViewBag.Action as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control form-control-sm searchableselect" })
+
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label class="col-lg-4 col-md-4 col-sm-12 col-form-label font-weight-bolder">Work Specific<span class="text-danger">*</span></label>
+                                        <div class="col-lg-7 col-md-6 col-sm-12">
+                                            @Html.DropDownListFor(m => m.WorkSpecific, ViewBag.WorkSpecefic as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control form-control-sm searchableselect" })
+
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label class="col-lg-4 col-md-4 col-sm-12 col-form-label font-weight-bolder">Required Notification<span class="text-danger">*</span></label>
+                                        <div class="col-lg-7 col-md-6 col-sm-12">
+                                            @Html.RadioButtonFor(n => n.RequiredNotification, true, new { @checked = true, @class = "custom-radio", id = "Rdbtn_Yes" }) Yes
+                                            @Html.RadioButtonFor(n => n.RequiredNotification, false, new { @class = "custom-radio", id = "Rdbtn_No" })No
+
+                                        </div>
+                                    </div>
+                                    <div id="divNotificationType" class="form-group row">
+                                        <label class="col-lg-4 col-md-4 col-sm-12 col-form-label font-weight-bolder">NotificationType<span class="text-danger">*</span></label>
+                                        <div class="col-lg-7 col-md-6 col-sm-12">
+                                            @Html.DropDownListFor(m => m.NotificationType, ViewBag.VNotificationType as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control form-control-sm searchableselect" })
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label class="col-lg-4 col-md-4 col-sm-12 col-form-label font-weight-bolder">Step<span class="text-danger">*</span></label>
+                                        <div class="col-lg-7 col-md-6 col-sm-12">
+                                            @Html.TextBoxFor(m => m.Step, new { @class = "form-control", @type = "number", @maxlength = 1, Onkeypress = "return inputLimiter(event,'Numbers')" })
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <div class="col-lg-12 offset-lg-2 offset-md-4 mb-3">
+                                    <input type="submit" id="Submit" name="Submit" value='@ViewBag.Button' class="btn btn-primary btn-md ml-0" />
+                                    <input type="reset" id="Reset" value="Reset" class="btn btn-danger btn-md" />
+                                </div>
+
+                            </div>
+                        }
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+    <!-- MAIN CONTENT AREA ENDS -->
+</section>

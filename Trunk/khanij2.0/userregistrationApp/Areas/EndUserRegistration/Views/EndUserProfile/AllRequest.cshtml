@@ -1,0 +1,131 @@
+﻿@*// *********************************************************************************************************
+    //  View Name                : AllRequset
+    //  Desciption               : Show all enduser requests
+    //  Created By               : Debaraj Swain
+    //  Created On               : 26 March 2021
+    // ********************************************************************************************************
+*@
+@using userregistrationApp.Helper;
+@model userregistrationEF.EndUserModel
+@{
+    ViewData["Title"] = "EndUser All New Requests";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        @Html.Partial("_CMSnavigation")
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+
+
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item mr-md-1">
+                            <a class="nav-link active" href="@Url.Action("AllRequest", "EndUserProfile")">
+                                Add New Request
+                            </a>
+                        </li>
+                        <li class="nav-item mr-md-1">
+                            <a class="nav-link" href="@Url.Action("AllUpdationRequest", "EndUserProfile")">
+                                Updation Request
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="@Url.Action("ActionTakenRequest", "EndUserProfile")">
+                                Action Taken
+                            </a>
+                        </li>
+                    </ul>
+                    @Html.Partial("_CMSutil")
+                </div>
+
+
+                <section class="box form-container">
+
+
+                    <div class="content-body">
+
+                        <div class="row">
+                            <div class="col-sm-12">
+
+                                <table id="table-exports" class="table table-sm table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th width="30">Sl#</th>
+                                            <th>Registration No.</th>
+                                            <th>Applicant Name</th>
+                                            <th>Address</th>
+                                            <th>District Name</th>
+                                            <th width="100px" class="noprint text-center">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @{ int i = 0;
+                                        }
+                                        @foreach (var b in ViewBag.AllReport)
+                                        {
+
+                                            i = i + 1;
+                                            <tr>
+                                                <td>
+                                                    @i
+                                                </td>
+                                                @*<td >@b.EndUserId </td>*@
+                                                <td>@b.RegistrationNo <input type="hidden" id="hfPersonId" name="PersonId" value=@b.EndUserId /> </td>
+                                                <td>@b.EndUserName </td>
+                                                <td>@b.Address </td>
+                                                <td>@b.DistrictName </td>
+                                                <td class="noprint text-center">
+                                                    <a href="@CustomQueryStringHelper.EncryptString("EndUserRegistration","EndUserForceDataView","EndUserProfile",new {id=b.EndUserId })" class="btn-floating btn-outline-primary btn-sm">Take Action</a>
+
+                                                </td>
+
+                                            </tr>
+                                        }
+
+                                    </tbody>
+                                </table>
+
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+    @{if (!string.IsNullOrEmpty((string)TempData["AcknowledgementMessage"]) && Convert.ToString((string)TempData["AcknowledgementMessage"]) == "1")
+        {
+            <script>
+                swal("","User registration with Registration Number @TempData["RegistrationNo"] has been Approved successfully." , "success");
+            </script>
+        }
+        else if (!string.IsNullOrEmpty((string)TempData["AcknowledgementMessage"]) && Convert.ToString((string)TempData["AcknowledgementMessage"]) == "2")
+        {
+            <script>
+                swal("","User registration with Registration Number @TempData["RegistrationNo"] has been Rejected successfully." , "success");
+            </script>
+        }
+        else if (!string.IsNullOrEmpty(ViewBag.AcknowledgementMessage) && Convert.ToString(ViewBag.AcknowledgementMessage) == "0")
+        {
+            <script>
+                swal("", "Something went wrong !", "warning");
+        window.location.href = "@Url.Action("AllRequest", "EndUserProfile", new { Area = "EndUserRegistration" })";
+            </script>
+        }
+    }
+</section>
+
+
+<script>
+
+
+
+
+    $(document).ready(function () {
+
+        loadNavigation('ViewPaymentHead', 'glTMng', 'plpaymenthead', 'tl', 'EndUser', 'All New Requests', ' ');
+
+
+    });
+</script>

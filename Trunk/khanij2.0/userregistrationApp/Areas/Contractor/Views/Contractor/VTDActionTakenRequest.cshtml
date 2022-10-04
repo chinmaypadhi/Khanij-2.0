@@ -1,0 +1,122 @@
+﻿@*// *********************************************************************************************************
+    //  View Name                : VTDActionTakenRequest
+    //  Desciption               : Show all Action taken VTD User requests
+    //  Created By               : Akshaya Dalei
+    //  Created On               : 15 March 2021
+    // ********************************************************************************************************
+*@
+@using userregistrationApp.Helper;
+@model IEnumerable<userregistrationEF.ForceFullDataVTDUser>
+@{
+    ViewData["Title"] = "VTDUser TakeAction Report";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        @Html.Partial("_CMSnavigation")
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item mr-md-1">
+                            <a class="nav-link" href="@Url.Action("VTDAllRequest", "Contractor")">
+                                New Request
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="@Url.Action("VTDActionTakenRequest", "Contractor")">
+                                Action Taken
+                            </a>
+                        </li>
+                    </ul>
+                    @Html.Partial("_CMSutil")
+                </div>
+                <section class="box form-container">
+                    <div class="content-body">
+                        <div class="legend-box">
+                            <ul class="d-flex mb-1 justify-content-end list-unstyled">
+                                <li><span class="bg-success"></span>Approved</li>
+                                <li><span class="bg-warning"></span>Rejected</li>
+                            </ul>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-12">
+
+                                <table id="table-exports" class="table table-sm table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th width="30">SlNo</th>
+                                            <th>Request Type</th>
+                                            <th>User Name / Registration No.</th>
+                                            <th>Applicant Name</th>
+                                            <th>Company Name</th>
+                                            <th>District Name</th>
+                                            <th>State Name</th>
+                                            <th>Status</th>
+                                            <th>User Remark</th>
+                                            <th>Approvers Remark</th>
+                                            <th>Requested By</th>
+                                            <th>Requested On</th>
+                                            <th>Action Taken By</th>
+                                            <th>Action Taken On</th>
+                                            <th width="150px" class="noprint text-center">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @{
+                                            int SlNo = 0;
+
+                                            foreach (var item in Model)
+                                            {
+
+                                                SlNo = SlNo + 1;
+                                                var dyclass = item.ApprovalStatus == "Approved" ? "active-row" : "inactive-row";
+
+                                            <tr class="@dyclass">
+                                                <td>@SlNo</td>
+                                                <td class="text-primary">@item.IsExisting</td>
+                                                <td>@item.UserName <input type="hidden" id="hfPersonId" name="PersonId" value=@item.VTDVendorId /> </td>
+                                                <td>@item.CompanyName </td>
+                                                <td>@item.ApplicantName </td>
+                                                <td>@item.DistrictName </td>
+                                                <td>@item.StateName </td>
+                                                @if (item.ApprovalStatus == "Approved")
+                                                    {
+                                                <td class="text-success">@item.ApprovalStatus</td>
+                                                    }
+                                                    else
+                                                    {
+                                                <td class="text-orange">@item.ApprovalStatus</td>
+                                                    }
+
+                                                <td>@item.UserRemarks </td>
+                                                <td>@item.ApproverRemarks </td>
+                                                <td>@item.AddedBy </td>
+                                                <td>@item.AddedOn </td>
+                                                <td>@item.ActionTakenBy </td>
+                                                <td>@item.ActionTakenOn </td>
+                                                <td class="noprint text-center">
+                                                    <a href="@CustomQueryStringHelper.EncryptString("Contractor","VTDUserDataView","Contractor",new {id=item.VTDVendorId })" class="btn-floating btn-outline-primary btn-sm">View Details</a>
+                                                </td>
+                                            </tr>
+                                            }
+                                        }
+                                    </tbody>
+                                </table>
+
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+
+    $(document).ready(function () {
+        loadNavigation('VTDUser', 'glTMng', 'plpaymenthead', 'tl', 'VTDUser', 'Action Taken', ' ');
+    });
+</script>

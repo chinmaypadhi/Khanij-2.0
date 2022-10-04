@@ -1,0 +1,104 @@
+﻿@model IEnumerable<MasterEF.MainMenuMaster>
+@{
+    ViewData["Title"] = "ViewList";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+@using MasterApp.Web;
+@if (ViewBag.msg != null)
+{
+    <script>
+          swal("", "@ViewBag.msg", "success");
+    </script>
+}
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        @Html.Partial("_CMSnavigation")
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item"><a class="nav-link" href="~/Master/MainMenu/Add">Add</a></li>
+                        <li class="nav-item"><a class="nav-link active" href="~/Master/MainMenu/ViewList">View</a></li>
+                    </ul>
+                    @Html.Partial("_CMSutil")
+                </div>
+                <section class="box form-container">
+                    <div class="content-body">
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="legend-box">
+                                    <ul class="d-flex mb-1 justify-content-end list-unstyled">
+                                        <li><span class="bg-success"></span> Active</li>
+                                        <li><span class="bg-warning"></span> Inactive</li>
+                                    </ul>
+                                </div>
+                                <table id="table-exports" class="table table-sm table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th width="30">Sl#</th>
+                                            <th>MainMenu Name</th>
+                                            <th>Module Name</th>
+                                            <th>Icon</th>
+                                            <th>Link Path</th>
+                                            <th>Slno</th>
+                                            <th>Svg Icon</th>
+                                            <th>Div Class</th>
+                                            <th>Status</th>
+                                            <th width="100px" class="text-center noprint">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @{
+                                            var count = 0;
+                                            foreach (var item in Model)
+                                            {
+                                                count++;
+                                                var dyclass = @item.Status == "Active" ? "active-row" : "inactive-row";
+
+                                                <tr class="@dyclass">
+                                                    <td>@count</td>
+                                                    <td>@item.MainMenuName</td>
+                                                    <td>@item.ModuleName</td>
+                                                    <td>@item.icon</td>
+                                                    <td>@item.LinkPath</td>
+                                                    <td>@item.Slno</td>
+                                                    <td>@item.SvgPath</td>
+                                                    <td>@item.divclass</td>
+                                                    @if (@item.Status == "Active")
+                                                    {
+                                                        <td class="text-success">@item.Status</td>
+                                                    }
+                                                    else
+                                                    {
+                                                        <td class="text-orange">@item.Status</td>
+                                                    }
+
+                                                    <td class="text-center noprint">
+                                                        <a href="@CustomQueryStringHelper.EncryptString("Master","Add","MainMenu",new {id=item.MmenuID })"
+                                                           class="btn-sm"
+                                                           title="Edit"><i class="icon-pencil-alt-solid"></i></a>
+                                                        <a href="@CustomQueryStringHelper.EncryptString("Master","Delete","MainMenu",new {id=item.MmenuID })"
+                                                           class="btn-sm"
+                                                           title="Delete" onclick="return confirm('Are you sure to Delete?')"><i class="icon-trash-alt-solid"></i></a>
+                                                    </td>
+                                                </tr>
+                                            }
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+</section>
+<script>
+    $(document).ready(function () {
+        debugger;
+        loadNavigation('ViewList', 'glRoleRes', 'plUser', 'tl', 'Master', 'MainMenu', ' ');
+        $('.searchableselect').searchableselect();
+    });
+</script>

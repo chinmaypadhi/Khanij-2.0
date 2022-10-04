@@ -1,0 +1,115 @@
+﻿@model MasterEF.UserInformationEF
+@{
+    ViewData["Title"] = "IBMDetails";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        @*  <uc1:navigation runat="server" ID="navigation" />*@
+        @Html.Partial("_navigation")
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="javascript:void(0);">
+                                IBM Details
+                            </a>
+                        </li>
+                    </ul>
+                    @Html.Partial("_util")
+                </div>
+
+                <section class="box form-container">
+                    <div class="content-body">
+
+                        <h5 class="text-brown font-weight-bold mt-0"> IBM Details</h5>
+                        @{ string UserType = "Lessee"; }
+                        @using (Html.BeginForm("IBMDetails", "UserInformation", FormMethod.Post, new { enctype = "multipart/form-data", AUTOCOMPLETE = "Off", id = "form1" }))
+                        {
+                            <div class="row">
+                                <div class="col-lg-6 col-md-6 col-sm-12 form-group">
+                                    <label class="col-form-label pt-0 font-weight-bolder">IBM Mine Code <span class="text-danger">*</span></label>
+                                    @(Html.TextBoxFor(x => x.IBM_NUMBER, new { @maxlength = "50", @class = "form-control" }))
+
+                                </div>
+                                <div class="col-lg-6 col-md-6 col-sm-12 form-group">
+                                    <label class="col-form-label pt-0 font-weight-bolder">IBM Registration Date<span class="text-danger">*</span></label>
+                                    <div class="input-group">
+                                        @Html.TextBoxFor(m => m.IBM_APPLICATON_DATE, new { @class = "form-control datepicker", id = "dt_IBM_APPLICATON_DATE" })
+                                        <div class="input-group-prepend">
+                                            <label class="input-group-text" for="dt_IBM_APPLICATON_DATE"><i class="far fa-calendar"></i></label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 col-md-6 col-sm-12 form-group">
+                                    <label class="col-form-label pt-0 font-weight-bolder">Registration Form<span class="text-danger">*</span></label>
+                                    <div class="custom-file">
+                                        <input type="file" class="custom-file-input" id="flRegistrationCopy" name="flRegistrationCopy">
+                                        <label class="custom-file-label" for="customFile">Choose Files</label>
+                                    </div>
+                                    <a href="@Url.Action("Download", "Application", new {  name=Model.FILE_IBM_REGISTRATION_FORM,path = Model.IBM_REGISTRATION_FORM_PATH })" target="_blank" class="file-download-licensee">@((Model.FILE_IBM_REGISTRATION_FORM != null) ? Model.FILE_IBM_REGISTRATION_FORM : "")</a>
+                                </div>
+                                <div class="col-lg-6 col-md-6 col-sm-12 form-group">
+                                    <label class="col-form-label font-weight-bolder">Remarks<span class="text-danger">*</span></label>
+                                    @Html.TextAreaFor(x => x.Remarks, new { @class = "form-control", @style = "Resize:none", @maxlength = "500" })
+                                </div>
+
+
+                            </div>
+
+
+
+                            @if (@Model.STATUS != 5)
+                            {
+                                <div class="row" style="position: absolute; bottom: 20px; right: 30px;">
+                                    <div class="col-md-12 col-sm-12">
+
+                                        @if (UserType.ToUpper() == "LESSEE")
+                                        {
+                                            <input type="submit" value="Save & Update" class="btn btn-success btn-md ml-0 waves-effect waves-light ">
+                                            <input type="button" title="Forward to DD" value="Forward To DD" name="cmd" class="btn btn-warning text-dark btn-md waves-effect waves-light" onclick="return OnForwarding('Forward To DD');" />
+                                        }
+                                        <input type="button" value="Approve" class="btn btnsave DMO-Button" id="approve" name="approve" onclick="return OnForwarding('Approve');" style="display: none;">
+                                        <input type="button" value="Reject" class="btn btnsave DMO-Button" id="reject" name="reject" onclick="return OnForwarding('Reject');" style="display: none;">
+                                    </div>
+                                </div>
+                            }
+                        }
+                        @*<div class="row">
+                                <div class="col-sm-12">
+                                    <a href="javascript:void(0);" class="btn btn-success btn-md ml-0 waves-effect waves-light">Save &amp; Update</a>
+                                    <a href="#" class="btn btn-warning text-dark btn-md waves-effect waves-light ml-0">Forward to DD</a>
+                                </div>
+                            </div>*@
+
+
+
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+    <!-- MAIN CONTENT AREA ENDS -->
+</section>
+<uc1:footer runat="server" ID="footer" />
+<script>
+    indicateMe = "yes"
+    backMe = "yes"
+    $(document).ready(function () {
+        loadNavigation('GrantOrderDetails', 'glRoleRes', 'pllesseprof', 'tl', 'Roles and Responsibity', 'Lessee Profile', ' ');
+    });
+</script>
+
+<script>
+    $(document).ready(function () {
+        $('.datepicker').datetimepicker({
+            format: 'LT',
+            format: 'DD-MM-YYYY',
+
+        });
+    });
+</script>
+

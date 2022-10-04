@@ -1,0 +1,211 @@
+﻿@model PermitEF.ePermitModel
+@{
+    ViewData["Title"] = "Add";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+
+@if (ViewBag.msg != null)
+{
+    <script>
+        alert('@ViewBag.msg');
+    </script>
+}
+
+
+
+
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        <!-- MAIN CONTENT AREA STARTS -->
+        @Html.Partial("_CMSnavigation")
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    @*<ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="#">
+                                New Fifth
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="@Url.Content("~/Permit/PaymentConfig/FifthScheduleView")">
+                                View Fifth Schedule
+                            </a>
+                        </li>
+                    </ul>*@
+                    @Html.Partial("_CMSutil")
+                    @*<uc1:util runat="server" ID="util" />*@
+                </div>
+
+                <section class="box form-container">
+                    <div class="content-body">
+                        @using (Html.BeginForm("ePermitRequiredFields", "ePermit", FormMethod.Post, new { AUTOCOMPLETE = "Off", id = "__AjaxAntiForgeryForm" }))
+                        {
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <div class="form-group row">
+                                        <label for="inputLoginId" class="col-sm-4 col-form-label">Dispatched Quantity (Current Financial Year) from 1st April till date<span class="text-danger">*</span></label>
+                                        <div class="col-sm-7">
+                                            @Html.TextBoxFor(m => m.TillDateDispatchedQty, new { @class = "form-control" })
+                                           
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            @if (ViewBag.WithAuction == true)
+                            {
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                        <div class="form-group row">
+                                            <label for="inputLoginId" class="col-sm-4 col-form-label">Remaining upfront payment till date <span class="text-danger">*</span></label>
+                                            <div class="col-sm-7">
+                                                @Html.TextBoxFor(m => m.TillDateBalanceUpfrontPayment, new { @class = "form-control" })
+
+                                            </div>
+                                            <label for="inputLoginId" class="col-sm-4 col-form-label">( Deposited : @ViewBag.UpfrontPaymentDeposited )</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+
+                           
+                            <div class="row">
+                                <div class="col-sm-6 offset-sm-2">
+                                    <input type="submit" value='Submit' class="btn btn-primary btn-md ml-0" name="BtnSave" id="BtnSave" />
+                                    <input type="reset" value="Reset" class="btn btn-danger btn-md" />
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </section>
+            </div>
+
+        </div>
+
+    </div>
+</section>
+
+
+
+
+<script>
+    indicateMe = "yes"
+    $(document).ready(function () {
+        loadNavigation('Add', 'glhelpdesk', 'plraiseticket', 'tl', 'Permit', 'E-Permit Required Fields', ' ');
+        $('.datetime').datetimepicker({
+            format: "DD/MM/YYYY"
+        }).keydown(false);
+    });
+</script>
+<script>
+    $(document).ready(function () {
+        $("#Submit").click(function () {
+            
+            if (!blankFieldValidation("TillDateDispatchedQty", "TillDateDispatchedQty")) {
+                return false;
+            }
+           
+        });
+
+
+    });
+
+</script>
+<script>
+    
+
+    $("#BtnSave").click(function () {
+
+        //var ProductionCap = "@ViewBag.ProductionCap";
+        var Balance = "@ViewBag.UpfrontPaymentDeposited";
+        var vv = "@ViewBag.WithAuction";
+
+        var _PermittedQty = "@ViewBag.PermittedQty";
+        var _TillDateDispatched = "@ViewBag.TillDateDispatched";
+
+        if (vv == "False") {
+
+            var entered = $("#TillDateDispatchedQty").val();
+
+            if (entered == null || entered == "") {
+                alert("Dispatched quantity required ! ");
+                $("#TillDateDispatchedQty").focus();
+                return false;
+            }
+            else if (parseFloat(entered) > parseFloat(_PermittedQty)) {
+                alert("Dispatched quantity between Total Dispatched (" + _TillDateDispatched + ") and Production Limit(" + _PermittedQty + ") ! ");
+                $("#TillDateDispatchedQty").val(0);
+                $("#TillDateDispatchedQty").focus();
+                return false;
+            }
+            else if (parseFloat(entered) < parseFloat(_TillDateDispatched)) {
+                alert("Dispatched quantity between Total Dispatched (" + _TillDateDispatched + ") and Production Limit(" + _PermittedQty + ") ! ");
+                $("#TillDateDispatchedQty").val(0);
+                $("#TillDateDispatchedQty").focus();
+                return false;
+            }
+            else {
+                $("#__AjaxAntiForgeryForm").submit();
+            }
+        }
+        else {
+            var entered = $("#TillDateDispatchedQty").val();
+            var amount = $("#TillDateBalanceUpfrontPayment").val();
+
+            if (entered == null || entered == "") {
+                alert("Dispatched quantity required ! ");
+                $("#TillDateDispatchedQty").focus();
+                return false;
+            }
+            //else if (parseFloat(entered) > parseFloat(ProductionCap)) {
+            //    alert("Enter Dispatched quantity exceeding the Production Limit! ");
+            //    $("#TillDateDispatchedQty").val(0);
+            //    $("#TillDateDispatchedQty").focus();
+            //    return false;
+            //}
+            else if (parseFloat(entered) > parseFloat(_PermittedQty)) {
+                alert("Dispatched quantity between Total Dispatched (" + _TillDateDispatched + ") and Production Limit(" + _PermittedQty + ") ! ");
+                $("#TillDateDispatchedQty").val(0);
+                $("#TillDateDispatchedQty").focus();
+                return false;
+            }
+            else if (parseFloat(entered) < parseFloat(_TillDateDispatched)) {
+                alert("Dispatched quantity between Total Dispatched (" + _TillDateDispatched + ") and Production Limit(" + _PermittedQty + ") ! ");
+                $("#TillDateDispatchedQty").val(0);
+                $("#TillDateDispatchedQty").focus();
+                return false;
+            }
+            if (amount == null || amount == "") {
+                alert("Remaining upfront payment required ! ");
+                $("#TillDateBalanceUpfrontPayment").focus();
+                return false;
+            }
+            else if (parseFloat(amount) > parseFloat(Balance)) {
+                alert("Enter Upfront payment exceeding the limit of depostied upfront payment amount! ");
+                $("#TillDateBalanceUpfrontPayment").val(0);
+                $("#TillDateBalanceUpfrontPayment").focus();
+                return false;
+            }
+            else {
+                $("#__AjaxAntiForgeryForm").submit();
+            }
+        }
+    });
+
+    $("#TillDateBalanceUpfrontPayment").change(function () {
+        var ApprovedUpfrontPayment = "@ViewBag.ApprovedUpfrontPayment";
+        var amount = $("#TillDateBalanceUpfrontPayment").val();
+
+        if (amount == null || amount == "") {
+            alert("Remaining upfront payment required ! ");
+            $("#TillDateBalanceUpfrontPayment").focus();
+            return false;
+        }
+        else if (parseFloat(amount) > parseFloat(ApprovedUpfrontPayment)) {
+            alert("Upfront payment exceeding the limit of approved upfront payment amount ( " + parseFloat(ApprovedUpfrontPayment) + " ) !");
+            $("#TillDateBalanceUpfrontPayment").val(0);
+            $("#TillDateBalanceUpfrontPayment").focus();
+            return false;
+        }
+    });
+</script>

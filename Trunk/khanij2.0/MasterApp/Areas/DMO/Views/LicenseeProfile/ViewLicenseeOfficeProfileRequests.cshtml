@@ -1,0 +1,109 @@
+﻿@model IEnumerable<MasterEF.ViewLicenseeDetailsAuthority>
+@using MasterApp.Web
+@{
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+<script>
+    $(document).ready(function () {
+        loadNavigation('Viewstate', 'glTMng', 'plstate', 'tl', 'Licensee', 'ProfileRequest', '');
+        $('.searchableselect').searchableselect();
+
+    });
+</script>
+<section class="wrapper main-wrapper row">
+    @if (TempData["msg"] != null)
+    {
+        <script>
+        alert('@TempData["msg"]');
+        </script>
+    }
+    @if (ViewBag.msg != null)
+    {
+        <script>
+        alert('@ViewBag.msg');
+        </script>
+    }
+
+    <div class="col-12">
+        @Html.Partial("_CMSnavigation")
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+
+                    @Html.Partial("_CMSutil")
+                </div>
+
+                <section class="box form-container">
+
+                    <div class="content-body pt-0">
+
+
+                        <div class="row">
+                            <div class="col-sm-12">
+
+                                <table id="table-exports" class="table table-sm table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th width="30"> Sl#</th>
+
+                                            <th>
+                                                Applicant Name
+                                            </th>
+                                            <th>
+                                                User Name
+                                            </th>
+                                            <th>
+                                                District
+                                            </th>
+                                            <th>
+                                                State
+                                            </th>
+                                            <th>
+                                                Requested On
+                                            </th>
+                                            <th>
+                                                Status
+                                            </th>
+                                            <th width="120" class="noprint">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+
+                                        @{ int i = 1;
+                                        }
+                                        @foreach (var b in Model)
+                                        {
+                                            <tr class="active-row">
+                                                <td>
+                                                    <label>  @i</label>
+                                                    @{ i++; }
+                                                </td>
+
+                                                <td><p class="m-0">@b.APPLICANT_NAME</p> </td>
+                                                <td><p class="m-0">@b.USER_NAME</p> </td>
+                                                <td><p class="m-0">@b.DISTRICT_NAME</p> </td>
+                                                <td><p class="m-0">@b.STATE_NAME</p> </td>
+                                                <td><p class="m-0">@b.REQUESTED_ON</p> </td>
+                                                @if (Convert.ToInt32(@b.status) == 1)
+                                                {
+                                                    <td><p class="m-0">New Profile Request</p></td>
+                                                }
+
+                                            <td class="noprint">
+                                                @*<a href="@Url.Content("~/Licensee/OfficeDetails/CompareOfficeDetails/")@b.id"*@
+                                                <a href="@CustomQueryStringHelper.EncryptString("Licensee","CompareOfficeDetails","OfficeDetails",new {id=@b.id })"
+                                                   class="btn-floating btn-outline-primary btn-sm"
+                                                   title="Take Action"><i class="icon-pencil-alt-solid"></i></a>
+                                            </td>
+                                            </tr>
+                                        }
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+</section>

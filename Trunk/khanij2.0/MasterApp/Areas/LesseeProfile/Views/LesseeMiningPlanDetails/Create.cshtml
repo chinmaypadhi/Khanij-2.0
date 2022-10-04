@@ -1,0 +1,514 @@
+﻿@*// *********************************************************************************************************
+    //  View Name                : Create
+    //  Desciption               : To Save and Update, Forward to DD, Delete Lesee Mining Plan Details
+    //  Created By               : Lingaraj Dalai
+    //  Created On               : 01 August 2021
+    // ********************************************************************************************************
+*@
+@model MasterEF.LesseeMiningPlanViewModel;
+@using MasterEF;
+@using MasterApp.Web;
+@using Microsoft.AspNetCore.Mvc;
+@using  Microsoft.AspNetCore.Http;
+@inject IHttpContextAccessor HttpContextAccessor
+@{
+    ViewData["Title"] = "Create";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+    UserLoginSession profile = HttpContextAccessor.HttpContext.Session.Get<UserLoginSession>(KeyHelper.UserKey);
+}
+@if (TempData["Message"] != null)
+{
+<script>
+        swal("",'@TempData["Message"]',"success");
+</script>
+}
+<script>
+    indicateMe = "yes"
+    backMe = "yes"
+    $(document).ready(function () {
+        loadNavigation('Create', 'glUIS', 'pllesseprof', 'tl', 'Lessee Profile', 'Mining Plan', ' ');
+        /*$('.searchableselect').searchableselect();*/
+        $('.datepicker').datetimepicker({
+            format: 'LT',
+            format: 'DD-MMM-YYYY',
+            daysOfWeekDisabled: [],
+            widgetPositioning: {
+                horizontal: 'auto',
+                vertical: 'bottom'
+            }
+        }).keydown(false);
+        if ($("#hdnMP_APPROVE_DATE").val() != "") {
+            $("#inputApplicationDate").val($("#hdnMP_APPROVE_DATE").val());
+        }
+        if ($("#hdnMP_VALID_FORM").val() != "") {
+            $("#inputValidFromDate").val($("#hdnMP_VALID_FORM").val());
+        }
+        if ($("#hdnMP_VALID_TO").val() != "") {
+            $("#inputValidToDate").val($("#hdnMP_VALID_TO").val());
+        }
+        @*if (@Model.VALID_TO_INTIMATION == "Validity Expired");
+        {
+            $("#VALID_TO").addClass('TodateExpiry');
+            $("#VALID_TO").prop('title', '@Model.VALID_TO_INTIMATION');
+        }
+        else if ((@Model.VALID_TO_INTIMATION == "Done")) {
+            $("#VALID_TO").removeClass('TodateExpiry');
+            $("#VALID_TO").removeClass('TodateIntimation');
+        }
+        else {
+            $("#VALID_TO").addClass('TodateIntimation');
+            $("#VALID_TO").prop('title', '@Model.VALID_TO_INTIMATION');
+        }*@
+        //For Disabling all DOM if  is  Forwarded to DD/DMO and Approval is Pending
+        if (@Model.STATUS != null && @Model.STATUS != "") {
+            if (@Model.STATUS == 1) {
+                $('.form-control').css("pointer-events", "none");
+                $('.btnsave').hide();
+            }
+        }
+        else {
+            $('.btnsave').show();
+        }
+        $("Submit").click(function() {
+            var YEAR = document.getElementsByName("YEAR");
+            var PRODUCTIONS = document.getElementsByName("PRODUCTIONS");
+            var iLAID, jLAID;
+            var countLAID = 0, cLAID = 0;
+            for (iLAID = 0; iLAID < YEAR.length; iLAID++) {
+                countLAID = 0;
+                cLAID = YEAR[iLAID].value;
+                for (jLAID = 0; jLAID < YEAR.length; jLAID++) {
+                    if (parseFloat(PRODUCTIONS[jLAID].value) >= 0) {
+                    }
+                    else {
+                        swal("", "please enter valid Lease Area  for Total Lease Area (in hectare)","warning");
+                        return false;
+                    }
+                    if (cLAID == YEAR[jLAID].value) {
+                        countLAID = countLAID + 1;
+                        if (countLAID > 1) {
+                            swal("", "please remove duplicate Lease Area  for Total Lease Area (in hectare)","warning");
+                            return false;
+                        }
+                    }
+                }
+
+            }
+        });
+         /*Change Label text for Minor Mineral*/
+        var mineraltypename = '@profile.MineralTypeName';
+        if (mineraltypename == "Minor Mineral") {
+            loadNavigation('Create', 'glUIS', 'pllesseprof', 'tl', 'Lessee Profile', 'Quarry Plan', ' ');
+            $("#LeaseCTO-tab").text('Quarry Lease Plan');/*Tab Text*/
+            $("#h5text").text('Quarry Lease Plan Details');/*Header Text*/
+            $("#lblApprovalDate").text('Quarry Lease Plan Approval Date');/*Label Text*/
+            $("#lblApprovalNo").text('Quarry Lease Plan Approval Number');/*Label Text*/
+            $("#lblValidFrom").text('Quarry Lease Plan Valid From');/*Label Text*/
+            $("#lblValidTo").text('Quarry Lease Plan Valid To');/*Label Text*/
+            $("#lblApprovalLetter").text('Quarry Plan & Approval Letter');/*Label Text*/
+        }
+        $('input[name="SOM_Upload_Letter"]').bind('change', function () {
+            $("input[type='Submit']").attr('disabled', false);
+            $("input[name='cmd']").attr('disabled', false);
+            filesize = this.files[0].size;
+            var val = $(this).val().toLowerCase(),
+                regex = new RegExp("(.*?)\.(jpeg|jpg|pdf)$");
+            if (!(regex.test(val))) {
+                swal("", ".docx, tif,xls  type is not an allowed file type. You can use only pdf, jpg, jpeg types of file(s). ", "warning");
+                this.value = '';
+                $("input[type='Submit']").attr('disabled', true);
+                $("input[name='cmd']").attr('disabled', true);
+                return false;
+            }
+            else if (filesize > 2048000) {
+                swal("", "File size must be 2 MB !", "warning");
+                $("input[type='Submit']").attr('disabled', true);
+                $("input[name='cmd']").attr('disabled', true);
+                return false;
+            }
+            else {
+                var fileName = $(this).val().split("\\").pop();
+                $(this).next('.custom-file-label').html(fileName);
+            }
+            return false;
+        });
+    });
+</script>
+<script>
+    function Validate() {
+        var from = $("#inputValidFromDate").val();
+        var to = $("#inputValidToDate").val();
+        if (Date.parse(from) > Date.parse(to)) {
+            swal("", "Invalid Date Range", "warning");
+            return false;
+        }
+        for (var i = 0; i < document.getElementById('MiningPlanTable').children[1].children.length; i++) {
+            if (document.getElementById('MiningPlanTable').children[1].children[i].children[1].getElementsByTagName("select")[0].value == "0") {
+                swal("", "Please Select Financial Year", "warning");
+                $('#YEAR').focus();
+                return false;
+            }
+            else if (document.getElementById('MiningPlanTable').children[1].children[i].children[2].getElementsByTagName("input")[0].value == "") {
+                swal("", "Please Enter Quantity", "warning");
+                $('#PRODUCTIONS').focus();
+                return false;
+            }
+            else if (document.getElementById('MiningPlanTable').children[1].children[i].children[3].getElementsByTagName("select")[0].value == "") {
+                swal("", "Please Select Unit", "warning");
+                return false;
+            }
+        }
+    }
+    var YearsList = document.getElementsByName("YEAR")
+    for (var i = 0; i <= YearsList.length; i++) {
+        this.addEventListener("change", function (e) {
+            var CurrentSelectedValue = e.target.value;
+            var Count = 0;
+            for (var i = 0; i < YearsList.length; i++) {
+                if (CurrentSelectedValue == YearsList[i].value) {
+                    Count = Count + 1;
+                }
+                else {
+                    $('.btnsave').show();
+                }
+                if (Count == 2) {
+                    alert('Same mining year ' + YearsList[i].value + ' already existed');
+                    Count = 1;
+                    YearsList[i].value = '--select--';
+                    $('.btnsave').hide();
+                    break;
+                    e.preventDefault();
+                }
+                else {
+                    $('.btnsave').show();
+                }
+            }
+        });
+        break;
+    }
+    function BindProdData() {
+        var vv = 0;
+        $("#MiningPlanTable").find('tr').each(function (i, el) {
+            if (i == 0) { }
+            else {
+                var $tds = $(this).find('td');
+                var abcd = "YEARS" + vv;
+                var units = "Units" + vv;
+                vv = vv + 1;
+                var data = $tds.eq(3).text().trim();
+                document.getElementById(abcd).value = data;
+            }
+        });
+    }
+    var totalRowsCount = 1;
+    var _flag = 0;
+    function addRow(tableID) {
+        if (totalRowsCount < 10) {
+            var table = document.getElementById(tableID);
+
+            var rowCount = table.rows.length;
+            var row = table.insertRow(rowCount);
+
+            var colCount = table.rows[1].cells.length;
+
+            for (var i = 0; i < colCount; i++) {
+
+                if (i == colCount - 1) { }
+                else {
+                    var newcell = row.insertCell(i);
+
+                    if (i == 0) {
+                        newcell.innerHTML = rowCount;
+                    }
+                    else {
+                        newcell.innerHTML = table.rows[1].cells[i].innerHTML;
+                    }
+
+                    switch (newcell.childNodes[0].type) {
+                        case "text":
+                            newcell.childNodes[0].value = "";
+                            break;
+                        case "checkbox":
+                            newcell.childNodes[0].checked = false;
+                            break;
+                        case "select-one":
+                            newcell.childNodes[0].selectedIndex = 0;
+                            break;
+                    }
+                }
+            }
+            totalRowsCount = totalRowsCount + 1;
+        }
+    }
+    var rws;
+    function RemoveRow(obj) {
+        totalRowsCount = totalRowsCount - 1;
+        var Rowslength = document.getElementById("MiningPlanTable").getElementsByTagName("tr").length;
+
+        if (Rowslength != 2)
+            document.getElementById("MiningPlanTable").deleteRow(Rowslength - 1);
+    }
+    function myFunction() {
+        var table = document.getElementById("MiningPlanTable");
+        var row = table.insertRow(0);
+        var cell1 = row.insertCell(0);
+        var cell2 = row.insertCell(1);
+        cell1.innerHTML = "NEW CELL1";
+        cell2.innerHTML = "NEW CELL2";
+    }
+    $(document).ready(function () {
+        $(function () {
+            $("body").tooltip({
+                selector: '[data-toggle="tooltip"]',
+                container: 'body'
+            });
+        })
+    });
+    function NextLeaseCTOQty() {
+        $('#LeaseCTOQty').trigger('click');
+        $('[href="#LeaseCTOQty"]').tab('show');
+        $("#LeaseCTOQty").show();
+        $('#LeaseCTO').hide();
+        $("#step2").addClass('active');
+        $("#step1").removeClass('active');
+    }
+    function BackLeaseCTOQty() {
+        $('#LeaseCTO').trigger('click');
+        $('[href="#LeaseCTO"]').tab('show');
+        $("#LeaseCTO").show();
+        $('#LeaseCTOQty').hide();
+        $("#step1").addClass('active');
+        $("#step2").removeClass('active');
+    }
+    function BackLeaseCTO() {
+        $('#LeaseCTOQty').trigger('click');
+        $('[href="#LeaseCTOQty"]').tab('show');
+        $("#LeaseCTOQty").show();
+        $('#LeaseCTO').hide();
+        $("#step2").addClass('active');
+        $("#step1").removeClass('active');
+    }
+</script>
+<script>
+    function Validate() {
+        var Iss = false;
+        if (!blankFieldValidation("inputApplicationDate", "Mining Plan Order Date")) {
+            $('#LeaseCTO-tab').trigger('click');
+            return false;
+        }
+        else if (!blankFieldValidation("MP_APPROVAL_NO", "Mining Plan Approval Order Number")) {
+            $('#LeaseCTO-tab').trigger('click');
+            return false;
+        }
+        else if (!blankFieldValidation("inputValidFromDate", "Mining Plan Valid From")) {
+            $('#LeaseCTO-tab').trigger('click');
+            return false;
+        }
+        else if (!blankFieldValidation("inputValidToDate", "Mining Plan Valid Up To")) {
+            $('#LeaseCTO-tab').trigger('click');
+            return false;
+        }
+        for (var i = 0; i < document.getElementById('MiningPlanTable').children[1].children.length; i++) {
+            debugger;
+            if (document.getElementById('MiningPlanTable').children[1].children[i].children[1].getElementsByTagName("select")[0].value == "0") {
+                swal("", "Please Select Year", "warning");
+                return false;
+            }
+            else if (document.getElementById('MiningPlanTable').children[1].children[i].children[2].getElementsByTagName("input")[0].value == "") {
+                swal("", "Please Enter Approved Quantity", "warning");
+                return false;
+            }
+        }
+        Iss = true;
+        return Iss;
+    }
+    function OnForwarding(btnAction) {
+        var Type;
+        if (btnAction == 'Forward To DD') {
+            Type = 'forward';
+        }
+        if (confirm("Before " + Type + " you need to apply your Digital Signature. Are you confirmed to " + Type + " Profile??")) {
+                var Postdata = 'action=signdoc' + "\n" + 'datatosign=Digital Signature Required' + "\n" + 'signaction=sign' + "\n" + 'filepath=' + "\n" + 'panNumberParam=' + "\n" + 'expirycheck=false' + "\n" + 'issuername=' + "\n" + 'certclass=1|2|3' + "\n" + 'certtype=ALL';
+                connection.send(Postdata);
+                connection.onerror = function (error) {
+                    swal("",'Please check the server connection: ' + error+'',"warning");
+                    swal("",error,"warning");
+                };
+                connection.onmessage = function (e) { // when DSC is success then following function executed.
+                    if (e.data.indexOf("subProtocol") == -1) {
+                        //alert(e.data);
+                        $("#DSCResponse").val(e.data).change();
+                        $.ajax(
+                            {
+                               url: '@Url.Action("CheckVerifyResponse", "LesseeDetails", new { Area = "LesseeProfile" })',
+                                type: "POST",
+                                data: { contentType: "pkcs7", signDataBase64Encoded: e.data, responseType: "plain" },
+                                success: function (msg) {
+                                    if (msg == "SUCCESS") {
+                                        if (btnAction == "Forward To DD") {
+                                            $("#SubResion").val("Forward To DD");
+                                        }
+                                        $("#form1").submit();
+                                    }
+                                }
+                            });
+                    }
+                    else {
+                        alert(e.data);
+                    }
+                };
+            }
+            else {
+                return false;
+            }
+    }
+    try {
+        var connection = new WebSocket('wss://localhost.emudhra.com:8080');
+        connection.onopen = function () {
+            console.log('Connection Opened');
+        };
+        connection.onerror = function (error) {
+        };
+        connection.onmessage = function (e) {
+            if (e.data.indexOf("subProtocol") == -1) {
+            }
+        };
+    }
+    catch (e) {
+        swal("", "No DSC Connection Found", "warning");
+    }
+</script>
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        <!-- MAIN CONTENT AREA STARTS -->
+        @Html.Partial("_CMSnavigation")
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="javascript:void(0);">
+                                Add
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="~/LesseeProfile/LesseeMiningPlanDetails/ViewList">
+                                View
+                            </a>
+                        </li>
+                    </ul>
+                    @Html.Partial("_CMSutil")
+                </div>
+                <section class="box form-container">
+                    <div class="content-body">
+                        @using (Html.BeginForm("Create", "LesseeMiningPlanDetails", FormMethod.Post, new { AUTOCOMPLETE = "Off", id = "form1", enctype = "multipart/form-data" }))
+                        {
+                        @(Html.HiddenFor(model => model.SubResion))
+                        @(Html.HiddenFor(model => model.SubApprove))
+                        @(Html.HiddenFor(model => model.SubReject))
+                        @(Html.HiddenFor(model => model.MINING_PLAN_ID))
+                        @Html.HiddenFor(x => x.CREATED_BY, new { @id = "hfCreatedBy" })
+                        @Html.HiddenFor(model => model.STATUS, new { id = "hdnStatus" })
+                        @Html.AntiForgeryToken()
+                        <ul class="nav nav-tabs progresstab" id="myTab" role="tablist">
+                            <li class="startstep active" id="step1">
+                                <a id="LeaseCTO-tab" data-toggle="tab" href="#LeaseCTO" role="tab" aria-controls="LeaseCTO" aria-selected="true" onclick="BackLeaseCTOQty()">Mining Plan Details</a>
+                            </li>
+                            <li id="step2">
+                                <a id="LeaseCTOQty-tab" data-toggle="tab" href="#LeaseCTOQty" role="tab" aria-controls="LeaseCTOQty" aria-selected="false" onclick="BackLeaseCTO()">Scheme of Mines</a>
+                            </li>
+                        </ul>
+                        <div class="tab-content" id="myTabContent">
+                            <div href="#LeaseCTO" class="tab-pane fade show active" id="LeaseCTO" role="tabpanel" aria-labelledby="LeaseCTO-tab">
+                                <h5 class="text-brown font-weight-bold mt-0 mb-4" id="h5text">Mining Plan</h5>
+                                <div class="row">
+                                    <div class="col-lg-3 col-md-6 col-sm-12 form-group">
+                                        <label class="col-form-label pt-0 font-weight-bolder" id="lblApprovalDate">Approval Date <span class="text-danger">*</span></label>
+                                        <div class="input-group">
+                                            <input type="text" class="form-control datepicker" id="inputApplicationDate" name="MP_APPROVE_DATE">
+                                            <div class="input-group-prepend">
+                                                <label class="input-group-text" for="inputApplicationDate"><i class="icon-calendar-alt-solid"></i></label>
+                                            </div>
+                                            @Html.HiddenFor(x => x.MP_APPROVE_DATE, new { @id = "hdnMP_APPROVE_DATE" })
+                                            @Html.ValidationMessageFor(m => m.MP_APPROVE_DATE, "", new { @class = "text-danger" })
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-5 col-md-6 col-sm-12 form-group">
+                                        <label class="col-form-label pt-0 font-weight-bolder" id="lblApprovalNo">Approval Number <span class="text-danger">*</span></label>
+                                        @Html.TextBoxFor(x => x.MP_APPROVAL_NO, new { @maxlength = "50", @class = "form-control" })
+                                        @Html.ValidationMessageFor(m => m.MP_APPROVAL_NO, "", new { @class = "text-danger" })
+                                    </div>
+                                    <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                        <label class="col-form-label pt-0 font-weight-bolder" id="lblValidFrom">Valid From <span class="text-danger">*</span></label>
+                                        <div class="input-group">
+                                            <input type="text" class="form-control datepicker" id="inputValidFromDate" name="MP_VALID_FORM">
+                                            <div class="input-group-prepend">
+                                                <label class="input-group-text" for="inputValidFromDate"><i class="icon-calendar-alt-solid"></i></label>
+                                            </div>
+                                            @Html.HiddenFor(x => x.MP_VALID_FORM, new { @id = "hdnMP_VALID_FORM" })
+                                            @Html.ValidationMessageFor(m => m.MP_VALID_FORM, "", new { @class = "text-danger" })
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                        <label class="col-form-label pt-0 font-weight-bolder" id="lblValidTo">Valid Upto <span class="text-danger">*</span></label>
+                                        <div class="input-group">
+                                            <input type="text" class="form-control datepicker" id="inputValidToDate" name="MP_VALID_TO">
+                                            <div class="input-group-prepend">
+                                                <label class="input-group-text" for="inputValidToDate"><i class="icon-calendar-alt-solid"></i></label>
+                                            </div>
+                                            @Html.HiddenFor(x => x.MP_VALID_TO, new { @id = "hdnMP_VALID_TO" })
+                                            @Html.ValidationMessageFor(m => m.MP_VALID_TO, "", new { @class = "text-danger" })
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                        <label for="inputLoginId" class="col-form-label font-weight-bolder" id="lblApprovalLetter">MP/SOM Approval Letter With Approved Table</label>
+                                        <div class="custom-file">
+                                            <input type="file" class="custom-file-input" id="File3" name="SOM_Upload_Letter">
+                                            <label class="custom-file-label" for="customFile">Choose Files</label>
+                                            <small class="text-danger">Files type <strong>(.jpg , .jpeg , .pdf)</strong> with maximum <strong>2MB</strong></small>
+                                        </div>
+                                        @if (Model.MP_SOM_FileName != null && Model.MP_SOM_FileName != "")
+                                            {
+                                        <label class="form-control-plaintext">@(Model.MP_SOM_FileName) <a href='~/@Model.MP_SOM_FilePath' title="" class="ml-2" data-original-title="Download" target="_blank"><i class="icon-file-pdf-solid h5 text-danger"></i></a></label>
+                                            }
+                                    </div>
+                                </div>
+                                <div class="row mt-4">
+                                    <div class="col-sm-12 text-center">
+                                        <a class="btn btn-primary btn-md ml-0 waves-effect waves-light btnNext" onclick="NextLeaseCTOQty()">Next</a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div href="#LeaseCTOQty" class="tab-pane fade" id="LeaseCTOQty" role="tabpanel" aria-labelledby="LeaseCTOQty-tab">
+                                <h5 class="text-brown font-weight-bold mt-0 mb-4">Scheme of Mines</h5>
+                                <div class="form-group row pt-3">
+                                    <div class="col-sm-7">
+                                        <div class="table-responsive">
+                                            @Html.Raw((String)ViewBag.tableLA)
+                                        </div>
+                                        <div class="row mt-4">
+                                            <a class='btn btn-danger btn-md remove m-0 mr-1'><i class='icon-minus-solid' aria-hidden='true' data-toggle='tooltip' data-placement='top' title='Remove Row' onclick="RemoveRow('MiningPlanTable')"></i></a> <a class='btn btn-success btn-md add-btn  m-0 mr-1' data-toggle='tooltip' data-placement='top' title='Add Row' onclick="addRow('MiningPlanTable')"><i class='icon-plus-solid' aria-hidden='true'></i></a>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row mt-4">
+                                    <div class="col-sm-12 text-center">
+                                        <a class="btn btn-dark btn-md ml-0 waves-effect waves-light btnPrevious" onclick="BackLeaseCTOQty()">Previous</a>
+                                        @if (Model.STATUS != 5)
+                                            {
+                                        <input type="submit" id="Submit" value="Save & Update" class="btn btn-success btn-md ml-0 waves-effect waves-light btnsave" onclick="return Validate()">
+                                        <input type="submit" value="Delete" class="btn btn-danger btn-md ml-0 waves-effect waves-light btnsave" id="Delete" name="delete" onclick="return confirm('Are you sure to delete?')" style="display:none;" />
+                                        <input type="button" title="Forward to DD" value="Forward To DD" name="cmd" class="btn btn-warning text-dark btn-md waves-effect waves-light ml-0 btnsave" onclick="if (Validate()) { return OnForwarding('Forward To DD'); }" />
+                                            }
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        }
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+</section>
+

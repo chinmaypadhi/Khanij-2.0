@@ -1,0 +1,517 @@
+﻿@model PermitEF.ePermitModel
+@using PermitEF;
+@using PermitApp.Web;
+@using PermitApp.Helper
+@using Microsoft.Extensions.Configuration;
+@using  Microsoft.AspNetCore.Http;
+@{
+    ViewData["Title"] = "ePermitViewWithoutDSC";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+@inject IConfiguration Configuration
+
+@inject IHttpContextAccessor HttpContextAccessor
+@{
+    UserLoginSession profile = HttpContextAccessor.HttpContext.Session.Get<UserLoginSession>(KeyHelper.UserKey);
+}
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        @Html.Partial("_CMSnavigation")
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        @if (@profile.UserType == "Lessee" || @profile.UserType == "Licensee" || @profile.UserType == "Tailing Dam")
+                        {
+                        @if (Model == null || (Model.DSCLesseeFilePath == null || Model.DSCLesseeFilePath == ""))
+                        {
+                            @if (Model.ActiveStatus != 7 && Model.ActiveStatus != 11)
+                            {
+                                <li class="nav-item">
+                                    <a href="javascript:void(0);" title="Generate Permit" id="btnSaveDraft" onclick="DownloadForm();" class="btn btn-success btn-md  mb-2  waves-effect waves-light rounded-0">Download Draft e-Permit Application</a>
+                                </li>
+                            }
+                            else
+                            {
+                                <li class="nav-item">
+                                    <a href="javascript:void(0);" title="Generate Permit" id="btnSave" onclick="getPDF();" class="btn btn-success btn-md  mb-2  waves-effect waves-light rounded-0">Generate Permit</a>
+                                </li>
+                            }
+                        }
+                       
+                        else
+                        {
+                        <li class="nav-item">
+                            <a href="@Model.DSCLesseeFilePath" title="Download e-Permit" id="btnDownload" class="btn btn-success btn-md  mb-2  waves-effect waves-light rounded-0">Download e-Permit</a>
+                        </li>
+
+
+                        }
+                        
+                        }
+                    </ul>
+                    @Html.Partial("_CMSutil")
+                </div>
+
+                <section class="box form-container">
+                    <div class="content-body">
+                        <input id="fName" type="hidden" />
+                        <input id="fid" type="hidden" />
+                        @(Html.HiddenFor(model => model.BulkPermitId))
+                        @(Html.HiddenFor(model => model.TransactionalID))
+                        @(Html.HiddenFor(model => model.DSCLesseeFilePath))
+                        <div class="table-responsive" id="viewtable">
+                            <table id="tablePRint" class="table table-bordered" style="width: 800px;margin: 0 auto;">
+
+                                <tbody>
+                                    <tr>
+                                        <th colspan="2" style="text-align: center; border-top: 1px solid black; border-left: 1px solid black;">
+                                            <img id="imgLogo" src="/CMSimg/LogoPrintNew.png" height="80" alt="LOGO">
+
+
+                                        </th>
+
+                                    </tr>
+                                    <tr>
+                                        <td class="font-weight-bold text-center text-brown" style="font-size: 20px;" colspan="2">e-Permit Application for @(Html.DisplayFor(model => model.MineralName))</td>
+
+                                    </tr>
+                                    <tr>
+                                        <td width="30%" class="font-weight-bold">E-Permit Number</td>
+
+                                        <td> @(Html.DisplayFor(x => x.BulkPermitNo))</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="font-weight-bold">Scheme of Coal Sale </td>
+                                        <td>@(Html.DisplayFor(model => model.TypeOfCoalDispatched))</td>
+                                    </tr>
+
+                                    <tr>
+                                        <td class="font-weight-bold"> Name of  Lessee/Licensee </td>
+                                        <td>
+                                            @(Html.DisplayFor(x => x.LesseeName))<br />
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="font-weight-bold">Address of Lessee/Licensee </td>
+                                        <td>
+                                            @(Html.DisplayFor(x => x.LesseeAddress))<br />
+                                        </td>
+                                    </tr>
+
+                                    <tr>
+                                        <td class="font-weight-bold">Grant Order Number</td>
+                                        <td>@(Html.DisplayFor(model => model.GrantOrderNo, "GrantOrderNo")) </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="font-weight-bold">Grant Order Date</td>
+                                        <td>@(Html.DisplayFor(model => model.DateOfGrant))</td>
+                                    </tr>
+
+                                    <tr>
+                                        <td class="font-weight-bold">Period of Lease/License</td>
+                                        <td>@(Html.DisplayFor(model => model.PeriodOfLease))</td>
+                                    </tr>
+                                   
+                                    <tr>
+                                        <td class="font-weight-bold">Village</td>
+                                        <td>@(Html.DisplayFor(model => model.Village))</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="font-weight-bold">Tehsil</td>
+                                        <td>@(Html.DisplayFor(model => model.Tehsil))</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="font-weight-bold">Panchayat </td>
+                                        <td>@(Html.DisplayFor(x => x.Panchayat))</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="font-weight-bold">Police Station</td>
+                                        <td>@(Html.DisplayFor(x => x.PoliceStation))</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="font-weight-bold">District</td>
+                                        <td>@(Html.DisplayFor(x => x.District))</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="font-weight-bold">Mineral Name</td>
+                                        <td>@(Html.DisplayFor(x => x.MineralName))</td>
+                                    </tr>
+
+                                    <tr>
+                                        <td class="font-weight-bold">Mineral Form </td>
+                                        <td>@(Html.DisplayFor(model => model.MineralNature))</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="font-weight-bold">Mineral Grade</td>
+                                        <td>@(Html.DisplayFor(model => model.MineralGradeName))</td>
+                                    </tr>
+
+                                    <tr>
+                                        <td class="font-weight-bold">Quantity to be Dispatched </td>
+                                        <td>@(Html.DisplayFor(model => model.ProposedQty))</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="font-weight-bold">Mineral Unit</td>
+                                        <td>@(Html.DisplayFor(model => model.UnitName))</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="font-weight-bold">Price (Rs Per Tonne) </td>
+                                        <td>@(Html.DisplayFor(model => model.RoyaltyRate))</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="font-weight-bold">Royalty Per Tonne</td>
+                                        <td>@(Html.DisplayFor(model => model.CalValue))</td>
+                                    </tr>
+                                    @if (Model != null && Model.PaymentDetails != null && Model.PaymentDetails.Count > 0)
+                                    {
+                                        decimal total = 0;
+                                        <tr>
+                                            @if (Model.ActiveStatus == 6 || Model.ActiveStatus == 7 || Model.ActiveStatus == 8 || Model.ActiveStatus == 11)
+                                            {
+                                                <td class="font-weight-bold text-center text-red" style="color:red" colspan="2">Total Online Paid Amount</td>
+
+                                            }
+                                            else
+                                            {
+                                                <td class="font-weight-bold text-center text-red" style="color:red" colspan="2">Payable</td>
+                                            }
+                                        </tr>
+
+                                        int i = 16;
+                                        foreach (var objList in Model.PaymentDetails)
+                                        {
+
+                                            if (objList.IsApplicable == true)
+                                            {
+                                                total += Convert.ToDecimal(objList.MappingValue);
+                                                <tr>
+                                                    <td class="font-weight-bold">@objList.PaymentType </td>
+                                                    <td>Rs. @objList.MappingValue </td>
+                                                </tr>
+
+                                                i++;
+                                            }
+                                        }
+                                        <tr>
+
+                                            @if (Model.ActiveStatus == 6 || Model.ActiveStatus == 7 || Model.ActiveStatus == 8 || Model.ActiveStatus == 11)
+                                            {
+                                                <td class="font-weight-bold">Total Online Paid Amount </td>
+                                            }
+                                            else
+                                            {
+                                                <td class="font-weight-bold">Total Payable Amount </td>
+                                            }
+                                            <td>Rs. @total </td>
+                                        </tr>
+
+
+                                        <tr>
+                                            <td class="font-weight-bold text-center" style="color:red"  colspan="2">Shall be paid separately</td>
+                                        </tr>
+                                        total = 0;
+                                        i = i + 1;
+                                        foreach (var objList in Model.PaymentDetails)
+                                        {
+
+                                            if (objList.IsApplicable == false)
+                                            {
+                                                total += Convert.ToDecimal(objList.MappingValue);
+                                                <tr>
+                                                    <td class="font-weight-bold">@objList.PaymentType </td>
+                                                    <td>Rs. @objList.MappingValue </td>
+                                                </tr>
+
+                                                i++;
+                                            }
+                                        }
+                                        <tr>
+                                            <td class="font-weight-bold">Total </td>
+                                            <td>Rs. @total </td>
+                                        </tr>
+
+
+
+                                        <tr>
+                                            <td class="font-weight-bold text-center text-red" style="color:red;" colspan="2">User information</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="font-weight-bold">Generated By </td>
+                                            <td>
+                                                @(Html.DisplayFor(model => model.GeneratedBy))
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="font-weight-bold">Designation</td>
+                                            <td>
+                                                @(Html.DisplayFor(model => model.GeneratedDesignation))
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="font-weight-bold">Generated Date and Time </td>
+                                            <td>
+                                                <span>@(System.DateTime.Now.ToString("dd/MM/yyyy hh:mm:ss tt"))</span>
+                                            </td>
+                                        </tr>
+                                       
+                                        if (Model != null && (Model.ActiveStatus == 7 || Model.ActiveStatus == 11))
+                                        {
+                                            <tr style="height: 80px">
+                                                <td style="border: 1px solid black; width: 5%; text-align: center">
+                                                    <span>@(i + 4)</span>
+                                                </td>
+                                                <td style="width: 45%; border-bottom: 1px solid black; border-top: 1px solid black; border-left: 1px solid black;">
+                                                    <span>DSC : </span>
+                                                </td>
+                                                <td style="border-bottom: 1px solid black; border-top: 1px solid black; border-right: 1px solid black; width: 50%;"></td>
+                                                <td></td>
+
+                                            </tr>
+                                            <tr>
+                                                <td colspan="2" style="font-size: 12px; text-align: left">
+                                                    <label>
+                                                        <i>This is a system generated permit. So physical signature is not required. </i>
+                                                    </label>
+                                                </td>
+                                                <td></td>
+
+                                            </tr>
+                                        }
+                                    }
+
+                                </tbody>
+                            </table>
+
+
+
+
+                        </div>
+
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+    <!-- MAIN CONTENT AREA ENDS -->
+</section>
+
+<script>
+    backMe = "yes"
+    $(document).ready(function () {
+        loadNavigation('balancequantitye-permit', 'glepermit', 'Epermit', 'tl', 'Permit', 'Generate Permit', ' ');
+        $('.searchableselect').searchableselect();
+
+
+
+
+        $('.shorting-lnk').click(function () {
+            $('.shorting-lnk i').toggleClass('fa-sort-amount-up-alt fa-sort-amount-down-alt ');
+        });
+        $('.filter-dropdown').hide();
+        $('.filter-lnk').click(function () {
+            $(this).toggleClass('active');
+            $(this).siblings('.filter-dropdown').slideToggle();
+        });
+        $('.filter-btn').click(function () {
+            $(this).parent('.shorting-cell .filter-dropdown').slideUp();
+            if ($(this).parent().parent('.shorting-cell').find('.filter-lnk').hasClass('active')) {
+                $(this).parent().siblings('.filter-lnk').removeClass('active');
+            }
+        });
+        //$("#excelIcon").click(function () {
+        //    exportTableToExcel("datatable", "text")
+        //});
+
+    });
+
+
+</script>
+<script>
+    $(document).ready(function () {
+        $('.datepicker').datetimepicker({
+            format: 'LT',
+            format: 'DD-MM-YYYY',
+
+        });
+    });
+</script>
+<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.3.3/jspdf.min.js"></script>
+<script src="https://html2canvas.hertzen.com/dist/html2canvas.js"></script>
+
+<script>
+    function DownloadForm() {
+
+        var HTML_Width = $("#tablePRint").width();
+        var HTML_Height = $("#tablePRint").height();
+        var top_left_margin = 15;
+        var PDF_Width = HTML_Width + (top_left_margin * 2);
+        var PDF_Height = (PDF_Width * 1.5) + (top_left_margin * 2);
+        var canvas_image_width = HTML_Width;
+        var canvas_image_height = HTML_Height;
+
+        var totalPDFPages = Math.ceil(HTML_Height / PDF_Height) - 1;
+
+
+        html2canvas($("#tablePRint")[0], { allowTaint: true }).then(function (canvas) {
+
+            canvas.getContext('2d');
+
+            console.log(canvas.height + "  " + canvas.width);
+
+            // var data = canvas.toDataURL();
+            var data = canvas.toDataURL("image/JPEG", 1.0);
+            var pdf = new jsPDF('p', 'pt', [PDF_Width, PDF_Height]);
+            pdf.addImage(data, 'JPEG', top_left_margin, top_left_margin, canvas_image_width, canvas_image_height);
+
+
+            for (var i = 1; i <= totalPDFPages; i++) {
+                pdf.addPage(PDF_Width, PDF_Height);
+                pdf.addImage(data, 'JPEG', top_left_margin, -(PDF_Height * i) + (top_left_margin * 4), canvas_image_width, canvas_image_height);
+            }
+            //data = data.replace('data:image/png;base64,', '');
+            data = pdf.save($("#TransactionalID").val() + ".pdf");
+
+        });
+
+    }
+
+    function getPDF() {
+
+        var HTML_Width = $("#tablePRint").width();
+        var HTML_Height = $("#tablePRint").height();
+        var top_left_margin = 15;
+        var PDF_Width = HTML_Width + (top_left_margin * 2);
+        var PDF_Height = (PDF_Width * 1.5) + (top_left_margin * 2);
+        var canvas_image_width = HTML_Width;
+        var canvas_image_height = HTML_Height;
+
+        var totalPDFPages = Math.ceil(HTML_Height / PDF_Height) - 1;
+
+
+        html2canvas($("#tablePRint")[0], { allowTaint: true }).then(function (canvas) {
+
+            canvas.getContext('2d');
+
+            console.log(canvas.height + "  " + canvas.width);
+
+            // var data = canvas.toDataURL();
+            var data = canvas.toDataURL("image/JPEG", 1.0);
+            var pdf = new jsPDF('p', 'pt', [PDF_Width, PDF_Height]);
+            pdf.addImage(data, 'JPEG', top_left_margin, top_left_margin, canvas_image_width, canvas_image_height);
+
+
+            for (var i = 1; i <= totalPDFPages; i++) {
+                pdf.addPage(PDF_Width, PDF_Height);
+                pdf.addImage(data, 'JPEG', top_left_margin, -(PDF_Height * i) + (top_left_margin * 4), canvas_image_width, canvas_image_height);
+            }
+            //data = data.replace('data:image/png;base64,', '');
+            data = pdf.output("datauristring").replace('data:application/pdf;base64,', '');
+                    //-----------------
+                     try {
+                    var dt = new Date();
+                         var FNID = $("#TransactionalID").val();
+                         var FileName = FNID + "_" + dt.getDate() + "" + (dt.getMonth() + 1) + "" + dt.getFullYear() + "_" + dt.getHours() + "_" + dt.getMinutes() + "_" + dt.getSeconds() + ".pdf";
+                    $("#fName").val(FileName).change();
+                    $.ajax({
+                        url: "/Permit/Transit/SaveNormalPdfFile",
+                        data: { base64BinaryStr: data, fileName: $("#fName").val(), ID: $("#BulkPermitId").val(), UpdateIn: "LESSEE_BP" },
+                        type: "post",
+                        dataType:'json',
+                        success: function (msg) {
+
+                            if (msg == "SUCCESS") {
+                                
+                                var FPath = '@Configuration["DSCReadFilePath"]' + $("#fName").val();
+                                var OutPath = "";
+                                var Postdata = 'action=signpdf' + "\n" + 'datatosign=' + FPath + '' + "\n" + 'signaction=2' + "\n" + 'outputpath=' + OutPath + '' + "\n" + 'signtype=sign' + "\n" + 'expirycheck=true' + "\n" + 'coordinate=600,100,1300,50' + "\n" + 'issuername=' + "\n" + 'certtype=ALL' + "\n" + 'certclass=0';
+                                connection.send(Postdata);
+                                connection.onerror = function (error) {
+                                    alert('Please check the server connection: ' + error);
+                                    alert(error);
+                                };
+
+                                connection.onmessage = function (e) { // when DSC is success then following function executed.
+
+                                    if (e.data.indexOf("subProtocol") == -1) {
+
+                                        $.ajax(
+                                            {
+                                                url: "/Permit/Transit/CheckVerifyResponse",
+                                                type: "POST",
+                                                data: { contentType: "pkcs7", signDataBase64Encoded: e.data, responseType: "plain" },
+                                                async: false,
+                                                success: function (msg) {
+
+                                                    if (msg == "SUCCESS") {
+
+                                                        var FNID = $("#fName").val();
+                                                        var BulkPermitId = $("#BulkPermitId").val();
+                                                        var signData = e.data;
+                                                        $.ajax({
+                                                            url:"/Permit/Transit/SavePdfFile",
+                                                            type: "POST",
+                                                            async: false,
+                                                            data: { base64BinaryStr: e.data, fileName: FNID, ID: BulkPermitId, UpdateIn: "LESSEE_BP" },
+                                                            success: function (msg) {
+                                                                if (msg == "SUCCESS") {
+                                                                    alert("You have successfully generate permit.");
+                                                                    window.location.href = "/Permit/CoalEPermit/GeneratedCoalPermit";
+                                                                }
+                                                                else {
+                                                                    alert(msg);
+                                                                }
+                                                            }
+                                                        });
+                                                    }
+                                                }
+                                            });
+                                    }
+                                    else {
+                                        alert(e.data);
+                                    }
+                                };
+                            }
+                            else {
+                                alert(msg);
+
+                            }
+                        }
+                    });
+                }
+                catch (e) {
+                    alert("Your DSC Connection is not working. Please try after some time.");
+                }
+                    //-------------------------
+
+
+
+        });
+
+
+
+    }
+    //following code is for DSC Signature
+    try {
+        var connection = new WebSocket('wss://localhost.emudhra.com:8080');
+
+        connection.onopen = function () {
+            console.log('Connection Opened');
+        };
+        connection.onerror = function (error) {
+            //  alert('Please check the DSC connection: ' + error);
+        };
+        connection.onmessage = function (e) {
+            if (e.data.indexOf("subProtocol") == -1) {
+                //  alert(e.data);
+            }
+        };
+    }
+    catch (e) {
+        alert("No DSC Connection Found");
+    }
+    //-----------------------------
+</script>
+

@@ -1,0 +1,609 @@
+﻿@model PermitEF.ePermitModel
+@{
+    ViewData["Title"] = "ePermitPayment";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+<style>
+    .form-check {
+        height: 25px;
+        width: 25px;
+        margin: 0 auto;
+    }
+    #leaseinformation .colon {
+        top: 6px;
+    }
+</style>
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        @Html.Partial("_CMSnavigation")
+
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="javascript:void(0);">
+                                Make Payment
+                            </a>
+                        </li>
+
+                    </ul>
+                    @Html.Partial("_CMSutil")
+                </div>
+
+                <section class="box form-container">
+                    <div class="content-body">
+                        @using (Html.BeginForm("MakeEndUserPayment", "Lessee", FormMethod.Post, new { enctype = "multipart/form-data", AUTOCOMPLETE = "Off", id = "__EUAntiForgeryForm", @Area = "Permit" }))
+                        {
+                            @Html.HiddenFor(model => model.ProposedQty)
+                            @Html.HiddenFor(model => model.BulkPermitId)
+                            @Html.HiddenFor(model => model.TotalPayableAmount)
+                            @Html.HiddenFor(model => model.MineralName)
+                            @Html.HiddenFor(model => model.MineralGradeName)
+                            @Html.HiddenFor(model => model.EmailId)
+                            @Html.HiddenFor(model => model.MobileNo)
+
+                            @(Html.HiddenFor(model => model.PayableRoyalty))
+                            @(Html.HiddenFor(model => model.NMET))
+                            @(Html.HiddenFor(model => model.TCS))
+                            @(Html.HiddenFor(model => model.DMF))
+                            @(Html.HiddenFor(model => model.Cess))
+                            @(Html.HiddenFor(model => model.eCess))
+                            @(Html.HiddenFor(model => model.Production))
+                            @(Html.HiddenFor(model => model.RemainingProduction))
+                            @(Html.HiddenFor(model => model.MineralGradeName))
+                            @(Html.HiddenFor(model => model.MineralNature))
+                            @(Html.HiddenFor(model => model.BasicRate))
+
+                            @Html.HiddenFor(model => model.PaymentStatus)
+                            @(Html.HiddenFor(model => model.PaymentBank))
+                            @(Html.HiddenFor(model => model.PaymentMode))
+                            @(Html.HiddenFor(model => model.P_Mode))
+
+                            @(Html.HiddenFor(model => model.GeneratedBy))
+                            @(Html.HiddenFor(model => model.GeneratedDesignation))
+                            @(Html.HiddenFor(model => model.BulkPermitNo))
+                            @(Html.HiddenFor(model => model.ActiveStatus))
+                            @(Html.HiddenFor(model => model.TransactionalID))
+                            @(Html.HiddenFor(model => model.TillDateBalanceUpfrontPayment))
+                            @(Html.HiddenFor(model => model.EAuctionType))
+                            @(Html.HiddenFor(model => model.DistrictId))
+                            @(Html.HiddenFor(model => model.District))
+                            @(Html.HiddenFor(model => model.DistrictCode))
+                            <h5 class="text-brown font-weight-bold mt-0 text-center">Calculation</h5>
+
+                            @if (Model.ActiveStatus == 6 || Model.ActiveStatus == 7 || Model.ActiveStatus == 11)
+                            {
+                                <h6 class="text-brown font-weight-bold">Online Paid</h6>
+                            }
+                            else
+                            {
+                                <h6 class="text-brown font-weight-bold">Payable Online</h6>
+                            }
+
+                            <div class="table-responsive">
+                                <table class="table table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th width="100px" class="font-weight-bolder">Classification</th>
+                                            <th width="50px" class="font-weight-bolder">Total Amount <small><i class="icon-rupee-sign-solid ml-1"></i></small></th>
+                                            @if (Model.ActiveStatus == 6 || Model.ActiveStatus == 7 || Model.ActiveStatus == 11)
+                                            {
+                                                <th width="100px" class="font-weight-bolder">Total Wallet Amount(At the time of Payment) <small><i class="icon-rupee-sign-solid ml-1"></i></small></th>
+                                            }
+                                            else
+                                            {
+                                                <th width="100px" class="font-weight-bolder">Total Wallet Amount <small><i class="icon-rupee-sign-solid ml-1"></i></small></th>
+
+                                            }
+                                            @if (Model.ActiveStatus == 6 || Model.ActiveStatus == 7 || Model.ActiveStatus == 11)
+                                            {
+                                                <th width="100px" class="font-weight-bolder">Paid by Wallet Amount <small><i class="icon-rupee-sign-solid ml-1"></i></small></th>
+                                            }
+                                            else
+                                            {
+                                                <th width="100px" class="font-weight-bolder">Pay by Wallet Amount <small><i class="icon-rupee-sign-solid ml-1"></i></small></th>
+
+                                            }
+                                            <th width="50px" class="font-weight-bolder"></th>
+                                            @if (Model.ActiveStatus == 6 || Model.ActiveStatus == 7 || Model.ActiveStatus == 11)
+                                            {
+                                                <th width="50px" class="font-weight-bolder">Paid Amount <small><i class="icon-rupee-sign-solid ml-1"></i></small></th>
+                                            }
+                                            else
+                                            {
+                                                <th width="50px" class="font-weight-bolder">Payable Amount <small><i class="icon-rupee-sign-solid ml-1"></i></small></th>
+                                            }
+
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+
+                                        @if (Model != null && Model.PaymentDetails != null && Model.PaymentDetails.Count > 0)
+                                        {
+                                            var A = 0.0;
+                                            var B = 0.0;
+                                            var C = 0.0;
+                                            var D = 0.0;
+
+                                            for (int i = 0; i < Model.PaymentDetails.Count; i++)
+                                            {
+                                                if (Model.PaymentDetails[i].IsApplicable == true)
+                                                {
+                                                    A += Convert.ToDouble(Model.PaymentDetails[i].TotalAmount);
+                                                    B += Convert.ToDouble(Model.PaymentDetails[i].AdjustmentAmount);
+                                                    if (Convert.ToDouble(Model.PaymentDetails[i].AdjustmentAmount) < Convert.ToDouble(Model.PaymentDetails[i].TotalAmount))
+                                                    {
+                                                        if (Model.PaymentDetails[i].IsWalletAdjusted == "1")
+                                                        {
+                                                            C += Convert.ToDouble(Model.PaymentDetails[i].MappingValue);
+                                                            D += Convert.ToDouble(Model.PaymentDetails[i].AdjustmentAmount);
+                                                        }
+                                                        else
+                                                        {
+                                                            C += Convert.ToDouble(Model.PaymentDetails[i].MappingValue);
+                                                        }
+
+                                                    }
+                                                    else
+                                                    {
+                                                        if (Model.PaymentDetails[i].IsWalletAdjusted == "1")
+                                                        {
+
+                                                            D += Convert.ToDouble(Model.PaymentDetails[i].TotalAmount);
+                                                        }
+                                                        C += Convert.ToDouble(Model.PaymentDetails[i].MappingValue);
+
+                                                    }
+                                                    <tr>
+                                                        <td>@Model.PaymentDetails[i].PaymentType</td>
+                                                        <td>@Model.PaymentDetails[i].TotalAmount</td>
+                                                        <td>@Model.PaymentDetails[i].AdjustmentAmount</td>
+                                                        @if (Convert.ToDouble(Model.PaymentDetails[i].AdjustmentAmount) < Convert.ToDouble(Model.PaymentDetails[i].TotalAmount))
+                                                        {
+
+                                                            if (Model.PaymentDetails[i].IsWalletAdjusted == "1")
+                                                            {
+                                                                <td>@Model.PaymentDetails[i].AdjustmentAmount</td>
+
+                                                            }
+                                                            else
+                                                            {
+                                                                <td>0</td>
+
+                                                            }
+                                                            <td>=</td>
+                                                            <td>@Model.PaymentDetails[i].MappingValue</td>
+                                                        }
+                                                        else
+                                                        {
+                                                            if (Model.PaymentDetails[i].IsWalletAdjusted == "1")
+                                                            {
+                                                                <td>@Model.PaymentDetails[i].TotalAmount</td>
+                                                            }
+                                                            else
+                                                            {
+                                                                <td>0</td>
+                                                            }
+                                                            <td >=</td>
+                                                            <td >@Model.PaymentDetails[i].MappingValue</td>
+                                                        }
+                                                    </tr>
+                                                }
+                                            }
+
+                                            <tr>
+                                                @if (Model.ActiveStatus == 6 || Model.ActiveStatus == 7 || Model.ActiveStatus == 11)
+                                                {
+                                                    <td class="font-weight-bold">Total Paid Amount</td>
+                                                }
+                                                else
+                                                {
+                                                    <td class="font-weight-bold">Total Payable Amount</td>
+                                                }
+                                                <td >@A</td>
+
+                                                <td >@B</td>
+                                                @if (B < A)
+                                                {
+                                                    <td >@D</td>
+                                                }
+                                                else
+                                                {
+                                                    if (Model.PaymentDetails[0].IsWalletAdjusted == "1")
+                                                    {
+                                                        <td >@D</td>
+                                                    }
+                                                    else
+                                                    {
+                                                        <td >0</td>
+                                                    }
+                                                }
+                                                <td>=</td>
+                                                <td >@C</td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                            
+                            <div class="table-responsive">
+                                <table class="table table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th width="100px" class="font-weight-bolder">Classification</th>
+                                            <th width="50px" class="font-weight-bolder">Total Amount <small><i class="icon-rupee-sign-solid ml-1"></i></small></th>
+                                            @if (Model.ActiveStatus == 6 || Model.ActiveStatus == 7 || Model.ActiveStatus == 11)
+                                            {
+                                                <th width="100px" class="font-weight-bolder">Total Wallet Amount(At the time of Payment) <small><i class="icon-rupee-sign-solid ml-1"></i></small></th>
+                                            }
+                                            else
+                                            {
+                                                <th width="100px" class="font-weight-bolder">Total Wallet Amount <small><i class="icon-rupee-sign-solid ml-1"></i></small></th>
+
+                                            }
+                                            @if (Model.ActiveStatus == 6 || Model.ActiveStatus == 7 || Model.ActiveStatus == 11)
+                                            {
+                                                <th width="100px" class="font-weight-bolder">Paid by Wallet Amount <small><i class="icon-rupee-sign-solid ml-1"></i></small></th>
+                                            }
+                                            else
+                                            {
+                                                <th width="100px" class="font-weight-bolder">Pay by Wallet Amount <small><i class="icon-rupee-sign-solid ml-1"></i></small></th>
+
+                                            }
+                                            <th width="50px" class="font-weight-bolder"></th>
+                                            @if (Model.ActiveStatus == 6 || Model.ActiveStatus == 7 || Model.ActiveStatus == 11)
+                                            {
+                                                <th width="50px" class="font-weight-bolder">Paid Amount <small><i class="icon-rupee-sign-solid ml-1"></i></small></th>
+                                            }
+                                            else
+                                            {
+                                                <th width="50px" class="font-weight-bolder">Payable Amount <small><i class="icon-rupee-sign-solid ml-1"></i></small></th>
+                                            }
+
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+
+                                        @if (Model != null && Model.PaymentDetails != null && Model.PaymentDetails.Count > 0)
+                                        {
+                                            var A = 0.0;
+                                            var B = 0.0;
+                                            var C = 0.0;
+                                            var D = 0.0;
+                                            var isOffline = false;
+                                            for (int i = 0; i < Model.PaymentDetails.Count; i++)
+                                            {
+                                                if (isOffline == false)
+                                                {
+
+                                                    <h6 class="text-brown font-weight-bold">Shall be paid separately</h6>
+                                                    @*<div class="col-xs-12">
+                            <div class="col-md-2 default-form-control-style">
+                                <label style="color: red; font-size: 16px;">Shall be paid separately</label>
+                            </div>
+                            <div class="col-md-2 default-form-control-style">
+                            </div>
+                            <div class="col-md-offset-1 col-md-2 default-form-control-style">
+                            </div>
+                            <div class="col-md-offset-1 col-md-2 default-form-control-style">
+                            </div>
+                        </div>*@
+                                                    isOffline = true;
+                                                }
+
+
+
+                                                if (Model.PaymentDetails[i].IsApplicable == false)
+                                                {
+                                                    A += Convert.ToDouble(Model.PaymentDetails[i].TotalAmount);
+                                                    B += Convert.ToDouble(Model.PaymentDetails[i].AdjustmentAmount);
+                                                    if (Convert.ToDouble(Model.PaymentDetails[i].AdjustmentAmount) < Convert.ToDouble(Model.PaymentDetails[i].TotalAmount))
+                                                    {
+                                                        if (Model.PaymentDetails[i].IsWalletAdjusted == "1")
+                                                        {
+                                                            C += Convert.ToDouble(Model.PaymentDetails[i].MappingValue);
+                                                            D += Convert.ToDouble(Model.PaymentDetails[i].AdjustmentAmount);
+                                                        }
+                                                        else
+                                                        {
+                                                            C += Convert.ToDouble(Model.PaymentDetails[i].MappingValue);
+                                                        }
+
+                                                    }
+                                                    else
+                                                    {
+                                                        if (Model.PaymentDetails[i].IsWalletAdjusted == "1")
+                                                        {
+
+                                                            D += Convert.ToDouble(Model.PaymentDetails[i].TotalAmount);
+                                                        }
+                                                        C += Convert.ToDouble(Model.PaymentDetails[i].MappingValue);
+
+                                                    }
+
+                                                    <tr>
+
+                                                        <td >@Model.PaymentDetails[i].PaymentType</td>
+
+                                                        <td >@Model.PaymentDetails[i].TotalAmount</td>
+
+                                                        <td >@Model.PaymentDetails[i].AdjustmentAmount</td>
+
+                                                        @if (Convert.ToDouble(Model.PaymentDetails[i].AdjustmentAmount) < Convert.ToDouble(Model.PaymentDetails[i].TotalAmount))
+                                                        {
+
+                                                            if (Model.PaymentDetails[i].IsWalletAdjusted == "1")
+                                                            {
+                                                                <td >@Model.PaymentDetails[i].AdjustmentAmount</td>
+
+                                                            }
+                                                            else
+                                                            {
+                                                                <td >0</td>
+
+
+                                                            }
+                                                            <td >=</td>
+
+                                                            <td >@Model.PaymentDetails[i].MappingValue</td>
+                                                        }
+                                                        else
+                                                        {
+                                                            if (Model.PaymentDetails[i].IsWalletAdjusted == "1")
+                                                            {
+                                                                <td >@Model.PaymentDetails[i].TotalAmount</td>
+
+                                                            }
+                                                            else
+                                                            {
+                                                                <td >0</td>
+
+                                                            }
+                                                            <td >=</td>
+
+                                                            <td >@Model.PaymentDetails[i].MappingValue</td>
+
+                                                        }
+
+                                                    </tr>
+                                                }
+
+
+
+                                            }
+
+
+                                            <tr>
+                                                @if (Model.ActiveStatus == 6 || Model.ActiveStatus == 7 || Model.ActiveStatus == 11)
+                                                {
+                                                    <td class="font-weight-bold">Total Paid Amount</td>
+                                                }
+                                                else
+                                                {
+                                                    <td class="font-weight-bold">Total Payable Amount</td>
+                                                }
+
+                                                <td >@A</td>
+                                                <td >@B</td>
+
+                                                @if (B < A)
+                                                {
+                                                    <td >@D</td>
+
+                                                }
+                                                else
+                                                {
+                                                    if (Model.PaymentDetails[0].IsWalletAdjusted == "1")
+                                                    {
+                                                        <td >@D</td>
+
+                                                    }
+                                                    else
+                                                    {
+                                                        <td >0</td>
+
+                                                    }
+                                                }
+                                                <td >=</td>
+
+                                                <td >@C</td>
+
+                                            </tr>
+
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+
+
+
+
+                            <div class="row mt-3">
+                                <div class="col-sm-12 text-center">
+                                    <a class="btn btn-dark btn-md  " data-toggle="modal" data-target="#leaseinformation">Lease/License information</a>
+                                    <a class="btn btn-primary btn-md  ">Make Payment</a>
+                                </div>
+                            </div>
+                        }
+                    </div>
+            </section>
+            </div>
+            </div>
+            </div>
+            <!-- MAIN CONTENT AREA ENDS -->
+            </section>
+            <div class="modal fade" id="leaseinformation" aria-modal="true">
+                <div class="modal-dialog modal-dialog-centered modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title m-0">Lease/License information</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">×</span>
+                            </button>
+                        </div>
+                        <div class="modal-body pt-2">
+                            <div class="row">
+                                <div class="col-sm-12">
+
+
+                                    <div class="row">
+                                        <div class="col-lg-12 col-md-12 col-sm-12">
+                                            <div class="row form-group">
+                                                <label class="col-lg-5 col-md-12  col-form-label font-weight-bolder">Name of lessee/ licensee</label>
+                                                <div class="col-lg-7 col-md-12">
+                                                    <span class="colon">:</span>
+                                                    @(Html.LabelFor(model => model.LesseeName, new { @class = "form-control-plaintext" }))
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-12 col-md-12 col-sm-12">
+                                            <div class="row form-group">
+                                                <label class="col-lg-5 col-md-12 col-form-label font-weight-bolder">Address</label>
+                                                <div class="col-lg-7 col-md-12">
+                                                <span class="colon">:</span>
+                                                @(Html.LabelFor(model => model.LesseeAddress, new { @class = "form-control-plaintext" }))
+                                            </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-12 col-md-12 col-sm-12">
+                                            <div class="row form-group">
+                                                <label class="col-lg-5 col-md-12 col-form-label font-weight-bolder">Grant Order No.</label>
+                                                <div class="col-lg-7 col-md-12">
+                                                    <span class="colon">:</span>
+                                                    @(Html.LabelFor(model => model.GrantOrderNo, new { @class = "form-control-plaintext" }))
+                                                    @(Html.HiddenFor(model => model.GrantOrderNo))
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-12 col-md-12 col-sm-12">
+                                            <div class="row form-group">
+                                                <label class="col-lg-5 col-md-12 col-form-label font-weight-bolder">Grant Order Date</label>
+                                                <div class="col-lg-7 col-md-12">
+                                                    <span class="colon">:</span>
+                                                    @(Html.LabelFor(model => model.DateOfGrant, new { @class = "form-control-plaintext" }))
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-12 col-md-12 col-sm-12">
+                                            <div class="row form-group">
+                                                <label class="col-lg-5 col-md-12 col-form-label font-weight-bolder">Period of Lease</label>
+                                                <div class="col-lg-7 col-md-12">
+                                                    <span class="colon">:</span>
+                                                    @(Html.LabelFor(model => model.PeriodOfLease, new { @class = "form-control-plaintext" }))
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-12 col-md-12 col-sm-12">
+                                            <div class="row form-group">
+                                                <label class="col-lg-5 col-md-12 col-form-label font-weight-bolder">Mineral Name</label>
+                                                <div class="col-lg-7 col-md-12">
+                                                    <span class="colon">:</span>
+                                                    @(Html.LabelFor(model => model.MineralName, new { @class = "form-control-plaintext" }))
+                                                    @(Html.HiddenFor(model => model.MineralId))
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-12 col-md-12 col-sm-12">
+                                            <div class="row form-group">
+                                                <label class="col-lg-5 col-md-12 col-form-label font-weight-bolder">Mineral Form</label>
+                                                <div class="col-lg-7 col-md-12">
+                                                    <span class="colon">:</span>
+                                                    @(Html.LabelFor(model => model.MineralNature, new { @class = "form-control-plaintext" }))
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-12 col-md-12 col-sm-12">
+                                            <div class="row form-group">
+                                                <label class="col-lg-5 col-md-12 col-form-label font-weight-bolder">Mineral Grade</label>
+                                                <div class="col-lg-7 col-md-12">
+                                                    <span class="colon">:</span>
+                                                    @(Html.LabelFor(model => model.MineralGradeName, new { @class = "form-control-plaintext" }))
+                                                    @(Html.HiddenFor(model => model.MineralGradeId))
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-12 col-md-12 col-sm-12">
+                                            <div class="row form-group">
+                                                <label class="col-lg-5 col-md-12 col-form-label font-weight-bolder">By end use plant inside the lease area</label>
+                                                <div class="col-lg-7 col-md-12">
+                                                    <span class="colon">:</span>
+                                                    <label class="form-control-plaintext">0.000</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="ccol-lg-12 col-md-12 col-sm-12">
+                                            <div class="row form-group">
+                                                <label class="col-lg-5 col-md-12 col-form-label font-weight-bolder">Quantity</label>
+                                                <div class="col-lg-7 col-md-12">
+                                                    <span class="colon">:</span>
+                                                    @(Html.LabelFor(model => model.ProposedQty, new { @class = "form-control-plaintext" }))
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-12 col-md-12 col-sm-12">
+                                            <div class="row form-group">
+                                                <label class="col-lg-5 col-md-12 col-form-label font-weight-bolder">Unit</label>
+                                                <div class="col-lg-7 col-md-12">
+                                                    <span class="colon">:</span>
+                                                    @(Html.LabelFor(model => model.UnitName, new { @class = "form-control-plaintext" }))
+                                                    @(Html.HiddenFor(model => model.UnitId))
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-12 col-md-12 col-sm-12">
+                                            <div class="row form-group">
+                                                <label class="col-lg-5 col-md-12 col-form-label font-weight-bolder">Royalty Rate <small><i class="icon-rupee-sign-solid ml-1"></i></small></label>
+                                                <div class="col-lg-7 col-md-12">
+                                                    <span class="colon">:</span>
+                                                    @if (Model != null && Model.PaymentDetails != null && Model.PaymentDetails.Count > 0)
+                                                    {
+                                                        for (int i = 0; i < Model.PaymentDetails.Count; i++)
+                                                        {
+                                                            if (Model.PaymentDetails[i].PaymentType.ToUpper().Contains("ROYALTY"))
+                                                            {
+                                                                if (Model.PaymentDetails[i].CalType.ToUpper().Contains("%") == false)
+                                                                {
+                                                                    <label class="form-control-plaintext" id="RoyaltyRate">@Model.PaymentDetails[i].CalValue @Model.PaymentDetails[i].CalType</label>
+
+                                                                    @*<input class="form-control" data-val="true" data-val-number="The field RoyaltyRate must be a number."
+                            id="RoyaltyRate" name="RoyaltyRate" readonly="readonly" type="text" value="@Model.PaymentDetails[i].CalValue @Model.PaymentDetails[i].CalType ">*@
+                                                                }
+                                                                else
+                                                                {
+                                                                    <label class="form-control-plaintext" id="RoyaltyRate">@Model.PaymentDetails[i].CalValue (@Model.PaymentDetails[i].RoyaltyRate @Model.PaymentDetails[i].CalType Of @Model.PaymentDetails[i].BasisRate)</label>
+                                                                    @* <input class="form-control" data-val="true" data-val-number="The field RoyaltyRate must be a number."
+                            id="RoyaltyRate" name="RoyaltyRate" readonly="readonly" type="text" value="@Model.PaymentDetails[i].CalValue (@Model.PaymentDetails[i].RoyaltyRate @Model.PaymentDetails[i].CalType Of @Model.PaymentDetails[i].BasisRate)">*@
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                    else
+                                                    {
+                                                        @(Html.LabelFor(model => model.RoyaltyRate, new { @class = "form-control-plaintext" }))
+                                                    }
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        
+            <script>
+              
+                backMe = "yes"
+                $(document).ready(function () {
+                    loadNavigation('Add', 'glhelpdesk', 'plraiseticket', 'tl', 'E-Permit', 'Apply e-permit', ' ');
+                    $('.datetime').datetimepicker({
+                        format: "DD/MM/YYYY"
+                    }).keydown(false);
+                });
+            </script>

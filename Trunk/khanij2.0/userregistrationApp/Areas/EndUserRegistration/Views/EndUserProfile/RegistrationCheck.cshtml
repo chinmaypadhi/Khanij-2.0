@@ -1,0 +1,327 @@
+﻿@*// *********************************************************************************************************
+    //  View Name                : RegistrationCheck
+    //  Desciption               : Check EndUser Status
+    //  Created By               : Debaraj Swain
+    //  Created On               : 18 April 2021
+    // ********************************************************************************************************
+*@
+@model userregistrationEF.EndUserModel
+@{
+    ViewData["Title"] = "ProfileView";
+    Layout = "~/Views/Shared/_WebHeaderLayout.cshtml";
+}
+<script src='@Url.Content("~/js/sweetalert.min.js")'></script>
+<script src="~/js/specialChar.js"></script>
+<script src="~/js/CSMValidation.js"></script>
+<script type="text/javascript">
+
+    function updateCaptcha() {
+
+        $.ajax({
+            url: "/EndUserRegistration/EndUserProfile/CaptchaImage",
+            data: {},
+            dataType: 'json',
+            type: 'post',
+            success: function (data) {
+                $("#capt1").html(data);
+            },
+            error: function (err) {
+                alert(err);
+            }
+        });
+    };
+    $(document).ready(function () {
+        updateCaptcha();
+    });
+</script>
+<style>
+    .form-group.row {
+        align-items: center;
+    }
+
+    label.col-form-label label {
+        margin-bottom: 0rem;
+    }
+
+    .main-content {
+        background-image: none;
+    }
+</style>
+<div class="inner-naviagtion">
+    <div class="container">
+        <div class="pt-lg-5 pt-md-4 pt-3">
+            <nav aria-label="breadcrumb mb-0">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="default.aspx" class="text-white"><span class="fas fa-home"></span></a></li>
+                    <li class="breadcrumb-item text-white" aria-current="page">User &amp; Vehicle Owner</li>
+                    <li class="breadcrumb-item text-white" aria-current="page">Application Status Check</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+</div>
+<div class="main-content py-3 login-content">
+    <div class="container">
+        <div class="text-dark">
+            <span class="text-danger float-right indicates">(*) indicates mandatory</span>
+            @using (Html.BeginForm("ProfileView", "RegistrationCheck", FormMethod.Post, new { id = "__EUAntiForgeryForm", @enctype = "multipart/form-data", @class = "form-horizontal bordered-row" }))
+            {
+                @*@Html.AntiForgeryToken()
+                    @Html.HiddenFor(model => model.UserCode)
+                    @Html.HiddenFor(model => model.RegistrationFeesId)
+                    @Html.Hidden("PaymentMode")
+                    @Html.Hidden("PaymentBank")*@
+                <div class="clearfix"></div>
+                <h4 class="text-dark font-weight-bold mt-4 mb-5 text-uppercase">Application Status Check </h4>
+                <div class="row">
+                    <div class="col-lg-6 col-md-12 col-sm-12">
+                        <div class="form-group row">
+                            <label class="col-sm-4 col-form-label font-weight-bolder">Registration Type<br /> पंजीकरण प्रकार<span class="text-danger">*</span></label>
+                            <div class="col-sm-7">
+                                <select class="form-control searchableselect" id="CheckType" onchange="onChangeRegistrationType()">
+                                    <option value="0">Select</option>
+                                    <option value="Trailing Dam">Trailing Dam</option>
+                                    <option value="User">User</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="col-lg-6 col-md-12 col-sm-12">
+                        <div class="form-group row">
+                            <label class="col-sm-4 col-form-label font-weight-bolder">Registration Number<br /> पंजीकरण क्रमांक<span class="text-danger">*</span></label>
+                            <div class="col-sm-7">
+                                <input type="text" name="CheckStatus" id="CheckApplicationStatus" maxlength="24" class="form-control" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-lg-8 col-12">
+                        <div class="form-group row">
+                            <label class="col-sm-3 col-form-label font-weight-bolder">Enter Captcha <br /> कैप्चा<span class="text-danger">*</span></label>
+                            <div class="col-sm-4">
+                                @Html.TextBoxFor(m => m.captcha, new { @class = "form-control", @maxlength = "10" })
+                            </div>
+
+                            <div class="col-sm-2 pr-md-0 mt-md-0 mt-4">
+                                <div id="capt1" class="form-control rounded-0"></div>
+                            </div>
+                            <div class="col-sm-1 pl-md-0 mt-md-0 mt-4">
+                                <label class="input-group-text  rounded-0" for="inputDate1"> <a href="javascript:;" onclick="updateCaptcha();"><i class="fas fa-sync-alt"></i></a> </label>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+
+                    </div>
+                </div>
+
+
+                <div class="row form-group">
+                    <div class="col-sm-6 offset-lg-2 offset-md-4">
+                        <input type="button" id="ChkStatus" value="Check Status" onclick="checkstatus();" class="btn btn-primary btn-md ml-0" />
+                    </div>
+                </div>
+
+
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="form-group row">
+                            <div class="col-sm-12">
+
+
+                                <ol class="mb-0 pl-3">
+
+                                    <strong class="text-danger">Note : Select appropriate registration type to know the status of your application.</strong>
+
+                                    <li>
+                                        <strong>Tailing Dam :</strong> Enter your Tailing Dam / Ashdyke / Mud pond Registration Number to know your Application Status for Tailing Dam / Ashdyke / Mud pond Registration.
+                                    </li>
+                                    <li>
+                                        <strong>User :</strong>
+                                        Enter your User Registration Number to know your Application Status for User Registration.
+                                    </li>
+                                </ol>
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+
+
+
+
+
+
+
+
+
+
+
+
+            }
+
+        </div>
+    </div>
+</div>
+<script>
+
+      function checkstatus() {
+          debugger;
+         var CheckType = $('#CheckType').val();
+         var UserCode = $("#CheckApplicationStatus").val();
+         var captcha = $("#captcha").val();
+
+      
+          if (!DropDownValidation("CheckType", "Registration Type")) {
+              return false;
+          }
+          if (!blankFieldValidation("CheckApplicationStatus", "Registration Number")) {
+              return false;
+          }
+          if (!blankFieldValidation("captcha", "captcha")) {
+              return false;
+          }
+
+          if ($("#capt1").html() != $("#captcha").val()) {
+              swal("", "Invalid captcha !", "warning");
+              $("#captcha").focus();
+              return;
+          }
+
+         if (UserCode.length > 0) {
+
+             if (CheckType == 'Tailing Dam') {
+
+                 $.ajax({
+                     type: "POST",
+                     url: '@Url.Content("~/TailingDam/Registration/CheckTailingDamApplicationStatus")',
+                     data: '{UserCode: "' + UserCode + '",captcha: "' + captcha + '",CheckType: "' + CheckType + '"}',
+                     contentType: "application/json; charset=utf-8",
+                     dataType: "json",
+
+                     success: function (data) {
+
+                         if (data == "4") {
+                             swal("", "Invalid captcha !", "warning");
+                             $('#captcha').focus();
+                             updateCaptcha();
+                         }
+                         else if (data != null && data != "0") {
+
+                             window.location.href = '@Url.Action("RegistrationCheck", "Registration", new { Area = "TailingDam" })?UserCode=' + UserCode;
+                         }
+
+                         else {
+                             swal("", "Please enter correct Registration number to Know the status of your application. !", "warning");
+                         }
+                     }
+                 });
+
+             } else if (CheckType == 'User') {
+
+             $.ajax({
+                   url: '@Url.Action("CheckEndUserApplicationStatus", "EndUserProfile")',
+            data: {
+                UserCode: UserCode,
+                     captcha: captcha
+
+            },
+
+                 success: function (data) {
+
+
+                      if (data != null && data != "0") {
+
+                         window.location.href = '@Url.Action("EUPRegistration", "EndUserProfile", new { Area = "EndUserRegistration" })?UserCode=' + UserCode;
+                     }
+
+                     else {
+                          swal("", "Please enter correct Registration number to Know the status of your application. !", "warning");
+                     }
+                 }
+             });
+
+     }
+
+
+
+
+
+
+}
+}
+
+    $(document).ready(function () {
+        $('.datepicker').datetimepicker({
+            format: 'LT',
+            format: 'DD-MM-YYYY',
+            daysOfWeekDisabled: [0, 6],
+        });
+
+    });
+</script>
+<script>
+    //Start code: Add font size
+    var min = 12;
+    var max = 18;
+    var reset = 15;
+
+    function increaseFontSize() {
+        var p = document.getElementsByTagName('body');
+        for (i = 0; i < p.length; i++) {
+            if (p[i].style.fontSize) {
+                var s = parseInt(p[i].style.fontSize.replace("px", ""));
+            } else {
+                var s = 15;
+            }
+            if (s != max) {
+                s += 1;
+            }
+            p[i].style.fontSize = s + "px"
+        }
+    }
+
+    function decreaseFontSize() {
+        var p = document.getElementsByTagName('body');
+        for (i = 0; i < p.length; i++) {
+            if (p[i].style.fontSize) {
+                var s = parseInt(p[i].style.fontSize.replace("px", ""));
+            } else {
+                var s = 15;
+            }
+            if (s != min) {
+                s -= 1;
+            }
+            p[i].style.fontSize = s + "px"
+        }
+    }
+
+    function reSetFontSize() {
+        var p = document.getElementsByTagName('body');
+        for (i = 0; i < p.length; i++) {
+            if (p[i].style.fontSize) {
+                var s = parseInt(p[i].style.fontSize.replace("px", ""));
+            } else {
+                var s = 15;
+            }
+            if (s != reset) {
+                s = 15;
+            }
+            p[i].style.fontSize = s + "px"
+        }
+    }
+    //End code: Add font size
+</script>
+
+
+
+

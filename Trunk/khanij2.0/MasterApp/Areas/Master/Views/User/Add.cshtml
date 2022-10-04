@@ -1,0 +1,371 @@
+﻿
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@model MasterEF.UserCreationModel
+@{
+    ViewData["Title"] = "Add";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+@if (ViewBag.msg != null)
+{
+    <script>
+
+ swal("",'@ViewBag.msg',"success");
+    </script>
+}
+@if (TempData["msg"] != null)
+{
+    <script>
+        swal("",'@TempData["msg"]',"success");
+    </script>
+}
+<script>
+    indicateMe = "yes"
+    $(document).ready(function () {
+        loadNavigation('Add', 'glRoleRes', 'plUser', 'tl', 'Master', 'User Creation', ' ');
+        $('.searchableselect').searchableselect();
+        debugger
+        if ($("#hfStateId").val() != "") {
+            $("#ddlState").val($("#hfStateId").val());
+        }
+        if ($("#hfUsertypeId").val() != "") {
+            $("#UsertypeId").val($("#hfUsertypeId").val()); 
+        }
+        if ($("#ddlState").val() != "") {
+            BindDistrictData();
+        }
+        if ($("#UsertypeId").val() != "") {
+            GetRoleTypeListByUserType();
+        }
+
+        //if ($("#hfRoleTypeId").val() != "") {
+        //    //$('#ddlDepartment').val($('#hfRoleTypeId').val());
+        //    GetRoleListByRoleType();
+        //}
+        //if ($("#ddlDepartment").val() != "") {
+        //    GetRoleListByRoleType();
+        //}
+    });
+    function BindDistrictData() {
+        if ($('#StateId').val() != "") {
+            debugger;
+            $.ajax({
+                url: '/Master/User/GetDistrictByStateId',
+                data: { 'StateId': $('#StateId').val() },
+                dataType: 'json',
+                type: 'post',
+                success: function (data) {
+                    debugger;
+                    var row = "";
+                    $('#ddlDistrict').html('');
+                    row += "<option value=''>Select</option>";
+                    $.each(data, function (ind, item) {
+                        row += "<option value='" + item.districtID + "'>" + item.districtName + "</option>";
+                    });
+                    $('#ddlDistrict').html(row);
+                    if ($("#hfDistrictId").val() != "") {
+                        $("#ddlDistrict").val($("#hfDistrictId").val());
+                    }
+                },
+                error: function (err) {
+                }
+            });
+        }
+        else {
+            $('#ddlDistrict').html('');
+            $('#ddlDistrict').append("<option value=''>Select</option>");
+        }
+    }
+    function GetRoleTypeListByUserType() {
+        if ($('#UsertypeId').val() != "") {
+            debugger
+            $.ajax({
+                url: '/Master/User/GetRoleTypeListByUserTypeId',
+                data: { 'UserTypeId': $('#UsertypeId').val() },
+                dataType: 'json',
+                type: 'post',
+                success: function (data) {
+                    var row = "";
+                    $('#ddlDepartment').html('');
+                    row += "<option value=''>Select</option>";
+                    $.each(data, function (ind, item) {
+                        row += "<option value='" + item.roleTypeId + "'>" + item.roleTypeName + "</option>";
+                    });
+                    $('#ddlDepartment').html(row); /*hfRoleTypeId*/
+                    if ($('#hfRoleTypeId').val() != "") {
+                        $("#ddlDepartment").val($("#hfRoleTypeId").val());
+                        GetRoleListByRoleType();
+                    }
+                },
+                error: function (err) {
+
+                }
+            });
+        }
+    }
+    function GetRoleListByRoleType() {
+        debugger;
+        if ($('#ddlDepartment').val() != "") {
+            debugger;
+            $.ajax({
+                url: '/Master/User/GetRoleListByRoleTypeId',
+                data: { 'RoleTypeId': $('#ddlDepartment').val() },
+                dataType: 'json',
+                type: 'post',
+                success: function (data) {
+                    var row = "";
+                    $('#ddlDesignation').html('');
+                    row += "<option value=''>Select</option>";
+                    $.each(data, function (ind, item) {
+                        row += "<option value='" + item.roleId + "'>" + item.roleName + "</option>";
+                    });
+                    $('#ddlDesignation').html(row);
+
+                    if ($('#hfRoleId').val() != "") {
+                        $("#ddlDesignation").val($("#hfRoleId").val());
+                    }
+                },
+                error: function (err) {
+
+                }
+            });
+        }
+    }
+    function Validate() {
+        var Iss = false;
+        if (!blankFieldValidation("UserName", "User Name")) {
+            return false;
+        }
+        if (!blankFieldValidation("ApplicantName", "User Full Name")) {
+            return false;
+        }
+        if (!DropDownValidation("UsertypeId", "User Type")) {
+            return false;
+        }
+        if (!DropDownValidation("ddlDepartment", "Department")) {
+            return false;
+        }
+        if (!DropDownValidation("ddlDesignation", "Designation")) {
+            return false;
+        }
+        if (!blankFieldValidation("Password", "Password")) {
+            return false;
+        }
+        if (!DropDownValidation("StateId", "State")) {
+            return false;
+        }
+        if (!DropDownValidation("ddlDistrict", "District")) {
+            return false;
+        }
+        if (!blankFieldValidation("MobileNo", "Mobile No")) {
+            return false;
+        }
+        if (!blankFieldValidation("EMailId", "EMail")) {
+            return false;
+        }
+        if (!validateEmail($('#EMailId').val())) {
+            swal("", "Please Enter valid Email Id", "warning");
+            return false;
+        }
+        if (!blankFieldValidation("Address", "Address")) {
+            return false;
+        }
+        if (!blankFieldValidation("PinCode", "Pin Code")) {
+            return false;
+        }
+        Iss = true;
+        return Iss;
+    }
+    function validateEmail(emailid) {
+        var emailReg = /^([\w-\.]+@@([\w-]+\.)+[\w-]{2,4})?$/;
+        return emailReg.test(emailid);
+    }
+</script>
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        @Html.Partial("_CMSnavigation")
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item"><a class="nav-link active" href="/Master/User/Add">Add</a></li>
+                        <li class="nav-item"><a class="nav-link" href="/Master/User/ViewList">View</a></li>
+                    </ul>
+                    @Html.Partial("_CMSutil")
+                </div>
+                <section class="box form-container">
+                    <div class="content-body">
+                        <form asp-action="Add" asp-controller="User" method="post" autocomplete="off">
+                            @Html.AntiForgeryToken()
+                            @Html.HiddenFor(m=>m.UserId)
+                            @Html.HiddenFor(m=>m.EncryptPassword)
+                            <div class="row">
+                                <div class="col-lg-6 col-12">
+                                    <div class="form-group row">
+                                        <label for="UserLoginId" class="col-sm-4 col-form-label">Login ID<span class="text-danger">*</span></label>
+                                        <div class="col-sm-7">
+                                            <input type="text" asp-for="UserName" class="form-control" onkeypress="return inputLimiter(event,'NameCharactersAndNumbers')" />
+                                            <span class="text-danger" asp-validation-for="UserName"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 col-12">
+                                    <div class="form-group row">
+                                        <label for="ApplicantName" class="col-sm-4 col-form-label">User Full Name<span class="text-danger">*</span></label>
+                                        <div class="col-sm-7">
+                                            <input type="text" class="form-control" asp-for="ApplicantName" onkeypress="return inputLimiter(event,'NameCharactersAndNumbers')" />
+                                            <span class="text-danger" asp-validation-for="ApplicantName"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 col-12">
+                                    <div class="form-group row">
+                                        <label for="UsertypeId" class="col-sm-4 col-form-label">User Type<span class="text-danger">*</span></label>
+                                        <div class="col-sm-7">
+                                            <select asp-for="UsertypeId" asp-items="ViewBag.UserTypes as IEnumerable<SelectListItem>"
+                                                    onchange="GetRoleTypeListByUserType()"
+                                                    class="form-control  searchableselect" autofocus="autofocus">
+                                                <option value="">Select</option>
+                                            </select>
+                                            <span class="text-danger" asp-validation-for="UsertypeId"></span>
+                                            @Html.HiddenFor(m => m.UsertypeId, new { @id = "hfUsertypeId" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 col-12">
+                                    <div class="form-group row">
+                                        <label for="ddlDepartment" class="col-sm-4 col-form-label">Department <span class="text-danger">*</span></label>
+                                        <div class="col-sm-7">
+                                            <select id="ddlDepartment" name="RoleTypeId"
+                                                    class="form-control searchableselect"
+                                                    onchange="GetRoleListByRoleType()">
+                                                <option value="">Select</option>
+                                            </select>
+                                            <span class="text-danger" asp-validation-for="RoleTypeId"></span>
+                                            @Html.HiddenFor(m => m.RoleTypeId, new { @id = "hfRoleTypeId" })
+
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-6 col-12">
+                                    <div class="form-group row">
+                                        <label for="ddlDesignation" class="col-sm-4 col-form-label">Designation <span class="text-danger">*</span></label>
+                                        <div class="col-sm-7">
+                                            <select id="ddlDesignation" name="RoleId" class="form-control searchableselect">
+                                                <option value="">Select</option>
+                                            </select>
+                                            <span class="text-danger" asp-validation-for="RoleId"></span>
+                                            @Html.HiddenFor(m => m.RoleId, new { @id = "hfRoleId" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 col-12">
+                                    <div class="form-group row">
+                                        <label for="Password" class="col-sm-4 col-form-label">Password <span class="text-danger">*</span></label>
+                                        <div class="col-sm-7">
+                                            <input type="text" asp-for="Password" class="form-control" />
+                                            @*@Html.PasswordFor(m=>m.Password, new {@class= "form-control" })*@
+                                            <span class="text-danger" asp-validation-for="Password"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 col-12">
+                                    <div class="form-group row">
+                                        <label for="StateId" class="col-sm-4 col-form-label">State<span class="text-danger">*</span></label>
+                                        <div class="col-sm-7">
+                                            <select asp-for="StateId" asp-items="ViewBag.State as IEnumerable<SelectListItem>"
+                                                    class="form-control  searchableselect" autofocus="autofocus" onchange="BindDistrictData()">
+                                                <option value="">Select</option>
+                                            </select>
+
+                                            @*@Html.DropDownListFor(m => m.StateId, ViewBag.State as IEnumerable<SelectListItem>, "Select", new { @class = "form-control  searchableselect", autofocus = "autofocus", @onchange = "BindDistrictData()", @id = "ddlState" })*@
+                                            @*<span class="text-danger">@Html.ValidationMessageFor(m => m.StateId)</span>*@
+                                            <span class="text-danger" asp-validation-for="StateId"></span>
+                                            @Html.HiddenFor(m => m.StateId, new { @id = "hfStateId" })
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 col-12">
+                                    <div class="form-group row">
+                                        <label for="ddlDistrict" class="col-sm-4 col-form-label">District <span class="text-danger">*</span></label>
+                                        <div class="col-sm-7">
+                                            <select id="ddlDistrict" name="DistrictId" class="form-control searchableselect">
+                                                <option value="">Select</option>
+                                            </select>
+                                            <span class="text-danger" asp-validation-for="DistrictID"></span>
+                                            @Html.HiddenFor(m => m.DistrictID, new { @id = "hfDistrictId" })
+
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-6 col-12">
+                                    <div class="form-group row">
+                                        <label for="MobileNo" class="col-sm-4 col-form-label">Mobile<span class="text-danger">*</span></label>
+                                        <div class="col-sm-7">
+                                            <input type="text" asp-for="MobileNo" class="form-control" maxlength="10" onkeypress="return inputLimiter(event,'Numbers')" />
+                                            <span class="text-danger" asp-validation-for="MobileNo"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 col-12">
+                                    <div class="form-group row">
+                                        <label for="EMailId" class="col-sm-4 col-form-label">E Mail<span class="text-danger">*</span></label>
+                                        <div class="col-sm-7">
+                                            <input type="email" asp-for="EMailId" class="form-control" />
+                                            <span class="text-danger" asp-validation-for="EMailId"></span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-6 col-12">
+                                    <div class="form-group row">
+                                        <label for="Address" class="col-sm-4 col-form-label">Address<span class="text-danger">*</span></label>
+                                        <div class="col-sm-7">
+                                            <input type="text" asp-for="Address" class="form-control" onkeypress="return inputLimiter(event,'NameCharactersAndNumbers')" />
+                                            <span class="text-danger" asp-validation-for="Address"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 col-12">
+                                    <div class="form-group row">
+                                        <label for="inputName" class="col-sm-4 col-form-label">Pin Code<span class="text-danger">*</span></label>
+                                        <div class="col-sm-7">
+                                            <input type="text" class="form-control" asp-for="PinCode" maxlength="6" onkeypress="return inputLimiter(event,'Numbers')" />
+                                            <span class="text-danger" asp-validation-for="PinCode"></span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-6 col-12">
+                                    <div class="form-group row">
+                                        <label for="inputName" class="col-sm-4 col-form-label">Status <span class="text-danger">*</span></label>
+                                        <div class="col-sm-7">
+                                            <div class="py-2">
+                                                @Html.RadioButtonFor(n => n.IsActive, true, new { @checked = true, @class = "custom-radio", id = "Rdbtn_Active" })
+                                                @*<input type="radio" asp-for="IsActive" class="custom-radio" checked />*@
+                                                <label class="radio-label">Active</label>
+                                                @Html.RadioButtonFor(n => n.IsActive, false, new { @class = "custom-radio", id = "Rdbtn_Inactive" })
+                                                @*<input type="radio" asp-for="IsActive" class="custom-radio" />*@
+                                                <label class="radio-label">Inactive</label>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6 offset-lg-2 offset-md-4">
+                                    <input type="submit" value='@ViewBag.Button' class="btn btn-primary btn-md ml-0" name="Submit" id="Submit" onclick="return Validate()" />
+                                    <a href="/Master/USer/Add" class="btn btn-danger btn-md">Reset</a>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+    <!-- MAIN CONTENT AREA ENDS -->
+</section>
+

@@ -1,0 +1,154 @@
+﻿@model IEnumerable<MasterEF.UserFeedbackmaster>
+@{
+    ViewData["Title"] = "ViewList";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+
+@if (TempData["msg"] != null)
+{
+    <script>
+        swal("",'@ViewBag.msg',"success");
+    </script>
+}
+<script>
+    $(document).ready(function () {
+        loadNavigation('ViewList', 'glTMng', 'plUserFeedback', 'tl', 'Masters', 'UserFeedback', '');
+
+        $('.searchableselect').searchableselect();
+
+
+        $('.datetimepicker').datetimepicker({
+            format: "DD-MMM-YYYY",
+        }).keydown(false);
+        $("#Show").click(function () {
+            debugger;
+            if ($('#txtFromDate').val() == "") {
+                swal("", "Please Select From Date", "warning");
+                //$('#txtFromDate').focus();
+                return false;
+            }
+            else if ($('#txtToDate').val() == "") {
+                swal("", "Please Select To Date", "warning");
+                //$('#txtToDate').focus();
+                return false;
+            }
+        });
+    });
+</script>
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        @Html.Partial("_CMSnavigation")
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+
+                        <li class="nav-item">
+                            <a class="nav-link active" href="javascript:void(0);">
+                                View
+                            </a>
+                        </li>
+                    </ul>
+                    @Html.Partial("_CMSutil")
+                </div>
+                <section class="box form-container">
+                    <form action="Viewlist" id="form" autocomplete="off">
+                        <div class="search-box">
+                            <div class="searchform px-3 pt-3">
+                                <div class="row">
+                                    <div class="col-sm-5">
+                                        <div class="form-group row">
+                                            <label for="inputText" class="col-sm-3 col-form-label">
+                                                From Date
+                                            </label>
+                                            <div class="col-sm-8">
+                                                <input type="text" class="form-control datetimepicker" id="txtFromDate" name="FromDate" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-5">
+                                        <div class="form-group row">
+                                            <label for="inputText" class="col-sm-3 col-form-label">
+                                                To Date
+                                            </label>
+                                            <div class="col-sm-8">
+                                                <input type="text" class="form-control datetimepicker" id="txtToDate" name="ToDate" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-5">
+                                        <div class="form-group row">
+                                            <div class="col-sm-9 offset-md-3">
+                                                <input type="submit" value="Show" name="Show" class="btn btn-sm btn-success ml-0" id="Show" />
+                                                <a href="~/Master/UserFeedback/ViewList" class="btn btn-danger btn-md"> Reset </a>
+                                                @*<a href="~/Master/UserFeedback/ViewList" class="btn btn-sm btn-success ml-0"> Show </a>*@
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="content-body pt-0">
+                            <div class="legend-box">
+                                <ul class="d-flex mb-1 justify-content-end list-unstyled">
+                                    <li><span class="bg-success"></span> Active</li>
+                                    <li><span class="bg-warning"></span> Inactive</li>
+                                </ul>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <table id="table-exports" class="table table-sm table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th width="30"> Sl#</th>
+                                                <th>  Name </th>
+                                                <th>  Email </th>
+                                                <th>  Mobile No </th>
+                                                <th>  User Type </th>
+                                                <th>  Organization </th>
+                                                <th>  Subject  </th>
+                                                <th>  Message  </th>
+                                                <th width="100" class="noprint text-center">Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @{ int i = 1;
+                                            }
+                                            @foreach (var b in Model)
+                                            {
+                                                <tr class="active-row">
+                                                    <td>
+                                                        @i
+                                                        @{ i++; }
+                                                    </td>
+                                                    <td>@b.Name </td>
+                                                    <td>@b.Email </td>
+                                                    <td>@b.MobileNo </td>
+                                                    <td>@b.UserTypeName </td>
+                                                    <td>@b.Organization </td>
+                                                    <td>@b.Subject </td>
+                                                    <td>@b.Message </td>
+                                                    <td class="noprint text-center">
+                                                        <a href="~/Master/UserFeedback/PublishUserFeedback?id=@b.FeedbackId&IsApproved=@b.IsApproved"
+                                                           class="btn btn-primary" onclick="return confirm('Are you sure to @b.ApproveStatus?')"
+                                                           title="Publish">@b.ApproveStatus</a>
+                                                    </td>
+                                                </tr>
+                                            }
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </section>
+            </div>
+        </div>
+    </div>
+</section>
+

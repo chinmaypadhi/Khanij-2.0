@@ -1,0 +1,883 @@
+﻿@*// *********************************************************************************************************
+    //  View Name                : PreferredBidder
+    //  Desciption               : To Save and Update Bidder Information
+    //  Created By               : Suroj Kumar Pradhan
+    //  Created On               : 02-may-2021
+    // ********************************************************************************************************
+*@
+
+@model UserInformationEF.PreferredBidder
+@{
+    ViewData["Title"] = "Add";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@if ((TempData["AckMsg"] != null))
+
+{
+    <script>
+        if ('@TempData["AckMsg"]' != null) {
+                swal("", '@TempData["AckMsg"]', "warning");
+
+
+        }
+    </script>
+}
+
+<h1>PreferredBidder</h1>
+<link rel="stylesheet" href="~/css/bootstrap-datetimepicker.min.css" type="text/css" />
+<script src="~/js/moment.min.js"></script>
+<script src="~/js/bootstrap-datetimepicker.min.js"></script>
+<script>
+
+                function Tehsilbind() {
+                    debugger;
+                    var RoleTypeId = $('#DistrictId').val();
+                    if (RoleTypeId == "") {
+                        RoleTypeId = 0;
+                    }
+        $('#TehsilId').empty();
+                    var v = "";
+                    if (RoleTypeId != 0) {
+
+            $.ajax({
+                        type: "POST",
+                url: "/UserInformationsystem/LeaseApplication/Tehsilbind",
+                data: { 'sid': RoleTypeId },
+                cache: false,
+                datatype: "JSON",
+                success: function (SList) {
+                var s = '<option value="-1">Select Tehsil</option>';
+                    $.each(SList, function (i, item) {
+                    s += '<option value="' + item.tehsilId + '">' + item.tehsilName + '</option>';
+                });
+                    $("#TehsilId").html(s);
+            },
+                failure: function (response) {
+                alert("sdfjsdjf2222");
+                console.log(response.responseText);
+            },
+                error: function (jqxhr, status, exception) {
+                alert('Exception:', exception.alert);
+            }
+        });
+        }
+
+    }
+
+    function Villagebind() {
+        debugger;
+        var RoleTypeId = $('#TehsilId').val();
+        if (RoleTypeId == "") {
+            RoleTypeId = 0;
+        }
+        $('#VillageId').empty();
+        var v = "";
+        if (RoleTypeId != 0) {
+
+            $.ajax({
+            type: "POST",
+                url: "/UserInformationsystem/LeaseApplication/Villagebind",
+                data: { 'sid': RoleTypeId },
+                cache: false,
+                datatype: "JSON",
+                success: function (SList) {
+                    $.each(SList, function (i, item) {
+            debugger;
+                        $("#VillageId").append($("<option></option>").val(item.villageId).html(item.villageName));
+
+        });
+
+    },
+                failure: function (response) {
+        alert("sdfjsdjf2222");
+        console.log(response.responseText);
+    },
+                error: function (jqxhr, status, exception) {
+        alert('Exception:', exception.alert);
+    }
+            });
+        }
+
+    }
+    $(document).ready(function () {
+        $("#VillageId").val('@ViewBag.villageid');
+
+        $("#TehsilId").val('@ViewBag.Tehsilid');
+    });
+
+
+
+</script>
+<section class="wrapper main-wrapper row">
+
+    <div class="col-12">
+        @Html.Partial("_navigation")
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="javascript:void(0);">
+                                Online Lease Application
+                            </a>
+                        </li>
+                    </ul>
+                    @Html.Partial("_util")
+                </div>
+
+                <section class="box form-container">
+                    <div class="content-body">
+                        <div class="col-sm-6">
+                            <div class="form-group row">
+                                <label for="Submission_of_Clearances" style="color: #089c4c;font-size: 1rem;font-weight:bold">Highest Bidder Information (Proposal for Preferred Bidder)</label>
+                            </div>
+                        </div>
+
+                        @using (Html.BeginForm("PreferredBidder", "LeaseApplication", FormMethod.Post, new { AUTOCOMPLETE = "Off", id = "form1", enctype = "multipart/form-data" }))
+                        {
+                            @Html.HiddenFor(x => x.LesseeLOI)
+                            @Html.Hidden("Status")
+                            @Html.Hidden("btnValue")
+                            <div class="row">
+
+                                <div class="col-sm-6">
+                                    <div class="form-group row">
+                                        <label class="col-sm-4 col-form-label font-weight-bolder">Auction No*</label>
+                                        <div class="col-sm-7">
+
+                                            @Html.TextBoxFor(x => x.AuctionNo, new { @class = "form-control pointer", @style = "width:100%;", @maxLength = 100 })
+                                            @Html.ValidationMessageFor(x => x.AuctionNo, "", new { @class = "text-danger", @maxlength = 50 })
+                                            <span style="color: red" id="spanAuctionNo"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group row">
+                                        <label for="inputName" class="col-sm-4 col-form-label font-weight-bolder">Auction Type*</label>
+                                        <div class="col-sm-7">
+                                            @Html.DropDownListFor(model => model.AuctionType, ViewBag.AuctionList as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control searchableselect pointer", autofocus = "autofocus" })
+                                            @Html.ValidationMessageFor(x => x.AuctionType, "", new { @class = "text-danger", @maxlength = 50 })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group row">
+                                        <label for="inputName" class="col-sm-4 col-form-label font-weight-bolder">NIT Date*</label>
+                                        <div class="col-sm-7">
+
+                                            @Html.TextBoxFor(x => x.PeriodFrom, new { @class = "form-control datetime pointer", DataFormatString = "{0:yyyy-MM-dd}", @style = "width:100%;", onkeydown = "return false;" })
+                                            @Html.ValidationMessageFor(x => x.PeriodFrom, "", new { @class = "text-danger", @maxlength = 50 })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group row">
+                                        <label for="inputName" class="col-sm-4 col-form-label font-weight-bolder">Auction Date*</label>
+                                        <div class="col-sm-7">
+                                            @Html.TextBoxFor(x => x.PeriodTo, new { @class = "form-control datetime pointer", @style = "width:100%;", onkeydown = "return false;" })
+                                            @Html.ValidationMessageFor(x => x.PeriodTo, "", new { @class = "text-danger", @maxlength = 50 })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group row">
+                                        <label for="inputName" class="col-sm-4 col-form-label font-weight-bolder">Starting Bid Amount*</label>
+                                        <div class="col-sm-7">
+                                            @Html.TextBoxFor(x => x.BidStart, new { @class = "form-control pointer ", @style = "width:100%;", @maxLength = 10 })
+                                            @Html.ValidationMessageFor(x => x.BidStart, "", new { @class = "text-danger", @maxlength = 50 })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group row">
+                                        <label for="inputPassword" class="col-sm-4 col-form-label font-weight-bolder">Final Bid Amount*</label>
+                                        <div class="col-sm-7">
+                                            @Html.TextBoxFor(x => x.BidFinal, new { @class = "form-control pointer", @style = "width:100%;", @maxLength = 10 })
+                                            @Html.ValidationMessageFor(x => x.BidFinal, "", new { @class = "text-danger", @maxlength = 50 })
+
+                                            <span style="color: red" id="spanBidFinal"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group row">
+                                        <label for="inputPassword" class="col-sm-4 col-form-label font-weight-bolder">Total Area(In Hect)*</label>
+                                        <div class="col-sm-7">
+                                            @Html.TextBoxFor(x => x.AreaInHect, new { @class = "form-control pointer", @style = "width:100%;", @maxLength = 10 })
+                                            @Html.ValidationMessageFor(x => x.AreaInHect, "", new { @class = "text-danger", @maxlength = 50 })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group row">
+                                        <label for="inputPassword" class="col-sm-4 col-form-label font-weight-bolder">Bid Unit*</label>
+                                        <div class="col-sm-7">
+                                            @Html.DropDownListFor(m => m.BidUnitId, new List<SelectListItem>
+                                            {
+                                            new SelectListItem{ Text="%", Value = "%" },
+                                            new SelectListItem{ Text="Rs / Unit", Value = "Rs / Unit" }
+                                            }, "--Select--", new { @class = "form-control searchableselect pointer" })
+                                            @Html.ValidationMessageFor(x => x.BidUnitId, "", new { @class = "text-danger", @maxlength = 50 })
+                                        </div>
+                                    </div>
+                                </div>
+
+
+
+                                <div class="col-sm-6">
+                                    <div class="form-group row">
+                                        <label for="inputPassword" class="col-sm-4 col-form-label font-weight-bolder">Location*</label>
+                                        <div class="col-sm-7">
+                                            @Html.TextBoxFor(x => x.Location, new { @class = "form-control pointer", @style = "width:100%;", @maxLength = 50 })
+                                            @Html.ValidationMessageFor(x => x.Location, "", new { @class = "text-danger", @maxlength = 50 })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group row">
+                                        <label for="inputPassword" class="col-sm-4 col-form-label font-weight-bolder">Block Name*</label>
+                                        <div class="col-sm-7">
+                                            @Html.TextBoxFor(x => x.BlockName, new { @class = "form-control pointer", @style = "width:100%;", @maxLength = 50 })
+                                            @Html.ValidationMessageFor(x => x.BlockName, "", new { @class = "text-danger", @maxlength = 50 })
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-6">
+                                    <div class="form-group row">
+                                        <label for="inputPassword" class="col-sm-4 col-form-label font-weight-bolder">Lease Type*</label>
+                                        <div class="col-sm-7">
+                                            @Html.DropDownListFor(model => model.LeaseType, ViewBag.LeaseList as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control searchableselect pointer", autofocus = "autofocus" })
+                                            @Html.ValidationMessageFor(x => x.LeaseType, "", new { @class = "text-danger", @maxlength = 50 })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group row">
+                                        <label for="inputPassword" class="col-sm-4 col-form-label font-weight-bolder">Mineral Name*</label>
+                                        <div class="col-sm-7">
+                                            @Html.DropDownListFor(model => model.MineralId, ViewBag.Minerallist as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control searchableselect pointer", autofocus = "autofocus" })
+                                            @Html.ValidationMessageFor(x => x.MineralId, "", new { @class = "text-danger", @maxlength = 50 })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group row">
+                                        <label for="inputPassword" class="col-sm-4 col-form-label font-weight-bolder">District*</label>
+                                        <div class="col-sm-7">
+                                            @Html.DropDownListFor(model => model.DistrictId, ViewBag.Districtlist as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control searchableselect pointer", autofocus = "autofocus", onchange = "Tehsilbind()" })
+                                            @Html.ValidationMessageFor(x => x.DistrictId, "", new { @class = "text-danger", @maxlength = 50 })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group row">
+                                        <label for="inputPassword" class="col-sm-4 col-form-label font-weight-bolder">Tehsil*</label>
+                                        <div class="col-sm-7">
+                                            @if (ViewBag.DistrictlistEdit != null)
+                                            {<select asp-for="TehsilId"
+                                                     class="form-control searchableselect pointer" onchange="Villagebind()"
+                                                     asp-items="@(new SelectList(ViewBag.DistrictlistEdit as IEnumerable<SelectListItem>, "Value", "Text"))">
+                                                </select>}
+                                            else
+                                            {
+
+                                                <select asp-for="TehsilId"
+                                                        class="form-control searchableselect pointer" onchange="Villagebind()"
+                                                        asp-items="@(new SelectList(Enumerable.Empty<SelectListItem>(), "Value", "Text"))">
+                                                </select>
+                                            }
+
+                                            @Html.Hidden("hdntehsilid", "", new { @class = "hiddenid" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group row">
+                                        <label for="inputPassword" class="col-sm-4 col-form-label font-weight-bolder">Village*</label>
+                                        <div class="col-sm-7">
+                                            @if (ViewBag.VillagelistEdit != null)
+                                            {<select asp-for="VillageId"
+                                                     class="form-control searchableselect pointer"
+                                                     asp-items="@(new SelectList(ViewBag.VillagelistEdit as IEnumerable<SelectListItem>, "Value", "Text"))">
+                                                </select>}
+                                            else
+                                            {
+                                                <select asp-for="VillageId"
+                                                        class="form-control searchableselect pointer"
+                                                        asp-items="@(new SelectList(Enumerable.Empty<SelectListItem>(), "Value", "Text"))">
+                                                </select>
+                                            }
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group row">
+                                        <label for="inputPassword" class="col-sm-4 col-form-label font-weight-bolder">Minute with Bid Sheet *</label>
+                                        <div class="col-sm-7">
+                                            <div class="custom-file">
+                                                <input type="file" class="custom-file-input" id="filesupport" name="@Html.NameFor(Model => Model.BidSheetFile)" multiple>
+                                                <label class="custom-file-label" for="customFile">Choose Files</label>
+
+                                            </div>
+                                            @if (Model != null && !string.IsNullOrEmpty(@Model.BidSheetFileName))
+                                            {
+
+
+
+                                                <a href="@Url.Action("DownloadFiles", "LeaseApplication", new { filename = @Model.BidSheetFileName, foldername = "BidSheetFile" })">
+                                                    Download
+                                                </a>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group row">
+                                    <label for="Submission_of_Clearances" style="color: #089c4c;font-size: 1rem;font-weight:bold">Participants Details</label>
+                                </div>
+                            </div>
+                            @if (ViewBag.usertype == "DGM")
+                            {
+                                <div class="col-sm-12">
+                                    <div class="form-group row">
+                                        <label for="inputPassword" class="col-sm-4 col-form-label font-weight-bolder">Participant Name</label>
+                                        <div class="col-lg-4">
+                                            <input type="text" id="ParticipantName" class="k-textbox k-valid form-control" maxlength="100" style="width: 100%;">
+
+                                        </div>
+                                        <div class="col-lg-2">
+                                            <input class="btn btn-info btn-sm pointer" type="button" value="Add Row" onclick="addRow('dynamicTable')">
+                                        </div>
+                                        <div class="col-lg-2">
+                                            <input class="btn btn-info btn-sm pointer" type="button" name="" value="Remove Row" onclick="RemoveRow('dynamicTable');">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 " style="margin: 15px 0; max-height: 400px; overflow: auto;">
+
+
+                                    <table border="1" id="dynamicTable" class="table" style="margin-top: 15px;">
+                                        <thead>
+                                            <tr>
+                                                <th style="border-color: black;">Sr. No.</th>
+                                                <th style="border-color: black; width: 1200px">Participants Name</th>
+                                                <th style="border-color: black;">Highest Price Quoted By</th>
+
+
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @if (Model != null && Model.ParticipatesTable != null && Model.LesseeLOI > 0)
+                                            {
+                                                for (int i = 0; i < Model.ParticipatesTable.Rows.Count; i++)
+                                                {
+                                                    System.Data.DataTable dta = new System.Data.DataTable();
+                                                    dta = Model.ParticipatesTable;
+                                                    <tr>
+
+                                                        <td class="tdSrNo" style="border-color: black;"><span class="srno">@(i + 1)</span> </td>
+                                                        @if (Model.Status == 1 || Model.Status > 2)
+                                                        {
+                                                            <td id="tdParticipantsName" style="border-color: black;" hidden>
+                                                                @Html.RadioButton("GovRadio", @dta.Rows[i]["ParticipantsId"], Convert.ToInt32(dta.Rows[i]["Gov_IsSelected"]) == 1 ? true : false)
+                                                            </td>
+
+                                                        }
+                                                        <td id="tdParticipantsName" style="border-color: black;">
+                                                            <span>@dta.Rows[i]["Name"]</span>
+                                                            <input name="ParticipantName" value="@dta.Rows[i]["Name"]" type="hidden" />
+                                                        </td>
+                                                        <td id="tdHighest" style="border-color: black;" class=" pointer">
+
+                                                            @Html.RadioButton("ParticipantRadio", @dta.Rows[i]["Name"], Convert.ToInt32(dta.Rows[i]["IsSelected"]) == 1 ? true : false)
+                                                        </td>
+
+                                                    </tr>
+                                                }
+                                            }
+                                            else
+                                            {
+                                                <tr style="display: none">
+                                                    <td class="tdSrNo" style="border-color: black; width: 10px;">1</td>
+                                                    <td id="tdParticipantsName" style="border-color: black;">
+                                                        <label></label>
+                                                    </td>
+                                                    <td id="tdHighest" style="border-color: black;" class="text-center">
+                                                        <input type="radio" name="ParticipantRadio" id="ParticipantRadio">
+                                                    </td>
+
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                            }
+
+                            @if (ViewBag.usertype == "MRD")
+                            {
+                                if (Model != null && Model.ParticipatesTable != null && Model.LesseeLOI > 0)
+                                {
+
+                                    <table border="1" id="dynamicTable2" class="table" style="margin-top: 15px;">
+                                        <thead>
+                                            <tr>
+                                                <th style="border-color: black;" hidden>Gov. Selection</th>
+                                                <th style="border-color: black;">Sr. No.</th>
+                                                <th style="border-color: black; width: 1200px">Participants Name</th>
+                                                <th style="border-color: black;">Highest Price Quoted By</th>
+                                                @*  <th style="border-color: black;">Unit </th>*@
+
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+
+                                            @for (int i = 0; i < Model.ParticipatesTable.Rows.Count; i++)
+                                            {
+                                                System.Data.DataTable dta = new System.Data.DataTable();
+                                                dta = Model.ParticipatesTable;
+                                                <tr>
+
+                                                    <td style="border-color: black;" hidden>
+                                                        >
+                                                        @*<input type="radio"  name="GovRadio" id="GovRadio" value="@dta.Rows[i]["ParticipantsId"]" />*@
+                                                        @Html.RadioButton("GovRadio", @dta.Rows[i]["ParticipantsId"], Convert.ToInt32(dta.Rows[i]["Gov_IsSelected"]) == 1 ? true : false)
+                                                    </td>
+                                                    <td class="tdSrNo" style="border-color: black;">@(i + 1)</td>
+                                                    <td id="tdParticipantsName" style="border-color: black;">
+                                                        <span>@dta.Rows[i]["Name"]</span>
+                                                        <input name="ParticipantName" value="@dta.Rows[i]["Name"]" type="hidden" />
+                                                    </td>
+                                                    <td id="tdHighest" style="border-color: black;" class="text-center pointer">
+
+                                                        @Html.RadioButton("chk", @dta.Rows[i]["Name"], Convert.ToInt32(dta.Rows[i]["IsSelected"]) == 1 ? true : false)
+                                                    </td>
+
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+
+                                }
+                            }
+                            @if (Model != null && Model.LesseeLOI > 0)
+                            {
+                                if (@Model.For != "View")
+                                {
+                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" style="margin: 15px 0;">
+                                        <div class="col-lg-12 col-md-12 col-sm-12 padding_left_right_0">
+                                            <div class="col-md-4 col-lg-2 col-sm-4 default-form-control-style">
+                                                <label>Remarks</label>
+                                            </div>
+                                            <div class="col-md-5 col-lg-4 col-sm-5 default-form-control-style">
+                                                @Html.TextAreaFor(x => x.Remarks, new { @class = "k-textbox", @maxlength = 1000, style = "width: 375px;height: 100px;" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" style="margin: 15px 0;">
+                                        <div class="col-lg-12 col-md-12 col-sm-12 padding_left_right_0">
+                                            <div class="col-md-4 col-lg-2 col-sm-4 default-form-control-style col-lg-offset-3">
+                                            </div>
+                                            <div class="col-md-4 col-lg-1 col-sm-4 default-form-control-style">
+                                                <input type="button" onclick="return OnSubmit('Approve');" class="btn btn-primary" value="Approve" name="btnValue" />
+                                            </div>
+                                            <div class="col-md-5 col-lg-1 col-sm-5 default-form-control-style">
+                                                <input type="button" onclick="    return OnSubmit('Reject');" class="btn btn-primary" value="Reject" name="btnValue" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                                else
+                                {
+                                    if (@Model.Status == 2)// 2 for Reject
+                                    {
+                                        <div class="col-lg-12 col-lg-offset-5  default-form-control-style">
+                                            @*<input type="button" onclick="return OnSubmit('Forward');" class="btn btn-primary btn-lg text-center" value="Forward to Gov" name="btnValue" />*@
+                                            @if (ViewBag.usertype == "DGM")
+                                            {
+                                                <input type="button" class="btn btn-primary btn-lg" onclick=" submitClick('Forward')" value="Forward to Gov" id="btnForward" />
+                                            }
+                                        </div>
+
+
+                                    }
+                                }
+                            }
+                            <input type="Submit" style="display: none" id="finalSubmit" />
+                            <div class="col-sm-6 offset-sm-2">
+                                @if (Model.LesseeLOI == 0 || Model.LesseeLOI == null)
+                                {
+
+                                    <input type="submit" value='Submit'  class="btn btn-primary" name="Submit" id="Submit" onclick = "return submitClick();"   />
+                                   
+                                }
+                            </div>
+                        }
+                    </div>
+            </div>
+
+
+
+
+
+
+
+</section>
+<script>
+    function OnSubmit(btn) {
+
+        //if (confirm("Are you sure you want to " + btn + " ?")) {
+
+        if (btn == "Reject") {
+            $('#btnValue').val("Reject");
+            if ($('#Remarks').val() == '') {
+                swal("",'Remarks is required !',"warning");
+                $('#Remarks').focus();
+                //return false;
+                return
+
+            }
+            else {
+                $('#finalSubmit').click();
+            }
+        }
+        else {
+            debugger;
+            var checkedRadio = $('input[name="GovRadio"]:checked')
+            $('#btnValue').val("Approve");
+            if (checkedRadio.length == 0) {
+                swal("",'Please Select a Participant Name !', "warning");
+                $('#GovRadio').focus();
+                return
+
+                //return false;
+            }
+            if ($('#Remarks').val() == '') {
+                swal("",'Remarks is required !', "warning");
+                $('#Remarks').focus();
+                //return false;
+                return
+
+            }
+            else {
+                $('#finalSubmit').click();
+            }
+        }
+    }
+    var BidSheetFileSize = 0;
+    $('input[name="BidSheetFile"]').bind('change', function () { BidSheetFileSize = this.files[0].size; return false; });
+
+    $(document).ready(function () {
+        $('.datetime').datetimepicker({
+            format: 'LT',
+            format: "DD/MM/YYYY",
+
+        }).keydown(false);
+        $('.searchableselect').searchableselect();
+
+
+    });
+    if ($('#LesseeLOI').val() > 0) {
+
+        if ($('#Status').val() != 2) {
+            $('.pointer').css("pointer-events", "none");
+        }
+
+    }
+
+    function submitClick(data) {
+        debugger;
+        //$('#btnValue').val(data);
+
+
+         if ($("#AuctionNo").val() == "")
+         {
+             alert('Please Select Auction No.');
+             $('#AuctionNo').focus();
+             return false;
+         }
+        var tagSubValue = $('#AuctionType option:selected').text();
+        if (tagSubValue == "--Select--") {
+            swal("",'Please Select Auction Type.', "Warning");
+             $('#AuctionType').focus();
+             return false;
+        }
+        if ($("#PeriodFrom").val() == "") {
+            swal("",'Please Select NIT Date.',"Warning");
+            $('#PeriodFrom').focus();
+            return false;
+        }
+        if ($("#PeriodTo").val() == "") {
+            swal("",'Please Select Auction Date.', "Warning");
+            $('#PeriodTo').focus();
+            return false;
+        }
+        if ($("#BidStart").val() == "") {
+            swal("",'Please Enter Starting Bid Amount.', "Warning");
+            $('#BidStart').focus();
+            return false;
+        }
+        if ($("#BidFinal").val() == "") {
+            swal("",'Please Enter Final Bid Amount.', "Warning");
+            $('#BidFinal').focus();
+            return false;
+        }
+        if ($("#AreaInHect").val() == "") {
+            swal("",'Please Enter Total Area(In Hect).', "Warning");
+            $('#AreaInHect').focus();
+            return false;
+        }
+        var tagSubValue1 = $('#BidUnitId option:selected').text();
+        if (tagSubValue1 == "--Select--") {
+            swal("",'Please Select Bid Unit.', "Warning");
+            $('#BidUnitId').focus();
+            return false;
+        }
+        if ($("#Location").val() == "") {
+            swal("",'Please Enter Location.', "Warning");
+            $('#Location').focus();
+            return false;
+        }
+        if ($("#BlockName").val() == "") {
+            swal("",'Please Enter Block Name.', "Warning");
+            $('#BlockName').focus();
+            return false;
+        }
+        var tagSubValue2 = $('#LeaseType option:selected').text();
+        if (tagSubValue2 == "--Select--") {
+            swal("",'Please Select Lease Type.', "Warning");
+            $('#LeaseType').focus();
+            return false;
+        }
+        var tagSubValue2 = $('#MineralId option:selected').text();
+        if (tagSubValue2 == "--Select--") {
+            swal("",'Please Select Mineral Name.', "Warning");
+            $('#MineralId').focus();
+            return false;
+        }
+
+        var dist = $('#DistrictId option:selected').text();
+        if (dist == "--Select--") {
+            swal("",'Please Select District.', "Warning");
+            $('#DistrictId').focus();
+            return false;
+        }
+        var Tehsil = $('#TehsilId option:selected').text();
+        if (Tehsil == "--Select Tehsil--") {
+            swal("",'Please Select Tehsil.', "Warning");
+            $('#TehsilId').focus();
+            return false;
+        }
+
+        var village = $('#VillageId option:selected').text();
+        if (village == "") {
+            swal("",'Please Select village.', "Warning");
+            $('#VillageId').focus();
+            return false;
+        }
+
+        if (BidSheetFileSize == 0) {
+            swal("","Please upload Minute with Bid Sheet.", "Warning")
+            $('input[name="BidSheetFile"]').focus();
+            return false;
+        }
+
+        var startDate = document.getElementById("PeriodFrom").value;
+        var endDate = document.getElementById("PeriodTo").value;
+
+        var sparts = startDate.split("/");
+        var sdt = new Date(parseInt(sparts[2], 10),
+              parseInt(sparts[1], 10) - 1,
+              parseInt(sparts[0], 10));
+
+        var eparts = endDate.split("/");
+        var edt = new Date(parseInt(eparts[2], 10),
+              parseInt(eparts[1], 10) - 1,
+              parseInt(eparts[0], 10));
+
+        var checkedRadio = $('input[name="ParticipantRadio"]:checked')
+
+        if (checkedRadio.length == 0) {
+            swal("",'Please Select Highest Price Quoted By.', "Warning");
+            $('#ParticipantRadio').focus();
+            return false;
+        }
+        if ((Date.parse(edt) <= Date.parse(sdt))) {
+            swal("","Auction Date should be greater than NIT Date", "Warning");
+            //document.getElementById("ed_endtimedate").value = "";
+            $('#PeriodTo').focus()
+            return false;
+        }
+
+
+
+
+    }
+    $('#AuctionNo').focusout(function () {
+
+        $.ajax({
+            url: '@Url.Action("ValidateAuctionNo", "LeaseApplication", new { Area = "UserInformationsystem" })',
+            dataType: "JSON",
+            data: { AuctionNo: $('#AuctionNo').val() },
+            type: "GET",
+            success: function (data) {
+                console.log(data)
+                if (data >= 1) {
+                    $('#spanAuctionNo').text("Auction Number already exist");
+                    $('#AuctionNo').focus();
+                    $('#btnSubmit').hide();
+                }
+                else {
+                    $('#spanAuctionNo').text("");
+                    $('#btnSubmit').show();
+                }
+            }
+        });
+    });
+    var totalRowsCount = 1;
+    function addRow(tableID) {
+
+        if ($('#ParticipantName').val() == '') {
+            alert('Please Enter Participant Name');
+            $('#ParticipantName').focus();
+            return false;
+        }
+        var participantName = document.getElementsByName('ParticipantName');
+        for (var i = 0; i < participantName.length; i++) {
+            if (participantName[i].value == $('#ParticipantName').val()) {
+                alert('Participant Name ' + $('#ParticipantName').val() + ' is already entered.Please enter different name.');
+                $('#ParticipantName').focus();
+                return false
+            }
+        }
+
+        var table = document.getElementById(tableID);
+
+        var rowCount = table.rows.length;
+        var row = table.insertRow(rowCount);
+
+        var colCount = table.rows[1].cells.length;
+
+        for (var i = 0; i < colCount; i++) {
+
+            if (i == -2) { }
+
+            else {
+                var newcell = row.insertCell(i);
+
+                if (i == 0) {
+                    var SrNo = document.getElementsByClassName('srno').length;
+                    newcell.innerHTML = '<span class="srno">' + (SrNo + 1) + '</span>';
+                    //newcell.innerHTML = totalRowsCount;
+                }
+                else {
+                    if (i == 1) {
+
+                        newcell.style.cssText = 'width:1200px';
+                        $(newcell).append("<input type='hidden' name='ParticipantName' value='" + $('#ParticipantName').val() + "'>" + $('#ParticipantName').val())
+                        //newcell.innerHTML = $('#ParticipantName').val();
+                        //$(newcell).attr('name', 'ParticipantName')
+                    }
+                    else {
+                        //newcell.innerHTML = table.rows[1].cells[i].innerHTML;
+                        newcell.innerHTML = '<input type="radio" value="' + $('#ParticipantName').val() + '" name="ParticipantRadio" id="ParticipantRadio" />';
+                    }
+
+                }
+
+                switch (newcell.childNodes[0].type) {
+                    case "text":
+                        newcell.childNodes[0].value = "";
+                        break;
+                    case "checkbox":
+                        newcell.childNodes[0].checked = false;
+                        break;
+                    case "select-one":
+                        newcell.childNodes[0].selectedIndex = 0;
+                        break;
+                }
+            }
+        }
+        totalRowsCount = totalRowsCount + 1;
+        $('#ParticipantName').val('');
+    }
+    var rws;
+    function RemoveRow(obj) {
+        totalRowsCount = totalRowsCount - 1;
+        if (totalRowsCount <= 0) {
+            totalRowsCount = 1;
+        }
+
+        var Rowslength = document.getElementById("dynamicTable").getElementsByTagName("tr").length;
+
+        if (Rowslength != 2)
+            document.getElementById("dynamicTable").deleteRow(Rowslength - 1);
+    }
+
+
+    $("#BidFinal").focusout(function () {
+        BidAmount();
+    });
+    $("#BidStart").focusout(function () {
+        BidAmount();
+    });
+
+    function BidAmount() {
+        var BidStart = $('#BidStart').val();
+        var BidFinal = $('#BidFinal').val();
+
+        BidStart = BidStart || 0;
+        BidFinal = BidFinal || 0;
+
+        if (parseFloat(BidFinal) < parseFloat(BidStart)) {
+            $('#spanBidFinal').text('Final Bid Amount must be greater then Starting Bid Amount!')
+            $('#BidFinal').focus();
+            $('#btnSubmit').hide();
+        }
+        else {
+            $('#spanBidFinal').text('')
+            $('#btnSubmit').show();
+        }
+    }
+    $('#AuctionNo').on('keypress', function (event) {
+        debugger;
+        //var regex = new RegExp("^[a-zA-Z0-9]+$");
+        var str = "^[^\"',]*$";
+        var regex = new RegExp(str);
+        var key = String.fromCharCode(!event.charCode ? event.which : event.charCode);
+        if (!regex.test(key)) {
+            event.preventDefault();
+            return false;
+        }
+    });
+
+
+    $('#Location').on('keypress', function (event) {
+        var regex = new RegExp("^[0-9a-zA-Z \b]+$");
+        var key = String.fromCharCode(!event.charCode ? event.which : event.charCode);
+        if (!regex.test(key)) {
+            event.preventDefault();
+            return false;
+        }
+    });
+    $('#BlockName').on('keypress', function (event) {
+        var regex = new RegExp("^[0-9a-zA-Z \b]+$");
+        var key = String.fromCharCode(!event.charCode ? event.which : event.charCode);
+        if (!regex.test(key)) {
+            event.preventDefault();
+            return false;
+        }
+    });
+
+    $('#ParticipantName').on('keypress', function (event) {
+        var regex = new RegExp("^[0-9a-zA-Z \b]+$");
+        var key = String.fromCharCode(!event.charCode ? event.which : event.charCode);
+        if (!regex.test(key)) {
+            event.preventDefault();
+            return false;
+        }
+    });
+</script>

@@ -1,0 +1,370 @@
+﻿
+@using PermitEF;
+@using  Microsoft.AspNetCore.Http;
+@using Microsoft.AspNetCore.Mvc;
+@using PermitApp.Helper;
+@inject IHttpContextAccessor HttpContextAccessor
+@using PermitApp.Web;
+@model List<PermitEF.DemandNoteCodePayment>
+@{
+    ViewData["Title"] = "SubmittedNotice";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+    UserLoginSession profile = HttpContextAccessor.HttpContext.Session.Get<UserLoginSession>(KeyHelper.UserKey);
+    var URL = ViewBag.url;
+}
+<script>
+    $(document).ready(function () {
+        loadNavigation('Demand/Credit Note', 'glTMng', 'plpaymenthead', 'tl', 'Notice', 'Demand/Credit Note Payment', ' ');
+        $('.datepicker').datetimepicker({
+            format: 'LT',
+            format: "DD-MM-YYYY",
+            daysOfWeekDisabled: [],
+        });
+    });
+</script>
+<input type="hidden" id="hdnPayment" value="@profile.UserType" />
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        @Html.Partial("_CMSnavigation")
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+
+
+                        <li class="nav-item">
+                            <a class="nav-link active" href="/demandnote/DemandNotePayment/DemandNoteSummary">
+                                Demand Note Payment Summary
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link " href="/demandnote/DemandNotePayment/CreditNoteDetailsView">
+                                Credit Note Payment Summary
+                            </a>
+                        </li>
+                    </ul>
+                    @Html.Partial("_CMSutil")
+                </div>
+                <section class="box form-container">
+                    <div class="search-box">
+                        @using (Html.BeginForm("DemandNoteSummary", "DemandNotePayment", FormMethod.Post, new { AUTOCOMPLETE = "Off", id = "form1" }))
+                        {
+                            <div class="searchform px-3 py-3">
+                                <div class="row">
+                                    <div class="col-sm-4">
+                                        <div class="form-group row">
+                                            <label for="inputText" class="col-sm-3 col-form-label">
+                                                From Date
+                                            </label>
+                                            <div class="col-sm-8">
+                                                <div class="input-group">
+                                                    <input type="text" class="form-control datepicker" id="Fromdate" name="FromDate">
+                                                    <div class="input-group-prepend">
+                                                        <label class="input-group-text" for="Fromdate"><i class="icon-calendar-alt-solid"></i></label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <div class="form-group row">
+                                            <label for="inputText" class="col-sm-3 col-form-label">
+                                                To Date
+                                            </label>
+                                            <div class="col-sm-8">
+                                                <div class="input-group">
+                                                    <input type="text" class="form-control datepicker" id="Todate" name="ToDate">
+                                                    <div class="input-group-prepend">
+                                                        <label class="input-group-text" for="Todate"><i class="icon-calendar-alt-solid"></i></label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-2">
+                                        @*<a href="#" class="btn btn-sm btn-success m-0 waves-effect waves-light"> Show </a>*@
+                                        <input class="btn btn-sm btn-success m-0 waves-effect waves-light" type="submit" value="Show" />
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                    @if (profile.UserType == "District User")
+                    {
+                        <div>  <input type="button" id="btnVerify" value="Verify & Send" class="btn btn-primary" onclick="onSubmit()" name="submit"></div>
+                    }
+                        <div class="content-body pt-0">
+                            <div class="legend-box">
+                                <ul class="d-flex mb-1 justify-content-end list-unstyled">
+                                    <li><span class="bg-success"></span> Active</li>
+                                    <li><span class="bg-warning"></span> Inactive</li>
+                                </ul>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <table id="table-exports" class="table table-sm table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th width="30">Sl#</th>
+                                                @if (profile.UserType == "District User")
+                                                {
+                                                    <th width="30">Verify</th>
+                                                }
+                                                <th>District Name</th>
+                                                <th>User Name</th>
+                                                <th>Lessee Name</th>
+                                                <th>Demand Note No.</th>
+                                                <th>Date of Issuance</th>
+                                                <th>From Date</th>
+                                                <th>To Date</th>
+                                                <th width="100">Online Payment</th>
+                                                <th width="100">Shall be paid separately</th>
+                                                <th>Download File</th>
+                                                <th>Payment Status</th>
+                                                <th>Bank Transaction Details</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="tBodyId">
+                                            @{
+                                                int f = 0;
+
+                                            }
+                                            @foreach (var x in Model)
+                                            {
+
+                                                f = f + 1;
+                                            <tr>
+                                                <td> @f</td>
+                                                @if (@profile.UserType == "District User")
+                                                    {
+                                                if (Convert.ToInt32(x.IsVerify) > 0)
+        {
+            <td></td>
+        }
+        else
+        {
+            <td><input type="checkbox" name="chkbox" class="chkitem" id="chkkk-@f" /></td>
+
+        }
+                                                    }
+
+
+
+                                                <td>@x.DistrictName </td>
+                                                <td>@x.UserName </td>
+                                                <td>@x.ApplicantName </td>
+                                                <td><a href="/demandnote/DemandNotePayment/payment?id=@x.DemandNoteCode">@x.DemandNoteCode</a></td>
+                                                <td>@x.DemandDate </td>
+                                                <td>@x.FromDate</td>
+                                                <td>
+                                                    @x.ToDate <input type="hidden" id="hdnPayableRoyalty_@f" value=@x.PayableRoyalty>
+                                                    <input type="hidden" id="hdnUserId_@f" value=@x.UserID>
+                                                    <input type="hidden" id="hdnDemandCode_@f" value=@x.DemandNoteCode>
+                                                </td>
+                                                <td><strong>Payable Royalty :</strong>@x.PayableRoyalty <br /><strong>NMET :</strong> @x.NMET <br /><strong>DMF :</strong>@x.DMF <br /><strong>Monthly Periodic Amount :</strong> @x.Monthly_Periodic_Amount  <br /> <strong>Total Amount :</strong> @x.TotalPayableAmount  </td>
+                                                <td><strong>TCS : </strong> @x.TCS <br /><strong>Infrastructure Development Cess : </strong> @x.Infrastructure_Development_Cess <br /><strong>Environmental Cess : </strong>@x.Environmental_Cess <br /><strong>Total Amount : </strong> @x.ShallBePaidLater </td>
+                                                <td></td>
+                                                @if (profile.UserType == "Lessee")
+                                                    {
+                                                @*<td><a id="Payment" class="btn btn-primary" href="@URL/Payment/DemandNotePayment/Paymentss?DemandnoteId=@x.DemandNoteCode">Make Payment</a></td>*@
+                                                <td><a id="Payment" class="btn btn-primary" onclick="onpaymentClick('@x.DemandNoteCode')">Make Payment</a></td>
+                                                    }
+                                                    else
+                                                    {
+                                                <td>  @x.PaymentStatus </td>
+                                                    }
+                                                <td>@x.Payment_Transaction_Details </td>
+                                            </tr>
+
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+            </div>
+        </div>
+    </div>
+    <!-- MAIN CONTENT AREA ENDS -->
+</section>
+
+
+<script>
+    //$(document).ready(function () {
+    //   // BindData();
+    //});
+       @*function BindData() {
+        $.ajax({
+            type: "POST",
+            url: '@Url.Action("DemandNoteSummary")',
+            data: { FromDate: $("#Fromdate").val(), ToDate: $("#Todate").val()},
+            dataType: "json",
+            success: function (data) {
+                debugger;
+                //tBodyId
+
+
+                var html = "";
+
+
+                if (data.length == 0) {
+                    thiHtml = '<tr><td colspan="14"><center><b>Record not found.</b></center></td></tr>';
+                }
+                for (var i = 0; i < data.length; i++) {
+                    html += '<tr>';
+                    html += '<td>' + (i + 1) + '</td>';
+                    if ($("#hdnPayment").val() == "District User") {
+                        if (data[i].IsVerify > 0) {
+                            html += '<td></td>'
+                        }
+                        else {
+                            html += '<td><input type="checkbox" name="chkbox" class="chkitem" id="chkkk' + i + '"/></td>';
+
+                        }
+                    }
+
+
+                    html += '<td>' + data[i].DistrictName+'</td>';
+                    html += '<td>' + data[i].UserName+'</td>';
+                    html += '<td>' + data[i].ApplicantName +'</td>';
+                    html += '<td><a href="/demandnote/DemandNotePayment/payment?id=' + data[i].DemandNoteCode +'" >' + data[i].DemandNoteCode +'</a></td>';
+                    html += '<td>' + data[i].DemandDate  +'</td>';
+                    html += '<td>' + data[i].FromDate  +'</td>';
+                    html += '<td>' + data[i].ToDate + '<input type="hidden" id="hdnPayableRoyalty' + i + '" value="'+ data[i].PayableRoyalty+'">';
+                    html += '<input type="hidden" id="hdnUserId' + i + '" value="' + data[i].UserID + '">';
+                    html += '</td >';
+                    html += '<td><strong>Payable Royalty :</strong>' + data[i].PayableRoyalty + '<br/><strong>NMET :</strong>' + data[i].NMET + '<br/><strong>DMF :</strong>' + data[i].DMF + '<br/><strong>Monthly Periodic Amount :</strong>' + data[i].Monthly_Periodic_Amount + ' <br/> <strong>Total Amount :</strong> ' + data[i].TotalPayableAmount +' </td>';
+                    html += '<td><strong>TCS : </strong>' + data[i].TCS + '<br/><strong>Infrastructure Development Cess : </strong> ' + data[i].Infrastructure_Development_Cess + '<br/><strong>Environmental Cess : </strong> ' + data[i].Environmental_Cess + '<br/><strong>Total Amount : </strong> ' + data[i].ShallBePaidLater+'</td>';
+                    html += '<td></td>';//Download File
+                    if ($("#hdnPayment").val() == "Lessee") {
+                        html += '<td><a id="Payment" class="btn btn-primary" href="@URL/Payment/DemandNotePayment/Paymentss?DemandnoteId=' + data[i].DemandNoteCode +'" >Make Payment</a></td>';
+                    }
+                    else {
+                        html += '<td>' + data[i].PaymentStatus + '</td>';
+                    }
+                    html += '<td>' + data[i].Payment_Transaction_Details +'</td>';
+                    html += '</tr>';
+
+                }
+                $("#tBodyId").html(html);
+            },
+        });
+    }*@
+
+    function onpaymentClick(demandCode) {
+
+            $.ajax({
+            type: "POST",
+            url: '@Url.Action("DemandPayment", "DemandNotePayment")',
+            data: {
+                DemandCodeId: demandCode
+            },
+            success: function (response) {
+                window.location.href = response;
+            },
+            failure: function (response) {
+            }
+        });
+    }
+
+
+    function onSubmit() {
+        debugger;
+        var a = 1;
+        var msg = ""
+        if ($('input[type=checkbox]:checked').length == 0) {
+            swal("","You must select atleast one record.After that you can verify!","warning");
+            return false;
+        }
+        else {
+            var length = $('#table-exports tbody').find("tr").length;
+            var objDemandList = [];
+            var objAllData = new Object();
+
+            for (var t = 1; t < length + 1; t++) {
+                debugger
+
+                if ($('#chkkk_' + t + '').is(':checked')) {
+                    var fg = new Object();
+                    fg.DemandNoteCode = $('#hdnDemandCode_' + t + '').val()
+                    objDemandList.push(fg);
+                }
+            }
+
+            objAllData.objDemandListDataVal = objDemandList
+
+          //  objDemandList
+
+            $.ajax({
+
+                type: "POST",
+                url: '@Url.Action("VerifyDemandNoteS")',
+                data: objAllData,
+                success: function (data) {
+                    if (data.data == "1") {
+                        swal("", "Your Demand note/Credit note is verified successfully.", "success");
+                    }
+                    else {
+                        swal("", "something went wrong.", "warning");
+                    }
+
+                    // window.location.reload();
+                 },
+                 failure: function (response) {
+                     swal("", response.responseText, "warning");
+                 },
+                 error: function (response) {
+                     swal("", response.responseText, "warning");
+                 }
+             });
+
+
+        }
+    }
+
+
+    @*$("#btnPayment").click(function ()
+    {
+
+        var idsToSend = [];
+        var QtyToSend = [];
+        var DistrictId = [];
+        var totalQty = 0;
+        var row = "";
+
+
+
+        $("#table-exports input[type=checkbox]:checked").each(function ()
+        {
+            row = $(this).closest("tr")[0];
+            idsToSend.push(parseInt(row.cells[1].innerHTML));
+
+        });
+
+
+        if (confirm("Are you sure to make payment ?"))
+        {
+
+            window.location.href = "@URL/Payment/SuperLesseePayment/Payment?Ids=" + idsToSend;
+        }
+
+    });*@
+
+
+
+    function onpaymentclick(a)
+    {
+        alert(a);
+
+         if (confirm("Are you sure to make payment ?"))
+        {
+
+             window.location.href = "@URL/Payment/DemandNotePayment/Payment?DemandnoteId="+a;
+        }
+
+
+
+    }
+</script>

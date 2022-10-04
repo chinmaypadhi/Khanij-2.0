@@ -1,0 +1,429 @@
+﻿@*// *********************************************************************************************************
+    //  View Name                : Tender
+    //  Desciption               : To View Website Tender Details
+    //  Created By               : Lingaraj Dalai
+    //  Created On               : 12 Nov 2021
+    // ********************************************************************************************************
+*@
+@model HomeEF.ViewTenderModel
+@using Microsoft.AspNetCore.Mvc.Localization
+@using HomeEF;
+@using Microsoft.Extensions.Options;
+@using HomeApp.Services;
+@using HomeApp;
+@inject IOptions<KeyList> _objKeyList
+@inject IHtmlLocalizer<CommonResources> SharedLocalizer
+@inject CommonLocalizationService commonlocalizer
+@{
+    ViewData["Title"] = "Tender";
+    Layout = "~/Views/Shared/_WebHeaderLayout.cshtml";
+}
+<style>
+    .current {
+        background: #bb3900;
+        color: white;
+    }
+
+    #pagin li {
+        display: inline-block;
+        cursor: pointer;
+    }
+
+    .prev {
+        cursor: pointer;
+    }
+
+    .next {
+        cursor: pointer;
+    }
+
+    .last {
+        cursor: pointer;
+        margin-left: 5px;
+    }
+
+    .first {
+        cursor: pointer;
+        margin-right: 5px;
+    }
+</style>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('.datepicker').datetimepicker({
+            format: 'DD-MMM-YYYY'
+        }).keydown(false);
+        $('.tenders').addClass('active');
+        $(".tender-archive").hide();
+        $(".back").hide();
+        $("#hdnStatus").val('Active');
+        $(".arc").click(function () {
+            $(".tender-archive , .back").show();
+            $(".Active-Tender , .arc").hide();
+            $("#hdnStatus").val('Archive');
+        });
+        $(".back").click(function () {
+            $(".tender-archive , .back").hide();
+            $(".Active-Tender , .arc").show();
+            $("#hdnStatus").val('Active');
+        });
+        Paging();
+    })
+    /*Search Tender details*/
+    function SearchTenderList() {
+        $.ajax({
+            url: '/Website/Website/SearchTenderList',
+            dataType: 'json',
+            type: 'post',
+            data: {
+                "Tenderno": $("#VCH_TENDER_NO").val(),
+                "Fromdate": $("#txtFromDate").val(),
+                "Todate": $("#txtToDate").val(),
+                "Status": $("#hdnStatus").val()
+            },
+            success: function (data) {
+                if (data == "") {
+                    $("#lblMessage").text("No record(s) found!!");
+                }
+                else {
+                    $("#lblMessage").hide();
+                }
+                if ($("#hdnStatus").val() == "Active")
+                    $(".Active-Tender").empty().append(data);
+                else
+                    $(".tender-archive").empty().append(data);
+            },
+            error: function (err) {
+            }
+        });
+    }
+    //Pagination
+    function Paging() {
+        pageSize = 4;
+        incremSlide = 5;
+        startPage = 0;
+        numberPage = 0;
+        if (($(".line-content").length - 1) > pageSize) {
+            var pageCount = ($(".line-content").length - 1) / pageSize;
+            var totalSlidepPage = Math.floor(pageCount / incremSlide);
+            for (var i = 0; i < pageCount; i++) {
+                $("#pagin").append('<li class="page-item"><a class="page-link">' + (i + 1) + '</a></li>');
+                if (i > pageSize) {
+                    $("#pagin li").eq(i).hide();
+                }
+            }
+            var prev = $("<li/>").addClass("prev").html("<i class='fa fa-angle-double-left'></i>").click(function () {
+                startPage -= 5;
+                incremSlide -= 5;
+                numberPage--;
+                slide();
+            });
+            prev.hide();
+            var next = $("<li/>").addClass("next").html("<i class='fa fa-angle-double-right'></i>").click(function () {
+                startPage += 5;
+                incremSlide += 5;
+                numberPage++;
+                slide();
+            });
+            if (totalSlidepPage > 0) {
+                $("#pagin").prepend(prev).append(next);
+            }
+            $("#pagin li").first().find("a").addClass("current");
+            slide = function (sens) {
+                $("#pagin li").hide();
+                for (t = startPage; t < incremSlide; t++) {
+                    $("#pagin li").eq(t + 1).show();
+                }
+                if (startPage == 0) {
+                    next.show();
+                    prev.hide();
+                } else if (numberPage == totalSlidepPage) {
+                    next.hide();
+                    prev.show();
+                } else {
+                    next.show();
+                    prev.show();
+                }
+            }
+            showPage = function (page) {
+                $(".line-content").hide();
+                $(".line-content").each(function (n) {
+                    if (n >= pageSize * (page - 1) && n < pageSize * page)
+                        $(this).show();
+                });
+            }
+            showPage(1);
+            $("#pagin li a").eq(0).addClass("current");
+            $("#pagin li a").click(function () {
+                $("#pagin li a").removeClass("current");
+                $(this).addClass("current");
+                showPage(parseInt($(this).text()));
+            });
+        }
+    }
+</script>
+<div class="inner-naviagtion">
+    <div class="container">
+        <div class="">
+            <nav aria-label="breadcrumb mb-0">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="@_objKeyList.Value.HomeUrl"><span class="fas fa-home"></span></a></li>
+                    <li class="breadcrumb-item active text-white" aria-current="page">@SharedLocalizer["Tenders"]</li>
+                </ol>
+            </nav>
+
+        </div>
+    </div>
+</div>
+<div class="inner-content tender-sec">
+    <div class="container">
+        <div class="d-flex justify-content-between align-item-center">
+            <h3 class="heading">Tenders</h3>
+            <div>
+                <a href="javascript:void(0);" class="btn btn-danger arc">Archive</a>
+                <a href="javascript:void(0);" class="btn btn-dark back">Back</a>
+                <input type="hidden" id="hdnStatus">
+            </div>
+        </div>
+        <div class="bg-light pt-md-3 pb-md-0 pb-3 px-3 mb-4">
+            <div class="row">
+                <div class="col-lg-3 col-md-4">
+                    <div class="form-group">
+                        <label>Tender No.</label>
+                        @Html.TextBoxFor(m => m.VCH_TENDER_NO, new { @class = "form-control", @autofocus = "autofocus", @maxlength = "20" })
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-3">
+                    <div class="form-group">
+                        <label>From Date</label>
+                        <div class="input-group">
+                            <input id="txtFromDate" type="text" class="form-control datepicker" name="DTM_FROM_DATE">
+                            <div class="input-group-prepend">
+                                <label class="input-group-text" for="txtFromDate"><i class="far fa-calendar"></i></label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-3">
+                    <div class="form-group">
+                        <label>To Date</label>
+                        <div class="input-group">
+                            <input id="txtToDate" type="text" class="form-control datepicker" name="DTM_TO_DATE">
+                            <div class="input-group-prepend">
+                                <label class="input-group-text" for="txtToDate"><i class="far fa-calendar"></i></label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-1">
+                    <label class="invisible d-md-block d-none">button</label>
+                    <button type="button" class="btn btn-success d-flex" onclick="SearchTenderList()">Search</button>
+                </div>
+                <div class="col-md-1">
+                    <label class="invisible d-md-block d-none">button</label>
+                    <a href="~/Website/Website/Tender" class="btn btn-secondary d-flex">Clear</a>
+                </div>
+            </div>
+        </div>
+        @Html.Label("", (string)ViewBag.Message, new { @id = "lblMessage", @class = "col-sm-12 text-center text-danger" })
+        <div class="Active-Tender">
+            @Html.Raw((String)ViewData["ActiveTenderTable"])
+            @*<div class="tender-card tender-active">
+                    <h5>Tender Number : 167-EM</h5>
+                    <p>Auction (reverse auction) notice for allocation of sand mines. Office of the Collector (Mining) Korba (Chhattisgarh)</p>
+                    <p class="mb-1">
+                        <small class="text-danger d-lg-inline-block d-block">
+                            <span class="d-md-inline-block d-block"><i class="far fa-calendar-alt mr-2"></i> Closing  Date : 02-07-2021</span>
+                            <i class="far fa-clock ml-md-2 mr-2 ml-0"></i> Closing  Time : 5:45 PM
+                        </small>
+                        <span class="d-lg-inline-block d-none mx-2">|</span>
+                        <small>
+                            <span class="d-md-inline-block d-block">
+                                <i class="far fa-calendar-alt ml-lg-2 mr-2 ml-0"></i> Opening Date : 12-8-2021
+                            </span>
+                            <i class="far fa-clock ml-md-2 mr-2 ml-0"></i> Opening Time : 10:45 AM
+                        </small>
+                    </p>
+
+                    <div class="downloads">
+                        <a href="#"><i class="fas fa-file-pdf ml-2"></i></a>
+                        <a href="#"><i class="fas fa-file-pdf ml-2"></i></a>
+                    </div>
+
+
+                </div>
+
+
+                <div class="tender-card tender-active">
+                    <h5>Tender Number : 167-EM</h5>
+                    <p>Auction (reverse auction) notice for allocation of sand mines. Office of the Collector (Mining) Korba (Chhattisgarh)</p>
+                    <p class="mb-1">
+                        <small class="text-danger d-lg-inline-block d-block">
+                            <span class="d-md-inline-block d-block"><i class="far fa-calendar-alt mr-2"></i> Closing  Date : 02-07-2021</span>
+                            <i class="far fa-clock ml-md-2 mr-2 ml-0"></i> Closing  Time : 5:45 PM
+                        </small>
+                        <span class="d-lg-inline-block d-none mx-2">|</span>
+                        <small>
+                            <span class="d-md-inline-block d-block">
+                                <i class="far fa-calendar-alt ml-lg-2 mr-2 ml-0"></i> Opening Date : 12-8-2021
+                            </span>
+                            <i class="far fa-clock ml-md-2 mr-2 ml-0"></i> Opening Time : 10:45 AM
+                        </small>
+                    </p>
+
+
+
+                    <div class="downloads">
+                        <a href="#"><i class="fas fa-file-pdf ml-2"></i></a>
+                        <a href="#"><i class="fas fa-file-pdf ml-2"></i></a>
+                    </div>
+
+
+                </div>
+
+                <div class="tender-card">
+                    <h5>Tender Number : 167-EM</h5>
+                    <p>Auction (reverse auction) notice for allocation of sand mines. Office of the Collector (Mining) Korba (Chhattisgarh)</p>
+                    <p class="mb-1">
+                        <small class="text-danger d-lg-inline-block d-block">
+                            <span class="d-md-inline-block d-block"><i class="far fa-calendar-alt mr-2"></i> Closing  Date : 02-07-2021</span>
+                            <i class="far fa-clock ml-md-2 mr-2 ml-0"></i> Closing  Time : 5:45 PM
+                        </small>
+                        <span class="d-lg-inline-block d-none mx-2">|</span>
+                        <small>
+                            <span class="d-md-inline-block d-block">
+                                <i class="far fa-calendar-alt ml-lg-2 mr-2 ml-0"></i> Opening Date : 12-8-2021
+                            </span>
+                            <i class="far fa-clock ml-md-2 mr-2 ml-0"></i> Opening Time : 10:45 AM
+                        </small>
+                    </p>
+
+
+                    <div class="downloads">
+                        <a href="#"><i class="fas fa-file-pdf ml-2"></i></a>
+                        <a href="#"><i class="fas fa-file-pdf ml-2"></i></a>
+                    </div>
+
+
+                </div>
+
+                <div class="tender-card ">
+                    <h5>Tender Number : 167-EM</h5>
+                    <p>Auction (reverse auction) notice for allocation of sand mines. Office of the Collector (Mining) Korba (Chhattisgarh)</p>
+                    <p class="mb-1">
+                        <small class="text-danger d-lg-inline-block d-block">
+                            <span class="d-md-inline-block d-block"><i class="far fa-calendar-alt mr-2"></i> Closing  Date : 02-07-2021</span>
+                            <i class="far fa-clock ml-md-2 mr-2 ml-0"></i> Closing  Time : 5:45 PM
+                        </small>
+                        <span class="d-lg-inline-block d-none mx-2">|</span>
+                        <small>
+                            <span class="d-md-inline-block d-block">
+                                <i class="far fa-calendar-alt ml-lg-2 mr-2 ml-0"></i> Opening Date : 12-8-2021
+                            </span>
+                            <i class="far fa-clock ml-md-2 mr-2 ml-0"></i> Opening Time : 10:45 AM
+                        </small>
+                    </p>
+
+
+                    <div class="downloads">
+                        <a href="#"><i class="fas fa-file-pdf ml-2"></i></a>
+                        <a href="#"><i class="fas fa-file-pdf ml-2"></i></a>
+                    </div>
+
+
+                </div>
+
+                <div class="tender-card ">
+                    <h5>Tender Number : 167-EM</h5>
+                    <p>Auction (reverse auction) notice for allocation of sand mines. Office of the Collector (Mining) Korba (Chhattisgarh)</p>
+                    <p class="mb-1">
+                        <small class="text-danger d-lg-inline-block d-block">
+                            <span class="d-md-inline-block d-block"><i class="far fa-calendar-alt mr-2"></i> Closing  Date : 02-07-2021</span>
+                            <i class="far fa-clock ml-md-2 mr-2 ml-0"></i> Closing  Time : 5:45 PM
+                        </small>
+                        <span class="d-lg-inline-block d-none mx-2">|</span>
+                        <small>
+                            <span class="d-md-inline-block d-block">
+                                <i class="far fa-calendar-alt ml-lg-2 mr-2 ml-0"></i> Opening Date : 12-8-2021
+                            </span>
+                            <i class="far fa-clock ml-md-2 mr-2 ml-0"></i> Opening Time : 10:45 AM
+                        </small>
+                    </p>
+
+
+                    <div class="downloads">
+                        <a href="#"><i class="fas fa-file-pdf ml-2"></i></a>
+                        <a href="#"><i class="fas fa-file-pdf ml-2"></i></a>
+                    </div>
+
+
+                </div>*@
+        </div>
+        <div class="tender-archive">
+            @Html.Raw((String)ViewData["ArchiveTenderTable"])
+            @*<div class="tender-card">
+                    <h5>Tender Number : 167-EM</h5>
+                    <p>Auction (reverse auction) notice for allocation of sand mines. Office of the Collector (Mining) Korba (Chhattisgarh)</p>
+                    <p class="mb-1">
+                        <small class="text-danger d-lg-inline-block d-block">
+                            <span class="d-md-inline-block d-block"><i class="far fa-calendar-alt mr-2"></i> Closing  Date : 02-07-2021</span>
+                            <i class="far fa-clock ml-md-2 mr-2 ml-0"></i> Closing  Time : 5:45 PM
+                        </small>
+                        <span class="d-lg-inline-block d-none mx-2">|</span>
+                        <small>
+                            <span class="d-md-inline-block d-block">
+                                <i class="far fa-calendar-alt ml-lg-2 mr-2 ml-0"></i> Opening Date : 12-8-2021
+                            </span>
+                            <i class="far fa-clock ml-md-2 mr-2 ml-0"></i> Opening Time : 10:45 AM
+                        </small>
+                    </p>
+
+                    <div class="downloads">
+                        <a href="#"><i class="fas fa-file-pdf ml-2"></i></a>
+                        <a href="#"><i class="fas fa-file-pdf ml-2"></i></a>
+                    </div>
+
+
+                </div>
+
+
+                <div class="tender-card">
+                    <h5>Tender Number : 167-EM</h5>
+                    <p>Auction (reverse auction) notice for allocation of sand mines. Office of the Collector (Mining) Korba (Chhattisgarh)</p>
+                    <p class="mb-1">
+                        <small class="text-danger d-lg-inline-block d-block">
+                            <span class="d-md-inline-block d-block"><i class="far fa-calendar-alt mr-2"></i> Closing  Date : 02-07-2021</span>
+                            <i class="far fa-clock ml-md-2 mr-2 ml-0"></i> Closing  Time : 5:45 PM
+                        </small>
+                        <span class="d-lg-inline-block d-none mx-2">|</span>
+                        <small>
+                            <span class="d-md-inline-block d-block">
+                                <i class="far fa-calendar-alt ml-lg-2 mr-2 ml-0"></i> Opening Date : 12-8-2021
+                            </span>
+                            <i class="far fa-clock ml-md-2 mr-2 ml-0"></i> Opening Time : 10:45 AM
+                        </small>
+                    </p>
+
+
+
+                    <div class="downloads">
+                        <a href="#"><i class="fas fa-file-pdf ml-2"></i></a>
+                        <a href="#"><i class="fas fa-file-pdf ml-2"></i></a>
+                    </div>
+
+
+                </div>*@
+
+
+
+
+
+
+        </div>
+        <nav aria-label="Page navigation">
+            <ul class="pagination justify-content-center" id="pagin">
+            </ul>
+        </nav>
+    </div>
+</div>
+
+

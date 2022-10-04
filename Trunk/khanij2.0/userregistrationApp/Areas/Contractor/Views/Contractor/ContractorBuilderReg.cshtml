@@ -1,0 +1,733 @@
+﻿
+@{
+    ViewData["Title"] = "ContractorBuilderReg";
+    Layout = "~/Views/Shared/_WebHeaderLayout.cshtml";
+}
+@using userregistrationEF;
+@inject Microsoft.Extensions.Options.IOptions<userregistrationEF.KeyList> metaOptions
+
+@{
+    var options = metaOptions.Value;
+}
+<style>
+    .refesh-btn {
+        position: absolute;
+        right: 59%;
+        top: 2px;
+        font-size: 25px;
+        border: 1px solid #ddd;
+        padding: 1px 10px;
+        background-color: #dddddd6e;
+        border-radius: 5px;
+    }
+</style>
+
+<div class="inner-naviagtion">
+    <div class="container">
+        <nav aria-label="breadcrumb mb-0">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="@options.HomeUrl"><span class="fas fa-home"></span></a></li>
+                <li class="breadcrumb-item text-white" aria-current="page">Registrations</li>
+                <li class="breadcrumb-item text-white" aria-current="page">Contractor/Builder</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+<div class="inner-content">
+    <div class="container">
+        <h3 class="heading">Contractor / Builder Registration</h3>
+        @using (Html.BeginForm("ContractorBuilderReg", "Contractor", FormMethod.Post, new { AUTOCOMPLETE = "Off", id = "form1", enctype = "multipart/form-data" }))
+        {
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="row">
+                        <div class="col-lg-10">
+                            <div class="row">
+                                <label class="col-lg-3 col-md-5 col-12 col-form-label ">Registration Type <span class="text-danger">*</span></label>
+                                <div class="col-lg-7 col-md-7 col-12">
+                                    <div class="py-2">
+                                        <div class="form-group">
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input " type="radio" name="RegistrationType" id="Contractor" value="Contractor" checked="checked">
+                                                <label class="form-check-label" for="Contractor">
+                                                    Contractor Registration
+                                                </label>
+                                            </div>
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="radio" name="RegistrationType" id="Builder" value="Builder">
+                                                <label class="form-check-label" for="Builder">
+                                                    Builder Registration
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="row">
+                                <label class="col-lg-5 col-md-5 col-12 col-form-label ">Name <span class="text-danger">*</span></label>
+                                <div class="col-lg-7 col-md-7 col-12">
+                                    <div class="form-group">
+                                        <input id="ContractorBuilderName" maxlength="50" name="ContractorBuilderName" type="text" class="form-control">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="row">
+                                <label class="col-lg-5 col-md-5 col-12 col-form-label ">
+                                    Mobile Number <span class="text-danger">*</span>
+                                    <a href="javascript:void(0)" class="extra-information" data-toggle="tooltip" data-placement="top" title="OTP will be sent on your mobile number">
+                                        <i class="fas fa-info-circle"></i>
+                                    </a>
+                                </label>
+                                <div class="col-lg-7 col-md-7 col-12">
+                                    <div class="form-group">
+                                        <input id="MobileNumber" name="MobileNumber" maxlength="10" type="text" class="form-control">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="row">
+                                <label class="col-lg-5 col-md-5 col-12 col-form-label ">Email Id </label>
+                                <div class="col-lg-7 col-md-7 col-12">
+                                    <div class="form-group">
+                                        <input id="EmailId" maxlength="50" name="EmailId" type="text" class="form-control">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-6">
+                            <div class="row">
+                                <label class="col-lg-5 col-md-5 col-12 col-form-label ">Address <span class="text-danger">*</span></label>
+                                <div class="col-lg-7 col-md-7 col-12">
+                                    <div class="form-group">
+                                        <textarea id="ContractorBuilderAddress" maxlength="500" name="ContractorBuilderAddress" class="form-control" rows="2"></textarea>
+                                        <small class="text-danger">Maximum <strong>500</strong> characters</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="row">
+                                <label class="col-lg-5 col-md-5 col-12 col-form-label ">State <span class="text-danger">*</span></label>
+                                <div class="col-lg-7 col-md-7 col-12">
+                                    <div class="form-group">
+                                        <select id="ddlState" name="StateId" class="form-control  searchableselect">
+                                            <option value="">Select</option>
+                                            @{
+                                                List<CommonAddressDetails> lstcommonAddressDetails = (List<CommonAddressDetails>)ViewData["StateDetails"];
+                                                if (lstcommonAddressDetails != null)
+                                                {
+                                                    foreach (var item in lstcommonAddressDetails)
+                                                    {
+                                                        if (item.StateID == 7)
+                                                        {
+                                                            <option value="@item.StateID">@item.StateName</option>
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="row">
+                                <label class="col-lg-5 col-md-5 col-12 col-form-label ">District <span class="text-danger">*</span></label>
+                                <div class="col-lg-7 col-md-7 col-12">
+                                    <div class="form-group">
+                                        <select id="ddlDistrict" name="DistrictId" class="form-control  searchableselect">
+                                            <option value="">Select</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="row">
+                                <label class="col-lg-5 col-md-5 col-12 col-form-label ">Pin Code <span class="text-danger">*</span></label>
+                                <div class="col-lg-7 col-md-7 col-12">
+                                    <div class="form-group">
+                                        <input id="PINCode" name="PINCode" type="text" maxlength="6" class="form-control">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="row">
+                                <label class="col-lg-5 col-md-5 col-12 col-form-label ">ID Proof Type <span class="text-danger">*</span></label>
+                                <div class="col-lg-7 col-md-7 col-12">
+                                    <div class="form-group">
+                                        <select id="IDProofType" name="IDProofType" class="form-control  searchableselect">
+                                            <option value="">Select</option>
+                                            <option value="Aadhar Card">Aadhar Card</option>
+                                            <option value="Pan Card">Pan Card</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="row">
+                                <label class="col-lg-5 col-md-5 col-12 col-form-label ">ID Proof Number <span class="text-danger">*</span></label>
+                                <div class="col-lg-7 col-md-7 col-12">
+                                    <div class="form-group">
+                                        <input id="IDProofNumber" maxlength="12" name="IDProofNumber" type="text" class="form-control">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="row">
+                                <label class="col-lg-5 col-md-5 col-12 col-form-label ">Upload ID Proof <span class="text-danger">*</span></label>
+                                <div class="col-lg-7 col-md-7 col-12">
+                                    <div class="form-group">
+                                        <div class="custom-file">
+                                            <input type="file" class="custom-file-input" id="IDProof" name="IDProof">
+                                            <label class="custom-file-label" for="IDProof">Choose Files</label>
+                                        </div>
+                                        <small class="text-danger">Only <strong> jpg, jpeg, png</strong> file types size Max. <strong>2 MB </strong></small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-6 Builder-show">
+                            <div class="row">
+                                <label class="col-lg-5 col-md-5 col-12 col-form-label ">RERA Registration No. <span class="text-danger">*</span></label>
+                                <div class="col-lg-7 col-md-7 col-12">
+                                    <div class="form-group">
+                                        <input id="RERARegistrationNo" maxlength="50" name="RERARegistrationNo" type="text" class="form-control">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6 Builder-show ">
+                            <div class="row">
+                                <label class="col-lg-5 col-md-5 col-12 col-form-label ">Upload RERA Registration <span class="text-danger">*</span></label>
+                                <div class="col-lg-7 col-md-7 col-12">
+                                    <div class="form-group">
+                                        <div class="custom-file">
+                                            <input type="file" class="custom-file-input" id="RERARegistration" name="RERARegistration">
+                                            <label class="custom-file-label" for="RERARegistration">Choose Files</label>
+                                        </div>
+                                        <small class="text-danger">Only <strong> jpg, jpeg, png</strong> file types size Max. <strong>2 MB </strong></small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-6">
+                            <div class="row">
+                                <label class="col-lg-5 col-md-5 col-12 col-form-label ">Enter Captcha <span class="text-danger">*</span></label>
+                                <div class="col-lg-7 col-md-7 col-12">
+                                    <div class="form-group">
+                                        <input id="ContractorBuilderCaptcha" type="text" class="form-control">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-6">
+                            <div class="form-group row">
+                                <div class="col-sm-4">
+                                    <div class="input-group">
+
+                                        <div id="capt1" class="form-control" ondrag="return false" oncopy="return false" onselectstart="return false" oncut="return false"></div>
+                                        <label class="input-group-text" for="inputDate1"> <a href="javascript:;" onclick="updateCaptcha();"><i class="fas fa-sync-alt"></i></a> </label>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="row">
+                                <label class="col-lg-5 col-md-5 col-12 col-form-label ">Enter OTP <span class="text-danger">*</span></label>
+                                <div class="col-lg-7 col-md-7 col-12">
+                                    <div class="form-group">
+                                        <input id="ContractorBuilderOTP" type="text" class="form-control">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-6">
+                            <div class="row">
+                                <input type="button" class="btn btn-success" id="btnsendOtp" value="Send OTP">
+                            </div>
+                        </div>
+
+                        <div class="col-sm-12">
+                            <div class="form-group row">
+                                <div class="custom-control custom-checkbox ml-2">
+                                    <input type="checkbox" class="custom-control-input" name="chkIagree" id="chkIagree">
+                                    <label class="custom-control-label  text-danger" for="chkIagree">
+                                        Declaration - I declare that all the information given above is true as per my knowledge and belief. I am aware that if any of the above information is found to be false or untrue, there may be penalty / penalty under the appropriate rules.
+                                        The Department of Mineral Resources will not be responsible for authenticating any of the above information.
+                                    </label>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mt-3" id="divButtons">
+                        <div class="col-lg-12">
+                            <button type="button" id="btnSubmit" class="btn btn-success btn-lg mr-2">Submit</button>
+                            <a href="/Contractor/Contractor/ContractorBuilderReg" class="btn btn-danger btn-lg">Reset</a>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        }
+    </div>
+</div>
+@{
+    if (ViewBag.SuccessMessage != null)
+    {
+        <script>
+        swal("", "You have successfully applied for Registration with Khanij Online Portal. @ViewBag.SuccessMessage. Please check your e-mail for details of registration.", "success");
+        </script>
+    }
+}
+<script>
+    $(document).ready(function () {
+        $('#divButtons').hide();
+
+        $(".Builder-show").hide();
+
+        $("#Builder").click(function () {
+            $(".Builder-show").show();
+        });
+
+        $("#Contractor").click(function () {
+            $(".Builder-show").hide();
+        });
+
+        updateCaptcha();
+    });
+
+    function updateCaptcha() {
+        debugger;
+        $.ajax({
+            url: '/VehicleOwner/VehicleOwner/CaptchaImage',
+            data: {},
+            dataType: 'json',
+            type: 'post',
+            success: function (data) {
+                $("#capt1").html(data);
+            },
+            error: function (err) {
+                swal("", err.responseText, "warning");
+            }
+        });
+    }
+
+    $('#ddlState').change(function () {
+        debugger;
+        if ($(this).val() != "") {
+            $.ajax({
+                url: "/Contractor/Contractor/GetDistrictByStateId",
+                data: { 'StateId': $(this).val() },
+                dataType: 'json',
+                type: 'post',
+                success: function (data) {
+                    debugger;
+                    $('#ddlDistrict').html('');
+                    $('#ddlDistrict').append("<option value=''>Select</option>");
+                    $.each(data, function (ind, item) {
+                        $('#ddlDistrict').append("<option value='" + item.districtID + "'>" + item.districtName + "</option>");
+                    });
+                },
+                error: function (err) {
+
+                }
+            });
+        }
+        else {
+            $('#ddlDistrict').html('');
+            $('#ddlDistrict').append("<option value=''>Select</option>");
+        }
+    });
+
+    $("#btnsendOtp").click(function () {
+        debugger;
+        if (ValidateContractorBuilder()) {
+            var mobileNumber = $("#MobileNumber").val();
+            var EmailID = $("#EmailId").val();
+
+            if (mobileNumber == "") {
+                swal("", "Please enter mobile number", "warning");
+                $('#Contact_Person_MobileNo').focus();
+                return false;
+            }
+            else {
+                $('#btnsendOtp').attr('readonly', 'readonly');
+
+                $.ajax({
+                    url: '/VehicleOwner/VehicleOwner/SendOTP',
+                    dataType: "",
+                    type: "POST",
+                    data: {
+                        MobileNumber: mobileNumber,
+                        EmailID: EmailID
+                    },
+                    success: function (data) {
+                        debugger;
+                        console.log(data);
+                        if (data != null) {
+                            $('#btnsendOtp').removeAttr('readonly');
+                            if (data == "SUCCESS") {
+                                swal("", "Enter Verification Code received on submitted Mobile/Email Id", "success");
+                            }
+                            else {
+                                swal("", data, "warning");
+                            }
+                        }
+                    }
+                })
+            }
+        }
+    });
+
+    $('#chkIagree').click(function () {
+        if (ValidateContractorBuilder()) {
+            if ($('#ContractorBuilderOTP').val() != "") {
+                $.ajax({
+                    url: '/VehicleOwner/VehicleOwner/VerifyOTP',
+                    data: {
+                        OTP: $('#ContractorBuilderOTP').val(),
+                        MobileNumber: $("#MobileNumber").val(),
+                        EmailID: $("#EmailId").val()
+                    },
+                    success: function (result) {
+                        if (result == "SUCCESS") {
+                            if ($('input[name="chkIagree"]:checked').length > 0) {
+                                $('#divButtons').show();
+                                $(this).attr('checked', 'checked');
+
+                            }
+                            else {
+                                $('#divButtons').hide();
+                                ChangeCheckBoxStatus();
+                            }
+                        }
+                        else if (result == "REQUIRED") {
+                            swal("", "Please enter mobile number and e-mail and OTP !", "warning");
+                            $('#divButtons').hide();
+                            ChangeCheckBoxStatus();
+                        }
+                        else {
+                            swal("", "This is an invalid OTP.Please send another OTP and try again !", "warning");
+                            $('#divButtons').hide();
+                            ChangeCheckBoxStatus();
+                        }
+                    },
+                    error: function (result) {
+                        swal("", "OTP Verification failed.Please try again !", "warning");
+                        $('#divButtons').hide();
+                        ChangeCheckBoxStatus();
+                    }
+                });
+            }
+            else {
+                 
+                swal("", "Please Enter OTP", "warning");
+                $("#ContractorBuilderOTP").focus();
+                $('#divButtons').hide();
+                ChangeCheckBoxStatus();
+                return false;
+            }
+        }
+        else { 
+            $('#divButtons').hide();
+            ChangeCheckBoxStatus();
+        }
+
+    });
+
+    function ChangeCheckBoxStatus() {
+        if ($('input[type="checkbox"]').is(':checked') == true) {
+            $('input[type="checkbox"]').prop('checked', false);
+        }
+    }
+
+    $("#MobileNumber").keydown(function (e) {
+        // Allow: backspace, delete, tab, escape, enter and .
+        if ($.inArray(e.keyCode, [46, 8, 9, 27, 13, 110, 190]) !== -1 ||
+            // Allow: Ctrl+A, Command+A
+            (e.keyCode === 65 && (e.ctrlKey === true || e.metaKey === true)) ||
+            // Allow: home, end, left, right, down, up
+            (e.keyCode >= 35 && e.keyCode <= 40)) {
+            // let it happen, don't do anything
+            return;
+        }
+        // Ensure that it is a number and stop the keypress
+        if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) {
+            e.preventDefault();
+        }
+    });
+
+    $("#PINCode").keydown(function (e) {
+        // Allow: backspace, delete, tab, escape, enter and .
+        if ($.inArray(e.keyCode, [46, 8, 9, 27, 13, 110, 190]) !== -1 ||
+            // Allow: Ctrl+A, Command+A
+            (e.keyCode === 65 && (e.ctrlKey === true || e.metaKey === true)) ||
+            // Allow: home, end, left, right, down, up
+            (e.keyCode >= 35 && e.keyCode <= 40)) {
+            // let it happen, don't do anything
+            return;
+        }
+        // Ensure that it is a number and stop the keypress
+        if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) {
+            e.preventDefault();
+        }
+    });
+
+    $('#RERARegistration').on('change', function () {
+        debugger;
+        var fileExtension = ['jpg', 'jpeg', 'png', 'pdf', 'tif'];
+        if ($.inArray($(this).val().split('.').pop().toLowerCase(), fileExtension) == -1) {
+            swal("", "Only formats are allowed : " + fileExtension.join(', '), "warning");
+            $(this).focus();
+            return false;
+        }
+
+        if (Number(this.files[0].size) > 2097152) {
+            swal("", 'Try to upload file less than 2MB!', "warning");
+            $(this).val('');
+            $(this).focus();
+            return false;
+        }
+        else {
+            var fileName = $(this).val().split("\\").pop();
+            $(this).next('.custom-file-label').html(fileName);
+        }
+
+    });
+
+    $('#IDProof').on('change', function () {
+        debugger;
+        var fileExtension = ['jpg', 'jpeg', 'png', 'pdf', 'tif'];
+        if ($.inArray($(this).val().split('.').pop().toLowerCase(), fileExtension) == -1) {
+            swal("", "Only formats are allowed : " + fileExtension.join(', '), "warning");
+            $(this).focus();
+            return false;
+        }
+
+        if (Number(this.files[0].size) > 2097152) {
+            swal("", 'Try to upload file less than 2MB!', "warning");
+            $(this).val('');
+            $(this).focus();
+            return false;
+        }
+        else {
+            var fileName = $(this).val().split("\\").pop();
+            $(this).next('.custom-file-label').html(fileName);
+        }
+
+    });
+
+    function ValidateContractorBuilder() {
+        if ($('#ContractorBuilderName').val() == "") {
+            swal("", 'Please Enter Name', "warning");
+            $('#ContractorBuilderName').focus();
+            return false;
+        }
+
+        if (CheckSpaceAtFirstPlaceAndLastPlace($("#ContractorBuilderName").val()) == false) {
+            swal("", "Please Check Name For Spaces at Beginning And End Place", "warning");
+            $("#ContractorBuilderName").focus();
+            return false;
+        }
+
+        if ($('#MobileNumber').val() == "") {
+            swal("", 'Please Enter Mobile Number', "warning");
+            $('#MobileNumber').focus();
+            return false;
+        }
+
+        if ($('#MobileNumber').val().length != 10) {
+            swal("", 'Please Enter Valid Mobile Number', "warning");
+            $('#MobileNumber').focus();
+            return false;
+        }
+
+        if ($('#EmailId').val() == "") {
+            swal("", 'Please Enter EmailId', "warning");
+            $('#EmailId').focus();
+            return false;
+        }
+
+        if (ValidateEmailAddress(document.getElementById("EmailId")) == false) {
+            swal("", "Please Enter Valid EmailId", "warning");
+            $("#EmailId").focus();
+            return false;
+        }
+         
+        if ($('#ContractorBuilderAddress').val() == "") {
+            swal("", 'Please Enter Address', "warning");
+            $('#ContractorBuilderAddress').focus();
+            return false;
+        }
+
+        if (CheckSpaceAtFirstPlaceAndLastPlace($("#ContractorBuilderAddress").val()) == false) {
+            swal("", "Please Check Address For Spaces at Beginning And End Place", "warning");
+            $("#ContractorBuilderAddress").focus();
+            return false;
+        }
+
+        if ($('#ddlState').val() == "") {
+            swal("", 'Please Select State', "warning");
+            $('#ddlState').focus();
+            return false;
+        }
+
+        if ($('#ddlDistrict').val() == "") {
+            swal("", 'Please Select District', "warning");
+            $('#ddlDistrict').focus();
+            return false;
+        }
+
+        if ($('#PINCode').val() == "") {
+            swal("", 'Please Enter PIN Code', "warning");
+            $('#PINCode').focus();
+            return false;
+        }
+
+        if ($('#PINCode').val().length != 6) {
+            swal("", 'Please Enter Valid PIN Code', "warning");
+            $('#PINCode').focus();
+            return false;
+        }
+
+        if ($('#IDProofType').val() == "") {
+            swal("", 'Please Select ID Proof Type', "warning");
+            $('#IDProofType').focus();
+            return false;
+        }
+
+        if ($('#IDProofNumber').val() == "") {
+            swal("", 'Please Enter ID Proof Number', "warning");
+            $('#IDProofNumber').focus();
+            return false;
+        }
+
+        if (CheckSpaceAtFirstPlaceAndLastPlace($("#IDProofNumber").val()) == false) {
+            swal("", "Please Check ID Proof Number For Spaces at Beginning And End Place", "warning");
+            $("#IDProofNumber").focus();
+            return false;
+        }
+
+        if ($('#IDProofType').val() == "Aadhar Card") {
+            if ($('#IDProofNumber').val().length != 12) {
+                swal("", 'Please Enter Valid ID Proof Number', "warning");
+                $('#IDProofNumber').focus();
+                return false;
+            }
+        }
+
+        if ($('#IDProofType').val() == "Pan Card") {
+            if ($('#IDProofNumber').val().length != 10) {
+                swal("", 'Please Enter Valid ID Proof Number', "warning");
+                $('#IDProofNumber').focus();
+                return false;
+            }
+        }
+
+        if ($('#IDProof').val() == "") {
+            swal("", 'Please Choose Upload ID Proof', "warning");
+            $('#IDProof').focus();
+            return false;
+        }
+
+        var SelectedRadioVal = $("input[name='RegistrationType']:checked").val();
+        if (SelectedRadioVal == 'Builder') {
+            if ($('#RERARegistrationNo').val() == "") {
+                swal("", 'Please Enter RERA RegistrationNo', "warning");
+                $('#RERARegistrationNo').focus();
+                return false;
+            }
+            if (CheckSpaceAtFirstPlaceAndLastPlace($("#RERARegistrationNo").val()) == false) {
+                swal("", "Please Check RERA RegistrationNo For Spaces at Beginning And End Place", "warning");
+                $("#RERARegistrationNo").focus();
+                return false;
+            }
+
+            if ($('#RERARegistration').val() == "") {
+                swal("", 'Please Choose Upload RERA Registration', "warning");
+                $('#RERARegistration').focus();
+                return false;
+            }
+        }
+        else {
+            $('#RERARegistrationNo').val('');
+        }
+
+        if ($('#ContractorBuilderCaptcha').val() == "") {
+            swal("", 'Please Enter Captcha', "warning");
+            $('#ContractorBuilderCaptcha').focus();
+            return false;
+        }
+        if ($('#ContractorBuilderCaptcha').val() != $('#capt1').html()) {
+            swal("", 'Please Enter Valid Captcha', "warning");
+            $('#ContractorBuilderCaptcha').focus();
+            updateCaptcha();
+            return false;
+        }
+
+        return true;
+    }
+
+    $('#btnSubmit').click(function () {
+        if (ValidateContractorBuilder()) {
+            if (confirm("Do you really want to submit the form?")) {
+                $('#btnSubmit').attr('readonly', 'readonly');
+                $('#form1').submit();
+            }
+            else { 
+                return false;
+            } 
+        }
+        else { 
+            return false;
+        }
+    });
+
+    function CheckSpaceAtFirstPlaceAndLastPlace(str) {
+        var regex = /^(?!\s)(?![\s\S]*\s$)[a-zA-Z0-9\s()-]+$/;
+        return regex.test(str);
+    }
+
+    $("#EmailId").keydown(function (evt) {
+        //debugger;
+        evt = (evt) ? evt : window.event;
+        var charCode = (evt.which) ? evt.which : evt.keyCode;
+        if (charCode == 32) {
+            return false;
+        }
+        return true;
+
+    });
+
+    function ValidateEmailAddress(inputText) {
+        debugger;
+        var mailformat = /^\w+([\.-]?\w+)@@\w+([\.-]?\w+)(\.\w{2,3})+$/;
+        if (inputText.value.match(mailformat)) {
+            inputText.focus();
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+
+    
+
+</script>

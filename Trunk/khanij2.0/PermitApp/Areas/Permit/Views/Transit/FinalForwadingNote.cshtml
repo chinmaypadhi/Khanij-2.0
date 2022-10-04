@@ -1,0 +1,272 @@
+﻿@model PermitEF.ForwardingNoteModel
+@using PermitApp.Helper;
+@{
+    ViewData["Title"] = "FinalForwadingNote";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+<section class="wrapper main-wrapper row">
+    <div class="col-12" id="mainDiv">
+        @Html.Partial("_CMSnavigation")
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link " href="@Url.Content("~/Permit/Transit/ApplyForwardingNote")">
+                                Apply New Application
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="#">
+                                Generated RTP Application
+                            </a>
+                        </li>
+
+                    </ul>
+                    @Html.Partial("_CMSutil")
+                </div>
+                <section class="box form-container">
+                    @using (Html.BeginForm("FinalForwadingNote", "Transit", FormMethod.Post, new { AUTOCOMPLETE = "Off", id = "form1" }))
+                    {
+
+
+                        @*<section class="box form-container">*@
+                        @*<div class="searchform ">
+                                <div class="row">
+                                    <label class="col-lg-2 col-md-5 col-sm-12 col-form-label form-group">From Date</label>
+                                    <div class=" col-lg-2 col-md-5 col-sm-12 input-group">
+                                        @(Html.TextBoxFor(model => model.From, new { @class = "form-control datepicker", id = "FromDate" }))
+                                        <div class="input-group-prepend">
+                                            <label class="input-group-text" for="FromDate"><i class="far fa-calendar"></i></label>
+                                        </div>
+                                    </div>
+
+
+
+                                    <label class="col-lg-2 col-md-5 col-sm-12 col-form-label form-group">To Date</label>
+                                    <div class=" col-lg-2 col-md-5 col-sm-12 input-group">
+                                        @(Html.TextBoxFor(model => model.To, new { @class = "form-control datepicker", id = "ToDate" }))
+                                        <div class="input-group-prepend">
+                                            <label class="input-group-text" for="ToDate"><i class="far fa-calendar"></i></label>
+                                        </div>
+                                    </div>
+
+
+                                    <div class="col-md-2 mt-md-0 mt-3">
+                                        <a href="#" class="btn btn-md btn-success m-0 waves-effect waves-light" data-original-title="" title="">Show </a>
+                                    </div>
+
+                                </div>
+
+                            </div>*@
+
+                        <div class="content-body">
+
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <table id="table-landscape" class="table table-sm table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th style="display:none;"></th>
+                                                <th>Sl#</th>
+                                                <th>E-Permit No.</th>
+                                                <th>RTP Application</th>
+                                                <th>Mineral Name</th>
+                                                <th>Mineral Form</th>
+                                                <th>Mineral Grade</th>
+                                                <th>RTP Application Qty (MT)</th>
+                                                <th>Dispatched Qty (MT)</th>
+                                                <th>RTP Generated Qty (MT)</th>
+                                                <th>Transportation Mode</th>
+                                                <th>Purchaser/Consignee</th>
+                                                <th>EDRM</th>
+                                                <th>EDRM Copy</th>
+                                                <th width="200px" class="text-center">Trip Operation</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach (var b in ViewBag.ViewList)
+                                            {
+                                            <tr>
+                                                <td style="display:none;">@b.ForwardingNoteId</td>
+                                                <td>@b.SRNO</td>
+                                                <td>@b.BulkPermitNumber</td>
+                                                <td>
+                                                    <a href="@CustomQueryStringHelper.EncryptString("Permit","RTPPermitApplication","Transit",new {ForwardingNoteId=@b.ForwardingNoteId })">@b.ForwardingNoteNumber</a>
+                                                    @*<a class="text-primary" href="@Url.Content("~/Permit/Transit/RTPPermitApplication/?ForwardingNoteId=")@b.ForwardingNoteId">@b.ForwardingNoteNumber</a>*@
+                                                    <br />
+                                                    <span><i class="far fa-calendar-alt mr-2"></i>@b.DateofSubmitedRTPRequest</span>
+                                                    <br />
+                                                </td>
+                                                <td>@b.MineralName</td>
+                                                <td>@b.MineralNature</td>
+                                                <td>@b.MineralGrade</td>
+                                                @if (b.isLable == 1)
+                                                {
+                                                    <td class="text-right">
+                                                        <a class="text-primary" href="@Url.Content("~/Permit/Lessee/ePermitRoyaltyHistory/?id=")@b.BulkPermitNumber">Royalty Changed</a>
+                                                    </td>
+                                                }
+                                                else
+                                                {
+                                                    <td class="noprint">
+                                                        @b.ReqQty
+                                                    </td>
+                                                }
+                                                <td class="text-right">
+                                                    @b.TotalDispatchedQty
+                                                </td>
+                                                <td class="text-right">@b.BalanceQty</td>
+                                                <td>@b.TransportationMode</td>
+                                                <td>@b.EndUser</td>
+                                                <td>
+                                                    @b.EDRMNumber
+                                                    <br />
+                                                    <span><i class="far fa-calendar-alt mr-2"></i>@b.EDRMDate</span>
+                                                </td>
+                                                @if (b.EDRMCopyPath == "")
+                                                {
+                                                    <td>-</td>
+
+                                                }
+                                                else
+                                                {
+                                                    <td class="text-right">
+                                                        <a class="text-primary" href="@b.EDRMCopyPath" target="_blank" class="btn-floating btn-outline-primary btn-sm waves-effect waves-light" data-original-title="" title=""><i class="fas fa-download"></i></a>
+                                                    </td>
+                                                }
+                                                @if (b.CloseTripStatus == 0 && b.TransportationMode == "Road-Rail")
+                                                {
+                                                    <td><span class=command style='color:red'>Dispatch Not Started</span> </td>
+                                                }
+                                                else if (b.CloseTripStatus == 0 && b.TransportationMode == "Inside Railway Siding")
+                                                {
+                                                    <td><input type='button' class='btn-floating btn-outline-dark-green btn-sm' onclick='return ApplyRTP(@b.ForwardingNoteId)' value='Generate RTP' /></td>
+                                                }
+                                                else if (b.GenerateRTPStatus == 4 && b.TransportationMode == "Inside Railway Siding")
+                                                {
+                                                    <td><input type='button' class='btn-floating btn-outline-dark-green btn-sm' onclick='return ApplyRTP(@b.ForwardingNoteId)' value='Generate RTP' /></td>
+                                                }
+                                                else if (b.CloseRTPStatus == 1 && b.TransportationMode == "Inside Railway Siding")
+                                                {
+                                                    <td><input type='button' class='btn-floating btn-outline-danger btn-sm' onclick='return CloseRTP(this)' value='Close RTP' /></td>
+                                                }
+                                                else if (b.CloseRTPStatus == 3 && b.GenerateRTPStatus == 3 && b.CloseTripStatus == 3 && b.TransportationMode == "Inside Railway Siding")
+                                                {
+                                                    <td><span class=command style='color:red'>RTP Closed</span> </td>
+                                                }
+                                                else if (b.CloseRTPStatus == 0 && b.GenerateRTPStatus == 3 && b.CloseTripStatus == 3 && b.TransportationMode == "Road-Rail")
+                                                {
+                                                    <td><span class=command style='color:red'>Dispatch Started</span> </td>
+                                                }
+                                                else if (b.CloseRTPStatus == 1 && b.GenerateRTPStatus == 3 && b.TransportationMode == "Road-Rail")
+                                                {
+                                                    <td><span class=command style='color:red'>Dispatch Stopped</span> </td>
+                                                }
+                                                else if (b.CloseTripStatus == 3 && b.GenerateRTPStatus == 3 && b.CloseRTPStatus == 3 && b.TransportationMode == "Road-Rail")
+                                                {
+                                                    <td><span class=command style='color:red'>RTP Closed</span> </td>
+                                                }
+                                                else if (b.CloseTripStatus == 1 && b.GenerateRTPStatus == 1 && b.TransportationMode == "Road-Rail")
+                                                {
+                                                    <td><input type='button' class='btn-floating btn-outline-danger btn-sm' onclick='return CloseForwardingTrips(@b.ForwardingNoteId)' value='Close Trip' /></td>
+                                                }
+                                                else if (b.NoofRTP == 1 && b.GenerateRTPStatus == 1 && b.TransportationMode == "Road-Rail")
+                                                {
+                                                    <td><input type='button' class='btn-floating btn-outline-dark-green btn-sm' onclick='return ApplyRTP(@b.ForwardingNoteId)' value='Generate Trip' /></td>
+                                                }
+                                                else if (b.CloseRTPStatus == 1 && b.TransportationMode == "Road-Rail")
+                                                {
+                                                    <td><input type='button' class='btn-floating btn-outline-danger btn-sm' onclick='return CloseRTP(this)' value='Close RTP' /></td>
+                                                }
+                                            </tr>
+
+                                            }
+                                        </tbody>
+                                    </table>
+
+
+                                </div>
+                            </div>
+                        </div>
+
+
+                        @*</section>*@
+                    }
+                </section>
+            </div>
+        </div>
+    </div>
+    <!-- MAIN CONTENT AREA ENDS -->
+</section>
+
+
+<script>
+    backMe = "yes"
+    $(document).ready(function () {
+        loadNavigation('ViewList', 'glhelpdesk', 'plraiseticket', 'tl', 'E-Permit', 'Generated RTP', ' ');
+        $('.searchableselect').searchableselect();
+        $('.shorting-lnk').click(function () {
+            $('.shorting-lnk i').toggleClass('fa-sort-amount-up-alt fa-sort-amount-down-alt ');
+        });
+        $('.filter-dropdown').hide();
+        $('.filter-lnk').click(function () {
+            $(this).toggleClass('active');
+            $(this).siblings('.filter-dropdown').slideToggle();
+        });
+        $('.filter-btn').click(function () {
+            $(this).parent('.shorting-cell .filter-dropdown').slideUp();
+            if ($(this).parent().parent('.shorting-cell').find('.filter-lnk').hasClass('active')) {
+                $(this).parent().siblings('.filter-lnk').removeClass('active');
+            }
+        });
+
+    });
+</script>
+<script>
+    $(document).ready(function () {
+        $('.datepicker').datetimepicker({
+            format: 'LT',
+            format: 'DD-MM-YYYY',
+
+        });
+    });
+</script>
+<script>
+    var RTPPassNo = "";
+    var filesize = 0;
+    var ForwardingNoteID;
+    var DispatchedQty;
+    function CloseRTP(obj) {
+
+        var $row = $(obj).closest("tr");
+        var $ForwardingNoteID = $row.find("td:nth-child(1)");
+        var $DispatchedQty = $row.find("td:nth-child(9)");
+        $.each($ForwardingNoteID, function () {
+            ForwardingNoteID = $(this).text();
+        });
+        $.each($DispatchedQty, function () {
+            DispatchedQty = $(this).text();
+        });
+
+        if (confirm("Are you sure you want to close RTP?")) {
+            var url = '@Url.Action("CloseRTPPassList", "Transit")?ForwardingNoteId=' + ForwardingNoteID;
+            window.location.href = url;
+        }
+    }
+    function ApplyRTP(id) {
+
+        if (confirm("Are you sure you want to Generate RTP?")) {
+            
+            var url = '@Url.Action("GenerateRTPPass", "Transit")?ForwardingNoteId=' + id;
+            window.location.href = url;
+        }
+    }
+    function CloseForwardingTrips(id) {
+        if (confirm("Are you sure you want to close trips?")) {
+            var url = '@Url.Action("CloseRTPPassList", "Transit")?ForwardingNoteId=' + id;
+            window.location.href = url;
+        }
+    }
+</script>

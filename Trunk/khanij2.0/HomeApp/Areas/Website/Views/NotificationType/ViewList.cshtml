@@ -1,0 +1,131 @@
+﻿@*// *********************************************************************************************************
+    //  View Name                : ViewList
+    //  Desciption               : To View and Delete Website Notification Type Details
+    //  Created By               : Lingaraj Dalai
+    //  Created On               : 12 Oct 2021
+    // ********************************************************************************************************
+*@
+@model IEnumerable<HomeEF.ViewNotificationTypeModel>
+@using HomeApp.Web;
+@{
+    ViewData["Title"] = "ViewList";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+@if (TempData["Message"] != null)
+{
+    <script>
+        var vv = '@TempData["Message"]';
+        if (vv == 1) {
+            swal("", "Notification Type updated successfully.", "success");
+        }
+        else if (vv == 2) {
+            swal("","Notification Type already exists.","warning");
+        }
+        else if (vv == 3){
+            swal("", "Something Errror occured. Please Try After Sometime!!", "error");
+        }
+        else if (vv == 4) {
+            swal("", "Notification Type Deleted Sucessfully!!", "success");
+        }
+    </script>
+}
+<script>
+    $(document).ready(function () {
+        $('.searchableselect').searchableselect();
+        $('#datatable').DataTable();
+        $('.shorting-lnk').click(function () {
+            $('.shorting-lnk i').toggleClass('fa-sort-amount-up-alt fa-sort-amount-down-alt ');
+        });
+        loadNavigation('ViewList', 'glhelpdesk', 'plraiseticket', 'tl', 'CMS', 'Notification Type', ' ');
+    });
+</script>
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        @Html.Partial("_navigation")
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link" href="~/Website/NotificationType/Add">
+                                Add
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="javascript:void(0);">
+                                View
+                            </a>
+                        </li>
+                    </ul>
+                    @Html.Partial("_util")
+                </div>
+                <section class="box form-container">
+                    <div class="content-body">
+                        <div class="legend-box">
+                            <ul class="d-flex mb-1 justify-content-end list-unstyled">
+                                <li><span class="bg-success"></span> Active</li>
+                                <li><span class="bg-warning"></span> Inactive</li>
+                            </ul>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div id="viewtable">
+                                    <table id="datatable" class="table table-sm table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th width="20px">Sl#</th>
+                                                <th>Notification Type</th>
+                                                <th>Notification Description</th>
+                                                <th>Status</th>
+                                                <th width="50" class="text-center noprint">Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @{
+                                                var count = 0;
+                                                foreach (var item in Model)
+                                                {
+                                                    count++;
+                                                    var dyclass = @item.BIT_STATUS == "Active" ? "active-row" : "inactive-row";
+                                                    <tr class="@dyclass">
+                                                        <td>@count</td>
+                                                        <td>@item.VCH_NOTIFICATION_NAME</td>
+                                                        <td>@item.VCH_NOTIFICATION_DESC</td>
+                                                        @if (@item.BIT_STATUS == "Active")
+                                                        {
+                                                            <td class="text-success">@item.BIT_STATUS</td>
+                                                        }
+                                                        else
+                                                        {
+                                                            <td class="text-orange">@item.BIT_STATUS</td>
+                                                        }
+                                                    <td class="text-center noprint">
+                                                        @*<a href="@CustomQueryStringHelper.EncryptString("Website","Add","NotificationType",new {id=item.INT_NOTIFICATION_TYPE_ID })" class="text-success btn-sm" title="Edit">
+            <i class="icon-pencil-alt-solid"></i>
+        </a>
+        <a href="@CustomQueryStringHelper.EncryptString("Website","Delete","NotificationType",new {id=item.INT_NOTIFICATION_TYPE_ID })" class="text-danger btn-sm"  title="Delete" onclick="return confirm('Are you sure to delete?')">
+            <i class="icon-trash-alt-solid"></i>
+        </a>*@
+                                                        <a href="/Website/NotificationType/Add/@item.INT_NOTIFICATION_TYPE_ID" class="text-success btn-sm">
+                                                            <i class="icon-pencil-alt-solid"></i>
+                                                        </a>
+                                                        <a href="/Website/NotificationType/Add/@item.INT_NOTIFICATION_TYPE_ID" class="text-danger btn-sm"  title="Delete" onclick="return confirm('Are you sure to delete?')">
+                                                            <i class="icon-trash-alt-solid"></i>
+                                                        </a>
+                                                    </td>
+                                                    </tr>
+                                                }
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+    <!-- MAIN CONTENT AREA ENDS -->
+</section>

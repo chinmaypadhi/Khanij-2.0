@@ -1,0 +1,574 @@
+﻿@*// ***********************************************************************
+    //  View Name                : RailTPDesign
+    //  Desciption               : Used to generate print Railway eTransit Pass
+    //  Created By               : Suroj Kumar Pradhan
+    //  Created On               : 02-Aug-2021
+    // ************************************************************************@
+
+@model EpassEF.TransitPassModel
+@{
+    ViewData["Title"] = "TransitPassModel";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+@inject EpassApp.KhanijSecurity.KhanijIDataProtection protector;
+<style>
+    div, p, table {
+        padding: 0px;
+        margin: 0px;
+    }
+
+    .margin {
+        margin: 25px;
+    }
+
+    .logo-title-border {
+        border: 0.5px solid;
+        margin-top: 20px;
+        margin-bottom: 30px;
+        margin-left: 10px;
+        margin-right: 10px;
+        padding: 10px;
+        width: 226px;
+    }
+
+    .img-logo {
+        margin: 0px 20px;
+    }
+
+    .barcode-title {
+    }
+
+    .size-a4 {
+        width: 9.3in;
+        height: 11.7in;
+    }
+</style>
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        @Html.Partial("_CMSnavigation")
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+
+                        <li class="nav-item">
+                            <a class="nav-link active" href="Viewe-TransitPassTP.aspx">
+                                Generate E-Transit Pass
+                            </a>
+                        </li>
+
+                    </ul>
+                    @Html.Partial("_CMSutil")
+                </div>
+
+                <section class="box form-container">
+                    <div class="content-body">
+
+                        <div class="table-responsive" id="viewtable">
+                            <table style="width: 100%;">
+                                <tr style="border: none;">
+                                    <td style="border-top: 1px solid black; border-left: 1px solid black;">
+                                        <img src="~/Images/logo.jpg" class="" width="100" height="100" />
+                                    </td>
+                                    <td style="border-top: 1px solid black; border-right: 1px solid black; text-align: center">
+                                        <span id="lead2" class="lead" style="font-size: 30px; text-align: center; color: red">GOVERNMENT OF CHHATTISGARH</span>
+                                        <br />
+                                        <span id="lead1" class="lead" style="font-size: 25px; text-align: center">MINERAL RESOURCES DEPARTMENT</span>
+                                        <br />
+                                        <span id="lead5" class="lead" style="font-size: 20px; text-align: center;">(@Html.DisplayFor(model => model.DistrictName) District)</span>
+                                        @if (@Model.RePrintCount != null)
+                                        {
+                                            <h5 style="text-align: right; margin-top: 0px; margin-right: 10px;">
+                                                <strong class="text-danger">@Model.RePrintCount </strong>
+                                            </h5>
+                                        }
+                                        <h5 style="text-align: right; margin-top: 15px; margin-right: 10px;">
+                                            @if (@ViewBag.usertype == "Tailing Dam")
+                                            {
+                                                @*<strong>Copy For : Tailing Dam</strong>*@
+                                                <strong id="DynamicTailingDam"></strong>
+                                            }
+                                            else
+                                            {
+                                                <strong>Copy For : Lessee (प्रति : पटटाधारी)</strong>
+                                            }
+                                        </h5>
+                                    </td>
+                                </tr>
+                            </table>
+                            <table class="" border="1" style="width: 100%;">
+                                <tbody>
+                                    <tr>
+
+                                        <td style="width: 60%;">
+                                        </td>
+                                        <td style="text-align: center; width: 60%;">
+                                            <div class="barcode-title">
+                                                <p><strong>Transit Pass Number (अभिवहन पास क्रमांक) : </strong></p>
+                                                <p><strong>--------------------------------------------------------- </strong></p>
+                                                @*<p class="text-center">@(Html.DisplayFor(model => model.TransitPassNumber))</p>*@
+                                                <p class="BarCodeNumber" id="BarCodeNumber"></p>
+                                            </div>
+                                        </td>
+
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <strong>District (जिला)</strong>
+                                            <br />
+                                            <strong>Issue Date & Time (जारी करने की दिनांक एवं समय)</strong>
+                                        </td>
+                                        <td>
+                                            @(Html.DisplayFor(model => model.DistrictName))<br />
+                                            @if (Model != null && Model.RailwayId != null && Model.RailwayId == 1)
+                                            {
+                                                if (Model != null && Model.GrossWeight_Qty != null && Model.GrossWeight_Qty > 0)
+                                                {
+                                                    <br />@(Html.DisplayFor(model => model.IssueDateTime))
+                                                }
+                                                else
+                                                {
+                                                    <br />
+                                                    <span></span>
+                                                }
+                                            }
+                                            else
+                                            {
+                                                <br />@(Html.DisplayFor(model => model.IssueDateTime))
+                                            }
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <strong>E-Permit No. (ई - परमिट क्रं.)</strong>
+                                            <br />
+                                        </td>
+                                        <td>@(Html.DisplayFor(model => model.BulkPermitNo))</td>
+                                    </tr>
+
+
+                                    <tr>
+                                        <td>
+                                            <strong>Scheme Of Coal Sale (कोल् विक्रय की स्कीम )</strong>
+
+                                        </td>
+                                        <td>
+                                            @(Html.DisplayFor(model => model.SchemeofCoal))
+
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <strong>License /Lessee's  Name (अनुज्ञप्ति / पटटेधारी का नाम)</strong>
+                                        </td>
+                                        <td>@(Html.DisplayFor(model => model.Lessee_Licensee_Name))</td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <strong>License /Mining Area Details (अनुज्ञप्ति /खान क्षेत्र का विवरण)</strong>
+                                            <br />
+                                            <strong>Village/Tehsil/District (ग्राम / तहसील / जिला)</strong>
+                                        </td>
+                                        <td>
+                                            @(Html.DisplayFor(model => model.VillageName)) / @(Html.DisplayFor(model => model.TehsilName)) / @(Html.DisplayFor(model => model.DistrictName))
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <strong>Area in Hectare (रकबा हेक्टेयर में)</strong>
+                                            <br />
+                                        </td>
+                                        <td>
+                                            @(Html.DisplayFor(model => model.Area))
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <strong>Lease Validity Period (अनुज्ञप्ति  / पटटा अवधि)</strong>
+                                            <br />
+                                        </td>
+                                        @if (@ViewBag.usertype != "TAILING DAM")
+                                        {
+                                            <td>@(Html.DisplayFor(model => model.LeaseFromDate)) to @(Html.DisplayFor(model => model.LeaseToDate)) @(Html.DisplayFor(model => model.LeaseValidity))</td>
+                                        }
+                                        else
+                                        {
+                                            <td>Not Applicable</td>
+                                        }
+                                    </tr>
+
+
+                                    <tr>
+                                        <td>
+                                            <strong>Mineral Name (खनिज का नाम)</strong>
+                                            <br />
+                                        </td>
+                                        <td>
+                                            @(Html.DisplayFor(model => model.MineralName))
+                                        </td>
+                                    </tr>
+
+
+                                    <tr>
+                                        <td>
+                                            <strong>Grade (ग्रेड)</strong>
+                                            <br />
+                                        </td>
+                                        <td>
+                                            @(Html.DisplayFor(model => model.MineralGradeName))
+                                        </td>
+                                    </tr>
+
+                                    <tr>
+                                        <td>
+                                            <strong>Total Weight((</strong>
+                                            <label>@Model.UnitName))</label>) <strong>(टोटल वेट (मीट्रिक टन)) (</strong>
+                                            <label>@Model.Hindi_UnitName))</label>
+                                            <br />
+                                        </td>
+                                        <td>
+
+                                            @(Html.DisplayFor(model => model.NetWeight_Qty)) <label> @Model.UnitName</label>
+
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <strong>
+                                                Sale value of the Mineral (In Rs per
+                                                <label>@Model.UnitName)</label>
+                                                <br />
+                                                (खनिज का विक्रय मूल्य (रु. प्रति
+                                                <label>@Model.Hindi_UnitName))</label>
+                                            </strong>
+
+                                        </td>
+                                        <td>
+                                            Rs @(Html.DisplayFor(model => model.Mineral_SaleValue)) / @(Html.DisplayFor(model => model.UnitName))
+
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <strong>
+                                                D.O Number/Date (If Applicable)
+                                                <br />
+                                                (डी.ओ. क्रमांक / दिनांक (यदि लागु हो))
+                                            </strong>
+                                            <br />
+                                        </td>
+                                        <td>
+
+                                            @(Html.DisplayFor(model => model.DONumber)) / @(Html.DisplayFor(model => model.DODate))
+
+                                        </td>
+                                    </tr>
+
+                                    <tr>
+                                        <td>
+                                            <strong>
+                                                Mineral Purchaser/ Recipient’s Name
+                                                <br />
+                                                (खनिज क्रेता / प्राप्तकर्ता का नाम)
+                                            </strong>
+                                            <br />
+                                        </td>
+                                        <td>@(Html.DisplayFor(model => model.PurchaserConsigneeName))</td>
+                                    </tr>
+
+
+                                    <tr>
+                                        <td>
+                                            <strong>Mode of Transportation (परिवहन पथ का प्रकार)</strong>
+                                            <br />
+                                        </td>
+                                        <td>@(Html.DisplayFor(model => model.TransportationMode))</td>
+                                    </tr>
+
+                                    <tr>
+                                        <td>
+                                            <strong>Destination (गंतव्य)</strong>
+                                            <br />
+                                        </td>
+                                        <td>@(Html.DisplayFor(model => model.Mineral_Destination))</td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <strong>Other (Remarks) (अन्य (टिप्पणियां))</strong>
+                                            <br />
+                                        </td>
+                                        <td>
+                                            @(Html.DisplayFor(model => model.Remarks))
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="2" style="font-size: 12px; text-align: left">
+                                            <label>
+                                                <i>This is a system generated e-Transit Pass. So physical signature is not required. Generated Time : @Model.SystemDateTime.ToString("dd/MM/yyyy hh:mm:ss tt") </i>
+                                            </label>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+
+                        </div>
+
+                        <div class="table-responsive" id="viewtable">
+                            <table style="width: 100%;">
+                                <tr style="border: none;">
+                                    <td style="border-top: 1px solid black; border-left: 1px solid black;">
+                                        <img src="~/Images/logo.jpg" class="" width="100" height="100" />
+                                    </td>
+                                    <td style="border-top: 1px solid black; border-right: 1px solid black; text-align: center">
+                                        <span id="lead2" class="lead" style="font-size: 30px; text-align: center; color: red">GOVERNMENT OF CHHATTISGARH</span>
+                                        <br />
+                                        <span id="lead1" class="lead" style="font-size: 25px; text-align: center">MINERAL RESOURCES DEPARTMENT</span>
+                                        <br />
+                                        <span id="lead5" class="lead" style="font-size: 20px; text-align: center;">(@Html.DisplayFor(model => model.DistrictName) District)</span>
+                                        @if (@Model.RePrintCount != null)
+                                        {
+                                            <h5 style="text-align: right; margin-top: 0px; margin-right: 10px;">
+                                                <strong class="text-danger">@Model.RePrintCount </strong>
+                                            </h5>
+                                        }
+                                        <h5 style="text-align: right; margin-top: 15px; margin-right: 10px;">
+                                            @if (@ViewBag.usertype == "Tailing Dam")
+                                            {
+                                                @*<strong>Copy For : Tailing Dam</strong>*@
+                                                <strong id="DynamicTailingDam"></strong>
+                                            }
+                                            else
+                                            {
+                                        <strong>Copy For : Purchaser / Consignee (प्रति : क्रेता / परेषिती)</strong>
+                                            }
+                                        </h5>
+                                    </td>
+                                </tr>
+                            </table>
+                            <table class="" border="1" style="width: 100%;">
+                                <tbody>
+                                    <tr>
+
+                                        <td style="width: 60%;">
+                                        </td>
+                                        <td style="text-align: center; width: 60%;">
+                                            <div class="barcode-title">
+                                                <p><strong>Transit Pass Number (अभिवहन पास क्रमांक) : </strong></p>
+                                                <p><strong>--------------------------------------------------------- </strong></p>
+                                                @*<p class="text-center">@(Html.DisplayFor(model => model.TransitPassNumber))</p>*@
+                                                <p class="BarCodeNumber" id="BarCodeNumber"></p>
+                                            </div>
+                                        </td>
+
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <strong>District (जिला)</strong>
+                                            <br />
+                                            <strong>Issue Date & Time (जारी करने की दिनांक एवं समय)</strong>
+                                        </td>
+                                        <td>
+                                            @(Html.DisplayFor(model => model.DistrictName))<br />
+                                            @if (Model != null && Model.RailwayId != null && Model.RailwayId == 1)
+                                            {
+                                                if (Model != null && Model.GrossWeight_Qty != null && Model.GrossWeight_Qty > 0)
+                                                {
+                                                    <br />@(Html.DisplayFor(model => model.IssueDateTime))
+                                                }
+                                                else
+                                                {
+                                                    <br />
+                                                    <span></span>
+                                                }
+                                            }
+                                            else
+                                            {
+                                                <br />@(Html.DisplayFor(model => model.IssueDateTime))
+                                            }
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <strong>E-Permit No. (ई - परमिट क्रं.)</strong>
+                                            <br />
+                                        </td>
+                                        <td>@(Html.DisplayFor(model => model.BulkPermitNo))</td>
+                                    </tr>
+
+
+                                    <tr>
+                                        <td>
+                                            <strong>Scheme Of Coal Sale (कोल् विक्रय की स्कीम )</strong>
+
+                                        </td>
+                                        <td>
+                                            @(Html.DisplayFor(model => model.SchemeofCoal))
+
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <strong>License /Lessee's  Name (अनुज्ञप्ति / पटटेधारी का नाम)</strong>
+                                        </td>
+                                        <td>@(Html.DisplayFor(model => model.Lessee_Licensee_Name))</td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <strong>License /Mining Area Details (अनुज्ञप्ति /खान क्षेत्र का विवरण)</strong>
+                                            <br />
+                                            <strong>Village/Tehsil/District (ग्राम / तहसील / जिला)</strong>
+                                        </td>
+                                        <td>
+                                            @(Html.DisplayFor(model => model.VillageName)) / @(Html.DisplayFor(model => model.TehsilName)) / @(Html.DisplayFor(model => model.DistrictName))
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <strong>Area in Hectare (रकबा हेक्टेयर में)</strong>
+                                            <br />
+                                        </td>
+                                        <td>
+                                            @(Html.DisplayFor(model => model.Area))
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <strong>Lease Validity Period (अनुज्ञप्ति  / पटटा अवधि)</strong>
+                                            <br />
+                                        </td>
+                                        @if (@ViewBag.usertype != "TAILING DAM")
+                                        {
+                                            <td>@(Html.DisplayFor(model => model.LeaseFromDate)) to @(Html.DisplayFor(model => model.LeaseToDate)) @(Html.DisplayFor(model => model.LeaseValidity))</td>
+                                        }
+                                        else
+                                        {
+                                            <td>Not Applicable</td>
+                                        }
+                                    </tr>
+
+
+                                    <tr>
+                                        <td>
+                                            <strong>Mineral Name (खनिज का नाम)</strong>
+                                            <br />
+                                        </td>
+                                        <td>
+                                            @(Html.DisplayFor(model => model.MineralName))
+                                        </td>
+                                    </tr>
+
+
+                                    <tr>
+                                        <td>
+                                            <strong>Grade (ग्रेड)</strong>
+                                            <br />
+                                        </td>
+                                        <td>
+                                            @(Html.DisplayFor(model => model.MineralGradeName))
+                                        </td>
+                                    </tr>
+
+                                    <tr>
+                                        <td>
+                                            <strong>Total Weight((</strong>
+                                            <label>@Model.UnitName))</label>) <strong>(टोटल वेट (मीट्रिक टन)) (</strong>
+                                            <label>@Model.Hindi_UnitName))</label>
+                                            <br />
+                                        </td>
+                                        <td>
+
+                                            @(Html.DisplayFor(model => model.NetWeight_Qty)) <label> @Model.UnitName</label>
+
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <strong>
+                                                Sale value of the Mineral (In Rs per
+                                                <label>@Model.UnitName)</label>
+                                                <br />
+                                                (खनिज का विक्रय मूल्य (रु. प्रति
+                                                <label>@Model.Hindi_UnitName))</label>
+                                            </strong>
+                                            <br />
+                                        </td>
+                                        <td>
+                                            Rs @(Html.DisplayFor(model => model.Mineral_SaleValue)) / @(Html.DisplayFor(model => model.UnitName))
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <strong>
+                                                D.O Number/Date (If Applicable)
+                                                <br />
+                                                (डी.ओ. क्रमांक / दिनांक (यदि लागु हो))
+                                            </strong>
+                                            <br />
+                                        </td>
+                                        <td>
+
+                                            @(Html.DisplayFor(model => model.DONumber)) / @(Html.DisplayFor(model => model.DODate))
+
+                                        </td>
+                                    </tr>
+
+                                    <tr>
+                                        <td>
+                                            <strong>
+                                                Mineral Purchaser/ Recipient’s Name
+                                                <br />
+                                                (खनिज क्रेता / प्राप्तकर्ता का नाम)
+                                            </strong>
+                                            <br />
+                                        </td>
+                                        <td>@(Html.DisplayFor(model => model.PurchaserConsigneeName))</td>
+                                    </tr>
+
+
+                                    <tr>
+                                        <td>
+                                            <strong>Mode of Transportation (परिवहन पथ का प्रकार)</strong>
+                                            <br />
+                                        </td>
+                                        <td>@(Html.DisplayFor(model => model.TransportationMode))</td>
+                                    </tr>
+
+                                    <tr>
+                                        <td>
+                                            <strong>Destination (गंतव्य)</strong>
+                                            <br />
+                                        </td>
+                                        <td>@(Html.DisplayFor(model => model.Mineral_Destination))</td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <strong>Other (Remarks) (अन्य (टिप्पणियां))</strong>
+                                            <br />
+                                        </td>
+                                        <td>
+                                            @(Html.DisplayFor(model => model.Remarks))
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="2" style="font-size: 12px; text-align: left">
+                                            <label>
+                                                <i>This is a system generated e-Transit Pass. So physical signature is not required. Generated Time : @Model.SystemDateTime.ToString("dd/MM/yyyy hh:mm:ss tt") </i>
+                                            </label>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+
+                        </div>
+
+                    </div>
+                </section>
+
+            </div>
+        </div>
+    </div>
+    <!-- MAIN CONTENT AREA ENDS -->
+</section>

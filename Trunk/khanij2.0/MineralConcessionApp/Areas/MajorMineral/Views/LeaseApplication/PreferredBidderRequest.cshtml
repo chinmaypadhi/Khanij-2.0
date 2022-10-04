@@ -1,0 +1,294 @@
+﻿@model MineralConcessionEF.LeaseApplicationModel
+@{
+    ViewData["Title"] = "Add";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@if ((TempData["AckApprove"] != null))
+
+{
+    <script>
+        if ('@TempData["AckApprove"]' != null) {
+                swal("", '@TempData["AckApprove"]', "warning");
+        }
+        TempData.Remove("AckApprove");
+    </script>
+}
+@if ((TempData["LOIAckMessage"] != null))
+
+{
+    <script>
+        if ('@TempData["LOIAckMessage"]' != null) {
+                swal("", '@TempData["LOIAckMessage"]', "warning");
+        }
+        TempData.Remove("LOIAckMessage");
+    </script>
+}
+<script>
+    $(document).ready(function () {
+        loadNavigation('PreferredBidderRequest', 'glRoleRes', 'plUser', 'tl', 'MajorMineral', 'Preferred Bidder Request', ' ');
+    });
+</script>
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        @Html.Partial("_CMSnavigation")
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="javascript:void(0);">
+                                View Request
+                            </a>
+                        </li>
+                    </ul>
+                    @Html.Partial("_CMSutil")
+                </div>
+                <section class="box form-container">
+                    <div class="search-box">
+                        <div class="content-body pt-0">
+                            <div class="legend-box">
+                                <ul class="d-flex mb-1 justify-content-end list-unstyled">
+                                    <li><span class="bg-success"></span> Active</li>
+                                    <li><span class="bg-warning"></span> Inactive</li>
+                                </ul>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="table-responsive" id="viewtable">
+                                        <table id="datatable" class="table table-sm table-bordered">
+                                            @{ int i = 1;
+                                            }
+                                            @foreach (var b in ViewBag.ViewList)
+                                            {
+                                                @if (i == 1)
+                                                {
+                                                    <thead>
+                                                        <tr>
+                                                            <th width="30">Sr.No.</th>
+                                                            <th>Auction No.</th>
+                                                            <th>Auction Type</th>
+                                                            <th>Auction Block Name</th>
+                                                            <th>Location(District,State)</th>
+                                                            <th>Mineral Name</th>
+                                                            <th>Status</th>
+
+                                                            <th>View Details</th>
+
+                                                        </tr>
+                                                    </thead>
+                                                }
+                                                <tbody>
+                                                    <tr class="active-row">
+
+                                                        <td>
+
+
+                                                            <p class="m-0">@b.SrNo</p>
+                                                            @{ i++; }
+                                                        </td>
+                                                        <td>
+                                                            <p class="m-0">
+                                                                <a class="btn btn-info btn-sm" name="#BackendProcced" href="@Url.Action("GetTimeline", "LeaseApplication", new { Area = "MajorMineral" })?id=@b.LesseeLOI"
+                                                                   title="Take Action" id="BackendProcced">@b.AuctionNo</a>
+                                                            </p>
+                                                        </td>
+                                                        <td><p class="m-0">@b.AuctionType</p></td>
+                                                        <td><p class="m-0">@b.BlockName</p></td>
+                                                        <td><p class="m-0">@b.Location</p></td>
+                                                        <td><p class="m-0">@b.MineralName</p></td>
+
+                                                        <td>
+                                                            <p>
+                                                            <p class="m-0"><b>@b.StrStatus</b></p>
+
+
+                                                        </td>
+                                                        <td>
+                                                            @if (ViewBag.usertype == "DGM")
+                                                            {
+                                                                @if (b.Status != 0)
+                                                                {
+                                                                    @if (b.Status != 1 && @b.Status != 2)
+                                                                    {
+                                                                        <p>
+                                                                            <a class="btn btn-info btn-sm" name="#BackendProcced" href="@Url.Action("OnlineLease", "OnlineLease", new { Area = "MajorMineral" })?id=@b.LesseeLOI&FOR=View"
+                                                                               title="Take Action" id="BackendProcced">View Profile</a>
+                                                                        </p>
+                                                                    }
+                                                                }
+                                                                @if (b.Status >= 0)
+                                                                {
+                                                                    <p>
+
+                                                                        <a class="btn btn-info btn-sm" name="#BackendProcced" href="@Url.Action("PreferredBidder", "LeaseApplication", new { Area = "MajorMineral" })?id=@b.LesseeLOI&FOR=View"
+                                                                           title="Take Action" id="BackendProcced">View Preferred Bidder Application</a>
+                                                                    </p>
+                                                                }
+                                                                @if (b.Status == 1)
+                                                                {
+                                                                    <p>
+
+                                                                        <a class="btn btn-info btn-sm" name="#BackendProcced" href="@Url.Action("OnlineLease", "OnlineLease", new { Area = "MajorMineral" })?id=@b.LesseeLOI&FOR=PreferredBidder"
+                                                                           title="Take Action" id="BackendProcced">Create Profile</a>
+                                                                    </p>
+                                                                }
+                                                                @if (b.Status == 4 || b.Status == 7)
+                                                                {
+                                                                    <p>
+
+                                                                        <a class="btn btn-info btn-sm" name="#BackendProcced" href="@Url.Action("Submission", "LeaseApplication", new { Area = "MajorMineral" })?id=@b.LesseeLOI&FOR=DGMForward"
+                                                                           title="Take Action" id="BackendProcced">Take Action</a>
+                                                                    </p>
+                                                                }
+                                                                @if (b.Status == 6)
+                                                                {
+                                                                    <p>
+
+                                                                        <a class="btn btn-info btn-sm" name="#BackendProcced" href="@Url.Action("Submission", "LeaseApplication", new { Area = "MajorMineral" })?id=@b.LesseeLOI&FOR=DGMForward"                                            
+                                                                           title="Take Action" id="BackendProcced">Take Action</a>
+                                                                    </p>
+                                                                }
+                                                                @if (b.Status == 10)
+                                                                {
+                                                                    <p>
+
+                                                                        <a class="btn btn-info btn-sm" name="#BackendProcced" href="@Url.Action("Submission", "LeaseApplication", new { Area = "MajorMineral" })?id=@b.LesseeLOI&FOR=IssuanceForwarding"
+                                                                           title="Take Action" id="BackendProcced">Take Action</a>
+                                                                    </p>
+                                                                }
+                                                                @if (b.Status == 102)
+                                                                {
+                                                                    <p>
+
+                                                                        <a class="btn btn-info btn-sm" name="#BackendProcced" href="@Url.Action("Submission", "LeaseApplication", new { Area = "MajorMineral" })?id=@b.LesseeLOI&FOR=Issuance"
+                                                                           title="Take Action" id="BackendProcced">Take Action</a>
+                                                                    </p>
+                                                                }
+                                                            }
+
+                                                            @if (ViewBag.usertype == "MRD")
+                                                            {
+                                                                @if (b.Status != 0)
+                                                                {
+                                                                    @if (b.Status != 1 && @b.Status != 2)
+                                                                    {
+                                                                        <p>
+                                                                            <a class="btn btn-info btn-sm" name="#BackendProcced" href="@Url.Action("OnlineLease", "OnlineLease", new { Area = "MajorMineral" })?id=@b.LesseeLOI&FOR=View"
+                                                                               title="Take Action" id="BackendProcced">View Profile</a>
+                                                                        </p>
+                                                                    }
+                                                                }
+
+                                                                @if (b.Status != 0)
+                                                                {
+                                                                    <p>
+
+                                                                        <a class="btn btn-info btn-sm" name="#BackendProcced" href="@Url.Action("PreferredBidder", "LeaseApplication", new { Area = "MajorMineral" })?id=@b.LesseeLOI&FOR=View"
+                                                                           title="Take Action" id="BackendProcced">View Preferred Bidder Application</a>
+                                                                    </p>
+                                                                }
+                                                                @if (b.Status == 0)
+                                                                {
+                                                                    <p>
+
+                                                                        <a class="btn btn-info btn-sm" name="#BackendProcced" href="@Url.Action("PreferredBidder", "LeaseApplication", new { Area = "MajorMineral" })?id=@b.LesseeLOI"
+                                                                           title="Take Action" id="BackendProcced">Take Action</a>
+                                                                    </p>
+                                                                }
+                                                                @if (b.Status == 5)
+                                                                {
+                                                                    <p>
+
+                                                                        <a class="btn btn-info btn-sm" name="#BackendProcced" href="@Url.Action("Submission", "LeaseApplication", new { Area = "MajorMineral" })?id=@b.LesseeLOI&FOR=DGMForward"
+                                                                           title="Take Action" id="BackendProcced">Take Action</a>
+                                                                    </p>
+                                                                }
+                                                                @if (b.Status == 101)
+                                                                {
+                                                                    <p>
+
+                                                                        <a class="btn btn-info btn-sm" name="#BackendProcced" href="@Url.Action("Submission", "LeaseApplication", new { Area = "MajorMineral" })?id=@b.LesseeLOI&FOR=Issuance Approval"
+                                                                           title="Take Action" id="BackendProcced">Take Action</a>
+                                                                    </p>
+                                                                }
+                                                            }
+
+                                                            @if (ViewBag.usertype == "Lessee" || ViewBag.usertype == "LesseeLOI")
+                                                            {
+                                                                @if (b.Status != 0)
+                                                                {
+                                                                    @if (b.Status != 1 && @b.Status != 2)
+                                                                    {
+                                                                        <p>
+                                                                            <a class="btn btn-info btn-sm" name="#BackendProcced" href="@Url.Action("OnlineLease", "OnlineLease", new { Area = "MajorMineral" })?id=@b.LesseeLOI&FOR=View"
+                                                                               title="Take Action" id="BackendProcced">View Profile</a>
+                                                                        </p>
+                                                                    }
+                                                                }
+                                                                @if (b.Status == 8)
+                                                                {
+                                                                    <a class="btn btn-info btn-sm" name="#BackendProcced" href="@Url.Action("Secondpayment", "LeaseApplication", new { Area = "MajorMineral" })?id=@b.LesseeLOI&FOR=View"
+                                                                       title="Take Action" id="BackendProcced">Pay Second Installment</a>
+                                                                }
+                                                                @if (b.Status == 9)
+                                                                {
+
+                                                                    <a class="btn btn-info btn-sm" name="#BackendProcced" href="@Url.Action("Secondpayment", "LeaseApplication", new { Area = "MajorMineral" })?id=@b.LesseeLOI&FOR=DGMForward"
+                                                                       title="Take Action" id="BackendProcced">Submit Clearances</a>
+
+                                                                }
+                                                                @if (b.Status == 3)
+                                                                {
+                                                                    <p>
+                                                                        <a class="btn btn-info btn-sm" name="#BackendProcced" href="@Url.Action("Submission", "LeaseApplication", new { Area = "MajorMineral" })?id=@b.LesseeLOI&FOR=View"
+                                                                           title="Take Action" id="BackendProcced">Pay First Installment</a>
+                                                                    </p>
+                                                                }
+                                                                @if (b.Status == 12)
+                                                                {
+                                                                    <p>
+                                                                        <a class="btn btn-info btn-sm" name="#BackendProcced" href="@Url.Action("ThirdInstalment", "LeaseApplication", new { Area = "MajorMineral" })?id=@b.LesseeLOI&FOR=ThirdInstallment"
+                                                                           title="Take Action" id="BackendProcced">Pay Third Installment</a>
+                                                                    </p>
+                                                                }
+                                                            }
+
+                                                            @if (ViewBag.usertype == "District User")
+                                                            {
+                                                                @if (b.Status == 11)
+                                                                {
+                                                                    <p>
+
+                                                                        <a class="btn btn-info btn-sm" name="#BackendProcced" href="@Url.Action("ProductionAgreement", "LeaseApplication", new { Area = "MajorMineral" })?id=@b.LesseeLOI&FOR=Issuance"
+                                                                           title="Take Action" id="BackendProcced">Take Action</a>
+                                                                    </p>
+                                                                }
+
+                                                                @if (b.Status == 13)
+                                                                {
+                                                                    <p>
+
+                                                                        <a class="btn btn-info btn-sm" name="#BackendProcced" href="@Url.Action("ThirdInstalment", "LeaseApplication", new { Area = "MajorMineral" })?id=@b.LesseeLOI&FOR=Leasedeed"
+                                                                           title="Take Action" id="BackendProcced">Take Action</a>
+                                                                    </p>
+                                                                }
+                                                            }
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            }
+                                        </table>
+                                    </div>
+
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+    <!-- MAIN CONTENT AREA ENDS -->
+</section>

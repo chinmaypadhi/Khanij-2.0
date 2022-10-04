@@ -1,0 +1,984 @@
+﻿
+@{
+    ViewData["Title"] = "TailingDamRegistration";
+    Layout = "~/Views/Shared/_WebHeaderLayout.cshtml";
+}
+@model userregistrationEF.cls_TailingDam;
+@inject Microsoft.Extensions.Options.IOptions<userregistrationEF.KeyList> metaOptions
+@using userregistrationEF;
+@{
+    var options = metaOptions.Value;
+}
+<div class="inner-naviagtion">
+    <div class="container">
+        <nav aria-label="breadcrumb mb-0">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="@options.HomeUrl" class="text-white"><span class="fas fa-home"></span></a></li>
+                <li class="breadcrumb-item text-white" aria-current="page">Registrations</li>
+                <li class="breadcrumb-item text-white" aria-current="page">Tailing Dam / Ashdyke / Mud pond</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+<div class="inner-section">
+    @using (Html.BeginForm("TailingDamRegistration", "Contractor", FormMethod.Post, new { AUTOCOMPLETE = "Off", id = "form1", enctype = "multipart/form-data" }))
+    {
+        @Html.Hidden("DistrictName")
+    <div class="container">
+
+        <h3 class="heading">Tailing Dam / Ashdyke / Mud pond Registration</h3>
+
+        <div class="form-group row">
+            <label for="inputMail" class="col-lg-3 col-md-4 col-12 col-form-label ">Purpose<span class="text-danger">*</span></label>
+            <div class="col-lg-3 col-md-8 col-12 mb-3">
+                <select id="ddlPurpose" class="form-control">
+                    <option value="">Select</option>
+                    <option value="Tailing Dam">Tailing Dam</option>
+                    <option value="Ashdyke">Ashdyke</option>
+                    <option value="Mud Pond">Mud Pond</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="form-group row" id="DivTailingDam">
+            <label for="inputMail" class="col-lg-3 col-md-4 col-12 col-form-label ">Are You Existing User ?<span class="text-danger">*</span></label>
+            <div class="col-lg-3 col-md-8 col-12">
+                <div class="py-2">
+                    <div class="custom-control custom-radio custom-control-inline">
+                        <input type="radio" onchange="onRadioChange();" class="custom-control-input" id="radioYes" name="radio-iRequirement" value="1">
+                        <label class="custom-control-label" for="radioYes">Yes</label>
+                    </div>
+                    <div class="custom-control custom-radio custom-control-inline">
+                        <input type="radio" onchange="onRadioChange();" class="custom-control-input" id="radioNo" name="radio-iRequirement" value="2">
+                        <label class="custom-control-label" for="radioNo">No</label>
+                    </div>
+                </div>
+            </div>
+
+            <label id="lblUserId" for="inputMail" class="col-lg-3 col-md-4 col-12 col-form-label ">User Id<span class="text-danger">*</span></label>
+            <div id="DivUserId" class="col-lg-3 col-md-8 col-12 mb-3">
+                <input type="text" class="form-control" id="txtUserId" name="UserName">
+            </div>
+
+        </div>
+
+        <div class="form-group row" id="DivPassword">
+            <label for="inputMail" class="col-lg-3 col-md-4 col-12 col-form-label ">Password<span class="text-danger">*</span></label>
+            <div class="col-lg-3 col-md-8 col-12">
+                <input type="password" class="form-control" id="txtPwd">
+            </div>
+            <div class="col-lg-6 col-md-8 col-12">
+                <button type="button" class="btn btn-success" data-toggle="modal" data-target="#security-msg" onclick="GetExistingUserDetails()">Get Details</button>
+            </div>
+        </div>
+        <div class="form-group row" id="DivExistingUser">
+            <label id="lblAppName" for="inputMail" class="col-lg-3 col-md-4 col-12 col-form-label ">Applicant Name</label>
+            <div class="col-lg-6 col-md-8 col-12">
+                <input type="text" class="form-control" id="lblExistingUserName" name="ApplicantName" readonly="readonly">
+            </div>
+            <input type="hidden" id="hdnUserTypeId" name="UserTypeId" />
+            <input type="hidden" id="hdnUserId" name="UserId" />
+        </div>
+        <div class="row mt-4">
+            <div class="col-lg-12"><h4 class="text-primary">Owner Details</h4><hr></div>
+        </div>
+
+
+        <div class="form-group row">
+            <label for="inputMail" class="col-lg-3 col-md-4 col-12 col-form-label ">Name of the Authorised Person<span class="text-danger">*</span></label>
+            <div class="col-lg-3 col-md-8 col-12 mb-3">
+                <input id="OwnerName" name="OwnerName" maxlength="100" type="text" class="form-control">
+            </div>
+            <label for="inputMail" class="col-lg-3 col-md-4 col-12 col-form-label ">Designation<span class="text-danger">*</span></label>
+            <div class="col-lg-3 col-md-8 col-12">
+                <input id="Designation" name="Designation" maxlength="50" type="text" class="form-control">
+            </div>
+        </div>
+
+        <div class="form-group row">
+            <label for="inputMail" class="col-lg-3 col-md-4 col-12 col-form-label ">
+                Company <span class="text-danger">*</span>
+                <a href="javascript:void(0)" class="extra-information" data-toggle="tooltip" data-placement="top" title="(If Company name Not listed in the list, kindly contact in Khanij Online Helpdesk.)">
+                    <i class="fas fa-info-circle"></i>
+                </a>
+
+            </label>
+            <div class="col-lg-3 col-md-8 col-12 mb-3">
+                <select id="CompanyId" name="CompanyId" class="form-control  searchableselect">
+                    <option value="">Select</option>
+                    @{
+                            List<CompanyDetails> lstCompanyDetails = (List<CompanyDetails>)ViewData["CompanyDetails"];
+                            if (lstCompanyDetails != null)
+                            {
+                                foreach (var item in lstCompanyDetails)
+                                {
+                        <option value="@item.CompanyId">@item.CompanyName</option>
+                                }
+                            }
+                    }
+                </select>
+            </div>
+            <label for="inputMail" class="col-lg-3 col-md-4 col-12 col-form-label ">Address<span class="text-danger">*</span></label>
+            <div class="col-lg-3 col-md-8 col-12">
+                <textarea id="Address" name="Address" maxlength="500" class="form-control" rows="2"></textarea>
+                <small class="text-danger">Maximum character should be <strong>500</strong></small>
+            </div>
+        </div>
+
+        <div class="form-group row">
+            <label for="inputMail" class="col-lg-3 col-md-4 col-12 col-form-label ">
+                Mobile Number<span class="text-danger">*</span>
+            </label>
+            <div class="col-lg-3 col-md-8 col-12 mb-3">
+                <input id="MobileNo" name="MobileNo" maxlength="10" type="text" class="form-control">
+            </div>
+            <label for="inputMail" class="col-lg-3 col-md-4 col-12 col-form-label ">E-mail ID<span class="text-danger">*</span></label>
+            <div class="col-lg-3 col-md-8 col-12">
+                <input name="EmailID" maxlength="50" id="EmailID" type="text" class="form-control">
+            </div>
+        </div>
+
+        <div class="form-group row">
+            <label for="inputMail" class="col-lg-3 col-md-4 col-12 col-form-label ">
+                Order No.<span class="text-danger">*</span>
+            </label>
+            <div class="col-lg-3 col-md-8 col-12 mb-3">
+                <input id="OrderNo" name="OrderNo" maxlength="50" type="text" class="form-control">
+            </div>
+            <label for="inputMail" class="col-lg-3 col-md-4 col-12 col-form-label ">Upload order Copy<span class="text-danger">*</span></label>
+            <div class="col-lg-3 col-md-8 col-12">
+                <div class="custom-file">
+                    <input type="file" name="Tailing_SCAN_COPY" id="TailingDamCOPY" class="custom-file-input">
+                    <label class="custom-file-label">Choose file...</label>
+                </div>
+                <small class="text-danger">Files type <strong>(.pdf , .docx)</strong> with maximum <strong>2MB</strong></small>
+            </div>
+        </div>
+
+        <div class="row mt-4">
+            <div class="col-lg-12"><h4 class="text-primary">Site Detail </h4><hr></div>
+        </div>
+
+
+        <div class="form-group row">
+            <label for="inputMail" class="col-lg-3 col-md-4 col-12 col-form-label ">
+                District<span class="text-danger">*</span>
+            </label>
+            <div class="col-lg-3 col-md-8 col-12 mb-3">
+                <select id="DistrictId" name="DistrictId" class="form-control  searchableselect" readonly>
+                    <option value="">Select</option>
+                    @{
+                            List<CommonAddressDetails> lstDistrictDetails = (List<CommonAddressDetails>)ViewData["DistrictDetails"];
+                            if (lstDistrictDetails != null)
+                            {
+                                foreach (var item in lstDistrictDetails)
+                                {
+                        <option value="@item.DistrictID">@item.DistrictName</option>
+                                }
+                            }
+
+                    }
+                </select>
+            </div>
+
+            <label for="inputMail" class="col-lg-3 col-md-4 col-12 col-form-label ">Tehsil<span class="text-danger">*</span></label>
+            <div class="col-lg-3 col-md-8 col-12">
+                <select id="TehsilId" name="TehsilId" class="form-control  searchableselect">
+                    <option value="">Select</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="form-group row">
+            <label for="inputMail" class="col-lg-3 col-md-4 col-12 col-form-label ">
+                Village<span class="text-danger">*</span>
+            </label>
+            <div class="col-lg-3 col-md-8 col-12 mb-3">
+                <select id="VillageId" name="VillageId" class="form-control  searchableselect">
+                    <option>Select</option>
+                </select>
+            </div>
+            <label for="inputMail" class="col-lg-3 col-md-4 col-12 col-form-label ">Area (In Hectare)<span class="text-danger">*</span></label>
+            <div class="col-lg-3 col-md-8 col-12">
+                <input id="Area" name="Area" maxlength="100" type="text" class="form-control">
+            </div>
+        </div>
+
+        <div class="form-group row">
+            <label for="inputMail" class="col-lg-3 col-md-4 col-12 col-form-label ">
+                Type of Site<span class="text-danger">*</span>
+            </label>
+            <div class="col-lg-3 col-md-8 col-12 mb-3">
+                <select id="TypeOfSite" name="TypeOfSite" class="form-control  searchableselect">
+                    <option value="">Select</option>
+                    @{
+                            List<TypeOfSite> lstTypeOfSite = (List<TypeOfSite>)ViewData["TypeOfSiteDetails"];
+                            if (lstTypeOfSite != null)
+                            {
+                                foreach (var item in lstTypeOfSite)
+                                {
+                        <option value="@item.Value">@item.Text</option>
+                                }
+                            }
+                    }
+                </select>
+            </div>
+            <label for="inputMail" class="col-lg-3 col-md-4 col-12 col-form-label ">Mineral Type<span class="text-danger">*</span></label>
+            <div class="col-lg-3 col-md-8 col-12">
+                <select id="MineralTypeId" name="MineralTypeId" class="form-control  searchableselect">
+                    <option value="">Select</option>
+                    @{
+                            List<MineralType> lstMineralType = (List<MineralType>)ViewData["MineralType"];
+                            if (lstMineralType != null)
+                            {
+                                foreach (var item in lstMineralType)
+                                {
+                        <option value="@item.Value">@item.Text</option>
+                                }
+                            }
+                    }
+                </select>
+            </div>
+        </div>
+
+        <div class="form-group row">
+            <label for="inputMail" class="col-lg-3 col-md-4 col-12 col-form-label ">
+                Mineral Name<span class="text-danger">*</span>
+            </label>
+            <div class="col-lg-3 col-md-8 col-12 mb-3">
+                <select id="MineralId" name="MineralId" class="form-control  searchableselect" readonly>
+                    <option value="">Select</option>
+                </select>
+            </div>
+            <label for="inputMail" class="col-lg-3 col-md-4 col-12 col-form-label ">Mineral Form<span class="text-danger">*</span></label>
+            <div class="col-lg-3 col-md-8 col-12">
+                <select id="MineralFormId" name="MineralFormId" class="form-control  searchableselect">
+                    <option value="">Select</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="form-group row">
+            <label for="inputMail" class="col-lg-3 col-md-4 col-12 col-form-label ">
+                Mineral Grade<span class="text-danger">*</span>
+            </label>
+            <div class="col-lg-3 col-md-8 col-12 mb-3">
+                <select id="MineralGradeId" name="MineralGradeId" class="form-control  searchableselect">
+                    <option value="">Select</option>
+                </select>
+            </div>
+            <label for="inputMail" class="col-lg-3 col-md-4 col-12 col-form-label ">Current Stock (As on date) <span class="text-danger">*</span></label>
+            <div class="col-lg-3 col-md-8 col-12">
+                <input id="CurrentStock" name="CurrentStock" maxlength="50" type="text" class="form-control">
+            </div>
+        </div>
+
+        <div class="form-group row">
+            <label for="inputMail" class="col-lg-3 col-md-4 col-12 col-form-label ">
+                Order Date<span class="text-danger">*</span>
+            </label>
+            <div class="col-lg-3 col-md-8 col-12 mb-3">
+                <div class="input-group">
+                    <input name="OrderDate" type="text" class="form-control datepicker" id="OrderDate">
+                    <div class="input-group-prepend">
+                        <label class="input-group-text" for="date2"><i class="far fa-calendar"></i></label>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="form-group row">
+            <label class="col-lg-3 col-md-5 col-12 col-form-label ">Enter Captcha <span class="text-danger">*</span></label>
+            <div class="col-lg-3 col-md-7 col-12">
+                <div class="form-group">
+                    <input id="TailingDamCaptcha" type="text" class="form-control">
+                </div>
+            </div>
+            <div class="col-sm-2">
+                <div class="input-group">
+
+                    <div id="capt1" class="form-control" ondrag="return false" oncopy="return false" onselectstart="return false" oncut="return false"></div>
+                    <label class="input-group-text" for="inputDate1"> <a href="javascript:;" onclick="updateCaptcha();"><i class="fas fa-sync-alt"></i></a> </label>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="form-group row">
+            <label class="col-lg-3 col-md-5 col-12 col-form-label ">Enter OTP <span class="text-danger">*</span></label>
+            <div class="col-lg-3 col-md-7 col-12">
+                <div class="form-group">
+                    <input id="TailingDamOTP" type="text" class="form-control">
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-8 col-12">
+                <input type="button" class="btn btn-success" id="btnsendOtp" value="Send OTP">
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="form-group row">
+                    <div class="custom-control custom-checkbox ml-2">
+                        <input type="checkbox" class="custom-control-input" name="chkIagree" id="chkIagree">
+                        <label class="custom-control-label  text-danger" for="chkIagree">
+                            Declaration - I declare that all the information given above is true as per my knowledge and belief. I am aware that if any of the above information is found to be false or untrue, there may be penalty / penalty under the appropriate rules.
+                            The Department of Mineral Resources will not be responsible for authenticating any of the above information.
+                        </label>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="row" id="divButtons">
+            <div class="col-lg-12">
+                <button id="btnSaveTailingDam" type="button" class="btn btn-success btn-lg mr-2">Submit</button>
+                <a href="/Contractor/Contractor/TailingDamRegistration" class="btn btn-danger btn-lg">Reset</a>
+            </div>
+        </div>
+    </div>
+    }
+</div>
+@if (TempData["Message"] != null)
+{
+    <script type="text/javascript">
+        window.onload = function () {
+            swal("","@TempData["Message"]","success");
+        };
+    </script>
+}
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('.selectpicker').selectpicker();
+        $('.searchableselect').searchableselect();
+        $('.datepicker').datetimepicker({
+            format: 'LT',
+            format: 'DD-MM-YYYY'
+            //daysOfWeekDisabled: [0, 6],
+        });
+        //--------------------------
+        if ($('input[name="chkIagree"]:checked').length > 0) {
+            $('#divButtons').show();
+            $(this).attr('checked', true);
+        }
+        else {
+            $('#divButtons').hide();
+            $(this).attr('checked', false);
+        }
+        //--------------------------------
+        updateCaptcha();
+        $('#DivTailingDam').hide();
+        $('#lblUserId').hide();
+        $('#DivUserId').hide();
+        $('#DivPassword').hide();
+        $('#DivExistingUser').hide();
+        $('.reg-app, .veh-own-reg').addClass('active');
+
+        $('#ddlPurpose').change(function () {
+            if ($(this).val() == "Tailing Dam") {
+                $('#DivTailingDam').show();
+            }
+            else {
+                $('#DivTailingDam').hide();
+                $('#DivUserId').hide();
+                $('#DivPassword').hide();
+                $('#lblUserId').hide();
+                $('input:radio[name=radio-iRequirement]:checked').prop('checked', false).checkboxradio("refresh");
+            }
+        });
+
+        $("#MobileNo").keydown(function (e) {
+            // Allow: backspace, delete, tab, escape, enter and .
+            if ($.inArray(e.keyCode, [46, 8, 9, 27, 13, 110, 190]) !== -1 ||
+                // Allow: Ctrl+A, Command+A
+                (e.keyCode === 65 && (e.ctrlKey === true || e.metaKey === true)) ||
+                // Allow: home, end, left, right, down, up
+                (e.keyCode >= 35 && e.keyCode <= 40)) {
+                // let it happen, don't do anything
+                return;
+            }
+            // Ensure that it is a number and stop the keypress
+            if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) {
+                e.preventDefault();
+            }
+        });
+
+        $("#Area").keydown(function (e) {
+            // Allow: backspace, delete, tab, escape, enter and .
+            if ($.inArray(e.keyCode, [46, 8, 9, 27, 13, 110, 190]) !== -1 ||
+                // Allow: Ctrl+A, Command+A
+                (e.keyCode === 65 && (e.ctrlKey === true || e.metaKey === true)) ||
+                // Allow: home, end, left, right, down, up
+                (e.keyCode >= 35 && e.keyCode <= 40)) {
+                // let it happen, don't do anything
+                return;
+            }
+            // Ensure that it is a number and stop the keypress
+            if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) {
+                e.preventDefault();
+            }
+        });
+
+        $("#CurrentStock").keydown(function (e) {
+            // Allow: backspace, delete, tab, escape, enter and .
+            if ($.inArray(e.keyCode, [46, 8, 9, 27, 13, 110, 190]) !== -1 ||
+                // Allow: Ctrl+A, Command+A
+                (e.keyCode === 65 && (e.ctrlKey === true || e.metaKey === true)) ||
+                // Allow: home, end, left, right, down, up
+                (e.keyCode >= 35 && e.keyCode <= 40)) {
+                // let it happen, don't do anything
+                return;
+            }
+            // Ensure that it is a number and stop the keypress
+            if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) {
+                e.preventDefault();
+            }
+        });
+
+        $('#TailingDamCOPY').on('change', function () {
+            debugger;
+            var fileExtension = ['jpg', 'jpeg', 'png', 'pdf'];
+            if ($.inArray($(this).val().split('.').pop().toLowerCase(), fileExtension) == -1) {
+                swal("", "Only formats are allowed : " + fileExtension.join(', '), "warning");
+                $(this).focus();
+                return false;
+            }
+
+            if (Number(this.files[0].size) > 2097152) {
+                swal("", 'Try to upload file less than 2MB!', "warning");
+                $(this).val('');
+                $(this).focus();
+                return false;
+            }
+            else {
+                var fileName = $(this).val().split("\\").pop();
+                $(this).next('.custom-file-label').html(fileName);
+            }
+
+        });
+    });
+
+    function onRadioChange() {
+        if ($("#radioYes").is(":checked")) {
+            $('#DivUserId').show();
+            $('#DivPassword').show();
+            $('#lblUserId').show();
+        }
+        else if ($("#radioYes").is(":checked")) {
+            $('#DivUserId').hide();
+            $('#DivPassword').hide();
+            $('#lblUserId').hide();
+        }
+        else {
+            $('#DivUserId').hide();
+            $('#DivPassword').hide();
+            $('#lblUserId').hide();
+        }
+    }
+
+    function updateCaptcha() {
+        debugger;
+        $.ajax({
+            url: '/VehicleOwner/VehicleOwner/CaptchaImage',
+            data: {},
+            dataType: 'json',
+            type: 'post',
+            success: function (data) {
+                $("#capt1").html(data);
+            },
+            error: function (err) {
+                swal("", err.responseText, "warning");
+            }
+        });
+    }
+
+    $('#DistrictId').change(function () {
+        debugger;
+        if ($(this).val() != "") {
+            $('#DistrictName').val($("#DistrictId option:selected").text());
+            $.ajax({
+                url: "/Contractor/Contractor/GetTehsilDataFromDistrictID",
+                data: { 'DistrictId': $(this).val() },
+                dataType: 'json',
+                type: 'post',
+                success: function (data) {
+                    debugger;
+                    if (data.length > 0) {
+                        $('#TehsilId').html('')
+                        $('#TehsilId').append("<option value=''>Select</option>");
+                        $.each(data, function (ind, item) {
+                            $('#TehsilId').append("<option value='" + item.tehsilID + "'>" + item.tehsilName + "</option>");
+                        });
+                    }
+                },
+                error: function (err) {
+
+                }
+            });
+        }
+        else {
+            $('#TehsilId').html('')
+            $('#TehsilId').append("<option value=''>Select</option>");
+            $('#VillageId').html('');
+            $('#VillageId').append("<option value=''>Select</option>");
+        }
+    });
+
+    $('#TehsilId').change(function () {
+        if ($(this).val() != "") {
+            $.ajax({
+                url: "/Contractor/Contractor/GetVillageDataFromTehsilID",
+                data: { 'TehsilId': $(this).val() },
+                dataType: 'json',
+                type: 'post',
+                success: function (data) {
+                    if (data.length > 0) {
+                        $('#VillageId').html('')
+                        $('#VillageId').append("<option value=''>Select</option>");
+                        $.each(data, function (ind, item) {
+                            $('#VillageId').append("<option value='" + item.villageID + "'>" + item.villageName + "</option>");
+                        });
+                    }
+                },
+                error: function (err) {
+
+                }
+            });
+        }
+        else {
+            $('#VillageId').html('');
+            $('#VillageId').append("<option value=''>Select</option>");
+        }
+    });
+
+    $('#MineralTypeId').change(function () {
+        debugger;
+        if ($(this).val() != "") {
+            $.ajax({
+                url: "/Contractor/Contractor/GetCascadeMineral",
+                data: { 'mineraltypeid': $(this).val() },
+                dataType: 'json',
+                type: 'post',
+                success: function (data) {
+                    debugger;
+                    if (data.length > 0) {
+                        $('#MineralId').html('');
+                        $('#MineralId').append("<option value=''>Select</option>");
+                        $.each(data, function (ind, item) {
+                            $('#MineralId').append("<option value='" + item.mineralID + "'>" + item.mineralName + "</option>");
+                        });
+                    }
+                },
+                error: function (err) { }
+            });
+        }
+        else {
+            $('#MineralId').html('');
+            $('#MineralId').append("<option value=''>Select</option>");
+            $('#MineralFormId').html('');
+            $('#MineralFormId').append("<option value=''>Select</option>");
+            $('#MineralGradeId').html('');
+            $('#MineralGradeId').append("<option value=''>Select</option>");
+        }
+    });
+
+    $('#MineralId').change(function () {
+        if ($(this).val() != "") {
+            $.ajax({
+                url: "/Contractor/Contractor/GetCascadeMineralNature",
+                data: { 'mineral': $(this).val() },
+                dataType: 'json',
+                type: 'post',
+                success: function (data) {
+                    debugger;
+                    if (data.length > 0) {
+                        $('#MineralFormId').html('');
+                        $('#MineralFormId').append("<option value=''>Select</option>");
+                        $.each(data, function (ind, item) {
+                            $('#MineralFormId').append("<option value='" + item.mineralNatureId + "'>" + item.mineralNature + "</option>");
+                        });
+                    }
+                },
+                error: function (err) { }
+            });
+        }
+        else {
+            $('#MineralFormId').html('');
+            $('#MineralFormId').append("<option value=''>Select</option>");
+            $('#MineralGradeId').html('');
+            $('#MineralGradeId').append("<option value=''>Select</option>");
+        }
+    });
+
+    $('#MineralFormId').change(function () {
+        debugger;
+        if ($(this).val() != "") {
+            $.ajax({
+                url: "/Contractor/Contractor/GetCascadeMineralGrade",
+                data: { 'mineralNature': $(this).val() },
+                dataType: 'json',
+                type: 'post',
+                success: function (data) {
+                    debugger;
+                    if (data.length > 0) {
+                        $('#MineralGradeId').html('');
+                        $('#MineralGradeId').append("<option value=''>Select</option>");
+                        $.each(data, function (ind, item) {
+                            $('#MineralGradeId').append("<option value='" + item.mineralGradeId + "'>" + item.mineralGrade + "</option>");
+                        });
+                    }
+                },
+                error: function (err) { }
+            });
+        }
+        else {
+            $('#MineralGradeId').html('');
+            $('#MineralGradeId').append("<option value=''>Select</option>");
+        }
+    });
+
+    $('#btnSaveTailingDam').click(function () {
+        if (ValidateTailingDam()) {
+            $('#form1').submit();
+        }
+        else {
+            return false;
+        }
+    });
+
+    $("#btnsendOtp").click(function () {
+        debugger;
+        if (ValidateTailingDam()) {
+            var mobileNumber = $("#MobileNo").val();
+            var EmailID = $("#EmailID").val();
+
+            if (mobileNumber == "") {
+                swal("", "Please enter mobile number", "warning");
+                $('#MobileNo').focus();
+                return false;
+            }
+            else {
+                $('#btnsendOtp').attr('readonly', 'readonly');
+
+                $.ajax({
+                    url: '/VehicleOwner/VehicleOwner/SendOTP',
+                    dataType: "",
+                    type: "POST",
+                    data: {
+                        MobileNumber: mobileNumber,
+                        EmailID: EmailID
+                    },
+                    success: function (data) {
+                        debugger;
+                        console.log(data);
+                        if (data != null) {
+                            $('#btnsendOtp').removeAttr('readonly');
+                            if (data == "SUCCESS") {
+                                swal("", "Enter Verification Code received on submitted Mobile/Email Id", "success");
+                            }
+                            else {
+                                swal("", data, "warning");
+                            }
+                        }
+                    }
+                })
+            }
+        }
+    });
+
+    $('#chkIagree').click(function () {
+        if (ValidateTailingDam()) {
+            if ($('#TailingDamOTP').val() != "") {
+                $.ajax({
+                    url: '/VehicleOwner/VehicleOwner/VerifyOTP',
+                    data: {
+                        OTP: $('#TailingDamOTP').val(),
+                        MobileNumber: $("#MobileNo").val(),
+                        EmailID: $("#EmailID").val()
+                    },
+                    success: function (result) {
+                        if (result == "SUCCESS") {
+                            if ($('input[name="chkIagree"]:checked').length > 0) {
+                                $('#divButtons').show();
+                                $(this).attr('checked', 'checked');
+
+                            }
+
+                            else {
+                                $('#divButtons').hide();
+                                ChangeCheckBoxStatus();
+                            }
+                        }
+                        else if (result == "REQUIRED") {
+                            swal("", "Please enter mobile number and e-mail and OTP !", "warning");
+                            $('#divButtons').hide();
+                            ChangeCheckBoxStatus();
+                        }
+                        else {
+                            swal("", "This is an invalid OTP.Please send another OTP and try again !", "warning");
+                            $('#divButtons').hide();
+                            ChangeCheckBoxStatus();
+                        }
+                    },
+                    error: function (result) {
+                        swal("", "OTP Verification failed.Please try again !", "warning");
+                        $('#divButtons').hide();
+                        ChangeCheckBoxStatus();
+                    }
+                });
+            }
+            else {
+                $('#chkIagree').prop('checked', false);
+                swal("", "Please Enter OTP", "warning");
+                $('#divButtons').hide();
+                $("#TailingDamOTP").focus();
+                return false;
+            }
+        }
+        else {
+
+            $('#chkIagree').prop('checked', false);
+            $('#divButtons').hide();
+        }
+
+    });
+
+    function ValidateTailingDam() {
+        if ($('#OwnerName').val() == "") {
+            swal("", "Please Enter Owner Name", "warning");
+            $('#OwnerName').focus();
+            return false;
+        }
+
+        if (CheckSpaceAtFirstPlaceAndLastPlace($('#OwnerName').val()) == false) {
+            swal("", "Please Check Owner Name For Spaces at Beginning And End Place", "warning");
+            $("#OwnerName").focus();
+            return false;
+        }
+
+        if ($('#Designation').val() == "") {
+            swal("", "Please Enter Designation", "warning");
+            $('#Designation').focus();
+            return false;
+        }
+
+        if (CheckSpaceAtFirstPlaceAndLastPlace($('#Designation').val()) == false) {
+            swal("", "Please Check Designation For Spaces at Beginning And End Place", "warning");
+            $("#Designation").focus();
+            return false;
+        }
+
+        if ($('#CompanyId').val() == "") {
+            swal("", "Please Select Company", "warning");
+            $('#CompanyId').focus();
+            return false;
+        }
+
+        if ($('#Address').val() == "") {
+            swal("", "Please Enter Address", "warning");
+            $('#CompanyId').focus();
+            return false;
+        }
+
+        if (CheckSpaceAtFirstPlaceAndLastPlace($('#Address').val()) == false) {
+            swal("", "Please Check Address For Spaces at Beginning And End Place", "warning");
+            $("#Address").focus();
+            return false;
+        }
+
+        if ($('#MobileNo').val() == "") {
+            swal("", "Please Enter MobileNo", "warning");
+            $('#MobileNo').focus();
+            return false;
+        }
+
+        if ($('#MobileNo').val() != "") {
+            if ($('#MobileNo').val().length != 10) {
+                swal("", "Please Enter Valid MobileNo", "warning");
+                $('#MobileNo').focus();
+                return false;
+            }
+        }
+
+        if ($('#EmailID').val() == "") {
+            swal("", "Please Enter EmailId", "warning");
+            $('#EmailID').focus();
+            return false;
+        }
+
+        if (ValidateEmailAddressNoMsg(document.getElementById("EmailID")) == false) {
+            swal("", "Please Enter Valid EmailId", "warning");
+            $('#EmailID').focus();
+            return false;
+        }
+
+        if ($('#OrderNo').val() == "") {
+            swal("", "Please Enter OrderNo", "warning");
+            $('#OrderNo').focus();
+            return false;
+        }
+
+        if (CheckSpaceAtFirstPlaceAndLastPlace($('#OrderNo').val()) == false) {
+            swal("", "Please Check OrderNo For Spaces at Beginning And End Place", "warning");
+            $("#OrderNo").focus();
+            return false;
+        }
+
+        if ($('#TailingDamCOPY').val() == "") {
+            swal("", "Please Choose Order Copy", "warning");
+            $('#TailingDamCOPY').focus();
+            return false;
+        }
+
+        if ($('#DistrictId').val() == "") {
+            swal("", "Please Select District", "warning");
+            $('#DistrictId').focus();
+            return false;
+        }
+
+        if ($('#TehsilId').val() == "") {
+            swal("", "Please Select Tehsil", "warning");
+            $('#TehsilId').focus();
+            return false;
+        }
+
+        if ($('#VillageId').val() == "") {
+            swal("", "Please Select Village", "warning");
+            $('#VillageId').focus();
+            return false;
+        }
+
+        if ($('#Area').val() == "") {
+            swal("", "Please Enter Area", "warning");
+            $('#Area').focus();
+            return false;
+        }
+
+        if ($('#TypeOfSite').val() == "") {
+            swal("", "Please Select TypeOfSite", "warning");
+            $('#TypeOfSite').focus();
+            return false;
+        }
+
+        if ($('#MineralTypeId').val() == "") {
+            swal("", "Please Select Mineral Type", "warning");
+            $('#MineralTypeId').focus();
+            return false;
+        }
+
+        if ($('#MineralId').val() == "") {
+            swal("", "Please Select Mineral Name", "warning");
+            $('#MineralId').focus();
+            return false;
+        }
+
+        if ($('#MineralFormId').val() == "") {
+            swal("", "Please Select Mineral Form", "warning");
+            $('#MineralFormId').focus();
+            return false;
+        }
+
+        if ($('#MineralGradeId').val() == "") {
+            swal("", "Please Select Mineral Grade", "warning");
+            $('#MineralGradeId').focus();
+            return false;
+        }
+
+        if ($('#CurrentStock').val() == "") {
+            swal("", "Please Enter Current Stock", "warning");
+            $('#CurrentStock').focus();
+            return false;
+        }
+
+        if ($('#OrderDate').val() == "") {
+            swal("", "Please Enter Order Date", "warning");
+            $('#OrderDate').focus();
+            return false;
+        }
+
+        if ($('#TailingDamCaptcha').val() == "") {
+            swal("", "Please Enter Captcha", "warning");
+            $('#TailingDamCaptcha').focus();
+            return false;
+        }
+
+        if ($('#capt1').html() != $('#TailingDamCaptcha').val()) {
+            swal("", "Please Enter Valid Captcha", "warning");
+            $('#TailingDamCaptcha').focus();
+            updateCaptcha();
+            return false;
+        }
+        return true;
+    }
+
+    function ValidateEmailAddressNoMsg(inputText) {
+        debugger;
+        var mailformat = /^\w+([\.-]?\w+)*@@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+        if (inputText.value.match(mailformat)) {
+            inputText.focus();
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+
+    function CheckSpaceAtFirstPlaceAndLastPlace(str) {
+        var regex = /^(?!\s)(?![\s\S]*\s$)[a-zA-Z0-9\s()-]+$/;
+        return regex.test(str);
+    }
+
+    $("#EmailID").keydown(function (evt) {
+        debugger;
+        evt = (evt) ? evt : window.event;
+        var charCode = (evt.which) ? evt.which : evt.keyCode;
+        if (charCode == 32) {
+            return false;
+        }
+        return true;
+
+    });
+
+    function ChangeCheckBoxStatus() {
+        if ($('input[type="checkbox"]').is(':checked') == true) {
+            $('input[type="checkbox"]').prop('checked', false);
+        }
+    }
+
+    function GetExistingUserDetails() {
+        debugger;
+        if (!blankFieldValidation("txtUserId", "Username")) {
+            return false;
+        }
+        if (!blankFieldValidation("txtPwd", "Password")) {
+            return false;
+        }
+        if ($('#txtUserId').val() != "" && $('#txtPwd').val() != "") {
+            $.ajax({
+                url: '/Contractor/Contractor/GetExistingUserDetails',
+                data: { 'UserName': $('#txtUserId').val(), 'Password': $('#txtPwd').val() },
+                dataType: 'json',
+                type: 'post',
+                success: function (data) {
+                    debugger;
+                    $('#DivExistingUser').show();
+                    $('#lblExistingUserName').val(data.applicantName);
+                    $('#hdnUserId').val(data.userId);
+                    $('#hdnUserTypeId').val(data.userTypeId);
+                },
+                error: function (err) {
+                }
+            });
+        }
+        else {
+            $('#lblExistingUserName').val('');
+            $('#hdnUserId').val('');
+            $('#hdnUserTypeId').val('');
+            $('#DivExistingUser').hide();
+        }
+    }
+
+</script>
+

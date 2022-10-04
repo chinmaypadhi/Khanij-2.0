@@ -1,0 +1,365 @@
+﻿@*// ************************************************************************************************************
+    //  View Name                : Create
+    //  Desciption               : To Save and Update, Forward, Approve and Reject Liecensee Minearal Details
+    //  Created By               : Prakash Chandra Biswal
+    //  Created On               : 31 June 2021
+    // **********************************************************************************************************
+*@
+
+@model MasterEF.MineralDetails
+@{
+    ViewData["Title"] = "MinealDetails";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+@if (TempData["Message"] != null)
+{
+    <script>
+        swal("", '@TempData["Message"]', "success");
+    </script>
+}
+<script>
+    indicateMe = "yes"
+    backMe = "yes"
+    $(document).ready(function () {
+        loadNavigation('Create', 'glRoleRes', 'pllesseprof', 'tl', 'Licensee Profile', 'Minearal Details', ' ');
+        $('.searchableselect').searchableselect();
+        $('.datepicker').datetimepicker({
+            format: 'LT',
+            format: 'DD-MMM-YYYY',
+            //daysOfWeekDisabled: [0, 6],
+            daysOfWeekDisabled: [],
+            widgetPositioning: {
+                horizontal: 'auto',
+                vertical: 'bottom'
+            }
+        }).keydown(false);
+
+        @if (Model.STATUS == 1 ) {
+
+         <Text>
+        document.getElementById("cmd").style.visibility = 'hidden'
+        document.getElementById("cmd1").style.visibility = 'hidden'
+        document.getElementById("cmd2").style.visibility = 'hidden'
+        </Text>
+        }
+
+        
+    });
+</script>
+<script>
+    function Validate() {
+        debugger;
+        var Iss = false;
+        if ($('#MINERAL_CATEGORY_ID').val() == "") {
+            swal("", "Please Select Mineral Category", "warning");
+            $('#MineralId').focus();
+            return false;
+        }
+        else if ($('#MineralId').val() == null) {
+            swal("", "Please Select Mineral Name", "warning");
+            $('#MineralId').focus();
+            return false;
+        }
+        else if ($('#MineralNatureId').val() == null) {
+            swal("", "Please Select Mineral Form", "warning");
+            $('#MineralNatureId').focus();
+            return false;
+        }
+        else if ($('#MineralGradeId').val() == null) {
+            swal("", "Please Select Mineral Grade", "warning");
+            $('#MineralGradeId').focus();
+            return false;
+        }
+
+        Iss = true;
+        return Iss;
+    }
+    function OnForwarding(btnAction) {
+        var Type;
+        if (btnAction == 'Forward To DD') {
+            Type = 'forward';
+        }
+        if (confirm("Before " + Type + " you need to apply your Digital Signature. Are you confirmed to " + Type + " Profile??")) {
+                var Postdata = 'action=signdoc' + "\n" + 'datatosign=Digital Signature Required' + "\n" + 'signaction=sign' + "\n" + 'filepath=' + "\n" + 'panNumberParam=' + "\n" + 'expirycheck=false' + "\n" + 'issuername=' + "\n" + 'certclass=1|2|3' + "\n" + 'certtype=ALL';
+                connection.send(Postdata);
+                connection.onerror = function (error) {
+                    swal("",'Please check the server connection: ' + error+'',"warning");
+                    swal("",error,"warning");
+                };
+                connection.onmessage = function (e) { // when DSC is success then following function executed.
+                    if (e.data.indexOf("subProtocol") == -1) {
+                        //alert(e.data);
+                        $("#DSCResponse").val(e.data).change();
+                        $.ajax(
+                            {
+                               url: '@Url.Action("CheckVerifyResponse", "UserInformationLiensee", new { Area = "Licensee" })',
+                                type: "POST",
+                                data: { contentType: "pkcs7", signDataBase64Encoded: e.data, responseType: "plain" },
+                                success: function (msg) {
+                                    if (msg == "SUCCESS") {
+                                        if (btnAction == "Forward To DD") {
+                                            $("#SubResion").val("Forward To DD");
+                                        }
+                                        $("#form1").submit();
+                                    }
+                                }
+                            });
+                    }
+                    else {
+                        alert(e.data);
+                    }
+                };
+            }
+            else {
+                return false;
+            }
+    }
+    try {
+        var connection = new WebSocket('wss://localhost.emudhra.com:8080');
+        connection.onopen = function () {
+            console.log('Connection Opened');
+        };
+        connection.onerror = function (error) {
+        };
+        connection.onmessage = function (e) {
+            if (e.data.indexOf("subProtocol") == -1) {
+            }
+        };
+    }
+    catch (e) {
+        swal("", "No DSC Connection Found", "warning");
+    }
+    function ForwordToDdWithoutDS(btnAction) {
+
+        if (btnAction == "Forward To DD") {
+            $("#SubResion").val("Forward To DD");
+        }
+
+        $("#form1").submit();
+
+    }
+</script>
+<script>
+    $(document).ready(function () {
+        debugger;
+        GetMineralName();
+        $('#MINERAL_CATEGORY_ID').change(function () {
+            alert($('#MINERAL_CATEGORY_ID').val());
+            debugger;
+            if ($('MINERAL_CATEGORY_ID').val() != "") {
+                GetMineralName();
+            }
+            else {
+                $('#MineralNatureId').html("").selectpicker('refresh');
+                $('#MineralGradeId').html("").selectpicker('refresh');
+            }
+
+        });
+        $('#MineralId').change(function () {
+            debugger;
+            GetMineralNatureByMineral();
+        });
+        $('#MineralNatureId').change(function () {
+            debugger;
+            GetMineralGradeByNature();
+        });
+        function GetMineralName() {
+            if ($('#MINERAL_CATEGORY_ID').val() != "") {
+                $.ajax({
+                    url: '/Licensee/Mineralinfo/GetMineralNameDetails',
+                    data: { 'mineralType': $('#MINERAL_CATEGORY_ID').val() },
+                    dataType: 'json',
+                    type: 'post',
+                    success: function (data) {
+                        debugger;
+                        $('#MineralId').html('');
+                        var row = "";
+                        $.each(data, function (ind, item) {
+                            row += "<option value='" + item.mineralId + "'>" + item.mineralName + "</option>";
+                            //$('<option>').val(b.Value).text(b.Text).appendTo('#CityId');
+                        });
+
+                        $('#MineralId').html(row).selectpicker('refresh');
+                        if ($('#hdnMineralIdList').val() != "") {
+                            debugger;
+                            var MineralCountString = $('#hdnMineralIdList').val().replace('[', '').replace(']', '');
+                            $('#MineralId').selectpicker('val', MineralCountString.split(','));
+                            GetMineralNatureByMineral();
+                        }
+                        else {
+                            //$('#MineralNatureId').html(row).selectpicker('refresh');
+                            //$('#MineralGradeId').html(row).selectpicker('refresh');
+                        }
+                    },
+                    error: function (err) {
+                    }
+                });
+            }
+            else {
+                $('#MineralId').html(row).selectpicker('refresh');
+                $('#MineralNatureId').html(row).selectpicker('refresh');
+                $('#MineralGradeId').html(row).selectpicker('refresh');
+            }
+        }
+        function GetMineralNatureByMineral() {
+            debugger;
+            var selectedItem = [];
+            if ($('#MineralId').val() != null) {
+                selectedItem = $('#MineralId').val();
+                if (selectedItem.length > 0) {
+                    $('#MineralNatureId').html('');
+                    $.ajax({
+                        url: '/Licensee/Mineralinfo/GetMineralFormInformationDetails',
+                        data: { 'mineralId': selectedItem.toString() },
+                        dataType: 'json',
+                        type: 'post',
+                        success: function (data) {
+                            debugger;
+                            var row = $('#MineralNatureId').html();;
+                            $.each(data, function (ind, item) {
+                                row += "<option value='" + item.mineralNatureId + "'>" + item.mineralNature + "</option>";
+                            });
+                            $('#MineralNatureId').html(row).selectpicker('refresh');
+                            //This section used for View
+                            if ($('#hdnMineralFormIdList').val() != "") {
+                                debugger;
+                                var MineralFormString = $('#hdnMineralFormIdList').val().replace('[', '').replace(']', '');
+                                $('#MineralNatureId').selectpicker('val', MineralFormString.split(','));
+                                GetMineralGradeByNature();
+                            }
+                        },
+                        error: function (err) {
+                        }
+                    });
+                }
+                else {
+                    $('#MineralGradeId').html(row).selectpicker('refresh');
+                    $('#MineralNatureId').html(row).selectpicker('refresh');
+                }
+            }
+        }
+        function GetMineralGradeByNature() {
+            debugger;
+            if ($('#MineralId').val() != null && $('#MineralNatureId').val() != null) {
+                var selectedItem = [];
+                selectedItem = $('#MineralId').val();
+                var selectedItemMineralNatureId = [];
+                selectedItemMineralNatureId = $('#MineralNatureId').val();
+                if (selectedItemMineralNatureId.length > 0 && selectedItem.length > 0) {
+                    $.ajax({
+                        url: '/Licensee/Mineralinfo/GetMineralGradeInformationDetails',
+                        data: { 'mineralId': selectedItem.toString(), 'MineralNatureList': selectedItemMineralNatureId.toString() },
+                        dataType: 'json',
+                        type: 'post',
+                        success: function (data) {
+                            debugger;
+                            $('#MineralGradeId').html('');
+                            var row = "";
+                            $.each(data, function (ind, item) {
+                                row += "<option value='" + item.mineralGradeId + "'>" + item.mineralGrade + "</option>";
+                            });
+                            $('#MineralGradeId').html(row).selectpicker('refresh');
+                            if ($('#hdnMineralGradeIdList').val() != "") {
+                                //This section used for View
+                                var MineralGradeString = $('#hdnMineralGradeIdList').val().replace('[', '').replace(']', '');
+                                $('#MineralGradeId').selectpicker('val', MineralGradeString.split(','));
+                            }
+                        },
+                        error: function (err) {
+                        }
+                    });
+                }
+                else {
+                    $('#MineralGradeId').html(row).selectpicker('refresh');
+                }
+            }
+        }
+    });
+</script>
+
+
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+
+        @Html.Partial("_CMSnavigation")
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="javascript:void(0);">
+                                Add
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="~/Licensee/Mineralinfo/ViewList">
+                                View
+                            </a>
+                        </li>
+                    </ul>
+                    @Html.Partial("_CMSutil")
+                </div>
+
+                <section class="box form-container">
+                    <div class="content-body">
+                        <h5 class="text-brown font-weight-bold mt-0"> Meneral Details</h5>
+
+                        @using (Html.BeginForm("Create", "Mineralinfo", FormMethod.Post, new { enctype = "multipart/form-data", AUTOCOMPLETE = "Off", id = "form1" }))
+                        {
+                            @(Html.HiddenFor(model => model.SubResion))
+                            @Html.HiddenFor(m => m.LICENSEE_APPLICATION_ID)
+
+                            <div class="row">
+
+                                <div class="col-lg-6 col-md-6 col-sm-12 form-group">
+                                    <label class="col-form-label pt-0 font-weight-bolder">Mineral Category <span class="text-danger">*</span></label>
+                                    @Html.DropDownListFor(model => model.MINERAL_CATEGORY_ID, ViewBag.MineralCategory as IEnumerable<SelectListItem>, "Select", new { @class = "form-control searchableselect", @autofocus = "autofocus" })
+                                    @Html.ValidationMessageFor(m => m.MINERAL_CATEGORY_ID, "", new { @class = "text-danger" })
+                                </div>
+                                <div class="col-lg-6 col-md-6 col-sm-12 form-group">
+                                    <label class="col-form-label pt-0 font-weight-bolder">Mineral Name <span class="text-danger">*</span></label>
+                                    @Html.HiddenFor(m => m.MineralIdList, new { @id = "hdnMineralIdList" })
+                                    <select multiple data-style="bg-white" class="selectpicker form-control" id="MineralId" name="MineralCount"></select>
+                                    @Html.ValidationMessageFor(m => m.MineralCount, "", new { @class = "text-danger" })
+                                </div>
+                                <div class="col-lg-6 col-md-6 col-sm-12 form-group">
+                                    <label class="col-form-label pt-0 font-weight-bolder">Mineral Form <span class="text-danger">*</span></label>
+                                    @Html.HiddenFor(m => m.MineralFormIdList, new { @id = "hdnMineralFormIdList" })
+                                    <select multiple data-style="bg-white" class="selectpicker form-control" id="MineralNatureId" name="MineralFormCount"></select>
+                                    @Html.ValidationMessageFor(m => m.MineralFormCount, "", new { @class = "text-danger" })
+                                </div>
+
+                                <div class="col-lg-6 col-md-6 col-sm-12 form-group">
+                                    <label class="col-form-label pt-0 font-weight-bolder">Mineral Grade <span class="text-danger">*</span></label>
+                                    @Html.HiddenFor(m => m.MineralGradeIdList, new { @id = "hdnMineralGradeIdList" })
+                                    <select multiple data-style="bg-white" class="selectpicker form-control" id="MineralGradeId" name="MineralGradeCount"></select>
+                                    @Html.ValidationMessageFor(m => m.MineralGradeCount, "", new { @class = "text-danger" })
+                                </div>
+
+
+                            </div>
+                            <div class="row mt-4">
+                                <div class="col-sm-12 text-center">
+                                    @if (@Model.STATUS != 5)
+                                    {
+                                        <input type="submit" value="Save & Update" name="cmd" formaction="" class="btn btn-success btn-md ml-0 waves-effect waves-light  btnsave" id="cmd" onclick="return Validate()">
+                                        @*<input type="submit" value="Delete" name="delete" class="btn btn-danger btn-md ml-0 waves-effect waves-light btnsave" id="cmd2" onclick="return confirm('Are you sure to delete?')" style="display:none">*@
+                                        <input type="button" value="Forward To DD" name="cmd" class="btn btn-warning text-dark btn-md waves-effect waves-light btnsave" id="cmd1" onclick="if (Validate()) { return OnForwarding('Forward To DD'); }">
+                                        @*<input type="button" value="Forward To DD" name="cmd" class="btn btn-warning text-dark btn-md waves-effect waves-light btnsave" id="cmd1" onclick="if (Validate()) { return ForwordToDdWithoutDS('Forward To DD'); }">*@
+                                    }
+                                </div>
+                            </div>
+                        }
+
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+    <!-- MAIN CONTENT AREA ENDS -->
+</section>
+
+
+
+

@@ -1,0 +1,245 @@
+﻿@model PermitEF.ECCappingEF
+
+
+@{
+    ViewData["Title"] = "CapingScreen";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var YEAR = ViewBag.Year;
+    var stock = ViewBag.Stock;
+    var msg = ViewBag.msg;
+
+}
+
+
+<div class="main-tab">
+    <ul class="nav nav-tabs">
+        <li class="nav-item active">
+            <a class="nav-link active" href="javascript:void(0);">
+                Update
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="~/ECCapping/ecCapping/CapingScreenView">
+                View
+            </a>
+        </li>
+    </ul>
+
+</div>
+
+
+<section class="box form-container">
+    <div class="col-12">
+        <div class="panel panel-primary">
+            @using (Html.BeginForm("EditECcapping", "ecCapping", FormMethod.Post, new { @id = "ECCappingform" }))
+            {
+                <div class="content-body">
+
+
+                    <div class="row">
+                        <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="col-md-12 ">
+                                        <span class="text-danger">*</span>
+                                        <label class="col-lg-3 col-lg-5 col-sm-12 col-form-label">Financial Year :</label>
+                                        <select class="k-input ddlDropdown ECCaping k-valid " name="FinancialYear" id="Year">
+                                            <option value="0">Select Financial Year</option>
+                                            <option value="@YEAR" selected>@YEAR</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <fieldset>
+                        <legend> Grade Wise Opening Stock  </legend>
+                        <div class="row">
+                            <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12">
+                                <div class="row">
+                                    <div class="col-lg-12">
+
+
+                                        @if (stock != null)
+                                        {
+                                            foreach (var i in stock)
+                                            {
+
+                                                <div class="col-md-12 ">
+                                                    <span class="text-danger">*</span>   <label class="col-lg-3 col-lg-5 col-sm-12 col-form-label">@i.MineralGrade</label>
+                                                    <input type="number" class="k-textbox ECCaping k-valid" style="width: 220px;" name="GradeWise_OpeningStock" value="@i.OpeningStock">
+                                                    <input type="hidden" name="MineralGradeId" value="@i.MineralGradeId" />
+
+                                                </div>
+                                            }
+                                        }
+
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </fieldset>
+                    <br />
+
+                    @*<div class="row" id="divRejectRemarks">
+                        <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12">
+                            <div class="row">
+                                <div class="col-xs-12">
+                                    <div class="col-md-12 ">
+                                        <label>Remarks :</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>*@
+                    <div class="col-md-12" style="margin-left:41%">
+                        <input type="button" value="Submit" onclick="return onBtnUpdate();" class="btn btn-primary btn-md ml-0 waves-effect waves-light" />
+                        <input type="reset" value="Reset" class="btn btn-danger btn-md ml-0 waves-effect waves-light" />
+                    </div>
+                </div>
+            }
+        </div>
+
+    </div>
+</section>
+
+
+<script>
+
+    $(document).ready(function () {
+         if (@msg != 0) {
+            if (@msg == 2)
+            {
+
+                swal({
+                    title: "Records Are Already Exists",
+                    type: "warning"
+                }).then(okay => {
+                    if (okay) {
+                        window.location.href = '@Url.Action("CapingScreenView", "ecCapping")'
+                    }
+                });
+
+
+
+
+
+
+                @*swal("", "Current FY Data Is Already Exists", "warning");
+                            setTimeout(function () {
+                                window.location.href = '@Url.Action("CapingScreenView", "ecCapping")'
+                            }, 5000);*@
+
+            }
+
+        }
+
+    });
+
+
+    function onBtnUpdate() {
+
+        var var_ECCaping = document.getElementsByClassName("ECCaping");
+        for (var i = 0; i < var_ECCaping.length; i++) {
+
+            if (var_ECCaping[i].value == "") {
+                alert('This field is required');
+                var_ECCaping[i].focus();
+                return false;
+            }
+
+        }
+
+
+
+
+         if (confirm("Before Declare Opening Stock you need to apply your Digital Signature. Are you sure to submit your request of opening stock ?")) {
+
+            var Postdata = 'action=signdoc' + "\n" + 'datatosign=Digital Signature Required' + "\n" + 'signaction=sign' + "\n" + 'filepath=' + "\n" + 'panNumberParam=' + "\n" + 'expirycheck=false' + "\n" + 'issuername=' + "\n" + 'certclass=1|2|3' + "\n" + 'certtype=ALL';
+            connection.send(Postdata);
+            connection.onerror = function (error) {
+                alert('Please check the server connection: ' + error);
+                alert(error);
+            };
+
+            connection.onmessage = function (e) { // when DSC is success then following function executed.
+                if (e.data.indexOf("subProtocol") == -1) {
+                    if (e.data == '' || e.data == undefined || e.data == null) {
+                        e.preventDefault();
+                    }
+                    else {
+                        $("#DSCResponse").val(e.data).change();
+                        $.ajax(
+                        {
+                           url: "/ECCapping/ecCapping/CheckVerifyResponse",
+                            type: "POST",
+                            data: { contentType: "pkcs7", signDataBase64Encoded: e.data, responseType: "plain" },
+                                success: function (msg) {
+                                    debugger;
+                                if (msg == "SUCCESS") {
+                                    $("#ECCappingform").submit();
+
+                                    return true;
+                                }
+                                else {
+                                    return false;
+                                }
+                            }
+                        });
+                    }
+                }
+                else {
+                    return false;
+                }
+            }
+
+        }
+        else {
+            return false;
+        }
+
+
+
+
+
+
+
+
+
+
+    }
+
+
+
+
+
+
+    //following code is for DSC Signature
+    try {
+        var connection = new WebSocket('wss://localhost.emudhra.com:8080');
+
+        connection.onopen = function () {
+            console.log('Connection Opened');
+        };
+        connection.onerror = function (error) {
+            //  alert('Please check the DSC connection: ' + error);
+        };
+        connection.onmessage = function (e) {
+            if (e.data.indexOf("subProtocol") == -1) {
+                //  alert(e.data);
+            }
+        };
+    }
+    catch (e) {
+        alert("No DSC Connection Found");
+    }
+    //-----------------------------
+
+
+
+
+
+</script>

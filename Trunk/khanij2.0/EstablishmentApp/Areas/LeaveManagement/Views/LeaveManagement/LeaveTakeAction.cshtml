@@ -1,0 +1,226 @@
+﻿@*// *********************************************************************************************************
+    //  View Name                : LeaveInboxDetails
+    //  Desciption               : To LeaveInboxDetails
+    //  Created By               : Suresh kumar behera
+    //  Created On               : 13-july-2021
+    // ********************************************************************************************************
+*@
+@model EstablishmentEf.LeaveInboxDetails
+@{
+    ViewData["Title"] = "LeaveTakeAction";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+
+@inject EstablishmentApp.KhanijSecurity.KhanijIDataProtection protector;
+@if (TempData["msg"] != null)
+{
+    <script>
+        var vv = '@TempData["msg"]';
+        if (vv == 1) {
+            swal("", "Leave forwarded successfully.", "success");
+        }
+        else if (vv == 2) {
+            swal("", "Leave approved successfully.", "success");
+        }
+        else if (vv == 3) {
+            swal("", "Leave rejected sucessfully", "success");
+        }
+        else {
+            swal("", "Something Errror occured. Please Try After Sometime!!", "error");
+        }
+    </script>
+
+    TempData["msg"] = null;
+
+}
+
+<script>
+
+    $(document).ready(function () {
+        indicateMe = "yes"
+        $('#datatable').DataTable();
+        loadNavigation('LeaveTakeAction', 'glholiday', 'plappleav', 'tl', 'Leave Management', 'LeaveTakeAction', ' ');
+        $('.searchableselect').searchableselect();
+
+        $("#Reset").click(function () {
+            window.location ="@Url.Content("~/LeaveManagement/LeaveManagement/leaveinbox/")"
+        });
+
+        $("#Submit").click(function () {
+            if (!blankFieldValidation("vchRemarks", "Remarks")) {
+                return false;
+            }
+            if (!DropDownValidation("intActionId", "Take Action")) {
+                return false;
+            }
+
+        });
+
+        //$("#Reject").click(function () {
+        //    if (!blankFieldValidation("vchRemarks", "Remarks")) {
+        //        return false;
+        //    }
+        //    if (!DropDownValidation("intActionId", "Take Action")) {
+        //        return false;
+        //    }
+
+        //});
+
+    });
+
+
+</script>
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+
+        @*@Html.Partial("_navigation")*@
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="javascript:void(0);">
+                                Add LeaveTakeAction
+                            </a>
+                        </li>
+                        <li class="nav-item">
+
+                            <a class="nav-link " href="@Url.Content("~/LeaveManagement/LeaveManagement/LeaveInbox")">
+                                View Leave Inbox
+                            </a>
+                        </li>
+                    </ul>
+
+                    @*@Html.Partial("_util")*@
+                </div>
+
+                <section class="box form-container">
+                    <div class="content-body">
+
+                        @using (Html.BeginForm("LeaveTakeAction", "LeaveManagement", FormMethod.Post, new { AUTOCOMPLETE = "Off", id = "form1" }))
+                        {
+                            <div class="bg-light p-3 mb-4">
+                                <div class="row">
+                                    <label class="col-lg-2 col-md-3 col-sm-12 col-form-label">Employee Name </label>
+                                    <div class="col-lg-3 col-md-9 col-sm-12">
+                                        <label class="form-control-plaintext">
+                                            <span class="colon">:</span>
+                                            <strong>
+                                                @Html.DisplayFor(m => m.EmployeeName)
+                                                @Html.HiddenFor(m => m.intLeaveId)
+
+                                            </strong>
+                                        </label>
+                                    </div>
+
+                                    <label class="col-lg-2 col-md-3 col-sm-12 col-form-label">Designation</label>
+                                    <div class="col-lg-4 col-md-9 col-sm-12">
+                                        <label class="form-control-plaintext"><span class="colon">:</span><strong> @Html.DisplayFor(m => m.Designation)</strong></label>
+                                    </div>
+
+
+
+                                    <label class="col-lg-2 col-md-3 col-sm-12 col-form-label">Department</label>
+                                    <div class="col-lg-3 col-md-9 col-sm-12">
+                                        <label class="form-control-plaintext"><span class="colon">:</span><strong>@Html.DisplayFor(m => m.Department)</strong></label>
+                                    </div>
+
+                                    <label class="col-lg-2 col-md-3 col-sm-12 col-form-label">Office Level</label>
+                                    <div class="col-lg-4 col-md-9 col-sm-12">
+                                        <label class="form-control-plaintext"><span class="colon">:</span><strong>@Html.DisplayFor(m => m.OfficeLevel)</strong></label>
+                                    </div>
+
+
+
+                                    <label class="col-lg-2 col-md-3 col-sm-12 col-form-label">Class</label>
+                                    <div class="col-lg-3 col-md-9 col-sm-12">
+                                        <label class="form-control-plaintext"><span class="colon">:</span><strong> @Html.DisplayFor(m => m.EmployeeClass)</strong></label>
+                                    </div>
+
+                                    <label class="col-lg-2 col-md-3 col-sm-12 col-form-label">Gender</label>
+                                    <div class="col-lg-4 col-md-9 col-sm-12">
+                                        <label class="form-control-plaintext"><span class="colon">:</span><strong>@Html.DisplayFor(m => m.Gender)</strong></label>
+                                    </div>
+
+
+                                    <label class="col-lg-2 col-md-3 col-sm-12 col-form-label">Date of birth</label>
+                                    <div class="col-lg-3 col-md-9 col-sm-12">
+                                        <label class="form-control-plaintext"><span class="colon">:</span><strong> @Html.DisplayFor(m => m.DateOfBirth)</strong></label>
+                                    </div>
+
+                                    <label class="col-lg-2 col-md-3 col-sm-12 col-form-label">Leave Type</label>
+                                    <div class="col-lg-4 col-md-9 col-sm-12">
+                                        <label class="form-control-plaintext"><span class="colon">:</span><strong>@Html.DisplayFor(m => m.LeaveType)</strong></label>
+                                    </div>
+
+
+                                    <label class="col-lg-2 col-md-3 col-sm-12 col-form-label">From Date</label>
+                                    <div class="col-lg-3 col-md-9 col-sm-12">
+                                        <label class="form-control-plaintext"><span class="colon">:</span><strong> @Html.DisplayFor(m => m.dtFromDate)</strong></label>
+                                    </div>
+
+                                    <label class="col-lg-2 col-md-3 col-sm-12 col-form-label">To Date</label>
+                                    <div class="col-lg-4 col-md-9 col-sm-12">
+                                        <label class="form-control-plaintext"><span class="colon">:</span><strong>@Html.DisplayFor(m => m.dtToDate)</strong></label>
+                                    </div>
+
+
+
+                                    <label class="col-lg-2 col-md-3 col-sm-12 col-form-label">No. of Days Apply</label>
+                                    <div class="col-lg-3 col-md-9 col-sm-12">
+                                        <label class="form-control-plaintext"><span class="colon">:</span><strong> @Html.DisplayFor(m => m.NoOfDays)</strong></label>
+                                    </div>
+
+                                    <label class="col-lg-2 col-md-3 col-sm-12 col-form-label">Reason</label>
+                                    <div class="col-lg-4 col-md-9 col-sm-12">
+                                        <label class="form-control-plaintext"><span class="colon">:</span><strong>@Html.DisplayFor(m => m.varReason)</strong></label>
+                                    </div>
+
+                                    <label class="col-lg-2 col-md-3 col-sm-12 col-form-label">E-mail</label>
+                                    <div class="col-lg-3 col-md-9 col-sm-12">
+                                        <label class="form-control-plaintext"><span class="colon">:</span><strong> @Html.DisplayFor(m => m.VchEmailid)</strong></label>
+                                    </div>
+
+                                    <label class="col-lg-2 col-md-3 col-sm-12 col-form-label">Mobile No</label>
+                                    <div class="col-lg-4 col-md-9 col-sm-12">
+                                        <label class="form-control-plaintext"><span class="colon">:</span><strong>@Html.DisplayFor(m => m.VchMobileNo)</strong></label>
+                                    </div>
+
+
+                                    <label class="col-lg-2 col-md-3 col-sm-12 col-form-label">Remarks</label>
+                                    <div class="col-lg-3 col-md-9 col-sm-12">
+                                        <label class="form-control-plaintext">
+                                            <span class="colon">:</span><strong>
+                                                @Html.TextAreaFor(m => m.vchRemarks, new { @class = "form-control", @maxlength = 500 })
+                                            </strong>
+                                        </label>
+                                    </div>
+                                    <label class="col-lg-2 col-md-3 col-sm-12 col-form-label">Take Action</label>
+                                    <div class="col-lg-4 col-md-9 col-sm-12">
+                                        @Html.DropDownListFor(m=>m.intActionId,ViewBag.ActionType as IEnumerable<SelectListItem>,"--Select--",new { @class="form-control searchable select"})
+                                    </div>
+                                    <div class="col-lg-12 offset-lg-2 offset-md-4">
+
+                                        <input type="submit" id="Submit" name="Submit" value='Submit' class="btn btn-primary btn-md ml-0" />
+                                        @*<input type="submit" id="Reject" name="Submit" value='Reject' class="btn btn-dark btn-md ml-0 waves-effect waves-light btnPrevious" />*@
+                                        <input type="reset" id="Reset" value="Reset" class="btn btn-danger btn-md" />
+                                    </div>
+
+
+
+                                </div>
+                            </div>
+
+
+                        }
+                    </div>
+                </section>
+            </div>
+        </div>
+
+
+    </div>
+    <!-- MAIN CONTENT AREA ENDS -->
+</section>
+

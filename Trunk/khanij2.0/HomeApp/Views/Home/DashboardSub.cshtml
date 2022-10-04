@@ -1,0 +1,299 @@
+﻿@using HomeEF;
+@using HomeApp.Web;
+@using Microsoft.AspNetCore.Mvc;
+@using Microsoft.Extensions.Configuration
+@inject IConfiguration Configuration
+@using  Microsoft.AspNetCore.Http;
+@inject IHttpContextAccessor HttpContextAccessor
+@{
+    UserLoginSession profile = HttpContextAccessor.HttpContext.Session.Get<UserLoginSession>(KeyHelper.UserKey);
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="content-type" content="text/html;charset=UTF-8" />
+    <meta charset="utf-8" />
+    <title>Khanij Online </title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta content="" name="description" />
+    <meta content="" name="author" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <link rel="stylesheet" href='@Url.Content("~/CMScss/bootstrap.min.css")' media="screen" />
+    <link rel="stylesheet" href='@Url.Content("~/CMScss/style.css")' type="text/css" />
+    <link rel="stylesheet" href='@Url.Content("~/CMScss/subdashboard.css")' type="text/css" />
+    <link rel="stylesheet" href='@Url.Content("~/CMScss/iconslist.css")' type="text/css" />
+    <script src='@Url.Content("~/CMSjs/jquery.min.js")'></script>
+
+</head>
+<body>
+    @Html.Partial("_CMSnavbar")
+    <div class="menu-section box-shadow">
+        <div class="container">
+            <div class="text-center  mb-4 pt-5">
+                <div class="search-pannel">
+                    <div class="input-group">
+                        <input type="text" class="form-control" list="datalistOptions" id="exampleDataList" placeholder="Type to search...">
+                        <div class="input-group-append">
+                            <span class="input-group-text"><i class="icon-search-solid"></i></span>
+                        </div>
+                    </div>
+                    <datalist id="datalistOptions">
+                        <option value="CMS"></option>
+                        <option value="Master"></option>
+                        <option value="Configuration"></option>
+                        <option value="User Information"></option>
+                        <option value="Registration"></option>
+                        <option value="Permit"></option>
+                        <option value="E-pass"></option>
+                        <option value="Return"></option>
+                        <option value="Star Rating"></option>
+                        <option value="Grievance"></option>
+                        <option value="Notice & Inspection"></option>
+                        <option value="Helpdesk"></option>
+                        <option value="Mineral Concession"></option>
+                        <option value="Change Request"></option>
+                        <option value="Establishment"></option>
+                        <option value="Manage Work Flow"></option>
+                        <option value="EC Caping"></option>
+                        <option value="Geology"></option>
+                        <option value="Inspection"></option>
+                        <option value="Demand / Credit Note"></option>
+                        <option value="Vehice Tracking System"></option>
+                    </datalist>
+                </div>
+            </div>
+            <div class="menu-content-sec rounded-2" id="module-pop">
+                <div class="row gap-5">
+                    @{
+                        //List<HomeEF.MainMenuMaster> MainMenuList = ViewBag.MainmenuList;
+
+                        var count = 0;
+                        foreach (var items in profile.Listmenu)
+                        {
+                            if (items.MenuName == "CMS")
+                            {
+                                <div id="div_@count" class="@items.divclass">
+                                    <div class="icon-box shadow-sm">
+                                        <i class="@items.SvgPath"></i>
+                                    </div>
+                                    <p class="text-center">@items.MenuName</p>
+                                    <a id="a_@count" class="menu-link" href="@items.LinkPath?MMenuId=@items.MenuId"></a>
+                                </div>
+                            }
+                            else
+                            {
+                                <div id="div_@count" class="@items.divclass">
+                                    <div class="icon-box shadow-sm">
+                                        <i class="@items.SvgPath"></i>
+                                    </div>
+                                    <p class="text-center">@items.MenuName</p>
+                                    @{
+                                        string[] linkpath = items.LinkPath.Split('/');
+                                        var url = linkpath[0] + "//" + linkpath[2] + CustomQueryStringHelper.EncryptString("", linkpath[4], linkpath[3], new { MMenuId = items.MenuId });
+                                        @*<a id="a_@count" class="menu-link" href="@url"></a>*@
+                                    }
+                                    <a id="a_@count" class="menu-link" href="@items.LinkPath?MMenuId=@items.MenuId"></a>
+                                </div>
+
+                            }
+                            count++;
+                        }
+
+                    }
+                </div>
+                @*<div class="row gap-5">
+                        <div class="menu-box one">
+                            <div class="icon-box shadow-sm">
+                                <i class="icon-CMS"></i>
+                            </div>
+                            <p class="text-center">CMS</p>
+                            <a class="menu-link" href="http://khanij.csmpl.in/Dashboard/CMS/CMSDashboard"></a>
+                        </div>
+
+
+                        <div class="menu-box two">
+                            <div class="icon-box shadow-sm">
+                                <i class="icon-MASTER"></i>
+                            </div>
+                            <p class="text-center">Master</p>
+                            <a class="menu-link" href="http://khanijmasterapp.csmpl.in/Home/Index"></a>
+                        </div>
+
+
+
+                        <div class="menu-box three">
+                            <div class="icon-box shadow-sm">
+                                <i class="icon-CONFIGURATION"></i>
+                            </div>
+                            <p class="text-center">Configuration</p>
+                            <a class="menu-link" href="javascript:void(0);"></a>
+                        </div>
+
+                        <div class="menu-box four">
+                            <div class="icon-box shadow-sm">
+                                <i class="icon-USER-INFORMATION"></i>
+                            </div>
+                            <p class="text-center">User Information</p>
+                            <a class="menu-link" href="javascript:void(0);"></a>
+                        </div>
+
+                        <div class="menu-box five">
+                            <div class="icon-box shadow-sm">
+                                <i class="icon-REGISTRATION"></i>
+                            </div>
+                            <p class="text-center">Registration</p>
+                            <a class="menu-link" href="javascript:void(0);"></a>
+                        </div>
+
+                        <div class="menu-box six">
+                            <div class="icon-box shadow-sm">
+                                <i class="icon-PERMIT"></i>
+                            </div>
+                            <p class="text-center">Permit</p>
+                            <a class="menu-link" href="javascript:void(0);"></a>
+                        </div>
+
+                        <div class="menu-box seven">
+                            <div class="icon-box shadow-sm">
+                                <i class="icon-E-PASS"></i>
+                            </div>
+                            <p class="text-center">E-pass</p>
+                            <a class="menu-link" href="javascript:void(0);"></a>
+                        </div>
+
+                        <div class="menu-box eight">
+                            <div class="icon-box shadow-sm">
+                                <i class="icon-RETURN"></i>
+                            </div>
+                            <p class="text-center">Return</p>
+                            <a class="menu-link" href="javascript:void(0);"></a>
+                        </div>
+
+                        <div class="menu-box nine">
+                            <div class="icon-box shadow-sm">
+                                <i class="icon-STAR-RATING"></i>
+                            </div>
+                            <p class="text-center">Star Rating</p>
+                            <a class="menu-link" href="javascript:void(0);"></a>
+                        </div>
+
+                        <div class="menu-box ten">
+                            <div class="icon-box shadow-sm">
+                                <i class="icon-GRIEVANCE"></i>
+                            </div>
+                            <p class="text-center">Grievance</p>
+                            <a class="menu-link" href="javascript:void(0);"></a>
+                        </div>
+
+                        <div class="menu-box eleven">
+                            <div class="icon-box shadow-sm">
+                                <i class="icon-NOTICE--INSPECTION"></i>
+                            </div>
+                            <p class="text-center">Notice & Inspection</p>
+                            <a class="menu-link" href="javascript:void(0);"></a>
+                        </div>
+
+                        <div class="menu-box twelve">
+                            <div class="icon-box shadow-sm">
+                                <i class="icon-HELPDESK"></i>
+                            </div>
+                            <p class="text-center">Helpdesk</p>
+                            <a class="menu-link" href="javascript:void(0);"></a>
+                        </div>
+
+                        <div class="menu-box thirteen">
+                            <div class="icon-box shadow-sm">
+                                <i class="icon-MINERAL-CONCESSION"></i>
+                            </div>
+                            <p class="text-center">Mineral Concession</p>
+                            <a class="menu-link" href="javascript:void(0);"></a>
+                        </div>
+
+                        <div class="menu-box fourteen">
+                            <div class="icon-box shadow-sm">
+                                <i class="icon-CHANGE-REQUEST"></i>
+                            </div>
+                            <p class="text-center">Change Request</p>
+                            <a class="menu-link" href="javascript:void(0);"></a>
+                        </div>
+
+                        <div class="menu-box fifteen">
+                            <div class="icon-box shadow-sm">
+                                <i class="icon-ESTABLISHMENT"></i>
+                            </div>
+                            <p class="text-center">Establishment</p>
+                            <a class="menu-link" href="javascript:void(0);"></a>
+                        </div>
+
+                        <div class="menu-box sixteen">
+                            <div class="icon-box shadow-sm">
+                                <i class="icon-DASHBOARD"></i>
+                            </div>
+                            <p class="text-center">Dashboard</p>
+                            <a class="menu-link" href="javascript:void(0);"></a>
+                        </div>
+
+                        <div class="menu-box seventeen">
+                            <div class="icon-box shadow-sm">
+                                <i class="icon-MANAGE-WORK-FLOW"></i>
+                            </div>
+                            <p class="text-center">Manage Work Flow</p>
+                            <a class="menu-link" href="javascript:void(0);"></a>
+                        </div>
+
+                        <div class="menu-box eighteen">
+                            <div class="icon-box shadow-sm">
+                                <i class="icon-EC-CAPING"></i>
+                            </div>
+                            <p class="text-center">EC Caping</p>
+                            <a class="menu-link" href="javascript:void(0);"></a>
+                        </div>
+
+                        <div class="menu-box ninetheen">
+                            <div class="icon-box shadow-sm">
+                                <i class="icon-GEOLOGY"></i>
+                            </div>
+                            <p class="text-center">Geology</p>
+                            <a class="menu-link" href="javascript:void(0);"></a>
+                        </div>
+
+                        <div class="menu-box twenty">
+                            <div class="icon-box shadow-sm">
+                                <i class="icon-INSPECTION"></i>
+                            </div>
+                            <p class="text-center">Inspection</p>
+                            <a class="menu-link" href="javascript:void(0);"></a>
+                        </div>
+
+                        <div class="menu-box twentyone">
+                            <div class="icon-box shadow-sm">
+                                <i class="icon-DEMAND_-CREDIT-NOTE"></i>
+                            </div>
+                            <p class="text-center">Demand / Credit Note</p>
+                            <a class="menu-link" href="javascript:void(0);"></a>
+                        </div>
+
+                        <div class="menu-box twentytwo">
+                            <div class="icon-box shadow-sm">
+                                <i class="icon-vehicle-tracking-system"></i>
+                            </div>
+                            <p class="text-center">icon-vehicle-tracking-system</p>
+                            <a class="menu-link" href="javascript:void(0);"></a>
+                        </div>
+                    </div>*@
+            </div>
+
+        </div>
+    </div>
+    <script src='@Url.Content("~/CMSjs/popper.min.js")'></script>
+    <script src='@Url.Content("~/CMSjs/bootstrap.min.js")'></script>
+    <script src='@Url.Content("~/CMSjs/styleswitch.js")'></script>
+    <script src='@Url.Content("~/CMSjs/scripts.js")'></script>
+</body>
+</html>
+
+
+
+
+

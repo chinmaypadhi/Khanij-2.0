@@ -1,0 +1,151 @@
+﻿@*// *********************************************************************************************************
+    //  View Name                : View Office Level
+    //  Desciption               : To view Office Level
+    //  Created By               : Suresh kumar behera
+    //  Created On               : 13-july-2021
+    // ********************************************************************************************************
+*@
+@model IEnumerable<EstablishmentEf.officeLevelEF>
+@{
+    ViewData["Title"] = "ViewList";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+
+@if (TempData["msg"] != null)
+{
+    <script>
+        var vv = '@TempData["msg"]';
+        if (vv == 1) {
+            swal("", "Section Officer tagging successfully.", "success");
+        }
+        else if (vv == 2) {
+            swal("", "Section Officer tagging already exists.", "warning");
+        }
+        else if (vv == 3) {
+            swal("", "Data updated sucessfully", "success");
+        }
+        else if (vv == 4) {
+            swal("", "Data deleted sucessfully", "success");
+        }
+        else {
+            swal("", "Something Errror occured. Please Try After Sometime!!", "error");
+        }
+    </script>
+
+    TempData["msg"] = null;
+
+}
+
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        @*@Html.Partial("_navigation")*@
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link " href="@Url.Content("~/EmpPro/OfficeLevel/Add")">
+                                Add Office Type
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="#">
+                                View  Office Type
+                            </a>
+                        </li>
+                    </ul>
+                    @*@Html.Partial("_util")*@
+                </div>
+
+                <section class="box form-container">
+                    <div class="content-body pt-0">
+                        <div class="legend-box">
+                            <ul class="d-flex mb-1 justify-content-end list-unstyled">
+                                <li><span class="bg-success"></span> Active</li>
+                                <li><span class="bg-warning"></span> Inactive</li>
+                            </ul>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div class="table-responsive" id="viewtable">
+                                    <table id="datatable" class="table table-sm table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th width="30px">Sl#</th>
+                                                <th>Office Type</th>
+                                                <th width="60px" class="noprint">Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @{
+                                                var count = 0;
+                                                foreach (var item in Model)
+                                                {
+                                                    count++;
+                                                    if (item.bitSatus)
+                                                    {
+                                                        <tr class="active-row">
+                                                            <td>@count</td>
+                                                            <td>@item.VchOfficeTypeName</td>
+                                                            <td class="noprint">
+                                                                <a href="@Url.Content("~/EmpPro/OfficeLevel/Add/")@item.IntOfficeTypeId " class="btn-floating btn-outline-primary btn-sm waves-effect waves-light" title="" data-original-title="Edit"><i class="icon-pencil-alt-solid"></i></a>
+                                                                <a href="@Url.Content("~/EmpPro/OfficeLevel/Delete/")@item.IntOfficeTypeId" class="btn-floating btn-outline-danger btn-sm waves-effect waves-light" data-toggle="tooltip" data-placement="top" title="Delete"><i class="far fa-trash-alt"></i></a>
+                                                            </td>
+                                                        </tr>
+                                                    }
+                                                    else
+                                                    {
+                                                        <tr class="inactive-row">
+                                                            <td>@count</td>
+                                                            <td>@item.VchOfficeTypeName</td>
+                                                            <td class="noprint">
+                                                                <a href="@Url.Content("~/EmpPro/OfficeLevel/Add/")@item.IntOfficeTypeId " class="btn-floating btn-outline-primary btn-sm waves-effect waves-light" title="" data-original-title="Edit"><i class="icon-pencil-alt-solid"></i></a>
+                                                                <a href="@Url.Content("~/EmpPro/OfficeLevel/Delete/")@item.IntOfficeTypeId" class="btn-floating btn-outline-danger btn-sm waves-effect waves-light" data-toggle="tooltip" data-placement="top" title="Delete"><i class="far fa-trash-alt"></i></a>
+                                                            </td>
+                                                        </tr>
+                                                    }
+
+                                                }
+
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+    <!-- MAIN CONTENT AREA ENDS -->
+</section>
+
+<script>
+    excelMe = "yes"
+    pdfMe = "yes"
+
+    $(document).ready(function () {
+        loadNavigation('ViewOfficeType', 'glempprofile', 'plofficetype', 'tl', 'Employee Profile', 'Office Type', ' ');
+
+        $('.searchableselect').searchableselect();
+
+        $('#datatable').DataTable();
+
+
+        $('.shorting-lnk').click(function () {
+            $('.shorting-lnk i').toggleClass('fa-sort-amount-up-alt fa-sort-amount-down-alt ');
+        });
+
+    });
+</script>
+<script>
+    $(document).ready(function () {
+        $('.datepicker').datetimepicker({
+            format: 'LT',
+            format: 'DD-MM-YYYY',
+            daysOfWeekDisabled: [0, 6],
+        });
+    });
+</script>

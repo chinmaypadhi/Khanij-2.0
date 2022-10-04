@@ -1,0 +1,659 @@
+﻿@*// *********************************************************************************************************
+    //  View Name                : Create
+    //  Desciption               : To Save and Update, Forward to DD, Delete Licensee Office Details
+    //  Created By               : Prakash Chandra Biswal
+    //  Created On               : 13 July 2021
+    // ********************************************************************************************************
+*@
+@model MasterEF.LicenseeDetails;
+@using MasterEF;
+@{
+    ViewData["Title"] = "Create";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+@if (TempData["Message"] != null)
+{
+    <script>
+        swal("",'@TempData["Message"]',"success");
+    </script>
+}
+
+<script>
+    indicateMe = "yes"
+    backMe = "yes"
+    $(document).ready(function () {
+        loadNavigation('Create', 'glUIS', 'pllesseprof', 'tl', 'Licensee Profile', 'Office Details', ' ');
+        $('.searchableselect').searchableselect();
+        onRadioChange();
+        onCompanyChange()
+        Bindcompany();
+        if (@Model.STATUS == 1) {
+            $('.btnsave').hide();
+            $('.form-control').css("pointer-events", "none");
+        }
+        else {
+            $('.btnsave').show();
+        }
+    });
+</script>
+<script>
+    $(document).ready(function () {
+        $('.datepicker').datetimepicker({
+            format: 'LT',
+            format: 'DD-MM-YYYY',
+            //daysOfWeekDisabled: [0, 6],
+            daysOfWeekDisabled: [],
+            widgetPositioning: {
+                horizontal: 'auto',
+                vertical: 'bottom'
+            }
+        });
+
+        $('input[name="selectedFile"]').bind('change', function () {
+            $("input[name='Submit']").attr('disabled', false);
+            filesize = this.files[0].size;
+            var val = $(this).val().toLowerCase(),
+                //regex = new RegExp("(.*?)\.(jpeg|jpg|png)$");
+                regex = new RegExp("(.*?)\.(pdf)$");
+            if (!(regex.test(val))) {
+                swal("", "only pdf file type are allowed. ", "warning");
+                this.value = '';
+                $("input[name='Submit']").attr('disabled', true);
+                return false;
+            }
+            else if (filesize > 2048000) {
+                swal("", "File size must be 2 MB !", "warning");
+                $("input[name='Submit']").attr('disabled', true);
+                return false;
+            }
+            else {
+                var fileName = $(this).val().split("\\").pop();
+                $(this).next('.custom-file-label').html(fileName);
+            }
+            return false;
+        });
+    });
+    function Validate() {
+        var Iss = false;
+        if (!checkInput("CategoryOfLicensee", "Lessee Category")) {
+            return false;
+        }
+        if ($('input[name="CategoryOfLicensee"]:checked').val() == "Firm") {
+            if (!checkInput("Firm", "Firm")) {
+                return false;
+            }
+            if (!DropDownValidation("ddlCompany", "Company/Association Name")) {
+                return false;
+            }
+        }
+        if ($('input[name="CategoryOfLicensee"]:checked').val() == "Association") {
+            if (!DropDownValidation("ddlCompany", "Company/Association Name")) {
+                return false;
+            }
+        }
+        if ($('input[name="CategoryOfLicensee"]:checked').val() == "Company") {
+            if (!checkInput("Company", "Company")) {
+                return false;
+            }
+            if (!DropDownValidation("ddlCompany", "Company/Association Name")) {
+                return false;
+            }
+        }
+        if ($('input[name="Company"]:checked').val() == "PSU") {
+            if (!blankFieldValidation("CollieryCode", "Colliery Code")) {
+                return false;
+            }
+        }
+        if (!blankFieldValidation("GSTNo", "GST No")) {
+            return false;
+        }
+
+        if (!blankFieldValidation("CORPORATE_NAME", "Corporate Name")) {
+            return false;
+        }
+        if (!blankFieldValidation("CORPORATE_ADDRESS", "Corporate Address")) {
+            return false;
+        }
+        if (!blankFieldValidation("CORPORATE_CONTACT_DETAILS1", "Corporate Mobile Number")) {
+            return false;
+        }
+        if ($("#CORPORATE_CONTACT_DETAILS1").val().length != 10) {
+            swal("", "Please Enter Valid Corporate Mobile Number", "warning");
+            return false;
+        }
+        if (!blankFieldValidation("BRANCH_NAME", "Branch Name")) {
+            return false;
+        }
+        if (!blankFieldValidation("BRANCH_ADDRESS", "Branch Address")) {
+            return false;
+        }
+        if (!blankFieldValidation("BRANCH_CONTACT_DETAILS1", "Branch Mobile Number")) {
+            return false;
+        }
+        if ($("#BRANCH_CONTACT_DETAILS1").val().length != 10) {
+            swal("", "Please Enter Valid Branch Mobile Number", "warning");
+            return false;
+        }
+        if (!blankFieldValidation("SITE_NAME", "Site Name")) {
+            return false;
+        }
+        if (!blankFieldValidation("SITE_ADDRESS", "Site Address")) {
+            return false;
+        }
+        if (!blankFieldValidation("SITE_CONTACT_DETAILS1", "Site Mobile Number")) {
+            return false;
+        }
+        if ($("#SITE_CONTACT_DETAILS1").val().length != 10) {
+            swal("", "Please Enter Valid Site Mobile Number", "warning");
+            return false;
+        }
+
+        if (!blankFieldValidation("AGENT_NAME", "Agent Name")) {
+            return false;
+        }
+        if (!blankFieldValidation("AGENT_ADDRESS", "Agent Address")) {
+            return false;
+        }
+        if (!blankFieldValidation("AGENT_CONTACT_DETAILS1", "Agent Mobile Number")) {
+            return false;
+        }
+        if ($("#AGENT_CONTACT_DETAILS1").val().length != 10) {
+            swal("", "Please Enter Valid Site Mobile Number", "warning");
+            return false;
+        }
+        Iss = true;
+        return Iss;
+    }
+    function onRadioChange() {
+        if ($("#Firm").is(":checked")) {
+            $('#divCompanyFirmAssociation').show();
+            $("#company_toggle").hide();
+            $("#firm_toggle").show();
+            $("#individual_toggle").hide();
+            $("#CompanyDropDown").show();
+        }
+        else if ($("#Company").is(":checked")) {
+            $('#divCompanyFirmAssociation').show();
+            $("#firm_toggle").hide();
+            $("#company_toggle").show();
+            $("#individual_toggle").hide();
+            $("#CompanyDropDown").show();
+        }
+        else if ($("#Association").is(":checked")) {
+            $("#firm_toggle").hide();
+            $("#company_toggle").hide();
+            $('#divCompanyFirmAssociation').show();
+            $("#individual_toggle").hide();
+            $("#CompanyDropDown").show();
+        }
+        else {
+            $('#divCompanyFirmAssociation').hide();
+            $("#firm_toggle").hide();
+            $("#company_toggle").hide();
+            $("#individual_toggle").show();
+            $("#CompanyDropDown").hide();
+            $('#Company').attr('checked', false); // Unchecks it
+        }
+    }
+     $(function () {
+        $("#CORPORATE_NAME_PREFIX").val('@Model.CORPORATE_NAME_PREFIX').selected = true;
+        $("#BRANCH_NAME_PREFIX").val('@Model.BRANCH_NAME_PREFIX').selected = true;
+        $("#SITE_NAME_PREFIX").val('@Model.SITE_NAME_PREFIX').selected = true;
+        $("#AGENT_NAME_PREFIX").val('@Model.AGENT_NAME_PREFIX').selected = true;
+     });
+    function onCompanyChange()
+    {
+        if ($('input[name="Company"]:checked').val() == "PSU")
+            $("#CollieryCode").show();
+        else
+            $("#CollieryCode").hide();
+    }
+     function OnForwarding(btnAction) {
+        var Type;
+        if (btnAction == 'Forward To DD') {
+            Type = 'forward';
+        }
+        if (confirm("Before " + Type + " you need to apply your Digital Signature. Are you confirmed to " + Type + " Profile??")) {
+                var Postdata = 'action=signdoc' + "\n" + 'datatosign=Digital Signature Required' + "\n" + 'signaction=sign' + "\n" + 'filepath=' + "\n" + 'panNumberParam=' + "\n" + 'expirycheck=false' + "\n" + 'issuername=' + "\n" + 'certclass=1|2|3' + "\n" + 'certtype=ALL';
+                connection.send(Postdata);
+                connection.onerror = function (error) {
+                    swal("",'Please check the server connection: ' + error+'',"warning");
+                    swal("",error,"warning");
+                };
+                connection.onmessage = function (e) { // when DSC is success then following function executed.
+                    if (e.data.indexOf("subProtocol") == -1) {
+                        //alert(e.data);
+                        $("#DSCResponse").val(e.data).change();
+                        $.ajax(
+                            {
+                               url: '@Url.Action("CheckVerifyResponse", "UserInformationLiensee", new { Area = "Licensee" })',
+                                type: "POST",
+                                data: { contentType: "pkcs7", signDataBase64Encoded: e.data, responseType: "plain" },
+                                success: function (msg) {
+                                    if (msg == "SUCCESS") {
+                                        if (btnAction == "Forward To DD") {
+                                            $("#SubResion").val("Forward To DD");
+                                        }
+                                        $("#form1").submit();
+                                    }
+                                }
+                            });
+                    }
+                    else {
+                        //alert(e.data);
+                    }
+                };
+            }
+            else {
+                return false;
+            }
+    }
+    try {
+        var connection = new WebSocket('wss://localhost.emudhra.com:8080');
+        connection.onopen = function () {
+            console.log('Connection Opened');
+        };
+        connection.onerror = function (error) {
+        };
+        connection.onmessage = function (e) {
+            if (e.data.indexOf("subProtocol") == -1) {
+            }
+        };
+    }
+    catch (e) {
+        swal("", "No DSC Connection Found", "warning");
+    }
+    function Bindcompany() {
+        $.ajax({
+            url: '/Licensee/OfficeDetails/GetAssociationListDetails',
+            dataType: 'json',
+            type: 'post',
+            success: function (data) {
+                debugger;
+                $('#ddlCompany').html('');
+                $('#ddlCompany').append("<option value=''>Select</option>");
+                $.each(data, function (ind, item) {
+                    $('#ddlCompany').append("<option value='" + item.companyId + "'>" + item.companyName + "</option>");
+                });
+                if ($("#hdn_CompanyId").val() != "") {
+                    $("#ddlCompany").val($("#hdn_CompanyId").val());
+                }
+            },
+            error: function (err) {
+            }
+        });
+    }
+    function ForwordToDdWithoutDS(btnAction) {
+
+        if (btnAction == "Forward To DD") {
+            $("#SubResion").val("Forward To DD");
+        }
+
+        $("#form1").submit();
+
+    }
+</script>
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        <!-- MAIN CONTENT AREA STARTS -->
+        @Html.Partial("_CMSnavigation")
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="javascript:void(0);">
+                                Add
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="~/Licensee/OfficeDetails/ViewList">
+                                View
+                            </a>
+                        </li>
+                    </ul>
+                    @Html.Partial("_CMSutil")
+                </div>
+                <section class="box form-container">
+                    <div class="content-body">
+                        @using (Html.BeginForm("Create", "OfficeDetails", FormMethod.Post, new { AUTOCOMPLETE = "Off", id = "form1", enctype = "multipart/form-data" }))
+                        {
+                            @Html.AntiForgeryToken()
+                            @Html.HiddenFor(model=>model.SubResion)
+                            @Html.HiddenFor(x => x.CREATED_BY)
+                            @Html.HiddenFor(x => x.LICENSEE_DETAIL_ID)
+                            <div class="bg-light p-2 mb-4 border">
+
+                                <div class="row">
+                                    <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                        <label class="col-form-label pt-0 font-weight-bolder">Licensee Category <span class="text-danger">*</span></label>
+                                        <div>
+                                            @Html.RadioButtonFor(model => model.CategoryOfLicensee, "Individual/Proprietor", new { id = "Individual", @class = "custom-radio", @onchange = "onRadioChange()" }) Individual/Proprietor
+                                            @Html.RadioButtonFor(model => model.CategoryOfLicensee, "Firm", new { id = "Firm", @class = "custom-radio", @onchange = "onRadioChange()" }) Firm
+                                            @Html.RadioButtonFor(model => model.CategoryOfLicensee, "Association", new { id = "Association", @class = "custom-radio", @onchange = "onRadioChange()" }) Association
+                                            @Html.RadioButtonFor(model => model.CategoryOfLicensee, "Company", new { id = "Company", @class = "custom-radio", @onchange = "onRadioChange()" }) Company
+                                            @Html.ValidationMessageFor(m => m.CategoryOfLicensee, "", new { @class = "text-danger" })
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-3 col-md-6 col-sm-12 form-group" style="display: none;" id="firm_toggle">
+                                        <label class="col-form-label pt-0 font-weight-bolder">Firm as <span class="text-danger">*</span></label>
+                                        <div>
+                                            @Html.RadioButtonFor(model => model.FirmAs, "Partnership", new { id = "Partnership", @class = "custom-radio" }) Partnership
+                                            @Html.RadioButtonFor(model => model.FirmAs, "Proprietary", new { id = "Proprietary", @class = "custom-radio" }) Proprietary
+                                            @Html.ValidationMessageFor(m => m.FirmAs, "", new { @class = "text-danger" })
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-3 col-md-6 col-sm-12 form-group" style="display: none;" id="company_toggle">
+                                        <label class="col-form-label pt-0 font-weight-bolder">Company as <span class="text-danger">*</span></label>
+                                        <div>
+                                            @Html.RadioButtonFor(model => model.Company, "Private", new { id = "Private", @class = "custom-radio", @onchange = "onCompanyChange()" }) Private
+                                            @Html.RadioButtonFor(model => model.Company, "PublicLimited", new { id = "PublicLimited", @class = "custom-radio", @onchange = "onCompanyChange()" }) PublicLimited
+                                            @Html.RadioButtonFor(model => model.Company, "PSU", new { id = "PSU", @class = "custom-radio", @onchange = "onCompanyChange()" }) PSU
+                                            @Html.RadioButtonFor(model => model.Company, "JointVenture", new { id = "Joint_Venture", @class = "custom-radio", @onchange = "onCompanyChange()" }) JointVenture
+                                            @Html.RadioButtonFor(model => model.Company, "Corporation", new { id = "Corporation", @class = "custom-radio", @onchange = "onCompanyChange()" }) Corporation
+                                            @Html.ValidationMessageFor(m => m.Company, "", new { @class = "text-danger" })
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-4 col-md-6 col-sm-12 form-group" id="CompanyDropDown">
+                                        <label class="col-form-label pt-0 font-weight-bolder">Company/Association Name <span class="text-danger">*</span></label>
+                                        <select id="ddlCompany" name="CompanyId" Class="form-control searchableselect" title="Company Name">
+                                            <option value="0">Select</option>
+                                        </select>
+                                        @Html.HiddenFor(m => m.CompanyId, new { @id = "hdn_CompanyId" })
+                                        @Html.ValidationMessageFor(m => m.CompanyId, "", new { @class = "text-danger" })
+                                    </div>
+
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-6" id="CO">
+                                    <div class="bg-light p-2 mb-4 border">
+                                        <h5 class="text-brown font-weight-bold mb-4">Corporate Office</h5>
+                                        <div class="row">
+                                            <div class="col-lg-6 col-md-6 col-sm-12 form-group">
+                                                <label class="col-form-label pt-0 font-weight-bolder">Name Prefix</label>
+                                                @Html.DropDownListFor(model => model.CORPORATE_NAME_PREFIX,
+                                                  new SelectList(new List<SelectListItem> {
+                                                                 new SelectListItem { Text = "Select", Value = "0"},
+                                                                 new SelectListItem { Text = "M/S.", Value = "M/S."},
+                                                                 new SelectListItem { Text = "Shri", Value = "Shri"},
+                                                                 new SelectListItem { Text = "Shrimati", Value = "Shrimati"},
+                                                                 new SelectListItem { Text = "Sushri", Value = "Sushri"},
+                                                 }, "Value", "Text"),
+                                                 new { @class = "form-control" })
+                                            </div>
+                                            <div class="col-lg-6 col-md-6 col-sm-12 form-group">
+                                                <label class="col-form-label pt-0 font-weight-bolder">Name <span class="text-danger">*</span></label>
+                                                @Html.TextBoxFor(x => x.CORPORATE_NAME, new { @maxlength = "50", @class = "form-control" })
+                                                @Html.ValidationMessageFor(m => m.CORPORATE_NAME, "", new { @class = "text-danger" })
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-lg-12 col-md-6 col-sm-12 form-group">
+                                                <label class="col-form-label pt-0 font-weight-bolder">Address <span class="text-danger">*</span></label>
+                                                @Html.TextAreaFor(x => x.CORPORATE_ADDRESS, new { @maxlength = "130", @class = "form-control", @rows = "2" })
+                                                @Html.ValidationMessageFor(m => m.CORPORATE_ADDRESS, "", new { @class = "text-danger" })
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-lg-6 col-md-6 col-sm-12 form-group">
+                                                <label class="col-form-label pt-0 font-weight-bolder">Mobile Number <span class="text-danger">*</span></label>
+                                                @Html.TextBoxFor(x => x.CORPORATE_CONTACT_DETAILS1, new { @maxlength = "10", @class = "form-control", @Onkeypress = "return inputLimiter(event,'Numbers')" })
+                                                @Html.ValidationMessageFor(m => m.CORPORATE_CONTACT_DETAILS1, "", new { @class = "text-danger" })
+                                            </div>
+                                            <div class="col-lg-6 col-md-6 col-sm-12 form-group">
+                                                <label class="col-form-label pt-0 font-weight-bolder">LandLine No </label>
+                                                @Html.TextBoxFor(x => x.CORPORATE_LANDLINE_NO, new { @maxlength = "20", @class = "form-control", @Onkeypress = "return inputLimiter(event,'Numbers')" })
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-lg-6 col-md-6 col-sm-12 form-group">
+                                                <label class="col-form-label pt-0 font-weight-bolder">Designation </label>
+                                                @Html.TextBoxFor(x => x.CORPORATE_DESIGNATION, new { @maxlength = "50", @class = "form-control" })
+                                            </div>
+                                            <div class="col-lg-6 col-md-6 col-sm-12 form-group">
+                                                <label class="col-form-label pt-0 font-weight-bolder">Email Id </label>
+                                                @Html.TextBoxFor(x => x.CORPORATE_MAIL_ID, new { @maxlength = "90", @class = "form-control" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div id="BO" class="col-lg-6">
+                                    <div class="bg-light p-2 mb-4 border">
+                                        <h5 class="text-brown font-weight-bold mb-4">Branch Office</h5>
+                                        <div class="row">
+                                            <div class="col-lg-6 col-md-6 col-sm-12 form-group">
+                                                <label class="col-form-label pt-0 font-weight-bolder">Name Prefix</label>
+                                                @Html.DropDownListFor(model => model.BRANCH_NAME_PREFIX,
+                                                 new SelectList(new List<SelectListItem> {
+                                                                new SelectListItem { Text = "Select", Value = "0"},
+                                                                new SelectListItem { Text = "M/S.", Value = "M/S."},
+                                                                new SelectListItem { Text = "Shri", Value = "Shri"},
+                                                                new SelectListItem { Text = "Shrimati", Value = "Shrimati"},
+                                                                new SelectListItem { Text = "Sushri", Value = "Sushri"},
+                                                }, "Value", "Text"),
+                                                new { @class = "form-control" })
+                                            </div>
+                                            <div class="col-lg-6 col-md-6 col-sm-12 form-group">
+                                                <label class="col-form-label pt-0 font-weight-bolder">Name <span class="text-danger">*</span></label>
+                                                @Html.TextBoxFor(x => x.BRANCH_NAME, new { @maxlength = "50", @class = "form-control" })
+                                                @Html.ValidationMessageFor(m => m.BRANCH_NAME, "", new { @class = "text-danger" })
+                                            </div>
+
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-lg-12 col-md-6 col-sm-12 form-group">
+                                                <label class="col-form-label pt-0 font-weight-bolder">Address <span class="text-danger">*</span></label>
+                                                @Html.TextAreaFor(x => x.BRANCH_ADDRESS, new { @maxlength = "130", @class = "form-control", @rows = "2" })
+                                                @Html.ValidationMessageFor(m => m.BRANCH_ADDRESS, "", new { @class = "text-danger" })
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-lg-6 col-md-6 col-sm-12 form-group">
+                                                <label class="col-form-label pt-0 font-weight-bolder">Mobile Number <span class="text-danger">*</span></label>
+                                                @Html.TextBoxFor(x => x.BRANCH_CONTACT_DETAILS1, new { @maxlength = "10", @class = "form-control", @Onkeypress = "return inputLimiter(event,'Numbers')" })
+                                                @Html.ValidationMessageFor(m => m.BRANCH_CONTACT_DETAILS1, "", new { @class = "text-danger" })
+                                            </div>
+                                            <div class="col-lg-6 col-md-6 col-sm-12 form-group">
+                                                <label class="col-form-label pt-0 font-weight-bolder">LandLine No</label>
+                                                @Html.TextBoxFor(x => x.BRANCH_LANDLINE_NO, new { @maxlength = "20", @class = "form-control", @Onkeypress = "return inputLimiter(event,'Numbers')" })
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-lg-6 col-md-6 col-sm-12 form-group">
+                                                <label class="col-form-label pt-0 font-weight-bolder">Designation</label>
+                                                @Html.TextBoxFor(x => x.BRANCH_DESIGNATION, new { @maxlength = "50", @class = "form-control" })
+                                            </div>
+                                            <div class="col-lg-6 col-md-6 col-sm-12 form-group">
+                                                <label class="col-form-label pt-0 font-weight-bolder">Email Id</label>
+                                                @Html.TextBoxFor(x => x.BRANCH_MAIL_ID, new { @maxlength = "90", @class = "form-control" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div id="SO" class="col-lg-6">
+                                    <div class="bg-light p-2 mb-4 border">
+                                        <h5 class="text-brown font-weight-bold mb-4">Site Office</h5>
+                                        <h5 class="text-brown font-weight-bold mb-2 text-decoration-underline">Primary</h5>
+                                        <div class="row">
+                                            <div class="col-lg-6 col-md-6 col-sm-12 form-group">
+                                                <label class="col-form-label pt-0 font-weight-bolder">Name Prefix</label>
+                                                @Html.DropDownListFor(model => model.SITE_NAME_PREFIX,
+                                                new SelectList(new List<SelectListItem> {
+                                                               new SelectListItem { Text = "Select", Value = "0"},
+                                                               new SelectListItem { Text = "M/S.", Value = "M/S."},
+                                                               new SelectListItem { Text = "Shri", Value = "Shri"},
+                                                               new SelectListItem { Text = "Shrimati", Value = "Shrimati"},
+                                                               new SelectListItem { Text = "Sushri", Value = "Sushri"},
+                                               }, "Value", "Text"),
+                                               new { @class = "form-control" })
+                                            </div>
+                                            <div class="col-lg-6 col-md-6 col-sm-12 form-group">
+                                                <label class="col-form-label pt-0 font-weight-bolder">Name <span class="text-danger">*</span></label>
+                                                @Html.TextBoxFor(x => x.SITE_NAME, new { @maxlength = "90", @class = "form-control" })
+                                                @Html.ValidationMessageFor(m => m.SITE_NAME, "", new { @class = "text-danger" })
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-lg-12 col-md-6 col-sm-12 form-group">
+                                                <label class="col-form-label pt-0 font-weight-bolder">Address <span class="text-danger">*</span></label>
+                                                @Html.TextAreaFor(x => x.SITE_ADDRESS, new { @maxlength = "130", @class = "form-control", @rows = "2" })
+                                                @Html.ValidationMessageFor(m => m.SITE_ADDRESS, "", new { @class = "text-danger" })
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-lg-6 col-md-6 col-sm-12 form-group">
+                                                <label class="col-form-label pt-0 font-weight-bolder">Mobile Number <span class="text-danger">*</span></label>
+                                                @Html.TextBoxFor(x => x.SITE_CONTACT_DETAILS1, new { @maxlength = "10", @class = "form-control", @Onkeypress = "return inputLimiter(event,'Numbers')" })
+                                                @Html.ValidationMessageFor(m => m.SITE_CONTACT_DETAILS1, "", new { @class = "text-danger" })
+                                            </div>
+                                            <div class="col-lg-6 col-md-6 col-sm-12 form-group">
+                                                <label class="col-form-label pt-0 font-weight-bolder">LandLine No</label>
+                                                @Html.TextBoxFor(x => x.SITE_LANDLINE_NO, new { @maxlength = "20", @class = "form-control", @Onkeypress = "return inputLimiter(event,'Numbers')" })
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-lg-6 col-md-6 col-sm-12 form-group">
+                                                <label class="col-form-label pt-0 font-weight-bolder">Designation</label>
+                                                @Html.TextBoxFor(x => x.SITE_DESIGNATION, new { @maxlength = "50", @class = "form-control" })
+                                            </div>
+                                            <div class="col-lg-6 col-md-6 col-sm-12 form-group">
+                                                <label class="col-form-label pt-0 font-weight-bolder">Email Id</label>
+                                                @Html.TextBoxFor(x => x.SITE_MAIL_ID, new { @maxlength = "90", @class = "form-control" })
+                                            </div>
+
+
+                                        </div>
+                                        <h5 class="text-brown font-weight-bold mb-2 text-decoration-underline">Secondary</h5>
+                                        <div class="row">
+                                            <div class="col-lg-6 col-md-6 col-sm-12 form-group">
+                                                <label class="col-form-label pt-0 font-weight-bolder">Name Prefix</label>
+                                                @Html.DropDownListFor(model => model.SECONDARY_SITE_NAME_PREFIX,
+                                                new SelectList(new List<SelectListItem> {
+                                                               new SelectListItem { Text = "Select", Value = "0"},
+                                                               new SelectListItem { Text = "M/S.", Value = "M/S."},
+                                                               new SelectListItem { Text = "Shri", Value = "Shri"},
+                                                               new SelectListItem { Text = "Shrimati", Value = "Shrimati"},
+                                                               new SelectListItem { Text = "Sushri", Value = "Sushri"},
+                                               }, "Value", "Text"),
+                                               new { @class = "form-control" })
+                                            </div>
+                                            <div class="col-lg-6 col-md-6 col-sm-12 form-group">
+                                                <label class="col-form-label pt-0 font-weight-bolder">Name <span class="text-danger">*</span></label>
+                                                @Html.TextBoxFor(x => x.SECONDARY_SITE_NAME, new { @maxlength = "90", @class = "form-control" })
+                                                @Html.ValidationMessageFor(m => m.SECONDARY_SITE_NAME, "", new { @class = "text-danger" })
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-lg-12 col-md-6 col-sm-12 form-group">
+                                                <label class="col-form-label pt-0 font-weight-bolder">Address <span class="text-danger">*</span></label>
+                                                @Html.TextAreaFor(x => x.SECONDARY_SITE_ADDRESS, new { @maxlength = "130", @class = "form-control", @rows = "2" })
+                                                @Html.ValidationMessageFor(m => m.SECONDARY_SITE_ADDRESS, "", new { @class = "text-danger" })
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-lg-6 col-md-6 col-sm-12 form-group">
+                                                <label class="col-form-label pt-0 font-weight-bolder">Mobile Number <span class="text-danger">*</span></label>
+                                                @Html.TextBoxFor(x => x.SECONDARY_SITE_CONTACT_DETAILS, new { @maxlength = "10", @class = "form-control", @Onkeypress = "return inputLimiter(event,'Numbers')" })
+                                                @Html.ValidationMessageFor(m => m.SECONDARY_SITE_CONTACT_DETAILS, "", new { @class = "text-danger" })
+                                            </div>
+                                            <div class="col-lg-6 col-md-6 col-sm-12 form-group">
+                                                <label class="col-form-label pt-0 font-weight-bolder">LandLine No</label>
+                                                @Html.TextBoxFor(x => x.SECONDARY_SITE_LANDLINE_NO, new { @maxlength = "20", @class = "form-control", @Onkeypress = "return inputLimiter(event,'Numbers')" })
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-lg-6 col-md-6 col-sm-12 form-group">
+                                                <label class="col-form-label pt-0 font-weight-bolder">Designation</label>
+                                                @Html.TextBoxFor(x => x.SECONDARY_SITE_DESIGNATION, new { @maxlength = "50", @class = "form-control" })
+                                            </div>
+                                            <div class="col-lg-6 col-md-6 col-sm-12 form-group">
+                                                <label class="col-form-label pt-0 font-weight-bolder">Email Id</label>
+                                                @Html.TextBoxFor(x => x.SECONDARY_SITE_MAIL_ID, new { @maxlength = "90", @class = "form-control" })
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <div id="AO" class="col-lg-6">
+                                    <div class="bg-light p-2 mb-4 border">
+                                        <h5 class="text-brown font-weight-bold mb-4">Agent Office</h5>
+                                        <div class="row">
+                                            <div class="col-lg-6 col-md-6 col-sm-12 form-group">
+                                                <label class="col-form-label pt-0 font-weight-bolder">Name Prefix</label>
+                                                @Html.DropDownListFor(model => model.AGENT_NAME_PREFIX,
+                                                new SelectList(new List<SelectListItem> {
+                                                               new SelectListItem { Text = "Select", Value = "0"},
+                                                               new SelectListItem { Text = "M/S.", Value = "M/S."},
+                                                               new SelectListItem { Text = "Shri", Value = "Shri"},
+                                                               new SelectListItem { Text = "Shrimati", Value = "Shrimati"},
+                                                               new SelectListItem { Text = "Sushri", Value = "Sushri"},
+                                               }, "Value", "Text"),
+                                               new { @class = "form-control" })
+                                            </div>
+                                            <div class="col-lg-6 col-md-6 col-sm-12 form-group">
+                                                <label class="col-form-label pt-0 font-weight-bolder">Name <span class="text-danger">*</span></label>
+                                                @Html.TextBoxFor(x => x.AGENT_NAME, new { @maxlength = "50", @class = "form-control" })
+                                                @Html.ValidationMessageFor(m => m.AGENT_NAME, "", new { @class = "text-danger" })
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-lg-12 col-md-6 col-sm-12 form-group">
+                                                <label class="col-form-label pt-0 font-weight-bolder">Address <span class="text-danger">*</span></label>
+                                                @Html.TextAreaFor(x => x.AGENT_ADDRESS, new { @maxlength = "130", @class = "form-control", @rows = "2" })
+                                                @Html.ValidationMessageFor(m => m.AGENT_ADDRESS, "", new { @class = "text-danger" })
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-lg-6 col-md-6 col-sm-12 form-group">
+                                                <label class="col-form-label pt-0 font-weight-bolder">Mobile Number <span class="text-danger">*</span></label>
+                                                @Html.TextBoxFor(x => x.AGENT_CONTACT_DETAILS1, new { @maxlength = "10", @class = "form-control", @Onkeypress = "return inputLimiter(event,'Numbers')" })
+                                                @Html.ValidationMessageFor(m => m.AGENT_CONTACT_DETAILS1, "", new { @class = "text-danger" })
+                                            </div>
+                                            <div class="col-lg-6 col-md-6 col-sm-12 form-group">
+                                                <label class="col-form-label pt-0 font-weight-bolder">LandLine No</label>
+                                                @Html.TextBoxFor(x => x.AGENT_LANDLINE_NO, new { @maxlength = "20", @class = "form-control", @Onkeypress = "return inputLimiter(event,'Numbers')" })
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-lg-6 col-md-6 col-sm-12 form-group">
+                                                <label class="col-form-label pt-0 font-weight-bolder">Designation</label>
+                                                @Html.TextBoxFor(x => x.AGENT_DESIGNATION, new { @maxlength = "50", @class = "form-control" })
+                                            </div>
+                                            <div class="col-lg-6 col-md-6 col-sm-12 form-group">
+                                                <label class="col-form-label pt-0 font-weight-bolder">Email Id</label>
+                                                @Html.TextBoxFor(x => x.AGENT_MAIL_ID, new { @maxlength = "90", @class = "form-control" })
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-lg-12 col-md-6 col-sm-12 form-group">
+                                                <label class="col-form-label pt-0 font-weight-bolder">Appointment Letter</label>
+                                                <div class="custom-file">
+                                                    <input type="file" class="custom-file-input" name="LETTER_OF_APPOINTMENT_OF_AGENT">
+                                                    <label class="custom-file-label" for="customFile">Choose Files</label>
+                                                </div>
+                                                @if (Model.FILE_LETTER_OF_APPOINTMENT_OF_AGENT != null && Model.FILE_LETTER_OF_APPOINTMENT_OF_AGENT != "")
+                                                {
+                                                    <label class="form-control-plaintext">@(Model.FILE_LETTER_OF_APPOINTMENT_OF_AGENT) <a href='~/@Model.LETTER_OF_APPOINTMENT_OF_AGENT_PATH' title="" class="ml-2" data-original-title="Download Appointment Letter" target="_blank"><i class="icon-file-pdf-solid h5 text-danger"></i></a></label>
+                                                }
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row mt-4">
+                                <div class="col-sm-12 text-center">
+                                    <input type="submit" id="Submit" value="Save & Update" class="btn btn-success btn-md ml-0 waves-effect waves-light btnsave" onclick="return Validate()">
+                                    @*<input type="submit" value="Delete" class="btn btn-danger btn-md ml-0 waves-effect waves-light btnsave" id="Delete" name="delete" onclick="return confirm('Are you sure to delete?')" style="display:none" />*@
+                                    <input type="button" title="Forward to DD" value="Forward To DD" name="cmd" class="btn btn-warning text-dark btn-md waves-effect waves-light ml-0 btnsave" onclick="if (Validate()) { return OnForwarding('Forward To DD'); }" />
+                                    @*<input type="button" title="Forward to DD" value="Forward To DD" name="cmd" class="btn btn-warning text-dark btn-md waves-effect waves-light ml-0 btnsave" onclick="if (Validate()) { return ForwordToDdWithoutDS('Forward To DD'); }" />*@
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+</section>
+

@@ -1,0 +1,212 @@
+﻿@*// *********************************************************************************************************
+    //  View Name                : GetAnalysedSample
+    //  Desciption               : To Download Lab Report samples
+    //  Created By               : Lingaraj Dalai
+    //  Created On               : 24 Feb 2021
+    // ********************************************************************************************************
+*@
+@model GeologyEF.LabReportmaster
+@using GeologyApp.Web
+@{
+    ViewData["Title"] = "GetAnalysedSample";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+@if (ViewBag.msg != null)
+{
+    <script>
+         var vv = '@ViewBag.msg';
+        if (vv == 1) {
+            swal("","Files uploaded successfully.","success");
+        }
+        else {
+            swal("","Something went wrong. Please try again!","error");
+        }
+    </script>
+}
+<script>
+    $(document).ready(function () {
+        loadNavigation('AnalysedSamples', 'glgeology', 'planasam', 'tl', 'Geology', 'Analysed Samples', ' ');
+        $('.searchableselect').searchableselect();
+        $('.shorting-lnk').click(function () {
+            $('.shorting-lnk i').toggleClass('fa-sort-amount-up-alt fa-sort-amount-down-alt ');
+        });
+        $('.filter-dropdown').hide();
+        $('.filter-lnk').click(function () {
+            $(this).toggleClass('active');
+            $(this).siblings('.filter-dropdown').slideToggle();
+        });
+        $('.filter-btn').click(function () {
+            $(this).parent('.shorting-cell .filter-dropdown').slideUp();
+            if ($(this).parent().parent('.shorting-cell').find('.filter-lnk').hasClass('active')) {
+                $(this).parent().siblings('.filter-lnk').removeClass('active');
+            }
+        });
+        $("#excelIcon").click(function () {
+            exportTableToExcel("datatable", "text")
+        });
+    });
+    function GetLabReportId(LabReportId) {
+        $("#hdnLabReportId").val(LabReportId);
+         $.ajax({
+                url: '@Url.Action("GetFilesList", "LabReports",new { Area="Geology"})',
+                type: "GET",
+             data: { LabReport_Id: $("#hdnLabReportId").val() },
+                success: function (data) {
+                }
+            })
+    }
+</script>
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        @Html.Partial("_CMSnavigation")
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link active">
+                                Get Analysed Samples
+                            </a>
+                        </li>
+                    </ul>
+                    @Html.Partial("_CMSutil")
+                    @Html.AntiForgeryToken()
+                </div>
+                <section class="box form-container">
+                    @using (Html.BeginForm("UploadResult", "LabReports", FormMethod.Post, new { AUTOCOMPLETE = "Off", id = "form1", enctype = "multipart/form-data" }))
+                    {
+                        <div class="content-body">
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div id="viewtable">
+                                        <table id="table-exports" class="table table-sm table-bordered">
+                                            <thead>
+                                                <tr>
+                                                    <th rowspan="2">Sl#</th>
+                                                    <th rowspan="2">FPO Code</th>
+                                                    <th rowspan="2">Report MM/Year</th>
+                                                    <th rowspan="2">Mineral</th>
+                                                    <th colspan="5" class="text-center">Area Details</th>
+                                                    <th rowspan="2">Camp Incharge</th>
+                                                    <th rowspan="2">Designation</th>
+                                                    <th rowspan="2">Type of Sample</th>
+                                                    <th rowspan="2">No. of Samples</th>
+                                                    <th rowspan="2">Type of Study</th>
+                                                    <th rowspan="2">Elements Analysed</th>
+                                                    <th rowspan="2">Submission Date</th>
+                                                    <th rowspan="2" class="text-center noprint">Attachment</th>
+                                                    <th rowspan="2" width="150px" class="text-center noprint">Action</th>
+                                                </tr>
+                                                <tr>
+                                                    <th>Name of Camp</th>
+                                                    <th>Village</th>
+                                                    <th>Tehsil</th>
+                                                    <th>District</th>
+                                                    <th>Regional Office</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @{ int i = 1;
+                                                }
+                                                @foreach (var b in ViewBag.ViewList)
+                                                {
+                                                    <tr>
+                                                        @Html.HiddenFor(m => m.LabReport_Id)
+
+                                                        <td>
+                                                            @i
+                                                            @{ i++; }
+                                                        </td>
+                                                        <td>@b.FPO_Code</td>
+                                                        <td>@b.Report_MY</td>
+                                                        <td>@b.MineralName</td>
+                                                        <td>@b.Location</td>
+                                                        <td>@b.VillageName</td>
+                                                        <td>@b.TehsilName</td>
+                                                        <td>@b.DistrictName</td>
+                                                        <td>@b.RegionalOfficeName</td>
+                                                        <td>@b.GeologistName</td>
+                                                        <td>@b.Designation</td>
+                                                        <td>@b.Type_Of_Sample</td>
+                                                        <td>@b.No_Of_Sample</td>
+                                                        <td>@b.Type_of_Study</td>
+                                                        <td>@b.Elements_analysed</td>
+                                                        <td>
+                                                            @if (b.Date_of_Submission != null)
+                                                            {
+                                                                @Convert.ToDateTime(b.Date_of_Submission).ToString("dd/MM/yyyy")
+                                                            }
+                                                        </td>
+                                                        <td class="text-center noprint">
+                                                            @if (b.AttechmentName != null)
+                                                            {
+                                                                @*<a href='~/Geology/LabReports/DownloadLab?filename=@b.AttechmentName'>
+                                                                        <i class="icon-download-solid" aria-hidden="true">
+                                                                        </i>
+                                                                    </a>*@
+                                                                <a href="@CustomQueryStringHelper.EncryptString("Geology","DownloadLab","LabReports",new {filename=@b.AttechmentName })">
+                                                                    <i class="icon-download-solid h4 text-danger" aria-hidden="true">
+                                                                    </i>
+                                                                </a>
+                                                            }
+                                                        </td>
+                                                        <td class="noprint">
+                                                            @*<a href="@Url.Content("~/Geology/LabReports/AnalysedSample/")@b.LabReport_Id"
+                                                                class="btn btn-primary btn-sm">View Result</a>*@
+                                                            <a href="@CustomQueryStringHelper.EncryptString("Geology","AnalysedSample","LabReports",new {id=@b.LabReport_Id })" class="btn btn-primary btn-sm">View Result</a>
+                                                        </td>
+                                                    </tr>
+                                                }
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal fade modal1" tabindex="-1" role="dialog" aria-labelledby="alertModal" aria-hidden="true">
+                            <div class="modal-dialog modal-md modal-dialog-centered" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header p-2">
+                                        <h5 class="modal-title m-0">Result Report Attachments</h5>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <div class="row">
+                                            <div class="col-sm-12">
+                                                <div class="table-responsive" id="viewtable">
+                                                    <table id="datatable" class="table table-sm table-bordered">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>Attachment</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            @foreach (var b in ViewBag.ViewList)
+                                                            {
+                                                                <tr class="active-row">
+                                                                    <td>
+                                                                        <a href='~/@b.Result_Attechment' height='30' width='30' target="_blank">
+                                                                            <i class="icon-download-solid" aria-hidden="true">
+                                                                            </i>
+                                                                        </a>
+                                                                    </td>
+                                                                </tr>
+                                                            }
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <input type="hidden" id="hdnLabReportId" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </section>
+            </div>
+        </div>
+    </div>
+</section>
+

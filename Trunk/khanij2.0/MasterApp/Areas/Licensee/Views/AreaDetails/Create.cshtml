@@ -1,0 +1,662 @@
+﻿@*// *********************************************************************************************************
+    //  View Name                : Create
+    //  Desciption               : To Save and Update, Forward to DD, Delete Licensee Area Details
+    //  Created By               : Prakash Chandra Biswal
+    //  Created On               : 21 July 2021
+    // ********************************************************************************************************
+*@
+@model MasterEF.AreaDetails;
+@using MasterEF;
+@{
+    ViewData["Title"] = "Create";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+@if (TempData["Message"] != null)
+{
+    <script>
+        swal("",'@TempData["Message"]',"success");
+    </script>
+}
+<script>
+    indicateMe = "yes"
+    backMe = "yes"
+    $(document).ready(function () {
+        $('.searchableselect').searchableselect();
+        loadNavigation('Create', 'glUIS', 'pllesseprof', 'tl', 'Licensee Profile', 'Area Details', ' ');
+        $('.datepicker').datetimepicker({
+            format: 'LT',
+            format: 'DD-MMM-YYYY',
+            //daysOfWeekDisabled: [0, 6],
+            daysOfWeekDisabled: [],
+            widgetPositioning: {
+                horizontal: 'auto',
+                vertical: 'bottom'
+            }
+        });
+        AreaType();
+        if ($("#hfWorkDate").val() != "") {
+            $("#inputPermissionDate").val($("#hfWorkDate").val());
+        }
+        if ($("#hfAgreementDate").val() != "") {
+            $("#inputAgreementDate").val($("#hfAgreementDate").val());
+        }
+        //--------------
+        if ($('#hfStateId').val() != "") {
+            $('#ddlState').val($('#hfStateId').val());
+            BindDistrictData();
+        }
+        //---------------
+        $('#ddlState').change(function () {
+            debugger;
+            BindDistrictData();
+        });
+        //--------------------------------
+        $('#DistrictID').change(function () {
+            debugger;
+            BindTehsilData();
+        });
+        //----------------------------------
+        $('#TehsilID').change(function () {
+            debugger;
+            BindVillageData();
+        });
+        /*Bind District details*/
+        function BindDistrictData() {
+            debugger;
+            if ($('#ddlState').val() != "") {
+                $.ajax({
+                    url: '/Licensee/AreaDetails/GetDistrictdetailsByRegionId',
+                    data: { 'StateId': $('#ddlState').val() },
+                    dataType: 'json',
+                    type: 'post',
+                    success: function (data) {
+                        debugger;
+                        $('#DistrictID').html('');
+                        $('#DistrictID').append("<option value=''>Select</option>");
+                        $.each(data, function (ind, item) {
+                            $('#DistrictID').append("<option value='" + item.districtId + "'>" + item.districtName + "</option>");
+                        });
+                        if ($('#hfDistrictId').val() != "") {
+                            $('#DistrictID').val($('#hfDistrictId').val());
+                            BindTehsilData();
+                        }
+                        if ($('#DistrictID').val() ==null) {
+                            $('#DistrictID').html('');
+                            $('#DistrictID').append("<option value=''>Select</option>");
+                            $.each(data, function (ind, item) {
+                                $('#DistrictID').append("<option value='" + item.districtId + "'>" + item.districtName + "</option>");
+                            });
+                        }
+                    },
+                    error: function (err) {
+                    }
+                });
+                //BindLeaseLandDistrictData();
+            }
+            else {
+                $('#DistrictID').html('');
+                $('#DistrictID').append("<option value=''>Select</option>");
+                $('#TehsilID').html('');
+                $('#TehsilID').append("<option value=''>Select</option>");
+                $('#VillageID').html('');
+                $('#VillageID').append("<option value=''>Select</option>");
+            }
+        }
+        /*Bind Tehsil data*/
+        function BindTehsilData() {
+            debugger;
+            if ($('#DistrictID').val() != "") {
+                $.ajax({
+                    url: '/Licensee/AreaDetails/GetTehsildetailsByDistrictId',
+                    data: { 'DistrictId': $('#DistrictID').val() },
+                    dataType: 'json',
+                    type: 'post',
+                    success: function (data) {
+                        debugger;
+                        var row = "";
+                        $('#TehsilID').html('');
+                        row += "<option value=''>Select</option>";
+                        $.each(data, function (ind, item) {
+                            row += "<option value='" + item.tehsilID + "'>" + item.tehsilName + "</option>";
+                        });
+                        $('#TehsilID').html(row);
+                        if ($("#hfTehsilId").val() != "") {
+                            $("#TehsilID").val($("#hfTehsilId").val());
+                            BindVillageData();
+                            BindLeaseLandVillageData();
+                        }
+                        if ($("#TehsilID").val() == null) {
+                            $('#TehsilID').html('');
+                            $('#TehsilID').append("<option value=''>Select</option>");
+                            $.each(data, function (ind, item) {
+                                $('#TehsilID').append("<option value='" + item.tehsilID + "'>" + item.tehsilName + "</option>");
+                            });
+                        }
+                    },
+                    error: function (err) {
+                    }
+                });
+            }
+            else {
+                $('#TehsilID').html('');
+                $('#TehsilID').append("<option value=''>Select</option>");
+                $('#VillageID').html('');
+                $('#VillageID').append("<option value=''>Select</option>");
+            }
+        }
+        /*Bind Vilage data*/
+        function BindVillageData() {
+            debugger;
+            if ($('#TehsilID').val() != "") {
+                $.ajax({
+                    url: '/Licensee/AreaDetails/GetVillagedetailsByTehsilId',
+                    data: { 'TehsilID': $('#TehsilID').val() },
+                    dataType: 'json',
+                    type: 'post',
+                    success: function (data) {
+                        debugger;
+                        var row = "";
+                        $('#VillageID').html('');
+                        row += "<option value=''>Select</option>";
+                        $.each(data, function (ind, item) {
+                            row += "<option value='" + item.villageID + "'>" + item.villageName + "</option>";
+                        });
+                        $('#VillageID').html(row);
+                        if ($("#hfVillageId").val() != "") {
+                            $("#VillageID").val($("#hfVillageId").val());
+                        }
+                        if ($("#VillageID").val() == null) {
+                            $('#VillageID').html('');
+                            $('#VillageID').append("<option value=''>Select</option>");
+                            $.each(data, function (ind, item) {
+                                $('#VillageID').append("<option value='" + item.villageID + "'>" + item.villageName + "</option>");
+                            });
+                        }
+                    },
+                    error: function (err) {
+                    }
+                });
+            }
+            else {
+                $('#VillageID').html('');
+                $('#VillageID').append("<option value=''>Select</option>");
+            }
+        }
+
+        $('input[type="file"]').bind('change', function () {
+            $("input[name='Submit']").attr('disabled', false);
+            filesize = this.files[0].size;
+            var val = $(this).val().toLowerCase(),
+                //regex = new RegExp("(.*?)\.(jpeg|jpg|png)$");
+                regex = new RegExp("(.*?)\.(pdf)$");
+            if (!(regex.test(val))) {
+                swal("", "only pdf file type are allowed. ", "warning");
+                this.value = '';
+                $("input[name='Submit']").attr('disabled', true);
+                return false;
+            }
+            else if (filesize > 2048000) {
+                swal("", "File size must be 2 MB !", "warning");
+                $("input[name='Submit']").attr('disabled', true);
+                return false;
+            }
+            else {
+                var fileName = $(this).val().split("\\").pop();
+                $(this).next('.custom-file-label').html(fileName);
+            }
+            return false;
+        });
+        //For Disabling all DOM if  is  Forwarded to DD/DMO and Approval is Pending
+        if (@Model.STATUS == 1) {
+            $('.form-control').css("pointer-events", "none");
+            $('#cmd').hide();
+            $('#cmd1').hide();
+        }
+
+    });
+    function Validate() {
+        debugger;
+        var Iss = false;
+        if (!DropDownValidation("ddlState", "State")) {
+            $('#Lease-tab').trigger('click');
+            return false;
+        }
+        else if (!DropDownValidation("DistrictID", "District")) {
+            $('#Lease-tab').trigger('click');
+            return false;
+        }
+        else if (!DropDownValidation("TehsilID", "Tehsil")) {
+            $('#Lease-tab').trigger('click');
+            return false;
+        }
+        else if (!DropDownValidation("VillageID", "Village")) {
+            $('#Lease-tab').trigger('click');
+            return false;
+        }
+
+        else if (!blankFieldValidation("AREA_IN_HECT", "Area in Hectare")) {
+            $('#Area-tab').trigger('click');
+            return false;
+        }
+        else if (!blankFieldValidation("txtLon", "Longitude")) {
+            $('#Area-tab').trigger('click');
+            return false;
+        }
+        //else if (!validateLng($('#txtLon').val())) {
+        //    swal("", "Please Enter valid Logitude", "warning");
+        //    return false;
+        //}
+        else if (!blankFieldValidation("txtLat", "Latitude")) {
+            $('#Area-tab').trigger('click');
+            return false;
+        }
+        //var x = validateLng();
+        //if (x == false) {
+        //    $('#txtLat').focus();
+        //    return false;
+        //}
+        
+        //var y = validateLat();
+        //if (y == false) {
+        //    $('#txtLat').focus();
+        //    return false;
+        //}
+       
+        Iss = true;
+        return Iss;
+    }
+    function AreaType(e) {
+        if ($("input[name='LEASELAND_AREA_TYPE']:checked").val() == "Forest") {
+            $("#divForest").show();
+            $("#divNonForest").hide();
+            $("#LEASELAND_AREA_SUB_TYPE").val($("#hfAreatype").val());
+        }
+        else {
+            $("#divNonForest").show();
+            $("#divForest").hide();
+            $("#LEASELAND_AREA_NF_SUB_TYPE").val($("#hfAreatype").val());
+        }
+    }
+    /*Bind Lease Land District details*/
+    function BindLeaseLandDistrictData() {
+        debugger;
+        if ($('#ddlState').val() != "") {
+            $.ajax({
+                url: '/Licensee/AreaDetails/GetLeaseLandDistrictdetailsByRegionId',
+                data: { 'StateId': $('#ddlState').val() },
+                dataType: 'json',
+                type: 'post',
+                success: function (data) {
+                    debugger;
+                    var row = "";
+                    $('#LEASELAND_DISRICT_ID').html('');
+                    row += "<option value=''>Select</option>";
+                    $.each(data, function (ind, item) {
+                        row += "<option value='" + item.leaselanD_DISRICT_ID + "'>" + item.leaselanD_DISRICT_NAME + "</option>";
+                    });
+                    $('#LEASELAND_DISRICT_ID').html(row);
+                    if ($("#hfLeaseLandDistrictId").val() != "") {
+                        $("#LEASELAND_DISRICT_ID").val($("#hfLeaseLandDistrictId").val());
+                    }
+                    if ($('#LEASELAND_DISRICT_ID').val() == null) {
+                        $('#LEASELAND_DISRICT_ID').html('');
+                        $('#LEASELAND_DISRICT_ID').append("<option value=''>Select</option>");
+                        $.each(data, function (ind, item) {
+                            $('#LEASELAND_DISRICT_ID').append("<option value='" + item.leaselanD_DISRICT_ID + "'>" + item.leaselanD_DISRICT_NAME + "</option>");
+                        });
+                    }
+                },
+                error: function (err) {
+                }
+            });
+        }
+        else {
+            var row = "";
+            $('#LEASELAND_DISRICT_ID').html('');
+            row += "<option value=''>Select</option>";
+            $('#LEASELAND_DISRICT_ID').html(row);
+        }
+    }
+    /*Bind Lease Land Vilage data*/
+    function BindLeaseLandVillageData() {
+        debugger;
+        if ($('#TehsilID').val() != "") {
+            $.ajax({
+                url: '/Licensee/AreaDetails/GetLeaseLandVillagedetailsByTehsilId',
+                data: { 'TehsilID': $('#TehsilID').val() },
+                dataType: 'json',
+                type: 'post',
+                success: function (data) {
+                    debugger;
+                    var row = "";
+                    $('#LEASELAND_VILLAGE_ID').html('');
+                    row += "<option value=''>Select</option>";
+                    $.each(data, function (ind, item) {
+                        row += "<option value='" + item.leaselanD_VILLAGE_ID + "'>" + item.leaselanD_VILLAGE_NAME + "</option>";
+                    });
+                    $('#LEASELAND_VILLAGE_ID').html(row);
+                    if ($("#hfLeaseLandVillageId").val() != "") {
+                        $("#LEASELAND_VILLAGE_ID").val($("#hfLeaseLandVillageId").val());
+                    }
+                    if ($('#LEASELAND_VILLAGE_ID').val() == null) {
+                        $('#LEASELAND_VILLAGE_ID').html('');
+                        $('#LEASELAND_VILLAGE_ID').append("<option value=''>Select</option>");
+                        $.each(data, function (ind, item) {
+                            $('#LEASELAND_VILLAGE_ID').append("<option value='" + item.leaselanD_VILLAGE_ID + "'>" + item.leaselanD_VILLAGE_NAME + "</option>");
+                        });
+                    }
+                },
+                error: function (err) {
+                }
+            });
+        }
+        else {
+            var row = "";
+            $('#LEASELAND_VILLAGE_ID').html('');
+            row += "<option value=''>Select</option>";
+            $('#LEASELAND_VILLAGE_ID').html(row);
+        }
+    }
+     function OnForwarding(btnAction) {
+        var Type;
+        if (btnAction == 'Forward To DD') {
+            Type = 'forward';
+        }
+        if (confirm("Before " + Type + " you need to apply your Digital Signature. Are you confirmed to " + Type + " Profile??")) {
+                var Postdata = 'action=signdoc' + "\n" + 'datatosign=Digital Signature Required' + "\n" + 'signaction=sign' + "\n" + 'filepath=' + "\n" + 'panNumberParam=' + "\n" + 'expirycheck=false' + "\n" + 'issuername=' + "\n" + 'certclass=1|2|3' + "\n" + 'certtype=ALL';
+                connection.send(Postdata);
+                connection.onerror = function (error) {
+                    swal("",'Please check the server connection: ' + error+'',"warning");
+                    swal("",error,"warning");
+                };
+                connection.onmessage = function (e) { // when DSC is success then following function executed.
+                    if (e.data.indexOf("subProtocol") == -1) {
+                        //alert(e.data);
+                        $("#DSCResponse").val(e.data).change();
+                        $.ajax(
+                            {
+                               url: '@Url.Action("CheckVerifyResponse", "UserInformationLiensee", new { Area = "Licensee" })',
+                                type: "POST",
+                                data: { contentType: "pkcs7", signDataBase64Encoded: e.data, responseType: "plain" },
+                                success: function (msg) {
+                                    if (msg == "SUCCESS") {
+                                        if (btnAction == "Forward To DD") {
+                                            $("#SubResion").val("Forward To DD");
+                                        }
+                                        $("#form1").submit();
+                                    }
+                                }
+                            });
+                    }
+                    else {
+                        alert(e.data);
+                    }
+                };
+            }
+            else {
+                return false;
+            }
+    }
+    try {
+        var connection = new WebSocket('wss://localhost.emudhra.com:8080');
+        connection.onopen = function () {
+            console.log('Connection Opened');
+        };
+        connection.onerror = function (error) {
+        };
+        connection.onmessage = function (e) {
+            if (e.data.indexOf("subProtocol") == -1) {
+            }
+        };
+    }
+    catch (e) {
+        swal("", "No DSC Connection Found", "warning");
+    }
+    function NextArea() {
+        $("#step2").addClass('active');
+        $("#Area").addClass('active');
+        $("#Lease").removeClass('active');
+        $("#step1").removeClass('active');
+    }
+
+    function BackArea() {
+        $("#step2").removeClass('active');
+        $("#Area").removeClass('active');
+        $("#Lease").addClass('active');
+        $("#step1").addClass('active');
+        
+    }
+    function ForwordToDdWithoutDS(btnAction) {
+
+        if (btnAction == "Forward To DD") {
+            $("#SubResion").val("Forward To DD");
+        }
+
+        $("#form1").submit();
+
+    }
+
+</script>
+<script>
+    var x = document.getElementById("demo");
+
+    function getLocation() {
+        debugger;
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(showPosition);
+        } else {
+            x.innerHTML = "Geolocation is not supported by this browser.";
+        }
+    }
+
+    function showPosition(position) {
+        debugger;
+        x.innerHTML = "Latitude: " + position.coords.latitude +
+            "<br>Longitude: " + position.coords.longitude;
+    }
+    function validateLat(lat) {
+        let pattern = new RegExp('^-?([1-8]?[1-9]|[1-9]0)\\.{1}\\d{1,6}');
+        return pattern.test(lat);
+    }
+    function validateLng(lng) {
+        let pattern = new RegExp('^-?([1-8]?[1-9]|[1-9]0)\\.{1}\\d{1,6}');
+        return  pattern.test(lng);
+    }
+    
+    function validateLng() {
+        debugger;
+        var lng = document.getElementById("txtLon").value;
+        var reg = new RegExp("^-?([1-8]?[1-9]|[1-9]0)\.{1}\d{1,6}");
+        if (reg.exec(lng)) {
+            //do nothing
+        } else {
+            swal("", "Please Enter valid Longitude", "warning");
+            return false;
+        }
+    }
+    function validateLat() {
+        debugger;
+        var lng = document.getElementById("txtLat").value;
+        var reg = new RegExp("^-?([1-8]?[1-9]|[1-9]0)\.{1}\d{1,6}");
+        if (reg.exec(lng)) {
+            //do nothing
+        } else {
+            swal("", "Please Enter valid Latitude", "warning");
+            return false;
+        }
+    }
+</script>
+
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        <!-- MAIN CONTENT AREA STARTS -->
+        @Html.Partial("_CMSnavigation")
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="javascript:void(0);">
+                                Add
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="~/Licensee/AreaDetails/ViewList">
+                                View
+                            </a>
+                        </li>
+                    </ul>
+                    @Html.Partial("_CMSutil")
+                </div>
+                <section class="box form-container">
+                    <div class="content-body">
+                        @using (Html.BeginForm("Create", "AreaDetails", FormMethod.Post, new { AUTOCOMPLETE = "Off", id = "form1", enctype = "multipart/form-data" }))
+                        {
+                            @Html.AntiForgeryToken()
+                            @Html.HiddenFor(model => model.SubResion)
+                            @Html.HiddenFor(model => model.LICENSEE_AREA_DETAIL_ID)
+                            @Html.HiddenFor(x => x.CREATED_BY)
+                            <ul class="nav nav-tabs progresstab" id="myTab" role="tablist">
+                                <li class="startstep active" id="step1">
+                                    <a class="active" id="Lease-tab" data-toggle="tab" href="#Lease" role="tab" aria-controls="Lease" aria-selected="true" onclick="BackArea()">Licensee Location</a>
+                                </li>
+                                <li id="step2">
+                                    <a id="Area-tab" data-toggle="tab" href="#Area" role="tab" aria-controls="Area" aria-selected="false" onclick="NextArea()">Area in Hectare</a>
+                                </li>
+                            </ul>
+                            <div class="tab-content" id="myTabContent">
+                                <div class="tab-pane fade show active" id="Lease" role="tabpanel" aria-labelledby="Lease-tab">
+                                    <h5 class="text-brown font-weight-bold">Location</h5>
+                                    <div class="row">
+                                        <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                            <label class="col-form-label font-weight-bolder">State <span class="text-danger">*</span></label>
+                                            @Html.DropDownListFor(m => m.StateId, ViewBag.State as IEnumerable<SelectListItem>, "Select State", new { @class = "form-control searchableselect", autofocus = "autofocus", @id = "ddlState" })
+                                            @Html.HiddenFor(m => m.StateId, new { @id = "hfStateId" })
+                                            @Html.ValidationMessageFor(m => m.StateId, "", new { @class = "text-danger" })
+                                        </div>
+                                        <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                            <label class="col-form-label font-weight-bolder">District <span class="text-danger">*</span></label>
+                                            <select id="DistrictID" name="DistrictId" Class="form-control searchableselect">
+                                                <option value="">Select</option>
+                                            </select>
+                                            @Html.HiddenFor(m => m.DistrictId, new { @id = "hfDistrictId" })
+                                            @Html.ValidationMessageFor(m => m.DistrictId, "", new { @class = "text-danger" })
+                                        </div>
+                                        <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                            <label class="col-form-label font-weight-bolder">Tehsil / Forest Division <span class="text-danger">*</span></label>
+                                            <select id="TehsilID" name="TehsilID" Class="form-control searchableselect">
+                                                <option value="">Select</option>
+
+                                            </select>
+                                            @Html.HiddenFor(m => m.TehsilID, new { @id = "hfTehsilId" })
+                                            @Html.ValidationMessageFor(m => m.TehsilID, "", new { @class = "text-danger" })
+                                        </div>
+                                        <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                            <label class="col-form-label font-weight-bolder">Village <span class="text-danger">*</span></label>
+                                            <select id="VillageID" name="VillageID" Class="form-control searchableselect">
+                                                <option value="">Select</option>
+                                            </select>
+                                            @Html.HiddenFor(m => m.VillageID, new { @id = "hfVillageId" })
+                                            @Html.ValidationMessageFor(m => m.VillageID, "", new { @class = "text-danger" })
+                                        </div>
+
+                                        <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                            <label for="inputLoginId" class="col-form-label font-weight-bolder">Block Forest Range</label>
+                                            @Html.TextBoxFor(x => x.BLOCK_FOREST_RANG, new { @class = "form-control" })
+                                        </div>
+                                        <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                            <label for="inputLoginId" class="col-form-label font-weight-bolder">Pin Code</label>
+                                            @Html.TextBoxFor(x => x.PIN_CODE, new { @maxlength = "6", @class = "form-control" })
+                                        </div>
+                                        <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                            <label class="col-form-label font-weight-bolder">Land Type <span class="text-danger">*</span></label>
+                                            @Html.DropDownListFor(m => m.LAND_ID, ViewBag.LandType as IEnumerable<SelectListItem>, "Select Land", new { @class = "form-control searchableselect", autofocus = "autofocus", @id = "ddlLand" })
+                                            @Html.HiddenFor(m => m.LAND_ID, new { @id = "hfLandId" })
+                                            @Html.ValidationMessageFor(m => m.LAND_ID, "", new { @class = "text-danger" })
+                                        </div>
+                                        <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                            <label class="col-form-label font-weight-bolder">Gram Panchayat</label>
+                                            @Html.TextBoxFor(x => x.GRAM_PANCHAYAT, new { @maxlength = "50", @class = "form-control" })
+                                        </div>
+                                        <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                            <label class="col-form-label font-weight-bolder">Police Station</label>
+                                            @Html.TextBoxFor(x => x.POLICE_STATION, new { @maxlength = "50", @class = "form-control" })
+                                        </div>
+                                    </div>
+                                    <div class="row mt-4">
+                                        <div class="col-sm-12 text-center">
+                                            <a class="btn btn-primary btn-md ml-0 waves-effect waves-light btnNext" onclick="NextArea()">Next</a>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="tab-pane fade show" id="Area" role="tabpanel" aria-labelledby="Area-tab">
+                                    <h5 class="text-brown font-weight-bold">Area in Hectare</h5>
+                                    <div class="row">
+                                        <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                            <label class="col-form-label font-weight-bolder">Area in Hectare <span class="text-danger">*</span></label>
+                                            @Html.TextBoxFor(x => x.AREA_IN_HECT, new { @maxlength = "20", @class = "form-control" })
+                                        </div>
+                                        <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                            <label class="col-form-label font-weight-bolder">Toposheet Number <span class="text-danger">*</span></label>
+                                            @Html.TextBoxFor(x => x.TOPOSHEET_NO, new { @maxlength = "50", @class = "form-control" })
+                                        </div>
+                                        <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                            <label class="col-form-label font-weight-bolder">Coordinates Number<span class="text-danger">*</span></label>
+                                            @Html.TextBoxFor(x => x.COORDINATES_NO, new { @maxlength = "50", @class = "form-control" })
+                                        </div>
+                                        <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                            <label class="col-form-label font-weight-bolder">Longitude (eg 20.2960587) <span class="text-danger">*</span></label>
+                                            @Html.TextBoxFor(x => x.Longitude, new { @maxlength = "50", @class = "form-control", @placeholder= "20.2960587", @id= "txtLon", onkeypress = "return inputLimiter(event,'NameCharactersAndNumbers')" })
+                                        </div>
+                                        <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                            <label class="col-form-label font-weight-bolder">Latitude (eg 85.8245398)<span class="text-danger">*</span></label>
+                                            @Html.TextBoxFor(x => x.Latitude, new { @maxlength = "50", @class = "form-control" , @placeholder = "85.8245398", @id = "txtLat", onkeypress = "return inputLimiter(event,'NameCharactersAndNumbers')" })
+                                        </div>
+
+                                        <div class="col-lg-4 col-md-6 col-sm-12 form-group">
+                                            <label class="col-form-label font-weight-bolder">Demarcation / DGPS / GPS / Total Station Survey Report / Coordinates </label>
+                                            <div class="custom-file">
+                                                <input type="file" class="custom-file-input" id="File11" name="selectedFile">
+                                                <label class="custom-file-label" for="customFile">Choose Files</label>
+                                            </div>
+                                            @if (Model.DEMARCATION_REPORT_PATH != null && Model.FILE_DEMARCATION_REPORT != "")
+                                            {
+                                                <label class="form-control-plaintext">@(Model.FILE_DEMARCATION_REPORT) <a href='~/@Model.DEMARCATION_REPORT_PATH' title="" class="ml-2" data-original-title="Download" target="_blank"><i class="icon-file-pdf-solid h5 text-danger"></i></a></label>
+                                            }
+                                        </div>
+
+                                    </div>
+                                    <div class="row mt-4">
+                                        <div class="col-sm-12 text-center">
+                                            <a class="btn btn-dark btn-md ml-0 waves-effect waves-light btnPrevious" onclick="BackArea()">Previous</a>
+                                            @if (@Model.STATUS != 5)
+                                            {
+                                                <input type="submit" id="Submit" value="Save & Update" class="btn btn-success btn-md ml-0 waves-effect waves-light btnsave" onclick="return Validate()">
+                                                <input type="submit" value="Delete" class="btn btn-danger btn-md ml-0 waves-effect waves-light btnsave" id="Delete" name="delete" onclick="return confirm('Are you sure to delete?')" style="display:none" />
+                                                <input type="button" title="Forward to DD" value="Forward To DD" name="cmd" id="cmd2" class="btn btn-warning text-dark btn-md waves-effect waves-light ml-0 btnsave" onclick="if (Validate()) { return OnForwarding('Forward To DD'); }" />
+                                                @*<input type="button" title="Forward to DD" value="Forward To DD" name="cmd" id="cmd2" class="btn btn-warning text-dark btn-md waves-effect waves-light ml-0 btnsave" onclick="if (Validate()) { return ForwordToDdWithoutDS('Forward To DD'); }" />*@
+
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        }
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+</section>
+<script>
+     @if (Model.STATUS == 1 ) {
+
+          <Text>
+            document.getElementById("Submit").style.visibility = 'hidden'
+            document.getElementById("Delete").style.visibility = 'hidden'
+            document.getElementById("cmd2").style.visibility = 'hidden'
+          </Text>
+        }
+
+</script>

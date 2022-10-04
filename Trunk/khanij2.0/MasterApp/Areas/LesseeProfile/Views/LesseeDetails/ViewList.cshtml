@@ -1,0 +1,589 @@
+﻿@*// *********************************************************************************************************
+    //  View Name                : Add
+    //  Desciption               : To View Lesee Application Details
+    //  Created By               : Lingaraj Dalai
+    //  Created On               : 06 July 2021
+    // ********************************************************************************************************
+*@
+@model MasterEF.LesseeInfoModel;
+@using MasterApp.Web;
+@using MasterEF;
+@using  Microsoft.AspNetCore.Http;
+@inject IHttpContextAccessor HttpContextAccessor
+@{
+    ViewData["Title"] = "ViewList";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+    UserLoginSession profile = HttpContextAccessor.HttpContext.Session.Get<UserLoginSession>(KeyHelper.UserKey);
+    //profile.MineralTypeName = "Major Mineral";
+    //profile.MineralName = "COAL";
+}
+<script>
+    backMe = "yes"
+    $(document).ready(function () {
+        loadNavigation('CompareApplicationDetails', 'glUIS', 'pllesseprof', 'tl', 'Lessee Profile', 'Lesse Details', ' ');
+        $('.divPerformAmt').hide();
+          /*Show hide controls for Minor/Major-Coal,NonCoal*/
+        var mineraltypename = '@profile.MineralTypeName';
+        var mineralname = '@profile.MineralName';
+        if (mineraltypename == "Minor Mineral") {
+            $('.divCoal').hide();/*Field E&I Cess*/
+            $('.divBidPremium').hide();/*BidPremium*/
+            $('.divLabEstablished').hide();
+            $('.divMajor').hide();
+        }
+        else {
+            $('.divMinor').hide();
+            if (mineralname != "COAL") {
+                $('.divCoal').hide();/*Field E&I Cess*/
+                $('.divAuctionDiv').hide();/*Field With Auction Money*/
+            }
+        }
+        if (@profile.UserTypeId!= 7) { /*Other than Lessee Login*/
+            $("#navlinkAdd").hide(); //Hide Add tab
+            $(".ml-3").hide(); //Hide Edit button
+        }
+    });
+</script>
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        <!-- MAIN CONTENT AREA STARTS -->
+        @Html.Partial("_CMSnavigation")
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item" id="navlinkAdd">
+                            <a class="nav-link" href="~/LesseeProfile/LesseeDetails/Add">
+                                Add
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="javascript:void(0);">
+                                View
+                            </a>
+                        </li>
+                    </ul>
+                    @Html.Partial("_CMSutil")
+                </div>
+                <section class="box form-container">
+                    <div class="content-body">
+                        <div class="message-heading">
+                            <h5 class="font-weight-bold text-brown">Lessee Information</h5>
+                            <div>
+                                <a href="javascript:void(0);" class="btn-dark btn-sm log-btn" data-val="collapsefillter1">Log Report <i class="icon-angle-down-solid"></i></a>
+                                <a href="@CustomQueryStringHelper.EncryptString("LesseeProfile","Add","LesseeDetails",new {id=Model.CREATED_BY })" class="btn-success btn-sm ml-3" data-original-title="Edit"><i class="icon-pencil-alt-solid"></i></a>
+                            </div>
+                        </div>
+                        <div class="message-highlighter">
+                            <div class="row">
+                                <label class="col-lg-3 col-md-4 col-sm-12 col-form-label">Lease Type</label>
+                                <div class="col-lg-3 col-md-8 col-sm-12">
+                                    <label class="form-control-plaintext" id="lblLeaseTypeId"><span class="colon">:</span>@Model.LeaseTypeName</label>
+                                </div>
+                                <label class="col-lg-3 col-md-4 col-sm-12 col-form-label">Application No.</label>
+                                <div class="col-lg-3 col-md-8 col-sm-12">
+                                    @if (Model.APPLICATION_FORM_FILE_NAME != null)
+                                    {
+                                        <label class="form-control-plaintext"><span class="colon">:</span>@(Model.APPLICATION_NUMBER) <a href='~/Upload/Lessee/APPLICATION/APPLICATION_FORM/@Model.APPLICATION_FORM_FILE_NAME' title="" class="ml-2" data-original-title="Download Application Form" target="_blank"><i class="icon-file-pdf-solid h5 text-danger"></i></a></label>
+                                    }
+                                </div>
+                                <label class="col-lg-3 col-md-4 col-sm-12 col-form-label">Mine Code</label>
+                                <div class="col-lg-3 col-md-8 col-sm-12">
+                                    <label class="form-control-plaintext"><span class="colon">:</span>@Model.MINE_CODE</label>
+                                </div>
+                                <label class="col-lg-3 col-md-4 col-sm-12 col-form-label">Lease Name</label>
+                                <div class="col-lg-3 col-md-8 col-sm-12">
+                                    <label class="form-control-plaintext"><span class="colon">:</span>@Model.RECONNAISSANCE_LICENSE_NAME</label>
+                                </div>
+                                <label class="col-lg-3 col-md-4 col-sm-12 col-form-label">Lease Address</label>
+                                <div class="col-lg-3 col-md-8 col-sm-12">
+                                    <label class="form-control-plaintext"><span class="colon">:</span>@Model.RECONNAISSANCE_LICENSE_ADDRESS</label>
+                                </div>
+                                <label class="col-lg-3 col-md-4 col-sm-12 col-form-label">PAN Card No.</label>
+                                <div class="col-lg-3 col-md-8 col-sm-12">
+                                    @if (Model.PAN_CARD_COPY_FILE_NAME != null)
+                                    {
+                                        <label class="form-control-plaintext"><span class="colon">:</span>@(Model.PAN_CARD_NO) <a href='~/Upload/Lessee/APPLICATION/PAN_CARD/@Model.PAN_CARD_COPY_FILE_NAME' title="" class="ml-2" data-original-title="Download PAN Card Copy" target="_blank"><i class="icon-file-pdf-solid h5 text-danger"></i></a></label>
+                                    }
+                                </div>
+                                <label class="col-lg-3 col-md-4 col-sm-12 col-form-label">Adhar Card No.</label>
+                                <div class="col-lg-3 col-md-8 col-sm-12">
+                                    @if (Model.ADHAR_CARD_SCAN_COPY_FILE_NAME != null)
+                                    {
+                                        <label class="form-control-plaintext"><span class="colon">:</span>@Model.ADHAR_CARD <a href='~/Upload/Lessee/APPLICATION/ADHAR_CARD/@Model.ADHAR_CARD_SCAN_COPY_FILE_NAME' title="" class="ml-2" data-original-title="Download AAdhar Card Copy" target="_blank"><i class="icon-file-pdf-solid h5 text-danger"></i></a></label>
+                                    }
+                                </div>
+                                <label class="col-lg-3 col-md-4 col-sm-12 col-form-label">Tin Card No.</label>
+                                <div class="col-lg-3 col-md-8 col-sm-12">
+                                    @if (Model.TIN_CARD_SCAN_COPY_FILE_NAME != null)
+                                    {
+                                        <label class="form-control-plaintext"><span class="colon">:</span>@(Model.TIN_CARD) <a href='~/Upload/Lessee/APPLICATION/TIN_CARD/@Model.TIN_CARD_SCAN_COPY_FILE_NAME' title="" class="ml-2" data-original-title="Download GST Copy" target="_blank"><i class="icon-file-pdf-solid h5 text-danger"></i></a></label>
+                                    }
+                                </div>
+                                <label class="col-lg-3 col-md-4 col-sm-12 col-form-label">Firm Registration Deed No.</label>
+                                <div class="col-lg-3 col-md-8 col-sm-12">
+                                    @if (Model.FIRM_REGISTRATION_DEED_FILE_NAME != null)
+                                    {
+                                        <label class="form-control-plaintext"><span class="colon">:</span>@(Model.FIRMREGISTRATION_DEED_NUMBER) <a href='~/Upload/Lessee/APPLICATION/FIRM_REGISTRATION_DEED/@Model.FIRM_REGISTRATION_DEED_FILE_NAME' title="" class="ml-2" data-original-title="Download Firm Registration Deed Document" target="_blank"><i class="icon-file-pdf-solid h5 text-danger"></i></a></label>
+                                    }
+                                </div>
+                                <label class="col-lg-3 col-md-4 col-sm-12 col-form-label">Incorporation Certification No.</label>
+                                <div class="col-lg-3 col-md-8 col-sm-12">
+                                    @if (Model.CERTIFICATE_OF_INCORPORATION_DOC_FILE_NAME != null)
+                                    {
+                                        <label class="form-control-plaintext"><span class="colon">:</span>@(Model.CERTIFICATE_OF_INCORPORATION_NUMBER) <a href='~/Upload/Lessee/APPLICATION/CIRTIFICATE_OF_INCORPORATION/@Model.CERTIFICATE_OF_INCORPORATION_DOC_FILE_NAME' title="" class="ml-2" data-original-title="Download Incorporation Certification Document" target="_blank"><i class="icon-file-pdf-solid h5 text-danger"></i></a></label>
+                                    }
+                                </div>
+                                <label class="col-lg-3 col-md-4 col-sm-12 col-form-label">WB Installed</label>
+                                <div class="col-lg-3 col-md-8 col-sm-12">
+                                    <label class="form-control-plaintext"><span class="colon">:</span>@Model.IsWBInstalled</label>
+                                </div>
+                                @if (Model.IsWBInstalled == "Yes")
+                                {
+                                    <label class="col-lg-3 col-md-4 col-sm-12 col-form-label">Stamping Date</label>
+                                    <div class="col-lg-3 col-md-8 col-sm-12">
+                                        <label class="form-control-plaintext"><span class="colon">:</span>@Model.WBStampDate</label>
+                                    </div>
+                                    <label class="col-lg-3 col-md-4 col-sm-12 col-form-label">Stamping Date Valid Upto</label>
+                                    <div class="col-lg-3 col-md-8 col-sm-12">
+                                        <label class="form-control-plaintext"><span class="colon">:</span>@Model.WBValidUpto</label>
+                                    </div>
+                                    <label class="col-lg-3 col-md-4 col-sm-12 col-form-label">Stamping Certificate</label>
+                                    <div class="col-lg-3 col-md-8 col-sm-12">
+                                        @if (Model.WBExemption_PATH != null)
+                                        {
+                                            <label class="form-control-plaintext"><span class="colon">:</span> <a href='~/Upload/Lessee/APPLICATION/WBInstalled/@Model.WBExemption_FILE' title="" class="ml-2" data-original-title="Download Document" target="_blank"><i class="icon-file-pdf-solid h5 text-danger"></i></a></label>
+                                        }
+                                    </div>
+                                }
+                                else
+                                {
+                                    <label class="col-lg-3 col-md-4 col-sm-12 col-form-label">Order copy of WB Exemption</label>
+                                    <div class="col-lg-3 col-md-8 col-sm-12">
+                                        @if (Model.WBExemption_PATH != null)
+                                        {
+                                            <label class="form-control-plaintext"><span class="colon">:</span> <a href='~/Upload/Lessee/APPLICATION/WBInstalled/@Model.WBExemption_FILE' title="" class="ml-2" data-original-title="Download Document" target="_blank"><i class="icon-file-pdf-solid h5 text-danger"></i></a></label>
+                                        }
+                                    </div>
+                                }
+                                <label class="col-lg-3 col-md-4 col-sm-12 col-form-label divLabEstablished">Lab Established</label>
+                                <div class="col-lg-3 col-md-8 col-sm-12 divLabEstablished">
+                                    <label class="form-control-plaintext"><span class="colon">:</span>@Model.IsLabEstablished</label>
+                                </div>
+                                @if (Model.IsLabEstablished == "Yes" && profile.MineralTypeName != "Minor Mineral")
+                                {
+                                    <label class="col-lg-3 col-md-4 col-sm-12 col-form-label">Upload copy of Inspection report by Officials(RH,DGM)</label>
+                                    <div class="col-lg-3 col-md-8 col-sm-12">
+                                        @if (Model.LabExemption_PATH != null)
+                                        {
+                                            <label class="form-control-plaintext"><span class="colon">:</span> <a href='~/Upload/Lessee/APPLICATION/LabInstalled/@Model.LabExemption_PATH' title="" class="ml-2" data-original-title="Download Lab Installed Document" target="_blank"><i class="icon-file-pdf-solid h5 text-danger"></i></a></label>
+                                        }
+                                    </div>
+                                }
+                                else if (Model.IsLabEstablished == "No" && profile.MineralTypeName != "Minor Mineral")
+                                {
+                                    <label class="col-lg-3 col-md-4 col-sm-12 col-form-label">Upload order copy of exemption by DGM / MRD</label>
+                                    <div class="col-lg-3 col-md-8 col-sm-12">
+                                        @if (Model.LabExemption_PATH != null)
+                                        {
+                                            <label class="form-control-plaintext"><span class="colon">:</span> <a href='~/Upload/Lessee/APPLICATION/LabInstalled/@Model.LabExemption_PATH' title="" class="ml-2" data-original-title="Download Lab Installed Document" target="_blank"><i class="icon-file-pdf-solid h5 text-danger"></i></a></label>
+                                        }
+                                    </div>
+                                }
+                                <label class="col-lg-3 col-md-4 col-sm-12 col-form-label">Application Type</label>
+                                <div class="col-lg-3 col-md-8 col-sm-12">
+                                    <label class="form-control-plaintext"><span class="colon">:</span>@Model.IsAuctionType</label>
+                                </div>
+                                @if (Model.AuctionTypeId == 2)
+                                {
+                                    <label class="col-lg-3 col-md-4 col-sm-12 col-form-label divAuctionDiv">Monthly Periodic Amount/Auction Money(in <i class="fas fa-rupee-sign"></i>)</label>
+                                    <div class="col-lg-3 col-md-8 col-sm-12 divAuctionDiv">
+                                        <label class="form-control-plaintext"><span class="colon">:</span>@Model.MonthlyPeriodicAmt</label>
+                                    </div>
+                                    <label class="col-lg-3 col-md-4 col-sm-12 col-form-label divBidPremium">Bid Premium(%)</label>
+                                    <div class="col-lg-3 col-md-8 col-sm-12 divBidPremium">
+                                        <label class="form-control-plaintext"><span class="colon">:</span>@Model.BidPremium</label>
+                                    </div>
+                                }
+                                <label class="col-lg-3 col-md-4 col-sm-12 col-form-label">Storage / Crusher</label>
+                                <div class="col-lg-3 col-md-8 col-sm-12">
+                                    <label class="form-control-plaintext"><span class="colon">:</span>@Model.StorageCrusher</label>
+                                </div>
+                                @if (Model.StorageCrusher == "Yes")
+                                {
+                                    <label class="col-lg-3 col-md-4 col-sm-12 col-form-label">Crusher Installed</label>
+                                    <div class="col-lg-3 col-md-8 col-sm-12">
+                                        <label class="form-control-plaintext"><span class="colon">:</span>@Model.CrusherInstalled</label>
+                                    </div>
+                                    @if (Model.CrusherInstalled == "No")
+                                    {
+                                        <label class="col-lg-3 col-md-4 col-sm-12 col-form-label">Storage/Crusher License Copy</label>
+                                        <div class="col-lg-3 col-md-8 col-sm-12">
+                                            @if (Model.StorageCrusherAttachment_FILE != null)
+                                            {
+                                                <label class="form-control-plaintext"><span class="colon">:</span> <a href='~/Upload/Lessee/APPLICATION/Minor_Mineral/@Model.StorageCrusherAttachment_FILE' title="" class="ml-2" data-original-title="Download Storage Crusher Document" target="_blank"><i class="icon-file-pdf-solid h5 text-danger"></i></a></label>
+                                            }
+                                        </div>
+                                    }
+                                }
+                                <label class="col-lg-3 col-md-4 col-sm-12 col-form-label divCoal">Adjust E & I CESS</label>
+                                <div class="col-lg-3 col-md-8 col-sm-12 divCoal">
+                                    <label class="form-control-plaintext"><span class="colon">:</span>@Model.AdjustCess</label>
+                                </div>
+                                @if (Model.AdjustCess == "Yes" && profile.MineralTypeName == "COAL")
+                                {
+                                    <label class="col-lg-3 col-md-4 col-sm-12 col-form-label">Order of</label>
+                                    <div class="col-lg-3 col-md-8 col-sm-12">
+                                        <label class="form-control-plaintext"><span class="colon">:</span>@Model.OrderOf</label>
+                                    </div>
+                                    <label class="col-lg-3 col-md-4 col-sm-12 col-form-label">Order No</label>
+                                    <div class="col-lg-3 col-md-8 col-sm-12">
+                                        @if (Model.OrderAttachment_File != null)
+                                        {
+                                            <label class="form-control-plaintext"><span class="colon">:</span>@(Model.OrderNo) <a href='~/Upload/Lessee/APPLICATION/APPLICATION_FORM/@Model.OrderAttachment_File' title="" class="ml-2" data-original-title="Download Attached Order Document" target="_blank"><i class="icon-file-pdf-solid h5 text-danger"></i></a></label>
+                                        }
+                                    </div>
+                                    <label class="col-lg-3 col-md-4 col-sm-12 col-form-label">Order Date</label>
+                                    <div class="col-lg-3 col-md-8 col-sm-12">
+                                        <label class="form-control-plaintext"><span class="colon">:</span>@Model.OrderDate</label>
+                                    </div>
+                                }
+                            </div>
+                            <ul class="timeline custom-scroll log-box" id="collapsefillter1">
+                                @Html.Raw((String)ViewBag.tableLA)
+                            </ul>
+                        </div>
+                        <div class="message-heading">
+                            <h5 class="font-weight-bold text-brown">Attachments Information</h5>
+                            <div>
+                                <a href="javascript:void(0);" class="btn-dark btn-sm log-btn" data-val="collapsefillter2">Log Report <i class="icon-angle-down-solid"></i></a>
+                                <a href="@CustomQueryStringHelper.EncryptString("LesseeProfile","Add","LesseeDetails",new {id=Model.CREATED_BY })" class="btn-success btn-sm ml-3" data-original-title="Edit"><i class="icon-pencil-alt-solid"></i></a>
+                            </div>
+                        </div>
+                        <div class="message-highlighter">
+                            <div class="row">
+                                <label class="col-lg-3 col-md-4 col-sm-12 col-form-label">Power of Attorney</label>
+                                <div class="col-lg-3 col-md-8 col-sm-12">
+                                    <span class="colon">:</span>@Model.POWER_OF_ATORNY_FILE_NAME
+                                    @if (Model.POWER_OF_ATORNY_FILE_NAME != null && Model.POWER_OF_ATORNY_FILE_NAME != "" && Model.POWER_OF_ATORNY_FILE_NAME != "--")
+                                    {
+                                        <label class="form-control-plaintext"><span class="colon">:</span> <a href='~/Upload/Lessee/APPLICATION/POWER_OF_ATORNY/@Model.POWER_OF_ATORNY_FILE_NAME' title="" class="ml-2" data-original-title="Download" target="_blank"><i class="icon-file-pdf-solid h5 text-danger"></i></a></label>
+                                    }
+                                </div>
+                                <label class="col-lg-3 col-md-4 col-sm-12 col-form-label">Affidavits / Mining Due Certificate</label>
+                                <div class="col-lg-3 col-md-8 col-sm-12">
+                                    <span class="colon">:</span>@Model.AFFIDAVITS_MINING_DUE_CERTIFICATE_FILE_NAME
+                                    @if (Model.AFFIDAVITS_MINING_DUE_CERTIFICATE_FILE_NAME != null && Model.AFFIDAVITS_MINING_DUE_CERTIFICATE_FILE_NAME != "" && Model.AFFIDAVITS_MINING_DUE_CERTIFICATE_FILE_NAME != "--")
+                                    {
+                                        <label class="form-control-plaintext"><span class="colon">:</span> <a href='~/Upload/Lessee/APPLICATION/AFFIDAVITS_MINNING_DUE_CERTIFICATE/@Model.AFFIDAVITS_MINING_DUE_CERTIFICATE_FILE_NAME' title="" class="ml-2" data-original-title="Download" target="_blank"><i class="icon-file-pdf-solid h5 text-danger"></i></a></label>
+                                    }
+                                </div>
+                                <label class="col-lg-3 col-md-4 col-sm-12 col-form-label">Khasara Panchsala</label>
+                                <div class="col-lg-3 col-md-8 col-sm-12">
+                                    <span class="colon">:</span>@Model.KHASARA_PANCHSALA_FILE_NAME
+                                    @if (Model.KHASARA_PANCHSALA_FILE_NAME != null && Model.KHASARA_PANCHSALA_FILE_NAME != "" && Model.KHASARA_PANCHSALA_FILE_NAME != "--")
+                                    {
+                                        <label class="form-control-plaintext"><span class="colon">:</span> <a href='~/Upload/Lessee/APPLICATION/KHASARA_PANCHASALA/@Model.KHASARA_PANCHSALA_FILE_NAME' title="" class="ml-2" data-original-title="Download" target="_blank"><i class="icon-file-pdf-solid h5 text-danger"></i></a></label>
+                                    }
+                                </div>
+                                <label class="col-lg-3 col-md-4 col-sm-12 col-form-label">Map / Plan of applied area</label>
+                                <div class="col-lg-3 col-md-8 col-sm-12">
+                                    <span class="colon">:</span>@Model.MAP_PLAN_OF_APPLIED_AREA_FILE_NAME
+                                    @if (Model.MAP_PLAN_OF_APPLIED_AREA_FILE_NAME != null && Model.MAP_PLAN_OF_APPLIED_AREA_FILE_NAME != "" && Model.MAP_PLAN_OF_APPLIED_AREA_FILE_NAME != "--")
+                                    {
+                                        <label class="form-control-plaintext"><span class="colon">:</span> <a href='~/Upload/Lessee/APPLICATION/MAP_PLAN_OF_APPLIED_AREA/@Model.MAP_PLAN_OF_APPLIED_AREA_FILE_NAME' title="" class="ml-2" data-original-title="Download" target="_blank"><i class="icon-file-pdf-solid h5 text-danger"></i></a></label>
+                                    }
+                                </div>
+                                <label class="col-lg-3 col-md-4 col-sm-12 col-form-label">Forest Report</label>
+                                <div class="col-lg-3 col-md-8 col-sm-12">
+                                    <span class="colon">:</span>@Model.FOREST_REPORT_FILE_NAME
+                                    @if (Model.FOREST_REPORT_FILE_NAME != null && Model.FOREST_REPORT_FILE_NAME != "" && Model.FOREST_REPORT_FILE_NAME != "--")
+                                    {
+                                        <label class="form-control-plaintext"><span class="colon">:</span> <a href='~/Upload/Lessee/APPLICATION/FOREST_REPORT/@Model.FOREST_REPORT_FILE_NAME' title="" class="ml-2" data-original-title="Download" target="_blank"><i class="icon-file-pdf-solid h5 text-danger"></i></a></label>
+                                    }
+                                </div>
+                                <label class="col-lg-3 col-md-4 col-sm-12 col-form-label">Revenue Officer Report</label>
+                                <div class="col-lg-3 col-md-8 col-sm-12">
+                                    <span class="colon">:</span>@Model.REVENUE_OFFICER_REPORT_FILE_NAME
+                                    @if (Model.REVENUE_OFFICER_REPORT_FILE_NAME != null && Model.REVENUE_OFFICER_REPORT_FILE_NAME != "" && Model.REVENUE_OFFICER_REPORT_FILE_NAME != "--")
+                                    {
+                                        <label class="form-control-plaintext"><span class="colon">:</span> <a href='~/Upload/Lessee/APPLICATION/REVENUE_OFFICER_REPORT/@Model.REVENUE_OFFICER_REPORT_FILE_NAME' title="" class="ml-2" data-original-title="Download" target="_blank"><i class="icon-file-pdf-solid h5 text-danger"></i></a></label>
+                                    }
+                                </div>
+                                <label class="col-lg-3 col-md-4 col-sm-12 col-form-label">Spot Inspection and Analysis Report</label>
+                                <div class="col-lg-3 col-md-8 col-sm-12">
+                                    <span class="colon">:</span>@Model.SPOT_INSPECTION_AND_ANALYSIS_REPORT_FILE_NAME
+                                    @if (Model.SPOT_INSPECTION_AND_ANALYSIS_REPORT_FILE_NAME != null && Model.SPOT_INSPECTION_AND_ANALYSIS_REPORT_FILE_NAME != "" && Model.SPOT_INSPECTION_AND_ANALYSIS_REPORT_FILE_NAME != "--")
+                                    {
+                                        <label class="form-control-plaintext"><span class="colon">:</span> <a href='~/Upload/Lessee/APPLICATION/SPOT_INSPECTION_AND_ANALYSIS_REPORT/@Model.SPOT_INSPECTION_AND_ANALYSIS_REPORT_FILE_NAME' title="" class="ml-2" data-original-title="Download" target="_blank"><i class="icon-file-pdf-solid h5 text-danger"></i></a></label>
+                                    }
+                                </div>
+                                <label class="col-lg-3 col-md-4 col-sm-12 col-form-label">Mining Inspector Report</label>
+                                <div class="col-lg-3 col-md-8 col-sm-12">
+                                    <span class="colon">:</span>@Model.MINING_INSPECTOR_REPORT_FILE_NAME
+                                    @if (Model.MINING_INSPECTOR_REPORT_FILE_NAME != null && Model.MINING_INSPECTOR_REPORT_FILE_NAME != "" && Model.MINING_INSPECTOR_REPORT_FILE_NAME != "--")
+                                    {
+                                        <label class="form-control-plaintext"><span class="colon">:</span> <a href='~/Upload/Lessee/APPLICATION/MINNING_INSPECTOR_REPORT/@Model.MINING_INSPECTOR_REPORT_FILE_NAME' title="" class="ml-2" data-original-title="Download" target="_blank"><i class="icon-file-pdf-solid h5 text-danger"></i></a></label>
+                                    }
+                                </div>
+                                <label class="col-lg-3 col-md-4 col-sm-12 col-form-label">Gram Panchayat Proposal</label>
+                                <div class="col-lg-3 col-md-8 col-sm-12">
+                                    <span class="colon">:</span>@Model.GRAM_PANCHAYAT_PROPOSAL_FILE_NAME
+                                    @if (Model.GRAM_PANCHAYAT_PROPOSAL_FILE_NAME != null && Model.GRAM_PANCHAYAT_PROPOSAL_FILE_NAME != "" && Model.GRAM_PANCHAYAT_PROPOSAL_FILE_NAME != "--")
+                                    {
+                                        <label class="form-control-plaintext"><span class="colon">:</span> <a href='~/Upload/Lessee/APPLICATION/GRAM_PANCHAYAT_PROPOSAL/@Model.GRAM_PANCHAYAT_PROPOSAL_FILE_NAME' title="" class="ml-2" data-original-title="Download" target="_blank"><i class="icon-file-pdf-solid h5 text-danger"></i></a></label>
+                                    }
+                                </div>
+                            </div>
+                            <ul class="timeline custom-scroll log-box" id="collapsefillter2">
+                                @Html.Raw((String)ViewBag.tableLB)
+                            </ul>
+                        </div>
+                        <div class="message-heading">
+                            <h5 class="font-weight-bold text-brown">Fees Information</h5>
+                            <div>
+                                <a href="javascript:void(0);" class="btn-dark btn-sm log-btn" data-val="collapsefillter3">Log Report <i class="icon-angle-down-solid"></i></a>
+                                <a href="@CustomQueryStringHelper.EncryptString("LesseeProfile","Add","LesseeDetails",new {id=Model.CREATED_BY })" class="btn-success btn-sm ml-3" data-original-title="Edit"><i class="icon-pencil-alt-solid"></i></a>
+                            </div>
+                        </div>
+                        <div class="message-highlighter">
+                            <div class="row">
+                                @if (Model.AuctionTypeId == 2)
+                                {
+                                    @if (@Model.PaymentModeType == "BG")
+                                    {
+                                        <label class="col-lg-3 col-md-4 col-sm-12 col-form-label">Payment Mode</label>
+                                        <div class="col-lg-3 col-md-8 col-sm-12">
+                                            <label class="form-control-plaintext"><span class="colon">:</span>BG</label>
+                                        </div>
+                                        <label class="col-lg-3 col-md-4 col-sm-12 col-form-label">Validity Upto</label>
+                                        <div class="col-lg-3 col-md-8 col-sm-12">
+                                            <label class="form-control-plaintext"><span class="colon">:</span>@Model.BG_ValidityUpto</label>
+                                        </div>
+                                        <label class="col-lg-3 col-md-4 col-sm-12 col-form-label">Copy of Performance Security</label>
+                                        <div class="col-lg-3 col-md-8 col-sm-12">
+                                            <label class="form-control-plaintext">
+                                                <span class="colon">:</span>@Model.PerformanceSecurity_FILE
+                                                @if (Model.PerformanceSecurity_FILE != null)
+                                                {
+                                                    <a href='~/Upload/Lessee/APPLICATION/Minor_Mineral/@Model.PerformanceSecurity_FILE' title="" class="ml-2" data-original-title="Download" target="_blank"><i class="icon-file-pdf-solid h5 text-danger"></i></a>
+                                                }
+                                            </label>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <label class="col-lg-3 col-md-4 col-sm-12 col-form-label">Payment Mode</label>
+                                        <div class="col-lg-3 col-md-8 col-sm-12">
+                                            <label class="form-control-plaintext"><span class="colon">:</span>DD</label>
+                                        </div>
+                                        <label class="col-lg-3 col-md-4 col-sm-12 col-form-label">Amount of DD</label>
+                                        <div class="col-lg-3 col-md-8 col-sm-12">
+                                            <label class="form-control-plaintext"><span class="colon">:</span>@Model.AmountOfDD</label>
+                                        </div>
+                                        <label class="col-lg-3 col-md-4 col-sm-12 col-form-label">Copy of Performance Security</label>
+                                        <div class="col-lg-3 col-md-8 col-sm-12">
+                                            <label class="form-control-plaintext">
+                                                <span class="colon">:</span>@Model.PerformanceSecurity_FILE
+                                                @if (Model.PerformanceSecurity_FILE != null)
+                                                {
+                                                    <a href='~/Upload/Lessee/APPLICATION/Minor_Mineral/@Model.PerformanceSecurity_FILE' title="" class="ml-2" data-original-title="Download" target="_blank"><i class="icon-file-pdf-solid h5 text-danger"></i></a>
+                                                }
+                                            </label>
+                                        </div>
+                                    }
+                                }
+                                <label class="col-lg-3 col-md-4 col-sm-12 col-form-label">Application Fees (in <i class="fas fa-rupee-sign"></i>)</label>
+                                <div class="col-lg-3 col-md-8 col-sm-12">
+                                    <label class="form-control-plaintext">
+                                        <span class="colon">:</span>@Model.APPLICATION_FEES
+                                        @if (Model.APPLICATION_FEES_COPY_FILE_NAME != null)
+                                        {
+                                            <a href='~/Upload/Lessee/APPLICATION/APPLICATION_FEES_COPY/@Model.APPLICATION_FEES_COPY_FILE_NAME' title="" class="ml-2" data-original-title="Download" target="_blank"><i class="icon-file-pdf-solid h5 text-danger"></i></a>
+                                        }
+                                    </label>
+                                </div>
+                                <label class="col-lg-3 col-md-4 col-sm-12 col-form-label">Application Fees Date</label>
+                                <div class="col-lg-3 col-md-8 col-sm-12">
+                                    <label class="form-control-plaintext"><span class="colon">:</span>@Model.APPLICATION_FEES_DATE</label>
+                                </div>
+                                <label class="col-lg-3 col-md-4 col-sm-12 col-form-label divMajor">Security Deposit Challan / DD Amount (in <i class="fas fa-rupee-sign"></i>)</label>
+                                <div class="col-lg-3 col-md-8 col-sm-12 divMajor">
+                                    <label class="form-control-plaintext">
+                                        <span class="colon">:</span>@Model.CHALLAN_DD_AMOUNT
+                                        @if (Model.CHALLAN_DD_AMOUNT_COPY_FILE_NAME != null)
+                                        {
+                                            <a href='~/Upload/Lessee/APPLICATION/CHALLAN_DD_COPY/@Model.CHALLAN_DD_AMOUNT_COPY_FILE_NAME' title="" class="ml-2" data-original-title="Download" target="_blank"><i class="icon-file-pdf-solid h5 text-danger"></i></a>
+                                        }
+                                    </label>
+                                </div>
+                                <label class="col-lg-3 col-md-4 col-sm-12 col-form-label divMajor">Security Deposit Challan/DD Date</label>
+                                <div class="col-lg-3 col-md-8 col-sm-12 divMajor">
+                                    <label class="form-control-plaintext"><span class="colon">:</span>@Model.CHALLAN_DD_AMOUNT_DATE </label>
+                                </div>
+                                <label class="col-lg-3 col-md-4 col-sm-12 col-form-label">Bank Guarrantee Amount (in <i class="fas fa-rupee-sign"></i>)</label>
+                                <div class="col-lg-3 col-md-8 col-sm-12">
+                                    <label class="form-control-plaintext">
+                                        <span class="colon">:</span>@Model.BANK_GUARRANTEE_AMOUNT
+                                        @if (Model.BANK_GUARRANTEE_COPY_FILE_NAME != null)
+                                        {
+                                            <a href='~/Upload/Lessee/APPLICATION/BANK_GUARRANTEE_COPY/@Model.BANK_GUARRANTEE_COPY_FILE_NAME' title="" class="ml-2" data-original-title="Download" target="_blank"><i class="icon-file-pdf-solid h5 text-danger"></i></a>
+                                        }
+                                    </label>
+                                </div>
+                                <label class="col-lg-3 col-md-4 col-sm-12 col-form-label">Bank Guarranty Date</label>
+                                <div class="col-lg-3 col-md-8 col-sm-12">
+                                    <label class="form-control-plaintext"><span class="colon">:</span>@Model.BANK_GUARRANTEE_DATE</label>
+                                </div>
+                                <label class="col-lg-3 col-md-4 col-sm-12 col-form-label divMinor">Bank Guarranty Validity Upto</label>
+                                <div class="col-lg-3 col-md-8 col-sm-12 divMinor">
+                                    <label class="form-control-plaintext"><span class="colon">:</span>@Model.BANK_GUARRANTEE_VALIDITY</label>
+                                </div>
+                                <label class="col-lg-3 col-md-4 col-sm-12 col-form-label divMajor">Surety Bond Amount (in <i class="fas fa-rupee-sign"></i>)</label>
+                                <div class="col-lg-3 col-md-8 col-sm-12 divMajor">
+                                    <label class="form-control-plaintext">
+                                        <span class="colon">:</span>@Model.SURITY_BOND_AMOUNT
+                                        @if (Model.SURITY_BOND_COPY_FILE_NAME != null)
+                                        {
+                                            <a href='~/Upload/Lessee/APPLICATION/SURETY_BOND_COPY/@Model.SURITY_BOND_COPY_FILE_NAME' title="" class="ml-2" data-original-title="Download" target="_blank"><i class="icon-file-pdf-solid h5 text-danger"></i></a>
+                                        }
+                                    </label>
+                                </div>
+                                <label class="col-lg-3 col-md-4 col-sm-12 col-form-label divMajor">Surety Bond Amount Date</label>
+                                <div class="col-lg-3 col-md-8 col-sm-12 divMajor">
+                                    <label class="form-control-plaintext"><span class="colon">:</span>@Model.SURITY_BOND_DATE</label>
+                                </div>
+                                <label class="col-lg-3 col-md-4 col-sm-12 col-form-label divPerformAmt">Amount of Performance Security</label>
+                                <div class="col-lg-3 col-md-8 col-sm-12 divPerformAmt">
+                                    <label class="form-control-plaintext"><span class="colon">:</span>@Model.UpfrontPaymentDeposited</label>
+                                </div>
+                                <label class="col-lg-3 col-md-4 col-sm-12 col-form-label divPerformAmt">Remaining Upfront Payment</label>
+                                <div class="col-lg-3 col-md-8 col-sm-12 divPerformAmt">
+                                    <label class="form-control-plaintext"><span class="colon">:</span>@Model.TillDateBalanceUpfrontPayment</label>
+                                </div>
+                                <label class="col-lg-3 col-md-4 col-sm-12 col-form-label">Fixed Deposits Monthly Income Scheme Certificate</label>
+                                <div class="col-lg-3 col-md-8 col-sm-12">
+                                    <label class="form-control-plaintext">
+                                        <span class="colon">:</span>
+                                        @if (Model.FIXED_DEPOSITS_MONTHLY_INCOME_SCHEME_CERTIFICATE_FILE_NAME != null)
+                                        {
+                                            <a href='~/Upload/Lessee/APPLICATION/FIXED_DEPOSITS_MONTHLY_INCOME_SCHEME_CERTIFICATE/@Model.FIXED_DEPOSITS_MONTHLY_INCOME_SCHEME_CERTIFICATE_FILE_NAME' title="" class="ml-2" data-original-title="Download" target="_blank"><i class="icon-file-pdf-solid h5 text-danger"></i></a>
+                                        }
+                                    </label>
+                                </div>
+                                <label class="col-lg-3 col-md-4 col-sm-12 col-form-label">Internet Connection Available dispatch Point</label>
+                                <div class="col-lg-3 col-md-8 col-sm-12">
+                                    <label class="form-control-plaintext"><span class="colon">:</span>@Model.InterNetConnectionAtDistpatch</label>
+                                </div>
+                                <label class="col-lg-3 col-md-4 col-sm-12 col-form-label">Till Date Dispatch Quantity (MT)</label>
+                                <div class="col-lg-3 col-md-8 col-sm-12">
+                                    <label class="form-control-plaintext"><span class="colon">:</span>@Model.TillDateDispatchQty</label>
+                                </div>
+                                <label class="col-lg-3 col-md-4 col-sm-12 col-form-label">Amount of Financial Assurance</label>
+                                <div class="col-lg-3 col-md-8 col-sm-12">
+                                    <label class="form-control-plaintext">
+                                        <span class="colon">:</span>@Model.FinancialAmountAssurance
+                                        @if (Model.FinancialAssuranceAttachment_FILE != null)
+                                        {
+                                            <a href='~/Upload/Lessee/APPLICATION/Minor_Mineral/@Model.FinancialAssuranceAttachment_FILE' title="" class="ml-2" data-original-title="Download" target="_blank"><i class="icon-file-pdf-solid h5 text-danger"></i></a>
+                                        }
+                                    </label>
+                                </div>
+                            </div>
+                            <ul class="timeline custom-scroll log-box" id="collapsefillter3">
+                                @Html.Raw((String)ViewBag.tableLC)
+                            </ul>
+                        </div>
+                        <div class="message-heading">
+                            <h5 class="font-weight-bold text-brown">Transfer Information</h5>
+                            <div>
+                                <a href="javascript:void(0);" class="btn-dark btn-sm log-btn" data-val="collapsefillter4">Log Report <i class="icon-angle-down-solid"></i></a>
+                                <a href="@CustomQueryStringHelper.EncryptString("LesseeProfile","Add","LesseeDetails",new {id=Model.CREATED_BY })" class="btn-success btn-sm ml-3" data-original-title="Edit"><i class="icon-pencil-alt-solid"></i></a>
+                            </div>
+                        </div>
+                        <div class="message-highlighter">
+                            <div class="row">
+                                <label class="col-lg-3 col-md-4 col-sm-12 col-form-label">Transferee Name</label>
+                                <div class="col-lg-3 col-md-8 col-sm-12">
+                                    <label class="form-control-plaintext"><span class="colon">:</span>@Model.NAME_OF_TRANSFEREE</label>
+                                </div>
+                                <label class="col-lg-3 col-md-4 col-sm-12 col-form-label">Transferee Address</label>
+                                <div class="col-lg-3 col-md-8 col-sm-12">
+                                    <label class="form-control-plaintext"><span class="colon">:</span>@Model.ADDRESS_OF_TRANSFEREE</label>
+                                </div>
+                                <label class="col-lg-3 col-md-4 col-sm-12 col-form-label">Transfer Grant Order Copy</label>
+                                <div class="col-lg-3 col-md-8 col-sm-12">
+                                    <label class="form-control-plaintext">
+                                        <span class="colon">:</span>@Model.TRANSFER_GRANT_ORDER_COPY_FILE_NAME
+                                        @if (Model.TRANSFER_GRANT_ORDER_COPY_FILE_NAME != null)
+                                        {
+                                            <a href='~/Upload/Lessee/APPLICATION/TRANSFER_GRANT_ORDER/@Model.TRANSFER_GRANT_ORDER_COPY_FILE_NAME' title="" class="ml-2" data-original-title="Download Copy" target="_blank"><i class="icon-file-pdf-solid h5 text-danger"></i></a>
+                                        }
+                                    </label>
+                                </div>
+                                <label class="col-lg-3 col-md-4 col-sm-12 col-form-label">Transfer Lease Deed Copy</label>
+                                <div class="col-lg-3 col-md-8 col-sm-12">
+                                    <label class="form-control-plaintext">
+                                        <span class="colon">:</span>@Model.TRANSFER_LEASE_DEED_COPY_FILE_NAME
+                                        @if (Model.TRANSFER_LEASE_DEED_COPY_FILE_NAME != null)
+                                        {
+                                            <a href='~/Upload/Lessee/APPLICATION/TRANSFER_LEASE_DEED/@Model.TRANSFER_LEASE_DEED_COPY_FILE_NAME' title="" class="ml-2" data-original-title="Download Copy" target="_blank"><i class="icon-file-pdf-solid h5 text-danger"></i></a>
+                                        }
+                                    </label>
+                                </div>
+                                <label class="col-lg-3 col-md-4 col-sm-12 col-form-label">Transfer Date</label>
+                                <div class="col-lg-3 col-md-8 col-sm-12">
+                                    <label class="form-control-plaintext"><span class="colon">:</span>@Model.DATE_OF_TRANSFER</label>
+                                </div>
+                                <label class="col-lg-3 col-md-4 col-sm-12 col-form-label">Remarks</label>
+                                <div class="col-lg-3 col-md-8 col-sm-12">
+                                    <label class="form-control-plaintext"><span class="colon">:</span>@Model.Remarks</label>
+                                </div>
+                            </div>
+                            <ul class="timeline custom-scroll log-box" id="collapsefillter4">
+                                @Html.Raw((String)ViewBag.tableLD)
+                            </ul>
+                        </div>
+                        <div class="message-heading divMajor">
+                            <h5 class="font-weight-bold text-brown">Purpose</h5>
+                            <div>
+                                <a href="javascript:void(0);" class="btn-dark btn-sm log-btn" data-val="collapsefillter5">Log Report <i class="icon-angle-down-solid"></i></a>
+                                <a href="@CustomQueryStringHelper.EncryptString("LesseeProfile","Add","LesseeDetails",new {id=Model.CREATED_BY })" class="btn-success btn-sm ml-3" data-original-title="Edit"><i class="icon-pencil-alt-solid"></i></a>
+                            </div>
+                        </div>
+                        <div class="message-highlighter mb-0 divMajor">
+                            @*<div class="row">
+                                                        <label class="col-lg-3 col-md-4 col-sm-12 col-form-label">Lease Purpose</label>
+                                <div class="col-lg-3 col-md-8 col-sm-12">
+                                    <label class="form-control-plaintext"><span class="colon">:</span>@Model.IsLeasePurpose</label>
+                                </div>
+                                                        <label class="col-lg-3 col-md-4 col-sm-12 col-form-label">State</label>
+                                <div class="col-lg-3 col-md-8 col-sm-12">
+                                    <label class="form-control-plaintext"><span class="colon">:</span>@Model.StateName</label>
+                                </div>
+                                <label class="col-lg-3 col-md-4 col-sm-12 col-form-label">District</label>
+                                <div class="col-lg-3 col-md-8 col-sm-12">
+                                    <label class="form-control-plaintext"><span class="colon">:</span>@Model.DisrictName</label>
+                                </div>
+                                <label class="col-lg-3 col-md-4 col-sm-12 col-form-label">End User Plant</label>
+                                <div class="col-lg-3 col-md-8 col-sm-12">
+                                    <label class="form-control-plaintext"><span class="colon">:</span>@Model.EndUserPlant</label>
+                                </div>
+                                <label class="col-lg-3 col-md-4 col-sm-12 col-form-label">Plant Capacity Per Annum</label>
+                                <div class="col-lg-3 col-md-8 col-sm-12">
+                                    <label class="form-control-plaintext"><span class="colon">:</span>@Model.PlantCapacity</label>
+                                </div>
+
+                                                    </div>*@
+                            @Html.Raw((String)ViewBag.tableLE)
+                            <ul class="timeline custom-scroll log-box" id="collapsefillter5">
+                                @Html.Raw((String)ViewBag.tableLF)
+                            </ul>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+</section>
+

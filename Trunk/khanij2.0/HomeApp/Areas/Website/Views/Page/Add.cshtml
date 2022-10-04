@@ -1,0 +1,443 @@
+﻿@*// *********************************************************************************************************
+    //  View Name                : Add
+    //  Desciption               : To Save and Update Website Page Details
+    //  Created By               : Prakash Chandra Biswal
+    //  Created On               : 20 Oct 2021
+    // ********************************************************************************************************
+*@
+@model HomeEF.AddPageModel
+@{
+    ViewData["Title"] = "Add";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+@if (TempData["Message"] != null)
+{
+    <script>
+        var vv = '@TempData["Message"]';
+        if (vv == 1) {
+            swal("","Page created successfully.","success");
+        }
+        else if (vv == 2) {
+            swal("","Page already exists.","warning");
+        }
+        else if (vv == 3) {
+            swal("", "Something Errror occured. Please Try After Sometime!!", "error");
+        }
+    </script>
+}
+
+<script>
+    //const { post } = require("jquery");
+
+    indicateMe = "yes"
+    $(document).ready(function () {
+        loadNavigation('Add', 'glhelpdesk', 'plraiseticket', 'tl', 'CMS', 'Manage Pages', ' ');
+        $('.searchableselect').searchableselect();
+        BindPluginTypeData();
+        //if ($("#hdnPageType").val() != "") {
+        //    $("#radio_1").prop("checked", true);
+        //}
+        debugger
+        if ($('#hdnPageType').val().length > 0) {
+            if ($('#hdnPageType').val() == "0") {
+                //PageContentChange();
+                $("#Rdbtn_Pag_Type_Plugin").prop("checked", true);
+                $(".PagePlugin").show();
+                $(".PageContent").hide();
+            }
+            else if ($('#hdnPageType').val() == "1") {
+                $(".PageContent").show();
+                $(".PagePlugin").hide();
+                var value = $('#hdnPageType').val();
+                //$("input[name=Rdbtn_Pag_Type_Plugin][value=" + value + "]").prop('checked', true);
+                $("#Rdbtn_Pag_Type_Content").prop("checked", true);
+
+            }
+            else if ($('#hdnPageType').val() == "2") {
+                $(".PagePlugin").show();
+                $(".PageContent").hide();
+                $("#Rdbtn_Pag_Type_Plugin").prop("checked", true);
+            }
+            else {
+                $(".PageContent").hide();
+                $(".PagePlugin").hide();
+            }
+        }
+        var _URL = window.URL || window.webkitURL;
+        $('input[name="META_IMG_FILE"]').bind('change', function () {
+            var file, img;
+            $("input[name='Submit']").attr('disabled', false);
+            filesize = this.files[0].size;
+            if ((file = this.files[0])) {
+                img = new Image();
+                img.onload = function () {
+                    var width = this.width;
+                    var height = this.height;
+                    $("#width").html(width);
+                    $("#height").html(height);
+                    if (width > 500 || height > 400) {
+                        swal("", "Width and heigth should not be more than 400X500px ", "warning");
+                        this.value = '';
+                        $("input[name='Submit']").attr('disabled', true);
+                        return false;
+                    }
+                };
+                img.src = _URL.createObjectURL(file);
+            }
+            var val = $(this).val().toLowerCase(),
+                regex = new RegExp("(.*?)\.(jpeg|jpg|png)$");
+            if (!(regex.test(val))) {
+                swal("", "docx,pdf,xlsx,tif type is not an allowed file type. You can use only jpg, jpeg, png types of file(s). ", "warning");
+                this.value = '';
+                $("input[name='Submit']").attr('disabled', true);
+                return false;
+            }
+            else if (filesize > 100000) {
+                swal("", "File size must be 100 kb !", "warning");
+                $("input[name='Submit']").attr('disabled', true);
+                return false;
+            }
+            else {
+                var fileName = $(this).val().split("\\").pop();
+                $(this).next('.custom-file-label').html(fileName);
+            }
+            return false;
+        });
+        $('input[name="FEATURE_IMAGE_FILE"]').bind('change', function () {
+            $("input[name='Submit']").attr('disabled', false);
+            filesize = this.files[0].size;
+            if ((file = this.files[0])) {
+                img = new Image();
+                img.onload = function () {
+                    var width = this.width;
+                    var height = this.height;
+                    $("#width").html(width);
+                    $("#height").html(height);
+                    if (width > 1920 || height > 180) {
+                        swal("", "Width and heigth should not be more than 1920X180px ", "warning");
+                        this.value = '';
+                        $("input[name='Submit']").attr('disabled', true);
+                        return false;
+                    }
+                };
+                img.src = _URL.createObjectURL(file);
+            }
+            var val = $(this).val().toLowerCase(),
+                regex = new RegExp("(.*?)\.(jpeg|jpg|png)$");
+            if (!(regex.test(val))) {
+                swal("", "docx,pdf,xlsx,tif type is not an allowed file type. You can use only jpg, jpeg, png types of file(s). ", "warning");
+                this.value = '';
+                $("input[name='Submit']").attr('disabled', true);
+                return false;
+            }
+            else if (filesize > 100000) {
+                swal("", "File size must be 100 kb !", "warning");
+                $("input[name='Submit']").attr('disabled', true);
+                return false;
+            }
+            else {
+                var fileName = $(this).val().split("\\").pop();
+                $(this).next('.custom-file-label').html(fileName);
+            }
+            return false;
+        });
+    });
+
+    function PageContentChange(e) {
+        if ($("input[name='INT_PAGE_TYPE']:checked").val() == "1") {
+            $(".PageContent").show();
+            $(".PagePlugin").hide();
+        }
+        else if ($("input[name='INT_PAGE_TYPE']:checked").val() == "2") {
+            //alert($("input[name='INT_PAGE_TYPE']:checked").val());
+            $(".PagePlugin").show();
+            $(".PageContent").hide();
+        }
+        else {
+            $(".PageContent").hide();
+            $(".PagePlugin").hide();
+        }
+
+    }
+    function Validate() {
+        var status = true;
+        if (!blankFieldValidation("VCH_PAGE_NAME", "Page Name")) {
+            return false;
+        }
+        if (!blankFieldValidation("VCH_PAGE_NAME_ALIAS", "Page Alias")) {
+            return false;
+        }
+        if (!blankFieldValidation("VCH_PAGE_TITLE", "Page Title")) {
+            return false;
+        }
+        if (!blankFieldValidation("VCH_URL", "URL")) {
+            return false;
+        }
+    }
+    /* To Bind Plugin Type Details */
+    function BindPluginTypeData() {
+        debugger;
+        $.ajax({
+            url: '/Website/Page/GetPluginTypeDetails',
+            dataType: 'json',
+            type: 'post',
+            success: function (data) {
+                $('#PluginTypeId').html('');
+                $('#PluginTypeId').append("<option value='0'>Select</option>");
+                $.each(data, function (ind, item) {
+                    $('#PluginTypeId').append("<option value='" + item.inT_PLUGIN_TYPE + "'>" + item.vcH_PLUGIN_NAME + "</option>");
+                });
+
+                if ($('#hfPluginTypeId').val() != "") {
+                    $('#PluginTypeId').val($('#hfPluginTypeId').val());
+                }
+                if ($('#PluginTypeId').val() == null) {
+                    $('#PluginTypeId').html('');
+                    $('#PluginTypeId').append("<option value=''>Select</option>");
+                    $.each(data, function (ind, item) {
+                        $('#PluginTypeId').append("<option value='" + item.inT_PLUGIN_TYPE + "'>" + item.vcH_PLUGIN_NAME + "</option>");
+                    });
+                }
+            },
+            error: function (err) {
+
+            }
+        });
+    }
+</script>
+
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        @Html.Partial("_CMSnavigation")
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="javascript:void(0);">
+                                Add
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link " href="~/Website/Page/ViewList">
+                                View
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="~/Website/Page/Archive">
+                                Archive
+                            </a>
+                        </li>
+                    </ul>
+                    @*@Html.Partial("_util")*@
+                </div>
+                <section class="box form-container">
+                    <div class="content-body">
+                        <h5>Add Pages</h5>
+                        @Html.HiddenFor(m => m.INT_PAGE_TYPE, new { @id = "hdnPageType" })
+                        @Html.HiddenFor(m => m.INT_PLUGIN_TYPE, new { @id = "hfPluginTypeId" })
+                        @using (Html.BeginForm("Add", "Page", FormMethod.Post, new { enctype = "multipart/form-data", AUTOCOMPLETE = "Off", id = "form1" }))
+                        {
+                            <div class="row">
+                                <div class="col-lg-4 col-md-6">
+                                    <label class="col-form-label">Page Name<span class="text-danger">*</span></label>
+                                    <div class="form-group">
+                                        @Html.TextBoxFor(m => m.VCH_PAGE_NAME, new { @class = "form-control", @autofocus = "autofocus" })
+                                        @Html.ValidationMessageFor(m => m.VCH_PAGE_NAME, "", new { @class = "text-danger" })
+                                        @Html.HiddenFor(m => m.INT_PAGE_ID)
+                                        
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-4 col-md-6">
+                                    <label class="col-form-label">Page Alias<span class="text-danger">*</span></label>
+                                    <div class="form-group">
+                                        @Html.TextBoxFor(m => m.VCH_PAGE_NAME_ALIAS, new { @class = "form-control", @autofocus = "autofocus" })
+                                        @Html.ValidationMessageFor(m => m.VCH_PAGE_NAME_ALIAS, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-4 col-md-6">
+                                    <label class="col-form-label">Page Title<span class="text-danger">*</span></label>
+                                    <div class="form-group">
+                                        @Html.TextBoxFor(m => m.VCH_PAGE_TITLE, new { @class = "form-control", @autofocus = "autofocus" })
+                                        @Html.ValidationMessageFor(m => m.VCH_PAGE_TITLE, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-4 col-md-6">
+                                    <label class="col-form-label">Snippet</label>
+                                    <div class="form-group">
+                                        @Html.TextAreaFor(m => m.VCH_PAGE_SNIPPET, new { @class = "form-control", @rows = "2", @autofocus = "autofocus" })
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-lg-4 col-md-6">
+                                    <label class="col-form-label">Meta Title</label>
+                                    <div class="form-group">
+                                        @Html.TextBoxFor(m => m.VCH_META_TITLE, new { @class = "form-control", @autofocus = "autofocus" })
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-4 col-md-6">
+                                    <label class="col-form-label">Meta Keyword</label>
+                                    <div class="form-group">
+                                        @Html.TextBoxFor(m => m.VCH_META_KEYWORD, new { @class = "form-control", @autofocus = "autofocus" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-4 col-md-6">
+                                    <label class="col-form-label">Meta Description</label>
+                                    <div class="form-group">
+                                        @Html.TextAreaFor(m => m.VCH_META_DESCIPTION, new { @class = "form-control", @rows = "2", @autofocus = "autofocus" })
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-4 col-md-6">
+                                    <label class="col-form-label">Meta Image</label>
+                                    <div class="form-group">
+                                        <div class="custom-file">
+                                            <input type="file" class="custom-file-input" id="META_IMG_FILE" name="META_IMG_FILE">
+                                            <label class="custom-file-label" for="customFile">Choose Files</label>
+                                            <small class="text-danger">
+                                                (<strong>.jpeg, .jpg, .png</strong> file only, image size of <strong>500*400</strong>
+                                                and <strong>max file size 100 KB</strong>)
+                                            </small>
+                                            @if (Model.VCH_META_IMAGE_NAME != null && Model.VCH_META_IMAGE_NAME != "")
+                                            {
+                                        <label class="form-control-plaintext" id="lblNotificationfile">@Model.VCH_META_IMAGE_NAME <a href="~/Website/Page/DownloadFiles?filename=@Model.VCH_META_IMAGE_NAME" title="" class="ml-2" data-original-title="Download"><i class="icon-download-solid h5"></i></a></label>
+                                            }
+                                            @Html.HiddenFor(m => m.VCH_META_IMAGE_NAME, new { @id = "hdnMetaImageFile" })
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-4 col-md-6">
+                                    <label class="col-form-label">Featured Image</label>
+                                    <div class="form-group">
+                                        <div class="custom-file">
+                                            <input type="file" class="custom-file-input" id="FEATURE_IMAGE_FILE" name="FEATURE_IMAGE_FILE">
+                                            <label class="custom-file-label" for="customFile">Choose Files</label>
+                                        </div>
+                                        <small class="text-danger">
+                                            (<strong>.jpeg, .jpg, .png</strong> file only, image size of <strong>1920*180</strong>
+                                            and <strong>max file size 100 KB</strong>)
+                                        </small>
+                                        @if (Model.VCH_FEATURE_IMAGE_NAME != null && Model.VCH_FEATURE_IMAGE_NAME != "")
+                                        {
+                                    <label class="form-control-plaintext" id="lblNotificationfile">@Model.VCH_FEATURE_IMAGE_NAME <a href="~/Website/Page/DownloadFiles?filename=@Model.VCH_FEATURE_IMAGE_NAME" title="" class="ml-2" data-original-title="Download"><i class="far fa-file-pdf h5"></i></a></label>
+                                        }
+                                        @Html.HiddenFor(m => m.VCH_FEATURE_IMAGE_NAME, new { @id = "hdnNotificationFile" })
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-4 col-md-6">
+                                    <label class="col-form-label">Link Type</label>
+                                    <div class="form-group">
+                                        <div class="form-check form-check-inline">
+
+                                            @Html.RadioButtonFor(n => n.BIT_LINK_TYPE, true, new { @checked = true, @class = "custom-radio", id = "Rdbtn_Link_Type_Active" })
+                                            <label class="form-check-label" for="Rdbtn_Link_Type_Active">Internal</label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+
+                                            @Html.RadioButtonFor(n => n.BIT_LINK_TYPE, false, new { @class = "custom-radio", id = "Rdbtn_Link_Type_Inactive" })
+                                            <label class="form-check-label" for="Rdbtn_Link_Type_Inactive">External</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-4 col-md-6">
+                                    <label class="col-form-label">URL<span class="text-danger">*</span></label>
+                                    <div class="form-group">
+                                        @Html.TextBoxFor(m => m.VCH_URL, new { @class = "form-control", @autofocus = "autofocus" })
+                                    </div>
+                                </div>
+                                <div class="col-lg-2 col-md-6">
+                                    <label class="col-form-label">Window Status</label>
+                                    <div class="form-group">
+                                        <div class="form-check form-check-inline">
+                                            @Html.RadioButtonFor(n => n.BIT_WINDOW_STATUS, true, new { @checked = true, @class = "custom-radio", id = "Rdbtn_window_status_Active" })
+                                            <label class="form-check-label" for="Rdbtn_window_status_Active">Same</label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            @Html.RadioButtonFor(n => n.BIT_WINDOW_STATUS, false, new { @class = "custom-radio", id = "Rdbtn_window_status_InActive" })
+                                            <label class="form-check-label" for="Rdbtn_window_status_InActive">New</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-4 col-md-6">
+                                    <label class="col-form-label">Page Type</label>
+                                    <div class="form-group">
+                                        <div class="custom-control custom-radio custom-control-inline">
+                                            <input type="radio" class="custom-control-input" id="Rdbtn_Pag_Type_Content" name="INT_PAGE_TYPE" value="1" onchange="PageContentChange(this)">
+                                            <label class="custom-control-label" for="Rdbtn_Pag_Type_Content">Content</label>
+                                        </div>
+                                        <div class="custom-control custom-radio custom-control-inline">
+                                            <input type="radio" class="custom-control-input" id="Rdbtn_Pag_Type_Plugin" name="INT_PAGE_TYPE" value="2" onchange="PageContentChange(this)">
+                                            <label class="custom-control-label" for="Rdbtn_Pag_Type_Plugin">Plugin</label>
+                                        </div>
+                                        <div class="custom-control custom-radio custom-control-inline">
+                                            <input type="radio" class="custom-control-input" id="Rdbtn_Pag_Type_None" name="INT_PAGE_TYPE" value="3" onchange="PageContentChange(this)">
+                                            <label class="custom-control-label" for="Rdbtn_Pag_Type_None">None</label>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row PagePlugin">
+                                <div class="col-lg-4 col-md-6">
+                                    <label class="col-form-label">Select Plugin</label>
+                                    <div class="form-group">
+                                        <select id="PluginTypeId" name="INT_PLUGIN_TYPE" class="form-control searchableselect" autofocus="autofocus">
+                                            <option value="0">Select</option>
+                                        </select>
+
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row PageContent">
+                                <div class="col-md-12">
+                                    <label class="col-form-label">Content</label>
+                                    <div class="form-group">
+                                        @Html.TextAreaFor(m => m.VCH_PAGE_CONTENT, new { @class = "form-control", @autofocus = "autofocus", @width = "400", id = "PageContent" })
+                                        @Html.ValidationMessageFor(m => m.VCH_PAGE_CONTENT, "", new { @class = "text-danger" })
+
+                                        <script src="https://cdn.ckeditor.com/4.15.1/standard/ckeditor.js"></script>
+                                        <script>
+                                            CKEDITOR.replace('PageContent');
+                                        </script>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-12 col-sm-12">
+                                    @*<input type="submit" value="Save" name="cmd" class="btn btn-success btn-md ml-0 waves-effect waves-light  btnsave" id="cmd">*@
+                                    <input type="submit" value='@ViewBag.Button' name="Submit" class="btn btn-success btn-md ml-0 waves-effect waves-light  btnsave" id="Submit" onclick="return Validate()">
+                                    @if (ViewBag.Button == "Update")
+                                    {
+                                        <a href="~/Website/Page/ViewList" class="btn btn-danger btn-md ml-0 waves-effect waves-light btncancel">Cancel</a>
+                                    }
+                                    else
+                                    {
+                                        <a href="~/Website/Page/Add" class="btn btn-danger btn-md ml-0 waves-effect waves-light btncancel">Cancel</a>
+                                    }
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+    <!-- MAIN CONTENT AREA ENDS -->
+</section>
+

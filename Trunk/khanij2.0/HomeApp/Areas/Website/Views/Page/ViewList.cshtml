@@ -1,0 +1,206 @@
+﻿@*// *********************************************************************************************************
+    //  View Name                : Add
+    //  Desciption               : To Save and Update Website Page Details
+    //  Created By               : Prakash Chandra Biswal
+    //  Created On               : 20 Oct 2021
+    // ********************************************************************************************************
+*@
+@model IEnumerable<HomeEF.ViewPageModel>
+@using HomeApp.Web;
+@{
+    ViewData["Title"] = "ViewList";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+
+@if (TempData["Message"] != null)
+{
+    <script>
+        var vv = '@TempData["Message"]';
+        if (vv == 1) {
+            swal("", "Page updated successfully.", "success");
+        }
+        else if (vv == 2) {
+            swal("","Page already exists.","warning");
+        }
+        else if (vv == 3){
+            swal("", "Something Errror occured. Please Try After Sometime!!", "error");
+        }
+        else if (vv == 4) {
+            swal("", "Page Deleted Sucessfully!!", "success");
+        }
+    </script>
+}
+<script>
+    archiveMe = "yes";
+    $(document).ready(function () {
+        loadNavigation('ViewList', 'glhelpdesk', 'plraiseticket', 'tl', 'CMS', 'Manage Pages', ' ');
+        $('.searchableselect').searchableselect();
+        $('#datatable').DataTable();
+        $('.shorting-lnk').click(function () {
+            $('.shorting-lnk i').toggleClass('fa-sort-amount-up-alt fa-sort-amount-down-alt ');
+        });
+        $("#ckbCheckAll").click(function () {
+            $(".checkBoxClass").prop('checked', $(this).prop('checked'));
+        });
+          $("#archiveIcon").click(function () {
+            var idsToSend = new Array();
+                $('table [type="checkbox"]').each(function () {
+                    if ($(this).is(':checked')) {
+                        idsToSend.push($(this).val());
+                    }
+                });
+            if (idsToSend.length <= 0) {
+                swal("", "Please select Notification to archive !", "warning");
+                return false;
+            }
+            else {
+                if (confirm("Are you sure to Archive?")) {
+                    $.ajax({
+                        type: "POST",
+                        url: "/Website/Page/ArchiveMove",
+                        data: {
+                            arr: JSON.stringify(idsToSend)
+                        },
+                        dataType: "json",
+                        success: function (result) {
+                            if (result == 4) {
+                                swal("", "Selected Pages Moved To Archive Sucessfully!!", "success");
+                            }
+                            else {
+                                swal("", "Something Errror occured. Please Try After Sometime!!", "error");
+                            }
+                            window.location.href = '@Url.Action("ViewList", "Page", new { Area = "Website" })';
+                        }
+                    });
+                    idsToSend = [];
+                }
+            }
+        });
+
+    });
+</script>
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        @Html.Partial("_CMSnavigation")
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link" href="~/Website/Page/Add">
+                                Add
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="javascript:void(0);">
+                                View
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="~/Website/Page/Archive">
+                                Archive
+                            </a>
+                        </li>
+                    </ul>
+                    @Html.Partial("_util")
+                </div>
+                <section class="box form-container">
+                    <div class="content-body">
+
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div class="table-responsive" id="viewtable">
+                                    <table id="datatable" class="table table-sm table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th width="20px" class="text-center noprint">
+                                                    <input type="checkbox" id="ckbCheckAll">
+                                                </th>
+                                                <th width="30px">Sl#</th>
+                                                <th>Page Name</th>
+                                                <th>Page Alias</th>
+                                                @*<th>Page Title</th>
+                                                    <th>Page Snippet</th>
+                                                    <th>Meta Title</th>
+                                                    <th>Meta Keyword</th>
+                                                    <th>Meta Description</th>*@
+                                                <th>Meta Image</th>
+                                                <th>Featured Image</th>
+                                                <th>Link Type</th>
+                                                <th>URL</th>
+                                                <th>Windows Status</th>
+                                                @*<th>Page Type</th>
+                                                    <th>Plugin Type</th>
+                                                    <th>Page Content</th>*@
+                                                <th>Created on</th>
+                                                <th width="50px" class="noprint text-center">Edit</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @{
+                                                var count = 0;
+                                                foreach (var item in Model)
+                                                {
+                                                    count++;
+                                                    var dynamicclass = @item.BIT_STATUS == "Active" ? "active-row" : "inactive-row";
+                                                    <tr>
+                                                        <td class="text-center noprint">
+                                                            <input type="checkbox" class="checkBoxClass" id='chkData' value="@item.INT_PAGE_ID">
+                                                        </td>
+                                                        <td>@count</td>
+                                                        <td>@item.VCH_PAGE_NAME</td>
+                                                        <td>@item.VCH_PAGE_NAME_ALIAS</td>
+                                                        @*<td>@item.VCH_PAGE_TITLE</td>
+                                                            <td>@item.VCH_PAGE_SNIPPET</td>
+                                                            <td>@item.VCH_META_TITLE</td>
+                                                            <td>@item.VCH_META_KEYWORD</td>
+                                                            <td>@item.VCH_META_DESCIPTION</td>*@
+                                                        @if (item.VCH_META_IMAGE_NAME != null && item.VCH_META_IMAGE_NAME != "")
+                                                        {
+                                                            <td class="text-center noprint"><a href="~/Website/Page/DownloadFiles?filename=@item.VCH_META_IMAGE_NAME" data-original-title="Download Meta Image"><i class="icon-download-solid h5 text-danger"></i></a></td>
+                                                        }
+                                                        else
+                                                        {
+                                                            <td>NA</td>
+                                                        }
+                                                        @if (item.VCH_FEATURE_IMAGE_NAME != null && item.VCH_FEATURE_IMAGE_NAME != "")
+                                                        {
+                                                            <td class="text-center noprint"><a href="~/Website/Page/DownloadFiles?filename=@item.VCH_FEATURE_IMAGE_NAME" data-original-title="Download Feature Image"><i class="icon-download-solid h5 text-danger"></i></a></td>
+                                                        }
+                                                        else
+                                                        {
+                                                            <td>NA</td>
+                                                        }
+                                                        <td>@item.BIT_LINK_TYPE</td>
+                                                        <td>@item.VCH_URL</td>
+                                                        <td>@item.BIT_WINDOW_STATUS</td>
+                                                        @*<td>@item.INT_PAGE_TYPE</td>
+                                                            <td>@item.INT_PLUGIN_TYPE</td>
+                                                            <td>@item.VCH_PAGE_CONTENT</td>*@
+                                                        <td>@item.DTM_CREATED_ON</td>
+                                                        <td class="noprint text-center">
+                                                            @*<a href="@CustomQueryStringHelper.EncryptString("Website", "Add", "Page", new { id = item.INT_PAGE_ID })" class="text-success btn-sm">
+            <i class="icon-pencil-alt-solid"></i>
+        </a>*@
+                                                            <a href="/Website/Page/Add/@item.INT_PAGE_ID" class="text-success btn-sm">
+                                                                <i class="icon-pencil-alt-solid"></i>
+                                                            </a>
+                                                        </td>
+                                                    </tr>
+                                                }
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+    <!-- MAIN CONTENT AREA ENDS -->
+</section>
+
+

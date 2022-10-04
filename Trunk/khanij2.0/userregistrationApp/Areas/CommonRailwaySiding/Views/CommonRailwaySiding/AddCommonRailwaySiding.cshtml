@@ -1,0 +1,633 @@
+﻿@addTagHelper*, Microsoft.AspNetCore.Mvc.TagHelpers
+@model userregistrationEF.CommonRailwaySidingModel
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer localizer
+@{
+    ViewData["Title"] = "AddCommonRailwaySiding";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+
+
+@if (TempData["msg"] != null)
+{
+    <script>
+        var vv = '@TempData["msg"]';
+        if (vv == 1) {
+            swal("", "Railway siding saved successfully.", "success");
+        }
+        else if (vv == 2) {
+            swal("", "Railway siding   allready exists.", "warning");
+        }
+        else if (vv == 3) {
+            swal("", "Railway siding  updated sucessfully", "success");
+        }
+        else if (vv == 4) {
+            swal("", "Railway siding   deleted sucessfully", "success");
+        }
+        else {
+            swal("", "Something Errror occured. Please Try After Sometime!!", "error");
+        }
+    </script>
+
+    TempData["msg"] = null;
+
+}
+<script>
+    $(document).ready(function () {
+        indicateMe = "yes";
+        backIcon = "yes";
+        loadNavigation('AddCommonRailwaySiding', 'glholiday', 'plappleav', 'tl', 'CommonRailwaySiding', 'Add CommonRailwaySiding', ' ');
+        $('#error').hide();
+        $("#RailwayZoneId").change(function () {
+
+            $.ajax({
+                type: "POST",
+                url: '@Url.Content("~/CommonRailwaySiding/CommonRailwaySiding/BindRailwaySiding")',
+                data: {
+                    "RailwayZoneId": $("#RailwayZoneId").val()
+                },
+                dataType: "json",
+                success: function (data) {
+                    console.log(data);
+                    $("#RSId").empty();
+                    var ops = '<option value="">--Select--</option>';
+                    for (var i = 0; i < data.length; i++) {
+                        ops += '<option value="' + data[i].value + '"> ' + data[i].text + '</option>';
+                    }
+                    $("#RSId").html(ops);
+                },
+                error: function () {
+                    alert("Error");
+                }
+            });
+
+
+        });
+
+        BindLessee();
+
+
+        if ($("#hidCRSId").val() != "") {
+            $("#Area").attr('disabled', true);
+            $("#RailwayZoneId").attr('disabled', true);
+            $("#RSId").attr('disabled', true);
+            $("#RSGradeid").attr('disabled', true);
+
+        }
+        $("#Submit").click(function ()
+        {
+            $("#Area").attr('disabled', false);
+            $("#RailwayZoneId").attr('disabled', false);
+            $("#RSId").attr('disabled', false);
+            $("#RSGradeid").attr('disabled', false);
+          
+
+            if (!blankFieldValidation("txtarea", "Area Name"))
+            {
+                return false;
+            }
+            if (!DropDownValidation("DistrictId", "District"))
+            {
+                return false;
+            }
+            if (!DropDownValidation("RailwayZoneId", "Railway Zone"))
+            {
+                return false;
+            }
+            if (!DropDownValidation("RSId", "Railway Siding"))
+            {
+                return false;
+            }
+            if (!blankFieldValidation("txtAddress", "Railway Siding Address "))
+            {
+                return false;
+            }
+            if (!blankFieldValidation("txtlatitude", "Latitute"))
+            {
+                return false;
+            }
+            if (!blankFieldValidation("txtlongitude", "Longitute"))
+            {
+                return false;
+            }
+            
+            if (!DropDownValidation("RSGradeid", "Railway Siding Declared Grade"))
+            {
+                return false;
+            }
+            if (!blankFieldValidation("txtrepresnt", "Representitive Name"))
+            {
+                return false;
+            }
+            if (!blankFieldValidation("txtmail", "Email Id"))
+            {
+                return false;
+            }
+            if (!blankFieldValidation("txtnum", "Mobile Number"))
+            {
+                return false;
+            }
+            //if ($("#selectedFile").val() == '')
+            //{
+
+            //    swal("","File Upload Cannot be Blank!","warning")
+            //    return false;
+            //}
+            if (!FileUploadValidation("selectedFile", "Supporting Doc ")) {
+                return false;
+            }
+            
+            if (!DropDownValidation("LesseeId", "Lessee"))
+            {
+                return false;
+            }
+
+
+        });
+
+        $("#Reset").click(function () {
+            window.location = "@Url.Content("~/CommonRailwaySiding/CommonRailwaySiding/AddCommonRailwaySiding/")"
+        });
+        $("#canc").click(function () {
+            window.location = "@Url.Content("~/CommonRailwaySiding/CommonRailwaySiding/ViewCommonRailwaySiding/")"
+        });
+
+        $('input[type="file"]').bind('change', function () {
+            $("input[name='Submit']").attr('disabled', false);
+            filesize = this.files[0].size;
+            var val = $(this).val().toLowerCase(),
+                //regex = new RegExp("(.*?)\.(jpeg|jpg|png)$");
+                regex = new RegExp("(.*?)\.(pdf)$");
+            if (!(regex.test(val))) {
+                swal("", "only pdf file type are allowed. ", "warning");
+                this.value = '';
+                $("input[name='Submit']").attr('disabled', true);
+                return false;
+            }
+            else if (filesize > 2048000) {
+                swal("", "File size must be 2 MB !", "warning");
+                $("input[name='Submit']").attr('disabled', true);
+                return false;
+            }
+            else {
+                var fileName = $(this).val().split("\\").pop();
+                $(this).next('.custom-file-label').html(fileName);
+            }
+            return false;
+        });
+
+
+    });
+
+    function BindLessee() {
+        $.ajax({
+            url: '/CommonRailwaySiding/CommonRailwaySiding/BindLessee',
+            data: {
+                "Id": $("#RailwayZoneId").val()
+            },
+            dataType: 'json',
+            type: 'post',
+            success: function (data) {
+
+                $('#LesseeId').html('');
+                var row = "";
+                $.each(data, function (ind, item) {
+                    row += "<option value='" + item.value + "'>" + item.text + "</option>";
+                });
+                $('#LesseeId').html(row).selectpicker('refresh');
+                if ($('#hdnLesseeList').val() != "") {
+                    //This section used for View
+                    var MineralGradeString = $('#hdnLesseeList').val().replace('[', '').replace(']', '');
+                    $('#LesseeId').selectpicker('val', MineralGradeString.split(','));
+                }
+            },
+            error: function (err) {
+            }
+        });
+
+    }
+</script>
+
+<SCRIPT language=Javascript>
+
+    function isNumberKey(evt) {
+        var charCode = (evt.which) ? evt.which : evt.keyCode;
+        if (charCode != 46 && charCode > 31
+            && (charCode < 48 || charCode > 57))
+            return false;
+
+        return true;
+    }
+
+    function lettersValidate(key) {
+        var keycode = (key.which) ? key.which : key.keyCode;
+
+        if ((keycode > 64 && keycode < 91) || (keycode > 96 && keycode < 123) || (keycode == 32)) {
+            return true;
+        }
+        else {
+            return false;
+        }
+
+    }
+
+</SCRIPT>
+
+
+
+<script>
+
+    //function datasubmit() {
+
+
+
+    //    swal({
+    //        title: "Message",
+    //        text: "Are you sure?",
+    //        type: "info",
+    //        showCancelButton: true,
+    //        confirmButtonColor: '#DD6B55',
+    //        confirmButtonText: 'Yes, I am sure!',
+    //        cancelButtonText: "No, cancel it!",
+    //        closeOnConfirm: false,
+    //        closeOnCancel: false
+    //    },
+    //        function (isConfirm) {
+
+    //            if (isConfirm) {
+    //                $("#formdata").submit();
+
+    //            } else {
+    //                swal("Cancelled", "Cancelled", "error");
+    //                e.preventDefault();
+    //            }
+    //        });
+
+
+
+    //}
+
+    function check() {
+
+
+        swal({
+            title: "Are you sure ??",
+            icon: "warning",
+            buttons: ["No", "Yes"],
+        })
+            .then((submit) => {
+                if (submit) {
+                    $("#form1").submit();
+                }
+            });
+
+
+    }
+
+
+
+
+
+
+
+
+
+</script>
+
+
+
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        @Html.Partial("_CMSnavigation")
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="javascript:void(0);">
+                                @localizer["Add CommonRailwaySiding"]
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="@Url.Content("~/CommonRailwaySiding/CommonRailwaySiding/ViewCommonRailwaySiding")">
+                                @localizer["View CommonRailwaySiding"]
+                            </a>
+                        </li>
+                        @Html.Partial("_CMSutil")
+                    </ul>
+
+                </div>
+                <div class="util-group d-flex align-items-center float-right">
+                    <a href="javascript:void(0);" id="backIcon" onclick="goBack();" data-toggle="tooltip" data-placement="top" data-original-title="Back" style=""><i class="icon-arrow-left-solid"></i></a>
+                </div>
+                <section class="box form-container">
+                    <div class="content-body">
+
+                        <form asp-controller="CommonRailwaySiding" asp-action="AddCommonRailwaySiding" enctype="multipart/form-data" method="post" id="form1">
+                            <div class="row">
+                                <div class="col-lg-6">
+
+                                    <div class="form-group row">
+                                        <label class="col-lg-4 col-md-4 col-sm-12 col-form-label font-weight-bolder"> @localizer["Area Name"] <span class="text-danger">*</span></label>
+
+                                        <div class="col-lg-7 col-md-6 col-sm-12">
+                                            <input type="text" asp-for="Area" onkeypress="return lettersValidate(event)" onpaste="return false;" class="form-control" id="txtarea" maxlength="200" />
+                                            <input type="hidden" asp-for="CRSId" id="hidCRSId" />
+
+                                            @*@Html.TextBoxFor(m => m.Area, new { @class = "form-control", @maxlength = 200 })
+                                            @Html.HiddenFor(m => m.CRSId, new { @id = "hidCRSId" })*@
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group row">
+                                        <label class="col-lg-4 col-md-4 col-sm-12 col-form-label font-weight-bolder"> @localizer["District"] <span class="text-danger">*</span></label>
+                                        <div class="col-lg-7 col-md-6 col-sm-12">
+                                            <select asp-for="DistrictId" asp-items="@ViewBag.dist" class="form-control form-control-sm searchableselect">
+                                                <option>---Select---</option>
+                                            </select>
+                                            @*@Html.DropDownListFor(m => m.RSGradeid, ViewBag.RSGrade as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control form-control-sm searchableselect" })*@
+
+                                        </div>
+                                    </div>
+
+
+                                    <div class="form-group row">
+                                        <label class="col-lg-4 col-md-4 col-sm-12 col-form-label font-weight-bolder"> @localizer["Railway Zone"] <span class="text-danger">*</span></label>
+                                        <div class="col-lg-7 col-md-6 col-sm-12">
+                                            <select asp-for="RailwayZoneId" asp-items="@ViewBag.RailwayZone"  class="form-control form-control-sm searchableselect">
+                                                <option>---Select---</option>
+                                            </select>
+                                            @*@Html.DropDownListFor(m => m.RailwayZoneId, ViewBag.RailwayZone as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control form-control-sm searchableselect" })*@
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group row">
+                                        <label class="col-lg-4 col-md-4 col-sm-12 col-form-label font-weight-bolder"> @localizer["Railway Siding"] <span class="text-danger">*</span></label>
+                                        <div class="col-lg-7 col-md-6 col-sm-12">
+                                            <select asp-for="RSId" asp-items="@ViewBag.RailwaySiding"  class="form-control form-control-sm searchableselect">
+                                                <option>---Select---</option>
+                                            </select>
+                                            @*@Html.DropDownListFor(m => m.RSId, ViewBag.RailwaySiding as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control form-control-sm searchableselect" })*@
+
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group row">
+                                        <label class="col-lg-4 col-md-4 col-sm-12 col-form-label font-weight-bolder">  @localizer["Railway Siding Address"]<span class="text-danger">*</span></label>
+                                        <div class="col-lg-7 col-md-6 col-sm-12">
+                                            <textarea asp-for="RSAddress" id="txtAddress" rows="3" cols="43" maxlength="500"></textarea>
+                                            @* <input type="text" asp-for="RSAddress" class="form-control" maxlength="500" />
+                                            @Html.TextAreaFor(m => m.RSAddress, new { @class = "form-control", @maxlength = 500 })*@
+
+
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label class="col-lg-4 col-md-4 col-sm-12 col-form-label font-weight-bolder"> @localizer["Latitute"] <span class="text-danger">*</span></label>
+                                        <div class="col-lg-7 col-md-6 col-sm-12">
+                                            <input type="text" id="txtlatitude" onpaste="return false;" onkeypress="return isNumberKey(event)" asp-for="RSLatitute" class="form-control" maxlength="20" />
+                                            @*@Html.TextBoxFor(m => m.RSLatitute, new { @class = "form-control", @maxlength = 50 })*@
+
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label class="col-lg-4 col-md-4 col-sm-12 col-form-label font-weight-bolder"> @localizer["Longitute"] <span class="text-danger">*</span></label>
+                                        <div class="col-lg-7 col-md-6 col-sm-12">
+                                            <input type="text" id="txtlongitude" onpaste="return false;" onkeypress="return isNumberKey(event)" asp-for="RSLongitute" class="form-control" maxlength="20" />
+                                            @*@Html.TextBoxFor(m => m.RSLongitute, new { @class = "form-control", @maxlength = 50 })*@
+
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label class="col-lg-4 col-md-4 col-sm-12 col-form-label font-weight-bolder"> @localizer["Railway Siding Declared Grade"] <span class="text-danger">*</span></label>
+                                        <div class="col-lg-7 col-md-6 col-sm-12">
+                                            <select asp-for="RSGradeid" asp-items="@ViewBag.RSGrade"  class="form-control form-control-sm searchableselect">
+                                                <option>---Select---</option>
+                                            </select>
+                                            @*@Html.DropDownListFor(m => m.RSGradeid, ViewBag.RSGrade as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control form-control-sm searchableselect" })*@
+
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label class="col-lg-4 col-md-4 col-sm-12 col-form-label font-weight-bolder"> @localizer["Representitive Name"] <span class="text-danger">*</span></label>
+
+                                        <div class="col-lg-7 col-md-6 col-sm-12">
+                                            <input type="text" asp-for="RepresentitiveName" onpaste="return false;" onkeypress="return lettersValidate(event)" id="txtrepresnt" class="form-control" maxlength="50" />
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group row">
+                                        <label class="col-lg-4 col-md-4 col-sm-12 col-form-label font-weight-bolder"> @localizer["Email Id"] <span class="text-danger">*</span></label>
+
+                                        <div class="col-lg-7 col-md-6 col-sm-12">
+                                            <input type="email" asp-for="EmailId" onpaste="return false;" id="txtmail" class="form-control" maxlength="50" />
+                                            <span id="error" style="color:red"> Invalid EmailId </span>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group row">
+                                        <label class="col-lg-4 col-md-4 col-sm-12 col-form-label font-weight-bolder"> @localizer["Mobile Number"] <span class="text-danger">*</span></label>
+
+                                        <div class="col-lg-7 col-md-6 col-sm-12">
+                                            <input type="text" asp-for="MobileNo" onpaste="return false;" onkeypress="return isNumberKey(event)" id="txtnum" class="form-control" maxlength="10" />
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group row">
+                                        <label class="col-lg-4 col-md-4 col-sm-12 col-form-label font-weight-bolder"> @localizer["Supporting Doc"] <span class="text-danger">*</span></label>
+                                        <div class="col-lg-7 col-md-6 col-sm-12">
+
+                                            <div class="custom-file">
+                                                <input type="file" class="custom-file-input" id="selectedFile" name="selectedFile">
+                                                <label class="custom-file-label" for="customFile"> @localizer["Choose Files"] </label>
+                                                <small class="text-danger">Please Upload Supporting Doc Only In  <strong> PDF</strong>and file size must be <strong> 2 MB </strong></small>
+                                            </div>
+
+                                            @if (Model.RsGradeDocPath != null && Model.RsGradeDocPath.Trim() != "")
+                                            {
+
+                                                <input type="hidden" id="hidCRSFilePath" name="hidCRSFilePath" asp-for="RsGradeDocPath" />
+                                                <input type="hidden" id="hidCRSFileName" name="hidCRSFileName" asp-for="RSGradeDoc" />
+
+                                                <label class="form-control-plaintext">
+                                                    @(Model.RSGradeDoc)
+                                                    <a href='~/@Model.RsGradeDocPath' title="" class="ml-2" data-original-title="Download" target="_blank">
+                                                        <i class="icon-file-pdf-solid h5 text-danger"></i>
+                                                    </a>
+                                                </label>
+
+                                            }
+                                        </div>
+                                    </div>
+
+
+
+                                    <div class="form-group row">
+                                        <label class="col-lg-4 col-md-4 col-sm-12 col-form-label font-weight-bolder"> @localizer["Lessee"] <span class="text-danger">*</span></label>
+                                        <div class="col-lg-7 col-md-6 col-sm-12">
+
+                                            @*@Html.HiddenFor(m => m.LesseeList, new { @id = "hdnLesseeList" })*@
+                                            <select multiple data-style="bg-white" class="selectpicker form-control" id="LesseeId" name="LesseeCount"></select>
+                                            @Html.ValidationMessageFor(m => m.LesseeCount, "", new { @class = "text-danger" })
+                                            <input type="hidden" asp-for="LesseeList" id="hdnLesseeList" />
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                                <div class="col-lg-12 offset-lg-2 offset-md-4 mb-3">
+                                    <input type="button" id="Submit" name="Submit" onclick="return check();" value='@ViewBag.Button' class="btn btn-primary btn-md ml-0" />
+
+                                    @if (@ViewBag.Button1 == "Cancel")
+                                    {
+                                        <input type="button" id="canc" value='@ViewBag.Button1' class="btn btn-danger btn-md" />
+
+                                    }
+                                    else
+                                    {
+
+                                        <input type="button" id="Reset" value='@ViewBag.Button1' class="btn btn-danger btn-md" />
+                                    }
+
+                                    @*<button asp-controller="CommonRailwaySiding" asp-action="AddCommonRailwaySiding" id="Submit">@ViewBag.Button</button>
+                                    <button id="Reset">Reset</button>*@
+                                </div>
+
+                            </div>
+
+                        </form>
+
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+</section>
+
+@*<section class="wrapper main-wrapper row">
+        <div class="col-12">
+
+            <div class="row">
+                <div class="col-12">
+                    <div class="main-tab">
+                        <ul class="nav nav-tabs">
+                            <li class="nav-item">
+                                <a class="nav-link active" href="javascript:void(0);">
+                                    Add CommonRailwaySiding
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="@Url.Content("~/CommonRailwaySiding/CommonRailwaySiding/ViewCommonRailwaySiding")">
+                                    View CommonRailwaySiding
+                                </a>
+                            </li>
+                        </ul>
+
+                    </div>
+
+                    <section class="box form-container">
+                        <div class="content-body">
+                            @using (Html.BeginForm("AddCommonRailwaySiding", "CommonRailwaySiding", FormMethod.Post, new { enctype = "multipart/form-data", AUTOCOMPLETE = "Off", id = "form1" }))
+                            {
+                                <div class="row">
+                                    <div class="col-lg-6">
+
+                                        <div class="form-group row">
+                                            <label class="col-lg-4 col-md-4 col-sm-12 col-form-label font-weight-bolder">Area Name<span class="text-danger">*</span></label>
+                                            <div class="col-lg-7 col-md-6 col-sm-12">
+                                                @Html.TextBoxFor(m => m.Area, new { @class = "form-control", @maxlength = 200 })
+                                                @Html.HiddenFor(m=>m.CRSId,new {@id="hidCRSId"})
+                                            </div>
+                                        </div>
+                                        <div class="form-group row">
+                                            <label class="col-lg-4 col-md-4 col-sm-12 col-form-label font-weight-bolder">Railway Zone<span class="text-danger">*</span></label>
+                                            <div class="col-lg-7 col-md-6 col-sm-12">
+
+                                                @Html.DropDownListFor(m => m.RailwayZoneId, ViewBag.RailwayZone as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control form-control-sm searchableselect" })
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group row">
+                                            <label class="col-lg-4 col-md-4 col-sm-12 col-form-label font-weight-bolder">Railway Siding<span class="text-danger">*</span></label>
+                                            <div class="col-lg-7 col-md-6 col-sm-12">
+                                                @Html.DropDownListFor(m => m.RSId, ViewBag.RailwaySiding as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control form-control-sm searchableselect" })
+
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group row">
+                                            <label class="col-lg-4 col-md-4 col-sm-12 col-form-label font-weight-bolder">Railway Siding Address<span class="text-danger">*</span></label>
+                                            <div class="col-lg-7 col-md-6 col-sm-12">
+                                                @Html.TextAreaFor(m => m.RSAddress, new { @class = "form-control", @maxlength = 500 })
+
+
+                                            </div>
+                                        </div>
+                                        <div class="form-group row">
+                                            <label class="col-lg-4 col-md-4 col-sm-12 col-form-label font-weight-bolder">Latitute<span class="text-danger">*</span></label>
+                                            <div class="col-lg-7 col-md-6 col-sm-12">
+                                                @Html.TextBoxFor(m => m.RSLatitute, new { @class = "form-control", @maxlength = 50 })
+
+                                            </div>
+                                        </div>
+                                        <div class="form-group row">
+                                            <label class="col-lg-4 col-md-4 col-sm-12 col-form-label font-weight-bolder">Longitute<span class="text-danger">*</span></label>
+                                            <div class="col-lg-7 col-md-6 col-sm-12">
+                                                @Html.TextBoxFor(m => m.RSLongitute, new { @class = "form-control", @maxlength = 50 })
+
+                                            </div>
+                                        </div>
+                                        <div class="form-group row">
+                                            <label class="col-lg-4 col-md-4 col-sm-12 col-form-label font-weight-bolder">Railway Siding Declared Grade<span class="text-danger">*</span></label>
+                                            <div class="col-lg-7 col-md-6 col-sm-12">
+                                                @Html.DropDownListFor(m => m.RSGradeid, ViewBag.RSGrade as IEnumerable<SelectListItem>, "--Select--", new { @class = "form-control form-control-sm searchableselect" })
+
+                                            </div>
+                                        </div>
+                                        <div class="form-group row">
+                                            <label class="col-lg-4 col-md-4 col-sm-12 col-form-label font-weight-bolder">Supporting Doc<span class="text-danger">*</span></label>
+                                            <div class="col-lg-7 col-md-6 col-sm-12">
+
+                                                    <div class="custom-file">
+                                                        <input type="file" class="custom-file-input" id="selectedFile" name="selectedFile">
+                                                        <label class="custom-file-label" for="customFile">Choose Files</label>
+                                                    </div>
+
+                                                    @if (Model.RsGradeDocPath != null && Model.RsGradeDocPath.Trim() != "")
+                                                    {
+                                                    <input type="hidden" id="hidCRSFilePath" name="hidCRSFilePath" value="@Model.RsGradeDocPath" />
+                                                    <input type="hidden" id="hidCRSFileName" name="hidCRSFileName" value="@Model.RSGradeDoc" />
+                                                    <label class="form-control-plaintext">@(Model.RSGradeDoc) <a href='~/@Model.RsGradeDocPath' title="" class="ml-2" data-original-title="Download" target="_blank"><i class="icon-file-pdf-solid h5 text-danger"></i></a></label>
+                                                    }
+                                            </div>
+                                        </div>
+
+
+
+                                        <div class="form-group row">
+                                            <label class="col-lg-4 col-md-4 col-sm-12 col-form-label font-weight-bolder">Lessee<span class="text-danger">*</span></label>
+                                            <div class="col-lg-7 col-md-6 col-sm-12">
+                                                @Html.HiddenFor(m => m.LesseeList, new { @id = "hdnLesseeList" })
+                                                <select multiple data-style="bg-white" class="selectpicker form-control" id="LesseeId" name="LesseeCount"></select>
+                                                @Html.ValidationMessageFor(m => m.LesseeCount, "", new { @class = "text-danger" })
+
+                                            </div>
+                                        </div>
+                                    </div>
+
+
+                                    <div class="col-lg-12 offset-lg-2 offset-md-4 mb-3">
+                                        <input type="submit" id="Submit" name="Submit" value='@ViewBag.Button' class="btn btn-primary btn-md ml-0" />
+                                        <input type="reset" id="Reset" value="Reset" class="btn btn-danger btn-md" />
+                                    </div>
+
+                                </div>
+                            }
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </div>
+    </section>*@
+
+

@@ -1,0 +1,143 @@
+﻿@using SupportApp.Web
+@model SupportEF.NoticeLetterEF
+
+@{
+    ViewData["Title"] = "Received_Reply";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+<script>
+    $(document).ready(function () {
+        loadNavigation('Received_Reply', 'glTMng', 'plpaymenthead', 'tl', 'Notice', 'Notice Letter Inbox', ' ');
+        $('.datepicker').datetimepicker({
+            format: 'LT',
+            format: "DD-MM-YYYY",
+            daysOfWeekDisabled: [],
+        });
+        //swal(ViewBag.RipMsg);
+    });
+</script>
+@if (ViewBag.RipMsg!=null)
+            {
+                <script>
+                    swal("",'@ViewBag.RipMsg',"success");
+                </script>
+            }
+
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        @Html.Partial("_CMSnavigation")
+
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="#">
+                                Notice Letter Inbox
+                            </a>
+                        </li>
+                    </ul>
+                    @Html.Partial("_CMSutil")
+                </div>
+                <section class="box form-container">
+                    @*<div class="search-box">
+                        @using (Html.BeginForm("Received_Reply", "Noticeletter", FormMethod.Post, new { AUTOCOMPLETE = "Off", id = "form1" }))
+                        {
+                            <div class="searchform px-3 py-3">
+                                <div class="row">
+                                    <div class="col-sm-4">
+                                        <div class="form-group row">
+                                            <label for="inputText" class="col-sm-3 col-form-label">
+                                                From Date
+                                            </label>
+                                            <div class="col-sm-8">
+                                                <div class="input-group">
+                                                    <input type="text" class="form-control datepicker" id="Fromdate">
+                                                    <div class="input-group-prepend">
+                                                        <label class="input-group-text" for="Fromdate"><i class="icon-calendar-alt-solid"></i></label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <div class="form-group row">
+                                            <label for="inputText" class="col-sm-3 col-form-label">
+                                                To Date
+                                            </label>
+                                            <div class="col-sm-8">
+                                                <div class="input-group">
+                                                    <input type="text" class="form-control datepicker" id="Todate">
+                                                    <div class="input-group-prepend">
+                                                        <label class="input-group-text" for="Todate"><i class="icon-calendar-alt-solid"></i></label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-2">
+                                        <a href="#" class="btn btn-sm btn-success m-0 waves-effect waves-light"> Show </a>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>*@
+                    <div class="content-body pt-0">
+                        <div class="legend-box">
+                            <ul class="d-flex mb-1 justify-content-end list-unstyled">
+                                <li><span class="bg-success"></span> Active</li>
+                                <li><span class="bg-warning"></span> Inactive</li>
+                            </ul>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <table id="table-exports" class="table table-sm table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th width="30">Sl#</th>
+                                            <th>Report Heading</th>
+                                            <th>Total Users</th>
+                                            <th>Replied Users</th>
+                                            <th>Create Date</th>
+                                            <th>View of send Notice</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @{ int i = 1;
+                                        }
+                                        @foreach (var b in ViewBag.NoticeDetails)
+                                        {
+                                        <tr class="active-row">
+                                            <td>@i</td>
+                                            @*<td><p class="m-0">@b.CompanyId</p> </td>*@
+                                            <td><p class="m-0">@b.NoticeSubject</p> </td>
+                                            <td>
+                                                <p class="m-0">
+                                                    <a href="@CustomQueryStringHelper.EncryptString("Notice","Received_Reply_Sub","Noticeletter",new {NoticeID=@b.NoticeID })">@b.UsersCount</a>
+                                                    @*<a href="@Url.Action("Received_Reply_Sub","Noticeletter",new { NoticeID = @b.NoticeID })">@b.UsersCount</a>*@
+                                                </p>
+                                            </td>
+                                            <td><p class="m-0">@b.RepliedUser</p> </td>
+                                            <td><p class="m-0">@b.CreatedOn</p> </td>
+                                            <td class="noprint">
+        @*<a href="@CustomQueryStringHelper.EncryptString("Notice","Reply_GetRepliedData","Noticeletter",new {NoticeID=@b.NoticeID })" class="btn-floating btn-outline-primary btn-sm"
+           title="View"><i class="icon-street-view-solid"></i></a>*@
+                                            <a href="@Url.Action("SubmittedNoticeDetails","Noticeletter",new { id = @b.NoticeID })"
+        class="btn-floating btn-outline-primary btn-sm"
+        title="View"><i class="icon-street-view-solid"></i></a>
+                                            </td>
+                                        </tr>
+                                            i++;
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+    <!-- MAIN CONTENT AREA ENDS -->
+</section>

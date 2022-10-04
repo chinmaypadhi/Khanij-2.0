@@ -1,0 +1,310 @@
+﻿
+@{
+    ViewData["Title"] = "Add";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+<script>
+    indicateMe = "yes"
+    $(document).ready(function () {
+        $('.searchableselect').searchableselect();
+        loadNavigation('Add', 'glhelpdesk', 'plraiseticket', 'tl', 'Configuration', 'Add ePermit', ' ');
+    });
+    function UserTypeChange(e) {
+        $("#LesseeConfigurationTypeId").val() == "";
+        $("#LicenseeConfigurationTypeId").val() == "";
+        if ($("#UserTypeId").val() == "1") {
+            $(".Lessee").show();
+            $(".Licensee").hide();
+        }
+        else if ($("#UserTypeId").val() == "2") {
+            $(".Licensee").show();
+            $(".Lessee").hide();
+        }
+        else {
+            $(".Licensee").hide();
+            $(".Lessee").hide();
+        }
+        $(".ePermit").hide();
+        $(".eTP").hide();
+        $(".eRPTP").hide();
+        $(".eRTP").hide();
+        $(".eTransitPass").hide();
+    }
+    function ConfigurationTypeChangeLessee(e) {
+        if ($("#LesseeConfigurationTypeId").val() == "1") {
+            $(".ePermit").show();
+            $(".eTP").hide();
+        }
+        else {
+            $(".eTP").show();
+            $(".ePermit").hide();
+        }
+    }
+    function ConfigurationTypeChangeLicensee(e) {
+        if ($("#LicenseeConfigurationTypeId").val() == "1") {
+            $(".eRPTP").show();
+            $(".eRTP").hide();
+            $(".eTransitPass").hide();
+        }
+        else if ($("#LicenseeConfigurationTypeId").val() == "2" || $("#LicenseeConfigurationTypeId").val() == "3") {
+            $(".eRPTP").hide();
+            $(".eRTP").show();
+            $(".eTransitPass").hide();
+        }
+        else {
+            $(".eTransitPass").show();
+            $(".eRPTP").hide();
+            $(".eRTP").hide();
+        }
+    }
+</script>
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        @Html.Partial("_navigation")
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="javascript:void(0);">
+                                Add
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="~/Configuration/ePermit/ViewList">
+                                View
+                            </a>
+                        </li>
+                    </ul>
+                    @Html.Partial("_util")
+                </div>
+                <section class="box form-container">
+                    <div class="content-body">
+                        <h5 class="text-brown font-weight-bold mt-0"> ePermit Details</h5>
+                        @using (Html.BeginForm("Add", "ePermit", FormMethod.Post, new { enctype = "multipart/form-data", AUTOCOMPLETE = "Off", id = "form1" }))
+                        {
+                            <div class="row">
+                                <div class="col-lg-3 col-md-6 col-sm-12 form-group">
+                                    <label class="col-form-label pt-0 font-weight-bolder">District <span class="text-danger">*</span></label>
+                                    <select id="DistrictId" class="form-control searchableselect" autofocus="autofocus">
+                                        <option value="">--Select--</option>
+                                        <option value="1">Balod</option>
+                                        <option value="2">Balodabazar-Bhatapara</option>
+                                        <option value="3">Balrampur-Ramanujganj</option>
+                                        <option value="4">Bastar(Jagdalpur)</option>
+                                        <option value="5">Bemetara</option>
+                                        <option value="6">Bijapur (Chhattisgarh)</option>
+                                        <option value="5">Bilaspur</option>
+                                        <option value="5">Dantewada (Dakshin Bastar)</option>
+                                    </select>
+                                </div>
+                                <div class="col-lg-3 col-md-6 col-sm-12 form-group">
+                                    <label class="col-form-label pt-0 font-weight-bolder">User Type <span class="text-danger">*</span></label>
+                                    <select class="form-control searchableselect" id="UserTypeId" onchange="UserTypeChange(this)">
+                                        <option value="">--Select--</option>
+                                        <option value="1">Lessee</option>
+                                        <option value="2">Licensee</option>
+                                    </select>
+                                </div>
+                                <div class="Lessee col-lg-3 col-md-6 col-sm-12 form-group" style="display:none;">
+                                    <label class="col-form-label pt-0 font-weight-bolder">Configuration Type <span class="text-danger">*</span></label>
+                                    <select class="form-control searchableselect" id="LesseeConfigurationTypeId" onchange="ConfigurationTypeChangeLessee(this)">
+                                        <option value="">--Select--</option>
+                                        <option value="1">eTP Permit</option>
+                                        <option value="2">eTP</option>
+                                    </select>
+                                </div>
+                                <div class="Licensee col-lg-3 col-md-6 col-sm-12 form-group" style="display:none;">
+                                    <label class="col-form-label pt-0 font-weight-bolder">Configuration Type <span class="text-danger">*</span></label>
+                                    <select class="form-control searchableselect" id="LicenseeConfigurationTypeId" onchange="ConfigurationTypeChangeLicensee(this)">
+                                        <option value="">--Select--</option>
+                                        <option value="1">eRPTP Permit</option>
+                                        <option value="2">eRTP Permit</option>
+                                        <option value="3">eLPT Permit</option>
+                                        <option value="4">eRPTP</option>
+                                        <option value="5">eRTP</option>
+                                        <option value="6">eLPT</option>
+                                    </select>
+                                </div>
+                                <div class="ePermit col-lg-3 col-md-6 col-sm-12 form-group" style="display:none;">
+                                    <label class="col-form-label pt-0 font-weight-bolder">Working Status <span class="text-danger">*</span></label>
+                                    <div class="ordering-style">
+                                        <ol>
+                                            <li>
+                                                <a>
+                                                    <span>Source Validity</span>
+                                                </a>
+                                                <input type="checkbox" />
+                                            </li>
+                                            <li>
+                                                <a>
+                                                    <span>EC Validity</span>
+                                                </a>
+                                                <input type="checkbox" />
+                                            </li>
+                                            <li>
+                                                <a>
+                                                    <span>CTO Validity</span>
+                                                </a>
+                                                <input type="checkbox" />
+                                            </li>
+                                            <li>
+                                                <a>
+                                                    <span>Quarry Plan</span>
+                                                </a>
+                                                <input type="checkbox" />
+                                            </li>
+                                        </ol>
+                                    </div>
+                                </div>
+                                <div class="eTP col-lg-3 col-md-6 col-sm-12 form-group" style="display:none;">
+                                    <label class="col-form-label pt-0 font-weight-bolder">Working Status <span class="text-danger">*</span></label>
+                                    <div class="ordering-style">
+                                        <ol>
+                                            <li>
+                                                <a>
+                                                    <span>CTO Validity</span>
+                                                </a>
+                                                <input type="checkbox" />
+                                            </li>
+                                            <li>
+                                                <a>
+                                                    <span>Forest Clearance Validity</span>
+                                                </a>
+                                                <input type="checkbox" />
+                                            </li>
+                                            <li>
+                                                <a>
+                                                    <span>EC Validity</span>
+                                                </a>
+                                                <input type="checkbox" />
+                                            </li>
+                                            <li>
+                                                <a>
+                                                    <span>Quarry Plan</span>
+                                                </a>
+                                                <input type="checkbox" />
+                                            </li>
+                                            <li>
+                                                <a>
+                                                    <span>Lease Deed Validity</span>
+                                                </a>
+                                                <input type="checkbox" />
+                                            </li>
+                                        </ol>
+                                    </div>
+                                </div>
+                                <div class="eTP col-lg-3 col-md-6 col-sm-12 form-group" style="display:none;">
+                                    <label class="col-form-label pt-0 font-weight-bolder">Quantity dispatched <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" />
+                                </div>
+                                <div class="eRPTP col-lg-3 col-md-6 col-sm-12 form-group" style="display:none;">
+                                    <label class="col-form-label pt-0 font-weight-bolder">Working Status <span class="text-danger">*</span></label>
+                                    <div class="ordering-style">
+                                        <ol>
+                                            <li>
+                                                <a>
+                                                    <span>Source Validity</span>
+                                                </a>
+                                                <input type="checkbox" />
+                                            </li>
+                                            <li>
+                                                <a>
+                                                    <span>EC Validity</span>
+                                                </a>
+                                                <input type="checkbox" />
+                                            </li>
+                                            <li>
+                                                <a>
+                                                    <span>CTO Validity</span>
+                                                </a>
+                                                <input type="checkbox" />
+                                            </li>
+                                        </ol>
+                                    </div>
+                                </div>
+                                <div class="eRTP col-lg-3 col-md-6 col-sm-12 form-group" style="display:none;">
+                                    <label class="col-form-label pt-0 font-weight-bolder">Working Status <span class="text-danger">*</span></label>
+                                    <div class="ordering-style">
+                                        <ol>
+                                            <li>
+                                                <a>
+                                                    <span>Source Validity</span>
+                                                </a>
+                                                <input type="checkbox" />
+                                            </li>
+                                            <li>
+                                                <a>
+                                                    <span>EC Validity</span>
+                                                </a>
+                                                <input type="checkbox" />
+                                            </li>
+                                            <li>
+                                                <a>
+                                                    <span>CTO Validity</span>
+                                                </a>
+                                                <input type="checkbox" />
+                                            </li>
+                                            <li>
+                                                <a>
+                                                    <span>Quarry Plan Validity</span>
+                                                </a>
+                                                <input type="checkbox" />
+                                            </li>
+                                        </ol>
+                                    </div>
+                                </div>
+                                <div class="eTransitPass col-lg-3 col-md-6 col-sm-12 form-group" style="display:none;">
+                                    <label class="col-form-label pt-0 font-weight-bolder">Working Status <span class="text-danger">*</span></label>
+                                    <div class="ordering-style">
+                                        <ol>
+                                            <li>
+                                                <a>
+                                                    <span>CTO Validity</span>
+                                                </a>
+                                                <input type="checkbox" />
+                                            </li>
+                                            <li>
+                                                <a>
+                                                    <span>Forest Clearance Validity</span>
+                                                </a>
+                                                <input type="checkbox" />
+                                            </li>
+                                            <li>
+                                                <a>
+                                                    <span>EC Validity</span>
+                                                </a>
+                                                <input type="checkbox" />
+                                            </li>
+                                            <li>
+                                                <a>
+                                                    <span>Quarry Plan</span>
+                                                </a>
+                                                <input type="checkbox" />
+                                            </li>
+                                            <li>
+                                                <a>
+                                                    <span>Lease Deed Validity</span>
+                                                </a>
+                                                <input type="checkbox" />
+                                            </li>
+                                        </ol>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12 col-sm-12">
+                                    <input type="submit" value="Submit" name="Submit" class="btn btn-success btn-md ml-0 waves-effect waves-light  btnsave" id="Submit">
+                                    <a href="~/Configuration/ePermit/Add" class="btn btn-danger btn-md ml-0 waves-effect waves-light btncancel">Cancel</a>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+    <!-- MAIN CONTENT AREA ENDS -->
+</section>
+

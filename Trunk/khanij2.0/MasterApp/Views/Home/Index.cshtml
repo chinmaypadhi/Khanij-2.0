@@ -1,0 +1,87 @@
+﻿@using MasterApp.Web;
+@using MasterEF;
+@using Microsoft.Extensions.Configuration
+@using Microsoft.AspNetCore.Http;
+@using Microsoft.Extensions.Options;
+@inject IConfiguration configuration
+@inject IHttpContextAccessor HttpContextAccessor
+@inject IOptions<KeyList> _objKeyList
+@{
+    List<MenuEF> index = HttpContextAccessor.HttpContext.Session.Get<List<MenuEF>>("Index");
+}
+<link rel="stylesheet" href='@Url.Content("~/CMScss/landing.css")' type="text/css" />
+@{
+    ViewData["Title"] = "Home Page";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+<script>
+    $(document).ready(function () {
+        if (@ViewBag.MMenuId== 2) {
+            loadNavigation('Index', 'Master', 'masone', 'tl', 'Master', '', ' ');
+        }
+        else if (@ViewBag.MMenuId== 10) {
+            loadNavigation('Index', 'Lessee Profile', 'masone', 'tl', 'Lessee Profile Details', '', ' ');
+        }
+        else if (@ViewBag.MMenuId== 18) {
+            loadNavigation('Index', 'Lessee Application', 'masone', 'tl', 'Lessee Application Details', '', ' ');
+        }
+        else if (@ViewBag.MMenuId== 45 || @ViewBag.MMenuId== 49) {
+            loadNavigation('Index', 'Lessee Application', 'masone', 'tl', 'View Lessee Profile', '', ' ');
+        }
+        else {
+            loadNavigation('Index', 'Home', 'masone', 'tl', 'Index', '', ' ');
+        }
+    });
+</script>
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        @Html.Partial("_CMSnavigation")
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="landing-section">
+                    <div class="row">
+                        @{
+                            int count = 1;
+                            if (index != null)
+                            {
+                                foreach (var item in index)
+                                {
+                                    foreach (var items in item.childMenuList)
+                                    {
+                                        <div class="col-lg-2 col-md-3 col-sm-12">
+                                            <div class="portlet">
+                                                <div class="icon"><i class="@items.GifIcon"></i></div>
+                                                <div class="title my-3">
+                                                    @items.MenuName
+                                                </div>
+                                                <div class="description">
+                                                    <p>
+                                                        @items.Description
+                                                    </p>
+                                                </div>
+                                                @if (item.MenuId == 18)
+                                                {
+                                                    string[] linkpath = items.ActionName.Split('?');
+                                                    string[] id = linkpath[1].Split('=');
+                                                    var url = CustomQueryStringHelper.EncryptString(items.Area, linkpath[0], items.Controller, new { Request = id[1] });
+                                                    <a class="menu-link" href="@_objKeyList.Value.ActionVerb://@_objKeyList.Value.SubDomenNAme@_objKeyList.Value.DomenNAme@url"></a>
+                                                }
+                                                else
+                                                {
+                                                    <a class="menu-link" href="@_objKeyList.Value.ActionVerb://@items.url@_objKeyList.Value.DomenNAme/@items.Area/@items.Controller/@items.ActionName"></a>
+                                                }
+                                            </div>
+                                        </div>
+                                    }
+                                    count++;
+                                }
+                            }
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- MAIN CONTENT AREA ENDS -->
+</section>

@@ -1,0 +1,276 @@
+﻿@*// *********************************************************************************************************
+    //  View Name                : AllRequest
+    //  Desciption               : To Bind All Lessee Profile Request Count details in view
+    //  Created By               : Lingaraj Dalai
+    //  Created On               : 03 March 2022
+    // ********************************************************************************************************
+*@
+@model MasterEF.LesseeProfileIndividualCountModel;
+@using MasterApp.Web;
+@using MasterEF;
+@using Microsoft.Extensions.Configuration
+@using Microsoft.AspNetCore.Http;
+@using Microsoft.Extensions.Options;
+@inject IConfiguration configuration
+@inject IHttpContextAccessor HttpContextAccessor
+@inject IOptions<KeyList> _objKeyList
+@{
+    ViewData["Title"] = "AllRequest";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+<style>
+    .theme-light {
+        --bg-light-grey: rgb(248 249 250 / 50%);
+    }
+
+    .theme-dark {
+        --bg-light-grey: #282b3c;
+    }
+
+    .request-section .portlet {
+        background: var(--bg-light-grey);
+        border-radius: 6px;
+        text-align: center;
+        padding: 1rem;
+        margin-bottom: 1.5rem;
+        border: 1px solid rgb(173 174 176 / 44%);
+    }
+
+        .request-section .portlet h6 {
+            font-size: 1rem;
+            height: 40px;
+        }
+
+    @@media only screen and (max-width: 1366px) {
+        .request-section .col-lg-2 {
+            flex: 0 0 25%;
+            max-width: 25%;
+        }
+    }
+
+    @@media only screen and (max-width: 1200px) {
+        .request-section .col-lg-2 {
+            flex: 0 0 33.333333%;
+            max-width: 33.333333%;
+        }
+    }
+
+    @@media only screen and (max-width: 768px) {
+        .request-section .col-lg-2 {
+            flex: 0 0 50%;
+            max-width: 50%;
+        }
+
+        .request-section .portlet h6 {
+            height: 15px;
+        }
+    }
+
+    @@media only screen and (max-width: 640px) {
+        .request-section .col-lg-2 {
+            flex: 0 0 100%;
+            max-width: 100%;
+        }
+    }
+</style>
+<script>
+    backMe = "yes"
+    $(document).ready(function () {
+        loadNavigation('AllRequest', 'Master', 'masone', 'tl', 'Dashboard', 'New Request for Lessee Profile', ' ');
+        $('.searchableselect').searchableselect();
+        DisableCount();
+    });
+    function DisableCount() {
+        if ($('#LESSEE_OFFICE_COUNT').html() == "0") { $('#Office_Details').css('pointer-events', 'none') } else { $('#Office_Details').css('pointer-events', 'auto') }
+        if ($('#LESSEE_APPLICATION_COUNT').html() == "0") { $('#APPLICATION_DETAILS').css('pointer-events', 'none') } else { $('#APPLICATION_DETAILS').css('pointer-events', 'auto') }
+        if ($('#LESSEE_GRANT_ORDER_COUNT').html() == "0") { $('#GRANT_ORDER_DETAILS').css('pointer-events', 'none') } else { $('#GRANT_ORDER_DETAILS').css('pointer-events', 'auto') }
+        if ($('#LESSEE_LICENSE_COUNT').html() == "0") { $('#AREA_DETAILS').css('pointer-events', 'none') } else { $('#AREA_DETAILS').css('pointer-events', 'auto') }
+        if ($('#LESSEE_MINERAL_INFORMATION_COUNT').html() == "0") { $('#MINERAL_INFORMATION').css('pointer-events', 'none') } else { $('#MINERAL_INFORMATION').css('pointer-events', 'auto') }
+        if ($('#LESSEE_IBM_COUNT').html() == "0") { $('#IBM_DETAILS').css('pointer-events', 'none') } else { $('#IBM_DETAILS').css('pointer-events', 'auto') }
+        if ($('#LESSEE_MINING_PLAN_COUNT').html() == "0") { $('#MINING_PLAN').css('pointer-events', 'none') } else { $('#MINING_PLAN').css('pointer-events', 'auto') }
+        if ($('#LESSEE_FOREST_CLEARANCE_COUNT').html() == "0") { $('#FOREST_CLEARANCE_DETAILS').css('pointer-events', 'none') } else { $('#FOREST_CLEARANCE_DETAILS').css('pointer-events', 'auto') }
+        if ($('#LESSEE_EC_COUNT').html() == "0") { $('#ENVIRONMENTAL_CLEARANCE_DETAILS').css('pointer-events', 'none') } else { $('#ENVIRONMENTAL_CLEARANCE_DETAILS').css('pointer-events', 'auto') }
+        if ($('#LESSEE_CTE_COUNT').html() == "0") { $('#CONSENT_TO_ESTABLISH').css('pointer-events', 'none') } else { $('#CONSENT_TO_ESTABLISH').css('pointer-events', 'auto') }
+        if ($('#LESSEE_CTO_COUNT ').html() == "0") { $('#CONSENT_TO_OPERATE').css('pointer-events', 'none') } else { $('#CONSENT_TO_OPERATE').css('pointer-events', 'auto') }
+        if ($('#LESSEE_Assessment_COUNT').html() == "0") { $('#Assessment_Report').css('pointer-events', 'none') } else { $('#Assessment_Report').css('pointer-events', 'auto') }
+    }
+    function SearchUser() {
+        var UserId = $('#UserId').val();
+        if (UserId == '') {
+            swal("", 'Select User !', "warning");
+        }
+        else {
+            $.ajax({
+                url: '/LesseeProfile/Profile/GetIndividualCount',
+                data: { 'IndiviudalId': $('#UserId').val() },
+                dataType: 'json',
+                type: 'post',
+                success: function (data) {
+                    debugger;
+                    $('#LESSEE_OFFICE_COUNT').text(data.lesseE_OFFICE_COUNT);
+                    $('#LESSEE_APPLICATION_COUNT').text(data.lesseE_APPLICATION_COUNT);
+                    $('#LESSEE_GRANT_ORDER_COUNT').text(data.lesseE_GRANT_ORDER_COUNT);
+                    $('#LESSEE_LICENSE_COUNT').text(data.lesseE_LICENSE_COUNT);
+                    $('#LESSEE_MINERAL_INFORMATION_COUNT').text(data.lesseE_MINERAL_INFORMATION_COUNT);
+                    $('#LESSEE_IBM_COUNT').text(data.lesseE_IBM_COUNT);
+                    $('#LESSEE_MINING_PLAN_COUNT').text(data.lesseE_MINING_PLAN_COUNT);
+                    $('#LESSEE_FOREST_CLEARANCE_COUNT').text(data.lesseE_FOREST_CLEARANCE_COUNT);
+                    $('#LESSEE_EC_COUNT').text(data.lesseE_EC_COUNT);
+                    $('#LESSEE_CTE_COUNT').text(data.lesseE_CTE_COUNT);
+                    $('#LESSEE_CTO_COUNT').text(data.lesseE_CTO_COUNT);
+                    $('#LESSEE_Assessment_COUNT').text(data.lesseE_Assessment_COUNT);
+                    DisableCount();
+                },
+                error: function (err) {
+                }
+            });
+        }
+    }
+    function EncryptUrl(Request) {
+        var UserId = $('#UserId').val();
+        if (UserId == '') {
+            UserId = 0;
+        }
+        $.ajax({
+            url: '/LesseeProfile/Profile/ProfileRequestUrl',
+            data: { 'Request': Request, 'IndiviudalId': UserId },
+            dataType: 'json',
+            type: 'post',
+            success: function (data) {
+                debugger;
+                window.location.href = data;
+            },
+            error: function (err) {
+            }
+        });
+    }
+</script>
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        @Html.Partial("_CMSnavigation")
+        <div class="row">
+            <section class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">
+                                Force Data Requests
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="javascript:void(0);">
+                                All New Requests
+                            </a>
+                        </li>
+                    </ul>
+                    @Html.Partial("_CMSutil")
+                </div>
+                <section class="box form-container">
+                    <div class="content-body">
+                        <div class="row mb-5">
+                            <label class="col-lg-1 col-md-1 col-form-label">User</label>
+                            <div class="col-lg-5 col-md-5  mb-lg-0 mb-2">
+                                <div class="input-group">
+                                    @Html.DropDownListFor(m => m.UserId, ViewBag.LesseeUser as IEnumerable<SelectListItem>, "Select", new { @class = "form-control  searchableselect", autofocus = "autofocus" })
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <button class="btn btn-md btn-success" id="SearchUser" onclick="SearchUser()">Search</button>&nbsp;&nbsp;
+                                <a class="btn btn-md btn-danger" href="@CustomQueryStringHelper.EncryptString("LesseeProfile", "AllRequest", "Profile", new { MMenuId=18 })">Clear</a>
+                            </div>
+                        </div>
+                        <div class="request-section">
+                            <div class="row">
+                                <div class="col-lg-2 col-md-3 col-sm-12">
+                                    <div class="portlet">
+                                        <h6>Lessee Information Details</h6>
+                                        <h1 class="text-success" id="LESSEE_OFFICE_COUNT">@Model.LESSEE_OFFICE_COUNT</h1>
+                                        <a onclick="EncryptUrl('1')" id="Office_Details" class="btn btn-sm btn-outline-success">View Details</a>
+                                    </div>
+                                </div>
+                                <div class="col-lg-2 col-md-3 col-sm-12">
+                                    <div class="portlet">
+                                        <h6>Lessee Application Details</h6>
+                                        <h1 class="text-success" id="LESSEE_APPLICATION_COUNT">@Model.LESSEE_APPLICATION_COUNT</h1>
+                                        <a onclick="EncryptUrl('2')" id="APPLICATION_DETAILS" class="btn btn-sm btn-outline-success">View Details</a>
+                                    </div>
+                                </div>
+                                <div class="col-lg-2 col-md-3 col-sm-12">
+                                    <div class="portlet">
+                                        <h6>Grant Order & Lease Deed Details</h6>
+                                        <h1 class="text-success" id="LESSEE_GRANT_ORDER_COUNT">@Model.LESSEE_GRANT_ORDER_COUNT</h1>
+                                        <a onclick="EncryptUrl('4')" id="GRANT_ORDER_DETAILS" class="btn btn-sm btn-outline-success">View Details</a>
+                                    </div>
+                                </div>
+                                <div class="col-lg-2 col-md-3 col-sm-12">
+                                    <div class="portlet">
+                                        <h6>Lease Information Details</h6>
+                                        <h1 class="text-success" id="LESSEE_LICENSE_COUNT">@Model.LESSEE_LICENSE_COUNT</h1>
+                                        <a onclick="EncryptUrl('5')" id="AREA_DETAILS" class="btn btn-sm btn-outline-success">View Details</a>
+                                    </div>
+                                </div>
+                                <div class="col-lg-2 col-md-3 col-sm-12">
+                                    <div class="portlet">
+                                        <h6>Mineral Information</h6>
+                                        <h1 class="text-success" id="LESSEE_MINERAL_INFORMATION_COUNT">@Model.LESSEE_MINERAL_INFORMATION_COUNT</h1>
+                                        <a onclick="EncryptUrl('6')" id="MINERAL_INFORMATION" class="btn btn-sm btn-outline-success">View Details</a>
+                                    </div>
+                                </div>
+                                <div class="col-lg-2 col-md-3 col-sm-12">
+                                    <div class="portlet">
+                                        <h6>IBM Details</h6>
+                                        <h1 class="text-success" id="LESSEE_IBM_COUNT">@Model.LESSEE_IBM_COUNT</h1>
+                                        <a onclick="EncryptUrl('8')" id="IBM_DETAILS" class="btn btn-sm btn-outline-success">View Details</a>
+                                    </div>
+                                </div>
+                                <div class="col-lg-2 col-md-3 col-sm-12">
+                                    <div class="portlet">
+                                        <h6>Mining Plan Details</h6>
+                                        <h1 class="text-success" id="LESSEE_MINING_PLAN_COUNT">@Model.LESSEE_MINING_PLAN_COUNT</h1>
+                                        <a onclick="EncryptUrl('7')" id="MINING_PLAN" class="btn btn-sm btn-outline-success">View Details</a>
+                                    </div>
+                                </div>
+                                <div class="col-lg-2 col-md-3 col-sm-12">
+                                    <div class="portlet">
+                                        <h6>Forest Clearence Details</h6>
+                                        <h1 class="text-success" id="LESSEE_FOREST_CLEARANCE_COUNT">@Model.LESSEE_FOREST_CLEARANCE_COUNT</h1>
+                                        <a onclick="EncryptUrl('3')" id="FOREST_CLEARANCE_DETAILS" class="btn btn-sm btn-outline-success">View Details</a>
+                                    </div>
+                                </div>
+                                <div class="col-lg-2 col-md-3 col-sm-12">
+                                    <div class="portlet">
+                                        <h6>Environment Clearance Details</h6>
+                                        <h1 class="text-success" id="LESSEE_EC_COUNT">@Model.LESSEE_EC_COUNT</h1>
+                                        <a onclick="EncryptUrl('9')" id="ENVIRONMENTAL_CLEARANCE_DETAILS" class="btn btn-sm btn-outline-success">View Details</a>
+                                    </div>
+                                </div>
+                                <div class="col-lg-2 col-md-3 col-sm-12">
+                                    <div class="portlet">
+                                        <h6>Consent to Establish Details</h6>
+                                        <h1 class="text-success" id="LESSEE_OFFICE_COUNT">@Model.LESSEE_CTE_COUNT</h1>
+                                        <a onclick="EncryptUrl('10')" id="CONSENT_TO_ESTABLISH" class="btn btn-sm btn-outline-success">View Details</a>
+                                    </div>
+                                </div>
+                                <div class="col-lg-2 col-md-3 col-sm-12">
+                                    <div class="portlet">
+                                        <h6>Consent to Operate Details</h6>
+                                        <h1 class="text-success" id="LESSEE_CTO_COUNT">@Model.LESSEE_CTO_COUNT</h1>
+                                        <a onclick="EncryptUrl('11')" id="CONSENT_TO_OPERATE" class="btn btn-sm btn-outline-success">View Details</a>
+                                    </div>
+                                </div>
+                                <div class="col-lg-2 col-md-3 col-sm-12">
+                                    <div class="portlet">
+                                        <h6>Assessment Report</h6>
+                                        <h1 class="text-success" id="LESSEE_Assessment_COUNT">@Model.LESSEE_Assessment_COUNT</h1>
+                                        <a onclick="EncryptUrl('12')" id="Assessment_Report" class="btn btn-sm btn-outline-success">View Details</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </section>
+        </div>
+    </div>
+</section>
+

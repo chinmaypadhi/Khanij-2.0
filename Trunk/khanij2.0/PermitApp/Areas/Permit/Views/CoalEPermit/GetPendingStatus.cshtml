@@ -1,0 +1,492 @@
+﻿@model PermitEF.ePermitModel
+@using Microsoft.Extensions.Options;
+@using PermitApp.Helper;
+@{
+    ViewData["Title"] = "ePermitPayment";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        @Html.Partial("_CMSnavigation")
+
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="javascript:void(0);">
+                                Make Payment
+                            </a>
+                        </li>
+
+                    </ul>
+                    @Html.Partial("_CMSutil")
+                </div>
+
+                <section class="box form-container">
+                    <div class="content-body">
+                        @using (Html.BeginForm("PostPaymenyStatus", "CoalEPermit", FormMethod.Post, new { enctype = "multipart/form-data", AUTOCOMPLETE = "Off", id = "__EUAntiForgeryForm", @Area = "Permit" }))
+                        {
+                            @Html.HiddenFor(model => model.ProposedQty)
+                            @Html.HiddenFor(model => model.BulkPermitId)
+                            @Html.HiddenFor(model => model.TotalPayableAmount)
+                            @Html.HiddenFor(model => model.TotalMiningPayableAmount)
+                            @Html.HiddenFor(model => model.TotalEVSPayableAmount)
+                            @Html.HiddenFor(model => model.TotalIncomTaxPayableAmount)
+                            @Html.HiddenFor(model => model.EVSOrder)
+                            @Html.HiddenFor(model => model.IncomeTaxOrder)
+                            @Html.HiddenFor(model => model.MiningOrder)
+                            @Html.HiddenFor(model => model.MineralName)
+                            @Html.HiddenFor(model => model.MineralGradeName)
+                            @Html.HiddenFor(model => model.EmailId)
+                            @Html.HiddenFor(model => model.MobileNo)
+
+                            @(Html.HiddenFor(model => model.PayableRoyalty))
+                            @(Html.HiddenFor(model => model.NMET))
+                            @(Html.HiddenFor(model => model.TCS))
+                            @(Html.HiddenFor(model => model.DMF))
+                            @(Html.HiddenFor(model => model.Cess))
+                            @(Html.HiddenFor(model => model.eCess))
+                            @(Html.HiddenFor(model => model.Production))
+                            @(Html.HiddenFor(model => model.RemainingProduction))
+                            @(Html.HiddenFor(model => model.MineralGradeName))
+                            @(Html.HiddenFor(model => model.MineralNature))
+                            @(Html.HiddenFor(model => model.BasicRate))
+
+                            @Html.HiddenFor(model => model.PaymentStatus)
+                            @(Html.HiddenFor(model => model.PaymentBank))
+                            @(Html.HiddenFor(model => model.PaymentMode))
+                            @(Html.HiddenFor(model => model.P_Mode))
+
+                            @(Html.HiddenFor(model => model.GeneratedBy))
+                            @(Html.HiddenFor(model => model.GeneratedDesignation))
+                            @(Html.HiddenFor(model => model.BulkPermitNo))
+                            @(Html.HiddenFor(model => model.ActiveStatus))
+                            @(Html.HiddenFor(model => model.TransactionalID))
+                            @(Html.HiddenFor(model => model.TillDateBalanceUpfrontPayment))
+                            @(Html.HiddenFor(model => model.EAuctionType))
+                            @(Html.HiddenFor(model => model.DistrictId))
+                            @(Html.HiddenFor(model => model.District))
+                            @(Html.HiddenFor(model => model.DistrictCode))
+                            <h5 class="text-brown font-weight-bold mt-0 text-center">Calculation</h5>
+
+                            @*@if (Model.ActiveStatus == 6 || Model.ActiveStatus == 7 || Model.ActiveStatus == 11)
+                                {
+                                    <h6 class="text-brown font-weight-bold">Online Paid</h6>
+                                }
+                                else
+                                {
+                                    <h6 class="text-brown font-weight-bold">Payable Online</h6>
+                                }*@
+                            <h6 class="text-brown font-weight-bold">Mining Department</h6>
+                            <div class="table-responsive">
+                                <table class="table table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th class="font-weight-bolder">Classification</th>
+                                            <th class="font-weight-bolder">Total Amount</th>
+                                            @if (Model.ActiveStatus == 6 || Model.ActiveStatus == 7 || Model.ActiveStatus == 11)
+                                            {
+                                                <th class="font-weight-bolder">Total Wallet Amount(At the time of Payment)</th>
+                                            }
+                                            else
+                                            {
+                                                <th class="font-weight-bolder">Total Wallet Amount</th>
+
+                                            }
+                                            @if (Model.ActiveStatus == 6 || Model.ActiveStatus == 7 || Model.ActiveStatus == 11)
+                                            {
+                                                <th class="font-weight-bolder">Paid by Wallet Amount</th>
+                                            }
+                                            else
+                                            {
+                                                <th class="font-weight-bolder">Pay by Wallet Amount</th>
+
+                                            }
+                                            <th class="font-weight-bolder"></th>
+                                            @if (Model.ActiveStatus == 6 || Model.ActiveStatus == 7 || Model.ActiveStatus == 11)
+                                            {
+                                                <th class="font-weight-bolder">Paid Amount</th>
+                                            }
+                                            else
+                                            {
+                                                <th class="font-weight-bolder">Payable Amount</th>
+                                            }
+
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+
+                                        @if (Model != null && Model.PaymentDetails != null && Model.PaymentDetails.Count > 0)
+                                        {
+                                            decimal A = 0;
+                                            decimal B = 0;
+                                            decimal C = 0;
+                                            decimal D = 0;
+                                            int count = 0;
+                                            var pid = 0;
+                                            var bulkid = 0;
+                                            string order = null;
+                                            int noncount = 0;
+                                            int fcont = 0;
+
+                                            for (int i = 0; i < Model.PaymentDetails.Count; i++)
+                                            {
+                                                if (Model.PaymentDetails[i].PayDeptId == 1 && Model.PaymentDetails[i].ApplicableId == 1)
+                                                {
+                                                    fcont += 1;
+                                                    if (Model.PaymentDetails[i].OrderNStatus == 1)
+                                                    {
+                                                        noncount = noncount + 1;
+                                                    }
+                                                    if (Model.PaymentDetails[i].MakePayementId == 1)
+                                                    {
+                                                        count = count + 1;
+                                                    }
+                                                    order = Convert.ToString(Model.MiningOrder);
+                                                    bulkid = Convert.ToInt32(Model.BulkPermitId);
+                                                    pid = Convert.ToInt32(Model.PaymentDetails[i].PayDeptId);
+                                                    if (Model.PaymentDetails[i].MakePayementId == 1)
+                                                    {
+                                                        A += Convert.ToDecimal(Model.PaymentDetails[i].TotalAmount);
+                                                        B += Convert.ToDecimal(Model.PaymentDetails[i].AdjustmentAmount);
+                                                        C += Convert.ToDecimal(Model.PaymentDetails[i].WalletAdjustedAmount);
+                                                        D += Convert.ToDecimal(Model.PaymentDetails[i].MappingValue);
+                                                    }
+                                                    <tr>
+                                                        <td width="100px">@Model.PaymentDetails[i].PaymentType</td>
+                                                        <td width="100px">@Model.PaymentDetails[i].TotalAmount</td>
+                                                        <td width="100px">@Model.PaymentDetails[i].AdjustmentAmount</td>
+                                                        <td width="100px">@Model.PaymentDetails[i].WalletAdjustedAmount</td>
+                                                        <td width="50px">=</td>
+                                                        @if (Model.PaymentDetails[i].MakePayementId == 1)
+                                                        {
+                                                            <td width="100px">@Model.PaymentDetails[i].MappingValue</td>
+                                                        }
+                                                        else
+                                                        {
+                                                            <td width="100px" style="background-color:red">@Model.PaymentDetails[i].MappingValue (Not Applicable For Online Payment)</td>
+                                                        }
+
+
+                                                    </tr>
+                                                }
+
+                                            }
+
+                                            if (fcont == 0)
+                                            {
+                                                <tr>
+                                                    <td style="color:red;" width="100px">No Record Available</td>
+                                                </tr>
+                                            }
+                                            else
+                                            {
+
+                                                <tr>
+                                                    @if (Model.ActiveStatus == 6 || Model.ActiveStatus == 7 || Model.ActiveStatus == 11 || count == noncount)
+                                                    {
+                                                        <td width="100px">Total Paid Amount</td>
+                                                    }
+                                                    else
+                                                    {
+                                                        <td width="100px">Total Payable Amount</td>
+                                                    }
+                                                    <td width="100px">@A</td>
+
+                                                    <td width="100px">@B</td>
+                                                    <td width="100px">@C</td>
+                                                    <td width="50px">=</td>
+                                                    <td width="100px">@D</td>
+
+                                                </tr>
+                                                <tr>
+                                                    @if (ViewBag.MiningDp == null)
+                                                    {
+
+                                                        <td style="color:green; text-align:center" colspan="6" width="100px">You Have Already Paid For the Mining Department</td>
+
+                                                    }
+                                                    else if (ViewBag.MINGetStatus != null)
+                                                    {
+                                                        <td style="color:red; text-align:center" colspan="6" width="100px">@ViewBag.MINGetStatus</td>
+
+                                                    }
+                                                    else
+                                                    {
+                                                        <td colspan="6" style="text-align:right;">
+                                                            @{
+                                                                var dataString = CustomQueryStringHelper.
+                                                                EncryptString("Permit", "PostPaymenyStatus", "CoalEPermit", new { id = bulkid, PaymentType = ViewBag.MiningDp });
+                                                            }
+                                                            <a href="@dataString" title="Verify" class="btn btn-primary btn-md ml-0 waves-effect waves-light">Verify</a>
+                                                        </td>
+                                                    }
+
+                                                </tr>
+                                            }
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                            <h6 class="text-brown font-weight-bold">Income Tax Department</h6>
+                            <div class="table-responsive">
+                                <table class="table table-bordered">
+
+                                    <tbody>
+
+                                        @if (Model != null && Model.PaymentDetails != null && Model.PaymentDetails.Count > 0)
+                                        {
+                                            decimal A = 0;
+                                            decimal B = 0;
+                                            decimal C = 0;
+                                            decimal D = 0;
+                                            var pid = 0;
+                                            var bulkid = 0;
+                                            string order = null;
+                                            int count = 0;
+                                            int noncount = 0;
+                                            int fcont = 0;
+
+                                            for (int i = 0; i < Model.PaymentDetails.Count; i++)
+                                            {
+                                                if (Model.PaymentDetails[i].PayDeptId == 2 && Model.PaymentDetails[i].ApplicableId == 1)
+                                                {
+                                                    fcont += 1;
+                                                    if (Model.PaymentDetails[i].MakePayementId == 1)
+                                                    {
+                                                        count = count + 1;
+                                                    }
+                                                    if (Model.PaymentDetails[i].OrderNStatus == 1)
+                                                    {
+                                                        noncount = noncount + 1;
+                                                    }
+                                                    order = Convert.ToString(Model.IncomeTaxOrder);
+                                                    bulkid = Convert.ToInt32(Model.BulkPermitId);
+                                                    pid = Convert.ToInt32(Model.PaymentDetails[i].PayDeptId);
+                                                    if (Model.PaymentDetails[i].MakePayementId == 1)
+                                                    {
+                                                        A += Convert.ToDecimal(Model.PaymentDetails[i].TotalAmount);
+                                                        B += Convert.ToDecimal(Model.PaymentDetails[i].AdjustmentAmount);
+                                                        C += Convert.ToDecimal(Model.PaymentDetails[i].WalletAdjustedAmount);
+                                                        D += Convert.ToDecimal(Model.PaymentDetails[i].MappingValue);
+                                                    }
+                                                    <tr>
+                                                        <td width="100px">@Model.PaymentDetails[i].PaymentType</td>
+                                                        <td width="100px">@Model.PaymentDetails[i].TotalAmount</td>
+                                                        <td width="100px">@Model.PaymentDetails[i].AdjustmentAmount</td>
+                                                        <td width="100px">@Model.PaymentDetails[i].WalletAdjustedAmount</td>
+                                                        <td width="50px">=</td>
+                                                        @if (Model.PaymentDetails[i].MakePayementId == 1)
+                                                        {
+                                                            <td width="100px">@Model.PaymentDetails[i].MappingValue</td>
+                                                        }
+                                                        else
+                                                        {
+                                                            <td width="100px" style="background-color:red">@Model.PaymentDetails[i].MappingValue (Not Applicable For Online Payment)</td>
+                                                        }
+
+                                                    </tr>
+                                                }
+                                            }
+
+                                            if (fcont == 0)
+                                            {
+                                                <tr>
+                                                    <td style="color:red;" width="100px">No Record Available</td>
+                                                </tr>
+                                            }
+                                            else
+                                            {
+                                                <tr>
+                                                    @if (Model.ActiveStatus == 6 || Model.ActiveStatus == 7 || Model.ActiveStatus == 11 || count == noncount)
+                                                    {
+                                                        <td width="100px">Total Paid Amount</td>
+                                                    }
+                                                    else
+                                                    {
+                                                        <td width="100px">Total Payable Amount</td>
+                                                    }
+                                                    <td width="100px">@A</td>
+
+                                                    <td width="100px">@B</td>
+                                                    <td width="100px">@C</td>
+                                                    <td width="50px">=</td>
+                                                    <td width="100px">@D</td>
+
+                                                </tr>
+                                                <tr>
+                                                    @if (ViewBag.IncomeDp == null)
+                                                    {
+
+                                                        <td style="color:green; text-align:center" colspan="6" width="100px">You Have Already Paid For the Income Department</td>
+
+                                                    }
+                                                    else if (ViewBag.INCGetStatus != null)
+                                                    {
+                                                        <td style="color:red; text-align:center" colspan="6" width="100px">@ViewBag.INCGetStatus</td>
+
+                                                    }
+                                                    else
+                                                    {
+                                                        <td colspan="6" style="text-align:right;">
+                                                            @{
+                                                                var dataString = CustomQueryStringHelper.
+                                                                EncryptString("Permit", "PostPaymenyStatus", "CoalEPermit", new { id = bulkid, PaymentType = ViewBag.IncomeDp });
+                                                            }
+                                                            <a href="@dataString" title="Verify" class="btn btn-primary btn-md ml-0 waves-effect waves-light">Verify</a>
+                                                        </td>
+                                                    }
+
+                                                </tr>
+                                            }
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                            <h6 class="text-brown font-weight-bold">EVS Department</h6>
+                            <div class="table-responsive">
+                                <table class="table table-bordered">
+
+                                    <tbody>
+
+                                        @if (Model != null && Model.PaymentDetails != null && Model.PaymentDetails.Count > 0)
+                                        {
+                                            decimal A = 0;
+                                            decimal B = 0;
+                                            decimal C = 0;
+                                            decimal D = 0;
+                                            var pid = 0;
+                                            var bulkid = 0;
+                                            string order = null;
+                                            int count = 0;
+                                            int noncount = 0;
+                                            int fcont = 0;
+
+                                            for (int i = 0; i < Model.PaymentDetails.Count; i++)
+                                            {
+                                                if (Model.PaymentDetails[i].PayDeptId == 3 && Model.PaymentDetails[i].ApplicableId == 1)
+                                                {
+                                                    fcont += 1;
+                                                    if (Model.PaymentDetails[i].MakePayementId == 1)
+                                                    {
+                                                        count = count + 1;
+                                                    }
+                                                    if (Model.PaymentDetails[i].OrderNStatus == 1)
+                                                    {
+                                                        noncount = noncount + 1;
+                                                    }
+                                                    order = Convert.ToString(Model.EVSOrder);
+                                                    bulkid = Convert.ToInt32(Model.BulkPermitId);
+                                                    pid = Convert.ToInt32(Model.PaymentDetails[i].PayDeptId);
+                                                    if (Model.PaymentDetails[i].MakePayementId == 1)
+                                                    {
+                                                        A += Convert.ToDecimal(Model.PaymentDetails[i].TotalAmount);
+                                                        B += Convert.ToDecimal(Model.PaymentDetails[i].AdjustmentAmount);
+                                                        C += Convert.ToDecimal(Model.PaymentDetails[i].WalletAdjustedAmount);
+                                                        D += Convert.ToDecimal(Model.PaymentDetails[i].MappingValue);
+                                                    }
+                                                    <tr>
+                                                        <td width="100px">@Model.PaymentDetails[i].PaymentType</td>
+                                                        <td width="100px">@Model.PaymentDetails[i].TotalAmount</td>
+                                                        <td width="100px">@Model.PaymentDetails[i].AdjustmentAmount</td>
+                                                        <td width="100px">@Model.PaymentDetails[i].WalletAdjustedAmount</td>
+                                                        <td width="50px">=</td>
+                                                        @if (Model.PaymentDetails[i].MakePayementId == 1)
+                                                        {
+                                                            <td width="100px">@Model.PaymentDetails[i].MappingValue</td>
+                                                        }
+                                                        else
+                                                        {
+                                                            <td width="100px" style="background-color:red">@Model.PaymentDetails[i].MappingValue (Not Applicable For Online Payment)</td>
+                                                        }
+
+                                                    </tr>
+                                                }
+
+                                            }
+
+                                            if (fcont == 0)
+                                            {
+                                                <tr>
+                                                    <td style="color:red;" width="100px">No Record Available</td>
+                                                </tr>
+                                            }
+                                            else
+                                            {
+
+
+                                                <tr>
+                                                    @if (Model.ActiveStatus == 6 || Model.ActiveStatus == 7 || Model.ActiveStatus == 11 || count == noncount)
+                                                    {
+                                                        <td width="100px">Total Paid Amount</td>
+                                                    }
+                                                    else
+                                                    {
+                                                        <td width="100px">Total Payable Amount</td>
+                                                    }
+                                                    <td width="100px">@A</td>
+
+                                                    <td width="100px">@B</td>
+                                                    <td width="100px">@C</td>
+                                                    <td width="50px">=</td>
+                                                    <td width="100px">@D</td>
+
+                                                </tr>
+                                                <tr>
+                                                    @if (ViewBag.EVSDp == null)
+                                                    {
+
+                                                        <td style="color:green; text-align:center" colspan="6" width="100px">You Have Already Paid For the Envirnoment Department</td>
+
+                                                    }
+                                                    else if (ViewBag.EVSGetStatus != null)
+                                                    {
+                                                        <td style="color:red; text-align:center" colspan="6" width="100px">@ViewBag.EVSGetStatus</td>
+
+                                                    }
+                                                    else
+                                                    {
+                                                        <td colspan="6" style="text-align:right;">
+                                                            @{
+                                                                var dataString = CustomQueryStringHelper.
+                                                                EncryptString("Permit", "PostPaymenyStatus", "CoalEPermit", new { id = bulkid, PaymentType = ViewBag.EVSDp });
+                                                            }
+                                                            <a href="@dataString" title="Verify" class="btn btn-primary btn-md ml-0 waves-effect waves-light">Verify</a>
+                                                        </td>
+                                                    }
+
+                                                </tr>
+                                            }
+                                        }
+
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div class="row mt-3">
+                                <div class="col-sm-12 text-center">
+                                    @if (ViewBag.EVSDp == null && ViewBag.IncomeDp == null && ViewBag.MiningDp==null)
+                                    {
+                                        <a class="btn btn-blue btn-md ml-0 waves-effect waves-light" href="@Url.Content("~/Permit/ePermit/GeneratePermit")">Genarate Permit</a>
+                                    }
+                                    @*<input type="submit" title="Make Payment" value="Make Payment" id="makePayment" class="btn btn-primary btn-md ml-0 waves-effect waves-light" />*@
+
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+    <!-- MAIN CONTENT AREA ENDS -->
+</section>
+@if(ViewBag.SUCCESS!=null)
+            {
+                <script>
+                    swal('','@ViewBag.SUCCESS','success')
+                </script>
+            }

@@ -1,0 +1,101 @@
+﻿@*// *********************************************************************************************************
+    //  View Name                : ViewList
+    //  Desciption               : To View Lesee Forest Clearance Details
+    //  Created By               : Lingaraj Dalai
+    //  Created On               : 27 July 2021
+    // ********************************************************************************************************
+*@
+@model MasterEF.LesseeForestClearanceViewModel;
+@using MasterApp.Web;
+@using MasterEF;
+@using  Microsoft.AspNetCore.Http;
+@inject IHttpContextAccessor HttpContextAccessor
+@{
+    ViewData["Title"] = "ViewList";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+    UserLoginSession profile = HttpContextAccessor.HttpContext.Session.Get<UserLoginSession>(KeyHelper.UserKey);
+}
+<script>
+    backMe = "yes"
+    $(document).ready(function () {
+        loadNavigation('ViewList', 'glUIS', 'pllesseprof', 'tl', 'Lessee Profile', 'Forest Clearance', ' ');
+        if (@profile.UserTypeId!= 7) { /*Other than Lessee Login*/
+            $("#navlinkAdd").hide(); //Hide Add tab
+            $(".ml-3").hide(); //Hide Edit button
+        }
+    });
+</script>
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        <!-- MAIN CONTENT AREA STARTS -->
+        @Html.Partial("_CMSnavigation")
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link" id="navlinkAdd" href="~/LesseeProfile/LesseeForestClearanceDetails/Create">
+                                Add
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="javascript:void(0);">
+                                View
+                            </a>
+                        </li>
+                    </ul>
+                    @Html.Partial("_CMSutil")
+                </div>
+                <section class="box form-container">
+                    <div class="content-body">
+                        <div class="message-heading">
+                            <h5 class="font-weight-bold text-brown">Forest Clearence Details</h5>
+                            <div>
+                                <a href="javascript:void(0);" class="btn-dark btn-sm log-btn" data-val="collapsefillter1">Log Report<i class="icon-angle-down-solid"></i></a>
+                                <a href="@CustomQueryStringHelper.EncryptString("LesseeProfile","Create","LesseeForestClearanceDetails",new {id=Model.CREATED_BY })" class="btn-success btn-sm ml-3" data-original-title="Edit"><i class="icon-pencil-alt-solid"></i></a>
+                            </div>
+                        </div>
+                        <div class="message-highlighter">
+                            <div class="row">
+                                <label class="col-lg-3 col-md-4 col-sm-12 col-form-label">Approval Number</label>
+                                <div class="col-lg-9 col-md-8 col-sm-12">
+                                    <label class="form-control-plaintext"><span class="colon">:</span>@Model.FC_APPROVAL_NUMBER</label>
+                                </div>
+                                <label class="col-lg-3 col-md-4 col-sm-12 col-form-label">Order Date</label>
+                                <div class="col-lg-9 col-md-8 col-sm-12">
+                                    <label class="form-control-plaintext"><span class="colon">:</span>@Model.FC_APPROVAL_DATE</label>
+                                </div>
+                                <label class="col-lg-3 col-md-4 col-sm-12 col-form-label">Valid From</label>
+                                <div class="col-lg-9 col-md-8 col-sm-12">
+                                    <label class="form-control-plaintext"><span class="colon">:</span>@Model.VALID_FROM</label>
+                                </div>
+                                <label class="col-lg-3 col-md-4 col-sm-12 col-form-label">Valid To</label>
+                                <div class="col-lg-9 col-md-8 col-sm-12">
+                                    <label class="form-control-plaintext"><span class="colon">:</span>@Model.VALID_TO</label>
+                                </div>
+                                <label class="col-lg-3 col-md-4 col-sm-12 col-form-label">Approval Letter</label>
+                                <div class="col-lg-9 col-md-8 col-sm-12">
+                                    <label class="form-control-plaintext">
+                                        <span class="colon">:</span>@Model.FC_LETTER_FILE_NAME
+                                        @if (Model.FC_LETTER_FILE_NAME != null && Model.FC_LETTER_FILE_NAME != "")
+                                        {
+                                            <a href='~/@Model.FC_LETTER_FILE_PATH' title="" class="ml-2" data-original-title="Download Approval Letter" target="_blank"><i class="icon-file-pdf-solid h5 text-danger"></i></a>
+                                        }
+                                    </label>
+                                </div>
+                                <label class="col-lg-3 col-md-4 col-sm-12 col-form-label">Remarks</label>
+                                <div class="col-lg-9 col-md-8 col-sm-12">
+                                    <label class="form-control-plaintext"><span class="colon">:</span>@Model.Remarks</label>
+                                </div>
+                            </div>
+                            <ul class='timeline custom-scroll log-box' id='collapsefillter1'>
+                                @Html.Raw((String)ViewBag.tableLA)
+                            </ul>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+</section>
+

@@ -1,0 +1,410 @@
+﻿@*// *********************************************************************************************************
+    //  View Name                : Create
+    //  Desciption               : To Save and Update, Forward to DD, Delete Lesee Mineral Information Details
+    //  Created By               : Lingaraj Dalai
+    //  Created On               : 04 August 2021
+    // ********************************************************************************************************
+*@
+@model MasterEF.LesseeMineralInformationModel;
+@using MasterEF;
+@using MasterApp.Web;
+@using Microsoft.AspNetCore.Mvc;
+@using  Microsoft.AspNetCore.Http;
+@inject IHttpContextAccessor HttpContextAccessor
+@{
+    ViewData["Title"] = "Create";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+    UserLoginSession profile = HttpContextAccessor.HttpContext.Session.Get<UserLoginSession>(KeyHelper.UserKey);
+}
+@if (TempData["Message"] != null)
+{
+    <script>
+        swal("",'@TempData["Message"]',"success");
+    </script>
+}
+<script>
+    indicateMe = "yes"
+    backMe = "yes"
+    $(document).ready(function () {
+        $('.searchableselect').searchableselect();
+        loadNavigation('Create', 'glUIS', 'pllesseprof', 'tl', 'Lessee Profile', 'Mineral Information', ' ');
+        //For Disabling all DOM if  is  Forwarded to DD/DMO and Approval is Pending
+          if (@Model.STATUS != null && @Model.STATUS != "") {
+            if (@Model.STATUS == 1) {
+                  $('.form-control').css("pointer-events", "none");
+                  $('.btnsave').hide();
+              }
+        }
+        else {
+            $('.btnsave').show();
+        }
+    /*Change Label text for Minor Mineral*/
+        var mineraltypename = '@profile.MineralTypeName';
+        if (mineraltypename == "Minor Mineral") {
+            $("#lblRelevantPage").text('Copy of the relevant page Quarry Plan');/*Label Text*/
+        }
+        $('input[name="FILE"]').bind('change', function () {
+            $("input[name='Submit']").attr('disabled', false);
+            filesize = this.files[0].size;
+            if (filesize > 2048000) {
+                swal("", "File size must be 2 MB !", "warning");
+                $("input[name='Submit']").attr('disabled', true);
+                return false;
+            }
+            else {
+                var fileName = $(this).val().split("\\").pop();
+                $(this).next('.custom-file-label').html(fileName);
+            }
+            return false;
+        });
+    });
+</script>
+<script>
+    $(document).ready(function () {
+        debugger;
+        GetMineralName();
+        $('#MINERAL_CATEGORY_ID').change(function () {
+            alert($('#MINERAL_CATEGORY_ID').val());
+            debugger;
+            GetMineralName();
+            $('#MineralNatureId').html("").selectpicker('refresh');
+            $('#MineralGradeId').html("").selectpicker('refresh');
+        });
+        $('#MineralId').change(function () {
+            debugger;
+            GetMineralNatureByMineral();
+        });
+        $('#MineralNatureId').change(function () {
+            debugger;
+            GetMineralGradeByNature();
+        });
+        function GetMineralName() {
+            if ($('#MINERAL_CATEGORY_ID').val() != "") {
+                $.ajax({
+                    url: '/LesseeProfile/LesseeMineralInformationDetails/GetMineralNameDetails',
+                    data: { 'mineralType': $('#MINERAL_CATEGORY_ID').val() },
+                    dataType: 'json',
+                    type: 'post',
+                    success: function (data) {
+                        debugger;
+                        $('#MineralId').html('');
+                        var row = "";
+                        $.each(data, function (ind, item) {
+                            row += "<option value='" + item.mineralId + "'>" + item.mineralName + "</option>";
+                        });
+                        $('#MineralId').html(row).selectpicker('refresh');
+                        if ($('#hdnMineralIdList').val() != "") {
+                            debugger;
+                            var MineralCountString = $('#hdnMineralIdList').val().replace('[', '').replace(']', '');
+                            $('#MineralId').selectpicker('val', MineralCountString.split(','));
+                            GetMineralNatureByMineral();
+                        }
+                        else {
+                            $('#MineralNatureId').html(row).selectpicker('refresh');
+                            $('#MineralGradeId').html(row).selectpicker('refresh');
+                        }
+                    },
+                    error: function (err) {
+                    }
+                });
+            }
+            else {
+                $('#MineralId').html(row).selectpicker('refresh');
+                $('#MineralNatureId').html(row).selectpicker('refresh');
+                $('#MineralGradeId').html(row).selectpicker('refresh');
+            }
+        }
+        function GetMineralNatureByMineral() {
+            debugger;
+            var selectedItem = [];
+            if ($('#MineralId').val() != null) {
+                selectedItem = $('#MineralId').val();
+                if (selectedItem.length > 0) {
+                    $('#MineralNatureId').html('');
+                    $.ajax({
+                        url: '/LesseeProfile/LesseeMineralInformationDetails/GetMineralFormInformationDetails',
+                        data: { 'mineralId': selectedItem.toString() },
+                        dataType: 'json',
+                        type: 'post',
+                        success: function (data) {
+                            debugger;
+                            var row = $('#MineralNatureId').html();;
+                            $.each(data, function (ind, item) {
+                                row += "<option value='" + item.mineralNatureId + "'>" + item.mineralNature + "</option>";
+                            });
+                            $('#MineralNatureId').html(row).selectpicker('refresh');
+                            //This section used for View
+                            if ($('#hdnMineralFormIdList').val() != "") {
+                                debugger;
+                                var MineralFormString = $('#hdnMineralFormIdList').val().replace('[', '').replace(']', '');
+                                $('#MineralNatureId').selectpicker('val', MineralFormString.split(','));
+                                GetMineralGradeByNature();
+                            }
+                        },
+                        error: function (err) {
+                        }
+                    });
+                }
+                else {
+                    $('#MineralGradeId').html(row).selectpicker('refresh');
+                    $('#MineralNatureId').html(row).selectpicker('refresh');
+                }
+            }
+        }
+        function GetMineralGradeByNature() {
+            debugger;
+            if ($('#MineralId').val() != null && $('#MineralNatureId').val() != null) {
+                var selectedItem = [];
+                selectedItem = $('#MineralId').val();
+                var selectedItemMineralNatureId = [];
+                selectedItemMineralNatureId = $('#MineralNatureId').val();
+                if (selectedItemMineralNatureId.length > 0 && selectedItem.length > 0) {
+                    $.ajax({
+                        url: '/LesseeProfile/LesseeMineralInformationDetails/GetMineralGradeInformationDetails',
+                        data: { 'mineralId': selectedItem.toString(), 'MineralNatureList': selectedItemMineralNatureId.toString() },
+                        dataType: 'json',
+                        type: 'post',
+                        success: function (data) {
+                            debugger;
+                            $('#MineralGradeId').html('');
+                            var row = "";
+                            $.each(data, function (ind, item) {
+                                row += "<option value='" + item.mineralGradeId + "'>" + item.mineralGrade + "</option>";
+                            });
+                            $('#MineralGradeId').html(row).selectpicker('refresh');
+                            if ($('#hdnMineralGradeIdList').val() != "") {
+                                //This section used for View
+                                var MineralGradeString = $('#hdnMineralGradeIdList').val().replace('[', '').replace(']', '');
+                                $('#MineralGradeId').selectpicker('val', MineralGradeString.split(','));
+                            }
+                        },
+                        error: function (err) {
+                        }
+                    });
+                }
+                else {
+                    $('#MineralGradeId').html(row).selectpicker('refresh');
+                }
+            }
+        }
+        /*****************************FILE UPLOAD**************************************************/
+        $('input[type="file"]').bind('change', function () {
+            $("input[type='Submit']").attr('disabled', false);
+            $("input[name='cmd']").attr('disabled', false);
+            filesize = this.files[0].size;
+            var val = $(this).val().toLowerCase(),
+                regex = new RegExp("(.*?)\.(jpeg|jpg|pdf)$");
+            if (!(regex.test(val))) {
+                swal("", ".docx, tif,xls  type is not an allowed file type. You can use only pdf, jpg, jpeg types of file(s). ", "warning");
+                this.value = '';
+                $("input[type='Submit']").attr('disabled', true);
+                $("input[name='cmd']").attr('disabled', true);
+                return false;
+            }
+            else if (filesize > 2048000) {
+                swal("", "File size must be 2 MB !", "warning");
+                $("input[type='Submit']").attr('disabled', true);
+                $("input[name='cmd']").attr('disabled', true);
+                return false;
+            }
+            else {
+                var fileName = $(this).val().split("\\").pop();
+                $(this).next('.custom-file-label').html(fileName);
+            }
+            return false;
+        });
+/******************************************************************************************/
+    });
+</script>
+<script>
+    function Validate() {
+        var Iss = false;
+        if ($('#MINERAL_CATEGORY_ID').val() == "") {
+            swal("", "Please Select Mineral Category", "warning");
+            $('#MineralId').focus();
+            return false;
+        }
+        else if ($('#MineralId').val() == null) {
+            swal("", "Please Select Mineral Name", "warning");
+            $('#MineralId').focus();
+            return false;
+        }
+        else if ($('#MineralNatureId').val() == null) {
+            swal("", "Please Select Mineral Form", "warning");
+            $('#MineralId').focus();
+            return false;
+        }
+        else if ($('#MineralGradeId').val() == null) {
+            swal("", "Please Select Mineral Grade", "warning");
+            $('#MineralId').focus();
+            return false;
+        }
+
+            //if (!DropDownValidation("MINERAL_CATEGORY_ID", "Mineral Category")) {
+            //    return false;
+            //}
+            //else if (!DropDownValidation("MineralId", "Mineral Name")) {
+            //    return false;
+            //}
+            //else if (!DropDownValidation("MineralNatureId", "Mineral Form")) {
+            //    return false;
+            //}
+            //else if (!DropDownValidation("MineralGradeId", "Mineral Grade")) {
+            //    return false;
+            //}
+        Iss = true;
+        return Iss;
+    }
+    function OnForwarding(btnAction) {
+        var Type;
+        if (btnAction == 'Forward To DD') {
+            Type = 'forward';
+        }
+        if (confirm("Before " + Type + " you need to apply your Digital Signature. Are you confirmed to " + Type + " Profile??")) {
+                var Postdata = 'action=signdoc' + "\n" + 'datatosign=Digital Signature Required' + "\n" + 'signaction=sign' + "\n" + 'filepath=' + "\n" + 'panNumberParam=' + "\n" + 'expirycheck=false' + "\n" + 'issuername=' + "\n" + 'certclass=1|2|3' + "\n" + 'certtype=ALL';
+                connection.send(Postdata);
+                connection.onerror = function (error) {
+                    swal("",'Please check the server connection: ' + error+'',"warning");
+                    swal("",error,"warning");
+                };
+                connection.onmessage = function (e) { // when DSC is success then following function executed.
+                    if (e.data.indexOf("subProtocol") == -1) {
+                        //alert(e.data);
+                        $("#DSCResponse").val(e.data).change();
+                        $.ajax(
+                            {
+                               url: '@Url.Action("CheckVerifyResponse", "LesseeDetails", new { Area = "LesseeProfile" })',
+                                type: "POST",
+                                data: { contentType: "pkcs7", signDataBase64Encoded: e.data, responseType: "plain" },
+                                success: function (msg) {
+                                    if (msg == "SUCCESS") {
+                                        if (btnAction == "Forward To DD") {
+                                            $("#SubResion").val("Forward To DD");
+                                        }
+                                        $("#form1").submit();
+                                    }
+                                }
+                            });
+                    }
+                    else {
+                        alert(e.data);
+                    }
+                };
+            }
+            else {
+                return false;
+            }
+    }
+    try {
+        var connection = new WebSocket('wss://localhost.emudhra.com:8080');
+        connection.onopen = function () {
+            console.log('Connection Opened');
+        };
+        connection.onerror = function (error) {
+        };
+        connection.onmessage = function (e) {
+            if (e.data.indexOf("subProtocol") == -1) {
+            }
+        };
+    }
+    catch (e) {
+        swal("", "No DSC Connection Found", "warning");
+    }
+</script>
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        <!-- MAIN CONTENT AREA STARTS -->
+        @Html.Partial("_CMSnavigation")
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="javascript:void(0);">
+                                Add
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="~/LesseeProfile/LesseeMineralInformationDetails/ViewList">
+                                View
+                            </a>
+                        </li>
+                    </ul>
+                    @Html.Partial("_CMSutil")
+                </div>
+                <section class="box form-container">
+                    <div class="content-body">
+                        @using (Html.BeginForm("Create", "LesseeMineralInformationDetails", FormMethod.Post, new { AUTOCOMPLETE = "Off", id = "form1", enctype = "multipart/form-data" }))
+                        {
+                            @(Html.HiddenFor(model => model.SubResion))
+                            @(Html.HiddenFor(model => model.SubApprove))
+                            @(Html.HiddenFor(model => model.SubReject))
+                            @(Html.HiddenFor(model => model.LESSEE_MINERAL_INFORMATION_ID))
+                            @Html.HiddenFor(x => x.CREATED_BY)
+                            @Html.HiddenFor(model => model.STATUS, new { id = "hdnStatus" })
+                            @Html.AntiForgeryToken()
+                            <h5 class="text-brown font-weight-bold mt-0 mb-4">Mineral Information</h5>
+                            <div class="row">
+                                <div class="col-lg-3 col-md-6 col-sm-12 form-group">
+                                    <label class="col-form-label pt-0 font-weight-bolder">Mineral Category <span class="text-danger">*</span></label>
+                                    @Html.DropDownListFor(model => model.MINERAL_CATEGORY_ID, ViewBag.MineralCategory as IEnumerable<SelectListItem>, "Select", new { @class = "form-control searchableselect", @autofocus = "autofocus" })
+                                    @Html.ValidationMessageFor(m => m.MINERAL_CATEGORY_ID, "", new { @class = "text-danger" })
+                                </div>
+                                <div class="col-lg-3 col-md-6 col-sm-12 form-group">
+                                    <label class="col-form-label pt-0 font-weight-bolder">Mineral <span class="text-danger">*</span></label>
+                                    @Html.HiddenFor(m => m.MineralIdList, new { @id = "hdnMineralIdList" })
+                                    <select multiple data-style="bg-white" class="selectpicker form-control" id="MineralId" name="MineralCount"></select>
+                                    @Html.ValidationMessageFor(m => m.MineralCount, "", new { @class = "text-danger" })
+                                </div>
+                                <div class="col-lg-3 col-md-6 col-sm-12 form-group">
+                                    <label class="col-form-label pt-0 font-weight-bolder">Mineral Form <span class="text-danger">*</span></label>
+                                    @Html.HiddenFor(m => m.MineralFormIdList, new { @id = "hdnMineralFormIdList" })
+                                    <select multiple data-style="bg-white" class="selectpicker form-control" id="MineralNatureId" name="MineralFormCount"></select>
+                                    @Html.ValidationMessageFor(m => m.MineralFormCount, "", new { @class = "text-danger" })
+                                </div>
+                                <div class="col-lg-3 d-lg-block d-none"></div>
+                                <div class="col-lg-3 col-md-6 col-sm-12 form-group">
+                                    <label class="col-form-label pt-0 font-weight-bolder">Mineral Grade <span class="text-danger">*</span></label>
+                                    @Html.HiddenFor(m => m.MineralGradeIdList, new { @id = "hdnMineralGradeIdList" })
+                                    <select multiple data-style="bg-white" class="selectpicker form-control" id="MineralGradeId" name="MineralGradeCount"></select>
+                                    @Html.ValidationMessageFor(m => m.MineralGradeCount, "", new { @class = "text-danger" })
+                                </div>
+                                <div class="col-lg-3 col-md-6 col-sm-12 form-group">
+                                    <label for="inputLoginId" class="col-form-label font-weight-bolder">Reserve Estimated</label>
+                                    @Html.TextBoxFor(x => x.ESTIMATED_RESERVE, new { @maxlength = "20", @class = "form-control" })
+                                </div>
+                                <div class="col-lg-3 col-md-6 col-sm-12 form-group">
+                                    <label for="inputLoginId" class="col-form-label font-weight-bolder">Mineral Reserve</label>
+                                    @Html.TextBoxFor(x => x.MINABLE_RESERVE, new { @maxlength = "20", @class = "form-control" })
+                                </div>
+                                <div class="col-lg-3 d-lg-block d-none"></div>
+                                <div class="col-lg-5 col-md-6 col-sm-12 form-group">
+                                    <label class="col-form-label font-weight-bolder" id="lblRelevantPage">Copy of the relevant page of MP/SOM whereby reserve</label>
+                                    <div class="custom-file">
+                                        <input type="file" class="custom-file-input" id="File30" name="FILE">
+                                        <label class="custom-file-label" for="customFile">Choose Files</label>
+                                        <small class="text-danger">Files type <strong>(.jpg , .jpeg , .pdf)</strong> with maximum <strong>2MB</strong></small>
+                                    </div>
+                                    @if (Model.COPY_OF_MP_SOM_ESTIMATION_FILE_NAME != null && Model.COPY_OF_MP_SOM_ESTIMATION_FILE_NAME != "")
+                                    {
+                                        <label class="form-control-plaintext">@(Model.COPY_OF_MP_SOM_ESTIMATION_FILE_NAME) <a href='~/@Model.COPY_OF_MP_SOM_ESTIMATION_FILE_PATH' title="" class="ml-2" data-original-title="Download" target="_blank"><i class="icon-file-pdf-solid h5 text-danger"></i></a></label>
+                                    }
+                                </div>
+                            </div>
+                            <div class="row mt-4">
+                                <div class="col-sm-12">
+                                    @if (Model.STATUS != 5)
+                                    {
+                                        <input type="submit" id="Submit" name="Submit" value="Save & Update" class="btn btn-success btn-md ml-0 waves-effect waves-light btnsave" onclick="return Validate()">
+                                        <input type="submit" value="Delete" class="btn btn-danger btn-md ml-0 waves-effect waves-light btnsave" id="Delete" name="delete" onclick="return confirm('Are you sure to delete?')" style="display:none;" />
+                                        <input type="button" title="Forward to DD" value="Forward To DD" name="cmd" class="btn btn-warning text-dark btn-md waves-effect waves-light ml-0 btnsave" onclick="if (Validate()) { return OnForwarding('Forward To DD'); }" />
+                                    }
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+</section>

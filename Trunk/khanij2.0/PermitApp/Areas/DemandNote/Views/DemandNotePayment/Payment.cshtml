@@ -1,0 +1,269 @@
+﻿
+@using PermitEF;
+@using  Microsoft.AspNetCore.Http;
+@using Microsoft.AspNetCore.Mvc;
+@using PermitApp.Helper;
+@inject IHttpContextAccessor HttpContextAccessor
+@using PermitApp.Web;
+@model List<PermitEF.DemandNotePaymentModel>;
+@addTagHelper "*, Microsoft.AspNet.Mvc.TagHelpers"
+@{
+    ViewData["Title"] = "SubmittedNotice";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+    UserLoginSession profile = HttpContextAccessor.HttpContext.Session.Get<UserLoginSession>(KeyHelper.UserKey);
+}
+<script>
+    $(document).ready(function () {
+        loadNavigation('Demand/Credit Note', 'glTMng', 'plpaymenthead', 'tl', 'Notice', 'Demand/Credit Note Payment', ' ');
+        $('.datepicker').datetimepicker({
+            format: 'LT',
+            format: "DD-MM-YYYY",
+            daysOfWeekDisabled: [],
+        });
+    });
+</script>
+<input type="hidden" id="hdnDemandNoteCode" value="@ViewBag.DemandID" />
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        @Html.Partial("_CMSnavigation")
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                @*<div class="main-tab">
+                        <ul class="nav nav-tabs">
+
+
+                            <li class="nav-item">
+                                <a class="nav-link " href="#">
+                                    Demand Note Payment Summary
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link  " href="#">
+                                    Credit Note Payment Summary
+                                </a>
+                            </li>
+                        </ul>
+                        @Html.Partial("_CMSutil")
+                    </div>*@
+                <section class="box form-container">
+                    @*<div class="search-box">
+                            @using (Html.BeginForm("SubmittedNotice", "Noticeletter", FormMethod.Post, new { AUTOCOMPLETE = "Off", id = "form1" }))
+                            {
+                                <div class="searchform px-3 py-3">
+                                    <div class="row">
+                                        <div class="col-sm-4">
+                                            <div class="form-group row">
+                                                <label for="inputText" class="col-sm-3 col-form-label">
+                                                    From Date
+                                                </label>
+                                                <div class="col-sm-8">
+                                                    <div class="input-group">
+                                                        <input type="text" class="form-control datepicker" id="Fromdate">
+                                                        <div class="input-group-prepend">
+                                                            <label class="input-group-text" for="Fromdate"><i class="icon-calendar-alt-solid"></i></label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-4">
+                                            <div class="form-group row">
+                                                <label for="inputText" class="col-sm-3 col-form-label">
+                                                    To Date
+                                                </label>
+                                                <div class="col-sm-8">
+                                                    <div class="input-group">
+                                                        <input type="text" class="form-control datepicker" id="Todate">
+                                                        <div class="input-group-prepend">
+                                                            <label class="input-group-text" for="Todate"><i class="icon-calendar-alt-solid"></i></label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-2">
+                                            <a href="#" class="btn btn-sm btn-success m-0 waves-effect waves-light" onclick="BindData();"> Show </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>*@
+                    <div><a class="btn btn-primary" href="/demandnote/DemandNotePayment/DemandNoteSummary">Back</a></div>
+                    <div class="content-body pt-0">
+                        <div class="legend-box">
+                            <ul class="d-flex mb-1 justify-content-end list-unstyled">
+                                <li><span class="bg-success"></span> Active</li>
+                                <li><span class="bg-warning"></span> Inactive</li>
+                            </ul>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <table id="table-exports" class="table table-sm table-bordered">
+                                    <thead>
+                                        <tr>
+
+                                            <th width="30">District Name</th>
+                                            <th>Lessee Name</th>
+                                            <th>e-Permit Number</th>
+                                            <th>Pass Number</th>
+                                            <th>Demand Note Quantity</th>
+                                            <th>Mineral Details</th>
+                                            <th>Online Payment</th>
+                                            <th>Shall be paid separately</th>
+                                            <th width="100">Online Payment</th>
+                                            <th width="100">Shall be paid separately</th>
+                                            <th width="100">Online Payment</th>
+                                            <th width="100">Shall be paid separately</th>
+                                            <th>Payment Status</th>
+
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tBodyId">
+                                        @foreach (var x in Model)
+                                        {
+                                            <tr>
+                                                <td>
+
+                                                    @x.DistrictName
+                                                </td>
+                                                <td>@x.LesseeName</td>
+                                                <td>@x.BulkPermitNo</td>
+                                                <td>@x.TransitPassNo</td>
+                                                <td>@x.DemandNoteQty</td>
+                                                <td>
+                                                    <strong>Mineral Name : </strong> @x.MineralName<br />
+                                                    <strong>Mineral Unit : </strong> @x.UnitName <br />
+                                                    <strong>Mineral Form : </strong> @x.MineralForm<br />
+                                                    <strong>Mineral Grade : </strong> @x.MineralGrade<br />
+                                                </td>
+
+                                                <td>
+                                                    <strong>Royalty Rate : </strong> @x.OldRoyaltyRate <br />
+                                                    <strong>Royalty : </strong> @x.OLDPayableRoyalty <br />
+                                                    <strong>NMET : </strong> @x.OLDNMET  <br />
+                                                    <strong>DMF : </strong>@x.OLDDMF <br />
+                                                    <strong>Monthly Periodic Amount : </strong> @x.OLDMonthlyPeriodicAmount  <br />
+                                                    <strong>Total Amount : </strong> @x.OLDTotalPayableAmount
+                                                </td>
+
+                                                <td>
+                                                    <strong>TCS : </strong> @x.OLDTCS  <br />
+                                                    <strong>Infrastructure Development Cess : </strong>@x.OLDiCess <br />
+                                                    <strong>Environmental Cess : </strong> @x.OLDeCess <br />
+                                                    <strong>Total Amount : </strong> @x.OLDShallBePaidLater
+                                                </td>
+
+                                                <td>
+                                                    <strong>Royalty Rate : </strong> @x.RoylatyRate <br />
+                                                    <strong>Royalty : </strong> @x.NEWPayableRoyalty   <br />
+                                                    <strong>NMET : </strong> @x.NEWNMET <br />
+                                                    <strong>DMF : </strong> @x.NEWDMF   <br />
+                                                    <strong>Monthly Periodic Amount : </strong> @x.NEWMonthlyPeriodicAmount   <br />
+                                                    <strong>Total Amount : </strong> @x.NEWTotalPayableAmount
+                                                </td>
+
+                                                <td>
+                                                    <strong>TCS : </strong> @x.NEWTCS  <br />
+                                                    <strong>Infrastructure Development Cess : </strong> @x.NEWiCess   <br />
+                                                    <strong>Environmental Cess : </strong>@x.NEWeCess   <br />
+                                                    <strong>Total Amount : </strong> @x.NEWShallBePaidLater
+                                                </td>
+
+                                                <td>
+                                                    <strong>Royalty : </strong> @x.PayableRoyalty <br />
+                                                    <strong>NMET : </strong> @x.NMET <br />
+                                                    <strong>DMF : </strong> @x.DMF  <br />
+                                                    <strong>Monthly Periodic Amount : </strong> @x.MonthlyPeriodicAmount <br />
+                                                    <strong>Total Amount : </strong>@x.TotalPayableAmount
+                                                </td>
+
+                                                <td>
+                                                    <strong>TCS : </strong>  @x.TCS   <br />
+                                                    <strong>Infrastructure Development Cess : </strong> @x.iCess  <br />
+                                                    <strong>Environmental Cess : </strong> @x.eCess <br />
+                                                    <strong>Total Amount : </strong> @x.ShallBePaidLater
+                                                </td>
+
+                                                <td>@x.Status</td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+    <!-- MAIN CONTENT AREA ENDS -->
+</section>
+
+
+<script>
+    $(document).ready(function () {
+       // BindData();
+    });
+       @*function BindData() {
+        $.ajax({
+            type: "POST",
+            url: '@Url.Action("ViewDetailsData")',
+            data: { DemandNoteCode: $("#hdnDemandNoteCode").val() },
+            dataType: "json",
+            success: function (data) {
+                debugger;
+                var html = "";
+                if (data.length == 0) {
+                    thiHtml = '<tr><td colspan="14"><center><b>Record not found.</b></center></td></tr>';
+                }
+                for (var i = 0; i < data.length; i++) {
+                    html += '<tr>';
+                    html += '<td>' + data[i].DistrictName+'</td>';
+                    html += '<td>' + data[i].LesseeName+'</td>';
+                    html += '<td>' + data[i].PermitNumber +'</td>';
+                    html += '<td>' + data[i].PassNumber +'</td>';
+                    html += '<td>' + data[i].DemandNoteQty  +'</td>';
+                    html += '<td><strong>Mineral Name : </strong> ' + data[i].MineralName+'<br/>' +
+                        '<strong>Mineral Unit : </strong> ' + data[i].UnitName +'<br/>' +
+                        '<strong>Mineral Form : </strong> ' + data[i].MineralForm +'<br/>' +
+                        '<strong>Mineral Grade : </strong> ' + data[i].MineralGrade + '<br/></td>';
+                    html += '<td> <strong>Royalty Rate : </strong> ' + data[i].OldRoyaltyRate +'  <br/>' +
+                        '<strong>Royalty : </strong> ' + data[i].OLDPayableRoyalty +' <br/>' +
+                        '<strong>NMET : </strong> ' + data[i].OLDNMET +' <br/>' +
+                        '<strong>DMF : </strong>' + data[i].OLDDMF +'<br/>' +
+                        '<strong>Monthly Periodic Amount : </strong> ' + data[i].OLDMonthlyPeriodicAmount +' <br/>' +
+                        '<strong>Total Amount : </strong> ' + data[i].OLDTotalPayableAmount +' </td>';
+
+                    html += '<td><strong>TCS : </strong> ' + data[i].OLDTCS +' <br/>' +
+                    '<strong>Infrastructure Development Cess : </strong> ' + data[i].OLDiCess +'<br/>' +
+                        '<strong>Environmental Cess : </strong> ' + data[i].OLDeCess +' <br/>' +
+                        '<strong>Total Amount : </strong> ' + data[i].OLDShallBePaidLater +' </td>';
+                    html += '<td><strong>Royalty Rate : </strong> ' + data[i].RoylatyRate +'  <br/>' +
+                        '<strong>Royalty : </strong> ' + data[i].NEWPayableRoyalty +'  <br/>' +
+                        '<strong>NMET : </strong> ' + data[i].NEWNMET +'  <br/>' +
+                        '<strong>DMF : </strong> ' + data[i].NEWDMF +'  <br/>' +
+                        '<strong>Monthly Periodic Amount : </strong> ' + data[i].NEWMonthlyPeriodicAmount +'  <br/>'+
+                        '<strong>Total Amount : </strong> ' + data[i].NEWTotalPayableAmount +' </td>';
+                    html += '<td><strong>TCS : </strong> ' + data[i].NEWTCS +'  <br/>' +
+                        '<strong>Infrastructure Development Cess : </strong> ' + data[i].NEWiCess +'  <br/>' +
+                        '<strong>Environmental Cess : </strong> ' + data[i].NEWeCess +'  <br/>' +
+                        '<strong>Total Amount : </strong> ' + data[i].NEWShallBePaidLater +' </td>';
+                    html += '<td><strong>Royalty : </strong> ' + data[i].PayableRoyalty + ' <br/>' +
+                        '<strong>NMET : </strong> ' + data[i].NMET + '  <br/>' +
+                        '<strong>DMF : </strong> ' + data[i].DMF + '  <br/>' +
+                        '<strong>Monthly Periodic Amount : </strong> ' + data[i].MonthlyPeriodicAmount + '<br/>' +
+                        '<strong>Total Amount : </strong> ' + data[i].TotalPayableAmount + ' </td>';
+                    html += '<td>  <strong>TCS : </strong> ' + data[i].TCS + '  <br/>' +
+                        '<strong>Infrastructure Development Cess : </strong> ' + data[i].iCess + ' <br/>' +
+                        '<strong>Environmental Cess : </strong> ' + data[i].eCess + ' <br/>' +
+                        '<strong>Total Amount : </strong> ' + data[i].ShallBePaidLater + '"</td>';
+                    html += '<td>' + data[i].PaymentStatus + '</td>';
+                    html += '</tr>';
+                }
+                $("#tBodyId").html(html);
+            },
+        });
+    }*@
+
+</script>

@@ -1,0 +1,2194 @@
+﻿@*// ***********************************************************************
+    //  View Name                : RPTP
+    //  Desciption               : Used to generate eTransit Pass of RPTP
+    //  Created By               : Suroj Kumar Pradhan
+    //  Created On               : 23-Aug-2021
+    // ************************************************************************@
+@model EpassEF.RPTPModel
+@{
+    ViewData["Title"] = "RPTP";
+
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+@{var Tempuserid = ViewBag.userid; }
+@inject EpassApp.KhanijSecurity.KhanijIDataProtection protector;
+<h1>RPTP</h1>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+<link href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.1/themes/base/jquery-ui.css" rel="stylesheet" type="text/css">
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.1/jquery-ui.min.js"></script>
+<script src="~/js/j1.12.js"></script>
+<script>
+    $(document).ready(function () {
+
+        $('.searchableselect').searchableselect();
+    });
+
+</script>
+<script>
+
+
+    jQuery(function () {
+        var quotations = [];
+        VehicleMaxWeight = 0;
+
+
+        jQuery('#VehicleIdALL').autocomplete({
+
+            source: function (request, response) {
+                $.ajax({
+                    url: '@Url.Content("~/Epass/eTransitpass/OnPostAutoComplete")',
+                    type: "POST",
+                    data: {
+                        prefix: $("#VehicleIdALL").val()+'~'+'@Tempuserid'
+                    },
+                    dataType: "json",
+                    success: function (SList) {
+
+                        mydata = new Array();
+
+                        quotations = [];
+                        if (SList.length > 0) {
+                            $.each(SList, function (i, item) {
+                                $("#lbltext").hide();
+                                mydata.push({
+                                    label: item.vehicleNumber,
+                                    value: item.vehicleNumber
+                                });
+                                var data = {};
+                                var vehicleid = item.vehicleId;
+                                var vehicletypeName = item.vehicleTypeName;
+                                var vehicleTypeid = item.vehicleTypeId;
+                                var transportername = item.companyName;
+                                var Transporterid = item.vehicleOwnerId;
+                                var VehicleMaxWeight = item.maxNetWeight;
+                                var VehicleCarryingCapacity = item.carryingCapacity;
+                                var GrossWeight = item.grossWeight;
+                                var label = item.vehicleNumber;
+                                var value = item.vehicleNumber;
+
+                                data.vehicleid = vehicleid;
+                                data.vehicletypeName = vehicletypeName;
+                                data.vehicleTypeid = vehicleTypeid;
+                                data.transportername = transportername;
+                                data.Transporterid = Transporterid;
+                                data.VehicleMaxWeight = VehicleMaxWeight;
+                                data.VehicleCarryingCapacity = VehicleCarryingCapacity;
+
+                                data.GrossWeight = GrossWeight;
+                                data.label = label;
+                                data.value = value;
+                                quotations.push(data);
+                            });
+                        }
+                        else {
+                            $("#lbltext").show();
+
+                            $("#VehicleIdALL").val('');
+                            $("#VehicleId").val('');
+                            $("#VehicleTypeName").val('');
+                            $("#VehicleTypeId").val('');
+                            $("#NetWeight_Qty").val('');
+                            $("#TransporterName").val('');
+                            $("#TransporterId").val('');
+                            $("#GrossWeight_Qty").val('');
+                        }
+                        response(quotations);
+                    },
+                    failure: function (response) {
+
+                        console.log(response.responseText);
+                    },
+
+
+                });
+            },
+            minLength: 4,
+            select: function (e, ui) {
+                debugger;
+                event.preventDefault();
+                $("#VehicleIdAll").val(ui.item.vehicleNumber);
+
+
+                $('#VehicleCarryingCapacity').text('carrying capacity - ' + ui.item.VehicleCarryingCapacity);
+
+                $("#TareWeight").val(ui.item.VehicleMaxWeight).trigger("change");
+
+                if (ui.item.GrossWeight > 0) {
+                        $("#GrossWeight_Qty").val(ui.item.GrossWeight).trigger("change");
+                        $("#GrossWeight_Qty").css("pointer-events", "none");
+                        //$("#TareWeight_Qty").css("pointer-events", "none");
+                    $("#NetWeight_Qty").val((parseFloat($("#GrossWeight_Qty").val()) - parseFloat($("#TareWeight").val())).toFixed(2));
+                    }
+                    else {
+                        $("#GrossWeight_Qty").css("pointer-events", "inherit");
+                        //$("#TareWeight_Qty").css("pointer-events", "inherit");
+                    }
+
+
+                $("#VehicleId").val(ui.item.vehicleid);
+                $("#VehicleTypeName").val(ui.item.vehicletypeName);
+                $("#VehicleTypeId").val(ui.item.vehicleTypeid);
+
+                $("#TransporterName").val(ui.item.transportername);
+                $("#TransporterId").val(ui.item.Transporterid);
+
+
+
+
+            },
+            focus: function (event, ui) {
+
+                event.preventDefault();
+                $("#VehicleIdAll").val(ui.item.vehicleNumber);
+            },
+
+        })
+            .autocomplete("instance")._renderItem = function (ul, item) {
+
+                var html = '';
+
+                //$.each(item, function (i, item) {
+                //    debugger;
+                //html +='<div class="k-animation-container" style="width: 250px; height: 128px; margin-left: -2px; padding-left: 2px; padding-right: 2px; padding-bottom: 4px; overflow: visible;  position: absolute; top: 582.238px; z-index: 10002; left: 1140.26px; box-sizing: content-box;">'
+                html += '<span style="background-color:red"><h3 style="margin-bottom:0px;color:red">' + item.value + '</h3><p style="margin-bottom:0px;font-weight:bold">' + item.transportername + '</p><p style="margin-bottom:0px">' + item.vehicletypeName + '</p></span>'
+
+                //});
+                return $("<li>").append(html).appendTo(ul);
+                var html = '';
+                //$("#dvall").append(html);
+        };
+
+    });
+
+
+
+
+</script>
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        @Html.Partial("_CMSnavigation")
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="Adde-TransitPassTP.aspx">
+                                Add
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link" href="Viewe-TransitPassTP.aspx">
+                                View
+                            </a>
+                        </li>
+
+                    </ul>
+                    @Html.Partial("_CMSutil")
+                </div>
+
+                <section class="box form-container">
+                    <div class="content-body">
+                        @using (Html.BeginForm("RPTP", "eTransitPass", FormMethod.Post, new { @id = "formRPTPTransitPass" }))
+                        {
+                            @*@(Html.Kendo().Window()
+                                .Modal(false)
+                                .Name("CheckFields")
+                                .Width(480)
+                                .Draggable()
+                                .Title("Please Confirm the Following Details")
+                                .Actions(actions => actions.Close())
+                                .HtmlAttributes(new { style = "overflow: unset !important;" })
+                                .Content(@<text>*@
+                            <div>
+                                <div class="row">
+                                    @*<div class="col-xs-6"></div>*@
+                                    <div class="col-sm-12 col-xs-12 col-lg-12 col-md-12" style="display:none">
+                                        <div class="table-responsive">
+                                            <table class="table table-bordered table-condensed">
+                                                <tr>
+                                                    <td><b>Vehicle Number</b></td>
+                                                    <td>
+                                                        <label style="color: red" id="lblVehicleIdAll"></label>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td><b>Tare Weight</b></td>
+                                                    <td>
+                                                        <label style="color: red" id="lblTareWeight_Qty"></label>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td><b>Gross Weight</b></td>
+                                                    <td>
+                                                        <label style="color: red" id="lblGrossWeight_Qty"></label>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td><b>Net Weight</b></td>
+                                                    <td>
+                                                        <label style="color: red" id="lblNetWeight_Qty"></label>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        <input type="button" id="Ok" class="confirm_yes k-button" value="Ok" style="width: 70px;" />
+                                                    </td>
+                                                    <td>
+                                                        <input type="button" id="Cancel" class="confirm_no k-button" value="Cancel" style="width: auto;" />
+                                                    </td>
+                                                </tr>
+
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            @*</text>
+                                    )
+                                )*@
+                            <div id="CheckFieldsWindow" style="display: none">
+                            </div>
+
+                            @(Html.HiddenFor(model => model.RoyaltyPaidTransitPassId))
+                            @(Html.HiddenFor(model => model.Remaining_Qty))
+                            @(Html.HiddenFor(Model => Model.TransportationMode))
+                            @(Html.Hidden("TPOffline"))
+                            @Html.AntiForgeryToken()
+
+
+                            <div class="row">
+                                <div class="col-lg-6 col-md-12 col-sm-12">
+                                    <div class="form-group row">
+
+                                        <div class="col-md-5">
+                                            @(Html.LabelFor(model => model.BulkPermitId, "e-Permit No"))
+                                            <span class="text-danger">*</span>
+                                            @Html.Label("(ई-परमिट नंबर)")
+
+                                        </div>
+                                        <div class="col-md-7 col-lg-7 col-sm-7 ">
+                                            @Html.DropDownListFor(m => m.BulkPermitId, ViewBag.Permit as IEnumerable<SelectListItem>, "Select", new { @class = "form-control form-control-sm searchableselect", onchange = "OnBulkPermitIdchange();" })
+                                            @Html.ValidationMessageFor(x => x.BulkPermitId, "", new { @class = "text-danger", @maxlength = 50 })
+                                        </div>
+
+                                    </div>
+                                    <div class="row" id="PurchaserType" style="display: none">
+
+                                        <div class="col-md-5">
+                                            @(Html.LabelFor(model => model.PurchaserType, "Purchaser Type"))
+                                            @Html.Label("(खरीदारी प्रकार)")
+                                            <span class="text-danger">*</span>
+                                            @(Html.ValidationMessageFor(model => model.PurchaserType))
+                                        </div>
+                                        <div class="col-md-3">
+
+                                            @Html.RadioButton("PurchaserType", "Registered", new { @id = "Registered" }) Registered
+
+
+                                        </div>
+                                        <div class="col-md-3 ">
+                                            @Html.RadioButton("PurchaserType", "Un-registered", new { @id = "UnRegistered" }) Un-registered
+
+                                        </div>
+
+                                    </div>
+
+                                    <div class="MinorMineralPurchaser" style="display: none">
+                                        <div class="row">
+
+                                            <div class="col-md-5 ">
+                                                @(Html.LabelFor(model => model.PurchaserSubType, "Purchase Type"))
+                                                @Html.Label("(खरीदारी प्रकार)")
+                                                <span class="text-danger">*</span>
+                                                @(Html.ValidationMessageFor(model => model.PurchaserSubType))
+                                            </div>
+                                            <div class="col-md-3 ">
+
+                                                @Html.RadioButton("PurchaserSubType", "Govt Work")<b>Govt. Work</b>
+
+
+                                            </div>
+                                            <div class="col-md-3 ">
+                                                @Html.RadioButton("PurchaserSubType", "Private Work") <b>Private Work</b>
+
+
+                                            </div>
+                                        </div>
+
+                                        <div class="row">
+
+                                            <div class="col-md-5 ">
+                                                @(Html.LabelFor(model => model.PurchaserConsigneeName, "Purchaser/Consignee Name"))
+                                                @Html.Label("(क्रेता / प्रेषती नाम)")
+                                                <span class="text-danger">*</span>
+
+                                            </div>
+                                            <div class="col-md-7 col-lg-7 col-sm-7 ">
+                                                @(Html.TextBoxFor(model => model.PurchaserConsigneeName, new { @class = "form-control", @style = "width:100%", @maxlength = 200 }))
+                                                @Html.ValidationMessageFor(x => x.PurchaserConsigneeName, "", new { @class = "text-danger", @maxlength = 50 })
+                                            </div>
+
+                                        </div>
+
+                                        <div class="row">
+
+                                            <div class="col-md-5 default-form-control-style">
+                                                @(Html.LabelFor(model => model.PurchaserContactNumber, "Purchaser/Consignee Mobile Number"))
+                                                @Html.Label("(क्रेता / प्रेषती मोबाइल नंबर)")
+                                                <span class="text-danger">*</span>
+
+                                            </div>
+                                            <div class="col-md-7 col-lg-7 col-sm-7 default-form-control-style">
+                                                @(Html.TextBoxFor(model => model.PurchaserContactNumber, new { @class = "form-control", @style = "width:100%", @maxlength = 20 }))
+                                                @Html.ValidationMessageFor(x => x.PurchaserContactNumber, "", new { @class = "text-danger", @maxlength = 50 })
+                                            </div>
+
+                                        </div>
+                                    </div>
+
+                                    <div class="row" id="DivPurchaserConsigneeId">
+
+                                        <div class="col-md-5 default-form-control-style">
+                                            @(Html.LabelFor(model => model.PurchaserConsigneeId, "Purchaser / Consignee"))<br />
+                                            @Html.Label("(क्रेता / परेषिती)")
+                                            <span class="text-danger">*</span>
+
+                                        </div>
+                                        <div class="col-md-7 col-lg-7 col-sm-7 default-form-control-style">
+                                            @*@Html.DropDownListFor(m => m.PurchaserConsigneeId, ViewBag.Permit as IEnumerable<SelectListItem>, "Select", new { @class = "form-control form-control-sm searchableselect", onchange = "permitchange();" })*@
+                                            @Html.DropDownListFor(m => m.PurchaserConsigneeId, new SelectList(Enumerable.Empty<SelectListItem>(), "Value", "Text"), "Select Licensee Type", new { @class = "form-control form-control-sm searchableselect", onchange = "OnPurchaserConsigneechange()" })
+
+                                            @Html.ValidationMessageFor(model => model.PurchaserConsigneeId, "", new { @class = "text-danger", @maxlength = 50 })
+
+                                        </div>
+
+                                    </div>
+                                    <div class="row" id="DivPurchaserConsigneeId_Minor" style="display: none;">
+
+                                    </div>
+
+                                    <div class="row" id="divForwardingNote">
+
+                                        <div class="col-md-5 default-form-control-style">
+                                            @(Html.LabelFor(model => model.ForwardingNoteID, "Railway Transit Pass"))<br />
+                                            @Html.Label("(रेलवे ट्रांसिट पास)")
+                                            <span class="text-danger">*</span>
+                                            @(Html.ValidationMessageFor(model => model.ForwardingNoteID))
+                                        </div>
+                                        <div class="col-md-7 col-lg-7 col-sm-7 default-form-control-style">
+                                            @*@Html.DropDownListFor(m => m.ForwardingNoteID, ViewBag.Permit as IEnumerable<SelectListItem>, "Select", new { @class = "form-control form-control-sm searchableselect", onchange = "permitchange();" })*@
+                                            @Html.DropDownListFor(m => m.ForwardingNoteID, new SelectList(Enumerable.Empty<SelectListItem>(), "Value", "Text"), "Select Licensee Type", new { @class = "form-control form-control-sm searchableselect" })
+
+                                        </div>
+
+                                    </div>
+
+                                    <div class="row">
+
+                                        <div class="col-md-5 ">
+                                            @(Html.LabelFor(model => model.DateOfDispatche, "Dispatch Date"))
+                                            @Html.Label("(प्रेषण तारीख)")
+                                            @(Html.ValidationMessageFor(model => model.DateOfDispatche))
+                                        </div>
+                                        <div class="col-md-7 col-lg-7 col-sm-7">
+                                            @(Html.TextBox("DateOfDispatche", null, new { @class = "form-control", @readonly = "readonly", @style = "width:100%;" }))
+                                        </div>
+
+                                    </div>
+
+                                    <div id="divRoadRail">
+                                        <div class="" id="divForMajorMineral" style="display: block;">
+                                            <div class="row">
+
+                                                <div class="col-md-5 ">
+                                                    @(Html.LabelFor(model => model.TransportationModeName, "Transportation Mode"))<br />
+                                                    @Html.Label("(परिवहन मोड)")
+                                                    @(Html.HiddenFor(x => x.ModeOfTransportationId))
+                                                    @(Html.ValidationMessageFor(model => model.TransportationModeName))
+                                                </div>
+                                                <div class="col-md-7 col-lg-7 col-sm-7 ">
+                                                    @(Html.TextBoxFor(model => model.TransportationModeName, new { @class = "form-control", @readonly = "readonly", @style = "width:100%;" }))
+                                                </div>
+
+                                            </div>
+
+                                            <div class="row">
+
+                                                <div class="col-md-5 default-form-control-style">
+                                                    @(Html.LabelFor(model => model.VehicleId, "Carrier No."))
+                                                    <span class="text-danger">*</span><br />
+                                                    @Html.Label("(कैरियर नंबर)")
+                                                    @(Html.ValidationMessageFor(model => model.VehicleId))
+                                                    @(Html.HiddenFor(model => model.VehicleId))
+                                                </div>
+                                                <div class="col-md-7 col-lg-7 col-sm-7 default-form-control-style">
+                                                    @*@Html.DropDownListFor(m => m.VehicleId, ViewBag.Permit as IEnumerable<SelectListItem>, "Select", new { @class = "form-control form-control-sm searchableselect", onchange = "permitchange();" })*@
+
+                                                    @(Html.TextBox("VehicleIdALL", null, new { @class = "form-control" }))
+                                                    <small class="text-danger" id="lbltext">You will need to enter minimum 4 Character</small>
+                                                    @*@(Html.Kendo().AutoComplete()
+                                                            .Name("VehicleIdAll")
+                                                            .DataTextField("VehicleNumber")
+                                                            .HtmlAttributes(new { style = "width:100%" })
+                                                            .Placeholder("Enter Vehicle Number")
+                                                            .Height(400)
+                                                            .Template("<span><h3 style='margin-bottom:0px;color:red'>#: data.VehicleNumber #</h3><p style='margin-bottom:0px;font-weight:bold'>#: data.VehicleOwner #</p><p style='margin-bottom:0px'>#: data.VehicleTypeName #</p></span>")
+                                                            .MinLength(4)
+                                                            .Filter("contains")
+                                                            .Delay(200)
+                                                            .Events(e => e.Change("FillVehicleData"))
+                                                            .DataSource(source => source
+                                                            .Custom()
+                                                            .Group(g => g.Add("CompanyName", typeof(string)))
+                                                            .Transport(transport => transport
+                                                            .Read(read =>
+                                                            {
+                                                                read.Action("GetAllVehicleInformation", "TransitPass", new { Area = "Transit" }).Data("onAdditionalData");
+                                                            }))
+                                                            .ServerFiltering(true))
+                                                        )*@
+                                                    @* @(Html.Kendo().DropDownList()
+                                                                      .Name("VehicleId")
+                                                                      .HtmlAttributes(new { data_value_primitive = "true", @style = "width:100%;" })
+                                                                      .OptionLabel("Select Vehicle")
+                                                                      .Events(e => e.Change("fillVehicleMaxWeight"))
+                                                                      .Filter(FilterType.Contains)
+                                                                      .MinLength(3)
+                                                                      .DataTextField("VehicleNumber")
+                                                                      .DataValueField("VehicleId")
+                                                                      .DataSource(source =>
+                                                                      {
+                                                                          source.Read(read =>
+                                                                          {
+                                                                              read.Action("GetCascadeVehicleByTransporter", "eTransitPass")
+                                                                                  .Data("TransporterId");
+                                                                          })
+                                                                          .ServerFiltering(true);
+                                                                      })
+                                                                      .Enable(false)
+                                                                      .AutoBind(false)
+                                                                      .CascadeFrom("TransporterId")
+                                                        )*@
+                                                </div>
+
+                                            </div>
+
+                                            <div class="row">
+
+                                                <div class="col-md-5 default-form-control-style">
+                                                    @(Html.LabelFor(model => model.TransporterId, "Name Of Carrier Owner"))<br />
+                                                    @Html.Label("(कैरियर मालिक का नाम)")
+                                                    <span class="text-danger">*</span>
+                                                    @(Html.ValidationMessageFor(model => model.TransporterId))
+                                                </div>
+                                                <div class="col-md-7 col-lg-7 col-sm-7 default-form-control-style">
+                                                    @*@(Html.Kendo().DropDownListFor(model => model.TransporterId)
+                                                        .BindTo(CHiMMS_MVC.Models.Generic.UtilityModel.GetTransporterMasterList())
+                                                        .Filter(FilterType.Contains)
+                                                        .Name("TransporterId")
+                                                        .DataTextField("Text")
+                                                        .DataValueField("Value")
+                                                        .OptionLabel("Select Vehicle Owner")
+                                                        .HtmlAttributes(new { data_value_primitive = "true", @style = "width:100%;" }))*@
+
+                                                    @(Html.TextBox("TransporterName", null, new { @readonly = "readonly", @class = "form-control", @style = "width:100%" }))
+                                                    @(Html.HiddenFor(model => model.TransporterId))
+                                                    @*@(Html.TextBox("TransporterId", null, new { @class = "form-control", @style = "width:100%;" }))*@
+
+                                                </div>
+
+                                            </div>
+
+                                            <div class="row">
+
+                                                <div class="col-md-5 default-form-control-style">
+                                                    @(Html.LabelFor(model => model.VehicleTypeId, "Vehicle Type"))
+                                                    @Html.Label("(वाहन प्रकार)")
+                                                    @(Html.ValidationMessageFor(model => model.VehicleTypeId))
+                                                </div>
+                                                <div class="col-md-7 col-lg-7 col-sm-7 default-form-control-style">
+                                                    @(Html.TextBox("VehicleTypeName", null, new { @readonly = "readonly", @class = "form-control", @style = "width:100%" }))
+                                                    @(Html.HiddenFor(model => model.VehicleTypeId))
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                        <div id="div-Un-registered" style="display: none">
+
+                                            <div class="row">
+
+                                                <div class="col-md-5 default-form-control-style">
+                                                    @(Html.LabelFor(model => model.UnRegistredVehicleTypeId, "Vehicle Type"))
+                                                    @Html.Label("(वाहन प्रकार)")
+                                                    @(Html.ValidationMessageFor(model => model.UnRegistredVehicleTypeId))
+                                                </div>
+                                                <div class="col-md-7 col-lg-7 col-sm-7 default-form-control-style">
+                                                    @*@Html.Kendo().DropDownListFor(model => model.UnRegistredVehicleTypeId).BindTo(CHiMMS_MVC.Models.Generic.UtilityModel.GetVT()).Filter(FilterType.Contains).Name("UnRegistredVehicleTypeId").DataTextField("Text").DataValueField("Value").OptionLabel("Select Vehicle Type").HtmlAttributes(new { style = "width:100%", data_value_primitive = "true" })*@
+
+                                                    @*@Html.DropDownListFor(m => m.UnRegistredVehicleTypeId, ViewBag.Permit as IEnumerable<SelectListItem>, "Select", new { @class = "form-control form-control-sm searchableselect", onchange = "permitchange();" })*@
+
+                                                    @Html.DropDownListFor(m => m.UnRegistredVehicleTypeId, new SelectList(Enumerable.Empty<SelectListItem>(), "Value", "Text"), "Select Licensee Type", new { @class = "form-control form-control-sm searchableselect" })
+
+                                                    @(Html.HiddenFor(model => model.UnRegistredVehicleTypeId))
+
+                                                </div>
+                                            </div>
+                                            <div id="div-Un-registeredWithoutTractor" style="display: none">
+                                                <div class="row">
+
+                                                    <div class="col-md-5 default-form-control-style">
+                                                        @(Html.LabelFor(model => model.VehicleId, "Vehicle Number"))
+                                                        @Html.Label("(वाहन क्रमांक)")
+                                                        <span class="text-danger">*</span>
+                                                        @(Html.ValidationMessageFor(model => model.VehicleId))
+                                                    </div>
+                                                    <div class="col-md-7 col-lg-7 col-sm-7 default-form-control-style">
+
+                                                        @Html.HiddenFor(x => x.UnRegistredWithoutTractorVehicleId)
+                                                        @*@(Html.Kendo().AutoComplete()
+                                                                .Name("UnRegistredWithoutTractorVehicle")
+                                                                .DataTextField("VehicleNumber")
+                                                                .HtmlAttributes(new { style = "width:100%" })
+                                                                .Placeholder("Enter Vehicle Number")
+                                                                .Height(400)
+                                                                .Template("<span><h3 style='margin-bottom:0px;color:red'>#: data.VehicleNumber #</h3><p style='margin-bottom:0px;font-weight:bold'>#: data.VehicleOwner #</p><p style='margin-bottom:0px'>#: data.VehicleTypeName #</p></span>")
+                                                                .MinLength(4)
+                                                                .Filter("contains")
+                                                                .Delay(200)
+                                                                .Events(e => e.Change("UnRegistredFillVehicleData"))
+                                                                .DataSource(source => source
+                                                                .Custom()
+                                                                .Group(g => g.Add("CompanyName", typeof(string)))
+                                                                .Transport(transport => transport
+                                                                .Read(read =>
+                                                                {
+                                                                    read.Action("UnRegistredGetAllVehicleInformation", "TransitPass", new { Area = "Transit" }).Data("UnRegistredonAdditionalData");
+                                                                }))
+                                                                .ServerFiltering(true))
+                                                            )*@
+                                                        @*@Html.DropDownListFor(m => m.UnRegistredVehicleTypeId, ViewBag.Permit as IEnumerable<SelectListItem>, "Select", new { @class = "form-control form-control-sm searchableselect", onchange = "permitchange();" })*@
+                                                        @Html.DropDownListFor(m => m.UnRegistredVehicleTypeId, new SelectList(Enumerable.Empty<SelectListItem>(), "Value", "Text"), "Select Licensee Type", new { @class = "form-control form-control-sm searchableselect" })
+
+                                                    </div>
+
+                                                </div>
+                                                <div class="row">
+
+                                                    <div class="col-md-5 default-form-control-style">
+                                                        @(Html.LabelFor(model => model.UnRegistredWithoutTractorVehicleOwner, "Owner(Vehicle) Name"))
+                                                        @Html.Label("(वाहन मालिक (परिवहनकर्ता) का नाम)")
+                                                        <span class="text-danger">*</span>
+                                                        @(Html.ValidationMessageFor(model => model.UnRegistredWithoutTractorVehicleOwner))
+                                                    </div>
+                                                    <div class="col-md-7 col-lg-7 col-sm-7 default-form-control-style">
+                                                        @(Html.TextBox("UnRegistredWithoutTractorVehicleOwner", null, new { @class = "form-control", @style = "width:100%", @maxlength = 200 }))
+                                                    </div>
+
+                                                </div>
+
+                                            </div>
+                                            <div id="div-Un-registeredWithTractor" style="display: none">
+                                                <div class="row">
+
+                                                    <div class="col-md-5 default-form-control-style">
+                                                        @(Html.LabelFor(model => model.UnRegistredWithTractorVehicleId, "Vehicle Number"))
+                                                        @Html.Label("(वाहन क्रमांक)")
+                                                        <span class="text-danger">*</span>
+                                                        @(Html.ValidationMessageFor(model => model.UnRegistredWithTractorVehicleId))
+                                                    </div>
+                                                    <div class="col-md-7 col-lg-7 col-sm-7 default-form-control-style">
+                                                        @(Html.TextBox("UnRegistredWithTractorVehicleId", null, new { @class = "form-control", @style = "width:100%", @maxlength = 30 }))
+                                                    </div>
+
+                                                </div>
+                                                <div class="row">
+
+                                                    <div class="col-md-5 default-form-control-style">
+                                                        @(Html.LabelFor(model => model.UnRegistredWithTractorVehicleOwner, "Owner(Vehicle) Name"))
+                                                        @Html.Label("(वाहन मालिक (परिवहनकर्ता) का नाम)")
+                                                        <span class="text-danger">*</span>
+                                                        @(Html.ValidationMessageFor(model => model.UnRegistredWithTractorVehicleOwner))
+                                                    </div>
+                                                    <div class="col-md-7 col-lg-7 col-sm-7 default-form-control-style">
+                                                        @(Html.TextBox("UnRegistredWithTractorVehicleOwner", null, new { @class = "form-control", @style = "width:100%", @maxlength = 200 }))
+                                                    </div>
+                                                </div>
+
+
+                                            </div>
+
+
+                                        </div>
+                                        @*  <div class="" id="divForMinorMineral" style="display: none;">
+                                                <div class="row">
+                                                    <div class="col-xs-12">
+                                                        <div class="col-md-5 default-form-control-style">
+                                                            @(Html.LabelFor(model => model.TransporterId, "Name Of Carrier Owner"))<br />
+                                                            @Html.Label("(कैरियर मालिक का नाम)")
+                                                            <span class="text-danger">*</span>
+                                                            @(Html.ValidationMessageFor(model => model.TransporterId))
+                                                        </div>
+                                                        <div class="col-md-7 col-lg-7 col-sm-7 default-form-control-style">
+                                                            @(Html.TextBox("Minor_VehicleOwner", null, new { @class = "form-control", @style = "width:100%" }))
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-xs-12">
+                                                        <div class="col-md-5 default-form-control-style">
+                                                            @(Html.LabelFor(model => model.VehicleId, "Carrier No."))
+                                                            <span class="text-danger">*</span><br />
+                                                            @Html.Label("(कैरियर नंबर)")
+                                                            @(Html.ValidationMessageFor(model => model.VehicleId))
+                                                        </div>
+                                                        <div class="col-md-7 col-lg-7 col-sm-7 default-form-control-style">
+                                                            @(Html.TextBox("Minor_VehicleNumber", null, new { @class = "form-control", @style = "width:100%" }))
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-xs-12">
+                                                        <div class="col-md-5 default-form-control-style">
+                                                            @(Html.LabelFor(model => model.Minor_VehicleTypeId, "Vehicle Type"))
+                                                            @Html.Label("(वाहन का प्रकार)")
+                                                            @(Html.ValidationMessageFor(model => model.Minor_VehicleTypeId))
+                                                            <span class="text-danger">*</span>
+                                                        </div>
+                                                        <div class="col-md-7 col-lg-7 col-sm-7 default-form-control-style">
+                                                            @(Html.TextBox("Minor_VehicleType", null, new { @class = "form-control", @style = "width:100%" }))
+                                                            @(Html.HiddenFor(model => model.Minor_VehicleTypeId))
+                                                        </div>
+                                                    </div>
+
+                                                </div>
+                                            </div>*@
+
+                                        <div class="row">
+
+                                            <div class="col-md-5 default-form-control-style">
+                                                @(Html.LabelFor(model => model.NameOfCarrierDriver, "Carrier Driver Name"))<br />
+                                                @Html.Label("(कैरियर चालक नाम)")
+                                                <span class="text-danger">*</span>
+                                                @(Html.ValidationMessageFor(model => model.NameOfCarrierDriver))
+                                            </div>
+                                            <div class="col-md-7 col-lg-7 col-sm-7 default-form-control-style">
+                                                @(Html.TextBoxFor(model => model.NameOfCarrierDriver, new { @class = "form-control", @style = "width:100%;" }))
+                                            </div>
+
+                                        </div>
+
+                                        <div class="row">
+
+                                            <div class="col-md-5 default-form-control-style">
+                                                @(Html.LabelFor(model => model.ParticularOfLicensee, "Particular Of Licensee"))<br />
+                                                @Html.Label("(लाइसेंसधारी की विशेष)")
+                                                @(Html.ValidationMessageFor(model => model.ParticularOfLicensee))
+                                            </div>
+                                            <div class="col-md-7 col-lg-7 col-sm-7 default-form-control-style">
+                                                @(Html.TextBoxFor(model => model.ParticularOfLicensee, new { @class = "form-control", @style = "width:100%;" }))
+                                            </div>
+
+                                        </div>
+
+                                        <div class="row">
+
+                                            <div class="col-md-5 default-form-control-style">
+                                                @(Html.LabelFor(model => model.DriverContactNumber, "Driver Contact Number"))<br />
+                                                @Html.Label("(वाहन चालक का संपर्क नंबर)")
+                                                <span class="text-danger">*</span>
+                                                @(Html.ValidationMessageFor(model => model.DriverContactNumber))
+                                            </div>
+                                            <div class="col-md-7 col-lg-7 col-sm-7 default-form-control-style">
+                                                @(Html.TextBox("DriverContactNumber", null, new { @class = "form-control", @style = "width:100%;", maxlength = "10" }))
+                                            </div>
+
+                                        </div>
+
+                                        <div class="row">
+
+                                            <div class="col-md-5 default-form-control-style">
+                                                @(Html.LabelFor(model => model.TareWeight, "Tare Weight"))<br />
+                                                @Html.Label("(टेयर वेट)")
+                                                <span class="text-danger">*</span>
+                                                @(Html.ValidationMessageFor(model => model.TareWeight))
+                                            </div>
+                                            <div class="col-md-7 col-lg-7 col-sm-7 default-form-control-style">
+                                                @(Html.TextBoxFor(model => model.TareWeight, new { @onBlur = "return onBlurTareWeight();", @class = "form-control numberCheck", @style = "width:100%;" }))
+                                            </div>
+
+                                        </div>
+
+                                        <div class="row">
+
+                                            <div class="col-md-5 default-form-control-style">
+                                                @(Html.LabelFor(model => model.GrossWeight, "Gross Weight"))<br />
+                                                @Html.Label("(ग्रॉस वेट)")
+                                                <span class="text-danger">*</span>
+                                                @(Html.ValidationMessageFor(model => model.GrossWeight))
+                                            </div>
+                                            @*<div class="col-md-7 col-lg-7 col-sm-7 default-form-control-style">*@
+                                            <div class="col-md-2 col-lg-7 col-sm-2 default-form-control-style">
+                                                @(Html.TextBoxFor(model => model.GrossWeight, new { @onBlur = "return onBlurGrossWeight();", @class = "form-control numberCheck", @style = "width:100%;" }))
+                                            </div>
+                                            <div class="col-md-7 default-form-control-style" style="margin-top: -30px; margin-left: 516px;">
+                                                <span style="width: 250px" class="text-danger" id="VehicleCarryingCapacity"></span>
+                                            </div>
+
+                                        </div>
+
+                                        <div class="row">
+
+                                            <div class="col-md-5 default-form-control-style">
+                                                @(Html.LabelFor(model => model.NetWeight, "Net Weight"))<br />
+                                                @Html.Label("(नेट वेट)")
+                                                @(Html.ValidationMessageFor(model => model.NetWeight))
+                                            </div>
+                                            <div class="col-md-7 col-lg-7 col-sm-7 default-form-control-style">
+                                                @(Html.TextBoxFor(model => model.NetWeight, new { @class = "form-control numberCheck", @readonly = "readonly", @style = "width:100%;" }))
+                                            </div>
+
+                                        </div>
+                                    </div>
+
+
+                                    <div id="divNonRoadRail" style="display: none">
+                                        <div class="row">
+
+                                            <div class="col-md-5 default-form-control-style">
+                                                @(Html.LabelFor(model => model.TransportationMode, "Transportation Mode"))<br />
+                                                @Html.Label("(परिवहन मोड)")
+                                            </div>
+                                            <div class="col-md-7 col-lg-7 col-sm-7 default-form-control-style">
+                                                <input class="form-control" id="TransportationMode2" name="MineralName" readonly="readonly" style="width: 100%" type="text" value="">
+                                            </div>
+
+                                        </div>
+
+                                        <div class="row">
+
+                                            <div class="col-md-5 default-form-control-style">
+                                                @(Html.LabelFor(model => model.TotalQty, "Enter Total Weight"))<br />
+                                                @Html.Label("(एंटर टोटल वेट)")
+                                                <span class="text-danger">*</span>
+                                            </div>
+                                            <div class="col-md-7 col-lg-7 col-sm-7 default-form-control-style">
+                                                @(Html.TextBoxFor(model => model.TotalQty, new { @class = "form-control numberCheck", @style = "width:100%" }))
+                                            </div>
+                                        </div>
+
+                                    </div>
+
+                                    <div id="divInsideRailway" style="display: none">
+                                        <div class="row">
+
+                                            <div class="col-md-5 default-form-control-style">
+                                                @(Html.LabelFor(model => model.TransportationMode, "Transportation Mode"))<br />
+                                                @Html.Label("(परिवहन मोड)")
+                                            </div>
+                                            <div class="col-md-7 col-lg-7 col-sm-7 default-form-control-style">
+                                                <input class="form-control" id="TransportationMode3" name="MineralName" readonly="readonly" style="width: 100%" type="text" value="">
+                                            </div>
+
+                                        </div>
+
+                                        <div class="row">
+
+                                            <div class="col-md-5 default-form-control-style">
+                                                @Html.LabelFor(model => model.RailwayId, "Railway Sliding")
+                                                <span class="text-danger">*</span><br />
+                                                @Html.Label("(रेलवे स्लाइडिंग)")
+                                            </div>
+                                            <div class="col-md-7 col-lg-7 col-sm-7 default-form-control-style">
+                                                @*@Html.DropDownListFor(m => m.RailwayId, ViewBag.Permit as IEnumerable<SelectListItem>, "Select", new { @class = "form-control form-control-sm searchableselect", onchange = "permitchange();" })*@
+                                                @Html.DropDownListFor(m => m.RailwayId, new SelectList(Enumerable.Empty<SelectListItem>(), "Value", "Text"), "Select Licensee Type", new { @class = "form-control form-control-sm searchableselect" })
+
+                                                @*@(Html.Kendo().DropDownList()
+                                                      .Name("RailwayId")
+                                                      .HtmlAttributes(new { data_value_primitive = "true", @style = "width:100%" })
+                                                      .OptionLabel("Select Railway")
+                                                      .Filter(FilterType.Contains)
+                                                      .MinLength(3)
+                                                      .DataTextField("RailwayName")
+                                                      .DataValueField("RailwayID")
+                                                      .Events(evt => evt.Change("OnRailwaySelection"))
+                                                      .DataSource(source =>
+                                                      {
+                                                          source.Read(read =>
+                                                          {
+                                                              read.Action("GetRailwayInformation", "TransitPass", new { Area = "Transit" });
+                                                          })
+                                                          .ServerFiltering(true);
+                                                      })
+                                                      .Enable(true)
+                                                      .AutoBind(true)
+                                                    )*@
+                                            </div>
+
+                                        </div>
+
+                                        <div class="row">
+
+                                            <div class="col-md-5 default-form-control-style">
+                                                @Html.LabelFor(model => model.AddressofRailwaySliding, "Address of Railway Sliding")<br />
+                                                @Html.Label("(रेलवे स्लाइडिंग का पता)")
+                                                <span class="text-danger">*</span>
+                                            </div>
+                                            <div class="col-md-7 col-lg-7 col-sm-7 default-form-control-style">
+                                                @Html.TextBoxFor(x => x.AddressofRailwaySliding, new { @class = "form-control", @readonly = "readonly", @style = "width:100%" })
+                                            </div>
+
+                                        </div>
+
+                                        <div class="row">
+
+                                            <div class="col-md-5 default-form-control-style">
+                                                @(Html.LabelFor(model => model.RailQty, "RTP Qty"))<br />
+                                                @Html.Label("(आर टी पी मात्रा)")
+                                                <span class="text-danger">*</span>
+                                            </div>
+                                            <div class="col-md-7 col-lg-7 col-sm-7 default-form-control-style">
+                                                @(Html.TextBoxFor(model => model.RailQty, new { @class = "form-control numberCheck", @style = "width:100%" }))
+                                            </div>
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                                <div class="col-lg-6 col-md-6 col-xs-12 col-sm-12">
+                                    <div class="row">
+
+                                        <div class="col-md-5 default-form-control-style">
+                                            @(Html.LabelFor(model => model.Address, "Address (पता)"))
+                                            @(Html.ValidationMessageFor(model => model.Address))
+                                        </div>
+                                        <div class="col-md-7 col-lg-7 col-sm-7 default-form-control-style">
+                                            @*@(Html.TextAreaFor(model => model.Address, new { @class="form-control", @readonly="readonly"}))*@
+                                            @(Html.TextArea("Address", null, new { @class = "form-control", @readonly = "readonly", @rows = 3, @style = "resize:none;width:100%;" }))
+                                        </div>
+
+                                    </div>
+
+                                    <div class="row">
+
+                                        <div class="col-md-5 default-form-control-style">
+                                            @(Html.LabelFor(model => model.MineralGrade, "Mineral Grade"))<br />
+                                            @Html.Label("(खनिज ग्रेड)")
+                                            @(Html.HiddenFor(x => x.MineralGradeId))
+                                            @(Html.ValidationMessageFor(model => model.MineralGrade))
+                                        </div>
+                                        <div class="col-md-7 col-lg-7 col-sm-7 default-form-control-style">
+                                            @(Html.TextBoxFor(model => model.MineralGrade, new { @class = "form-control", @readonly = "readonly", @style = "width:100%;" }))
+                                        </div>
+
+                                    </div>
+
+                                    <div class="row">
+
+                                        <div class="col-md-5 default-form-control-style">
+                                            @(Html.LabelFor(model => model.MineralTypeName, "Mineral Category"))<br />
+                                            @Html.Label("(खनिज श्रेणी)")
+                                            @(Html.HiddenFor(x => x.MineralTypeId))
+                                            @(Html.ValidationMessageFor(model => model.MineralTypeName))
+                                        </div>
+                                        <div class="col-md-7 col-lg-7 col-sm-7 default-form-control-style">
+                                            @(Html.TextBoxFor(model => model.MineralTypeName, new { @class = "form-control", @readonly = "readonly", @style = "width:100%;" }))
+                                        </div>
+
+                                    </div>
+
+                                    <div class="row">
+
+                                        <div class="col-md-5 default-form-control-style">
+                                            @(Html.LabelFor(model => model.MineralName, "Mineral Name"))<br />
+                                            @Html.Label("(खनिज नाम)")
+                                            @(Html.ValidationMessageFor(model => model.MineralName))
+                                        </div>
+                                        <div class="col-md-7 col-lg-7 col-sm-7 default-form-control-style">
+                                            @(Html.TextBoxFor(model => model.MineralName, new { @class = "form-control", @readonly = "readonly", @style = "width:100%;" }))
+                                        </div>
+
+                                    </div>
+
+                                    <div class="row">
+
+                                        <div class="col-md-5 default-form-control-style">
+                                            @(Html.LabelFor(model => model.MineralSaleValue, "Sale Value of Mineral"))
+                                            <span class="text-danger">*</span><br />
+                                            @Html.Label("(खनिज के बिक्री मूल्य)")
+                                            @(Html.ValidationMessageFor(model => model.MineralSaleValue))
+                                        </div>
+                                        <div class="col-md-7 col-lg-7 col-sm-7 default-form-control-style">
+                                            @(Html.TextBoxFor(model => model.MineralSaleValue, new { @class = "form-control numberCheck", @style = "width:100%;" }))
+                                        </div>
+
+                                    </div>
+
+                                    <div class="row">
+
+                                        <div class="col-md-5 default-form-control-style">
+                                            @(Html.LabelFor(model => model.Destination, "Mineral Destination"))<br />
+                                            @Html.Label("खनिज गंतव्य")
+                                            @(Html.ValidationMessageFor(model => model.Destination))
+                                        </div>
+                                        <div class="col-md-7 col-lg-7 col-sm-7 default-form-control-style">
+                                            @(Html.TextAreaFor(model => model.Destination, new { @class = "form-control", @style = "width:100%;resize:none;", @rows = 4 }))
+                                        </div>
+
+                                    </div>
+
+                                    <div class="row">
+
+                                        <div class="col-md-5 default-form-control-style">
+                                            @(Html.LabelFor(model => model.Route, "Route (मार्ग)"))
+                                            @(Html.ValidationMessageFor(model => model.Route))
+                                        </div>
+                                        <div class="col-md-7 col-lg-7 col-sm-7 default-form-control-style">
+                                            @(Html.TextBoxFor(model => model.RouteName, new { @class = "form-control", @readonly = "readonly", @style = "width:100%;" }))
+                                            @(Html.HiddenFor(x => x.Route))
+                                        </div>
+
+                                    </div>
+                                    <div id="divDestination" style="display: none">
+                                        <div class="row">
+
+                                            <div class="col-md-5 default-form-control-style">
+                                                @(Html.LabelFor(model => model.DistrictId, "Destination  District"))<br />
+                                                @Html.Label("(खनिज गंतव्य)")
+                                                <span class="text-danger">*</span>
+                                            </div>
+                                            <div class="col-md-7 col-lg-7 col-sm-7 default-form-control-style">
+                                                @*@Html.DropDownListFor(m => m.DistrictId, ViewBag.Permit as IEnumerable<SelectListItem>, "Select", new { @class = "form-control form-control-sm searchableselect", onchange = "permitchange();" })*@
+                                                @Html.DropDownListFor(m => m.DistrictId, new SelectList(Enumerable.Empty<SelectListItem>(), "Value", "Text"), "Select Licensee Type", new { @class = "form-control form-control-sm searchableselect" })
+
+                                                @*@(Html.Kendo().ComboBox()
+                                                    .Name("DistrictId")
+                                                     .DataSource(source =>
+                                                        {
+                                                            source.Read(read =>
+                                                            {
+                                                                read.Action("GetDistrictDataForUser", "PortalHome", new { Area = "TransparancyPortal" }).Type(HttpVerbs.Post);
+                                                            })
+
+                                                            .ServerFiltering(false);
+                                                        })
+                                                    .Placeholder("Select District")
+                                                    .DataTextField("DistrictName")
+                                                    .DataValueField("DistrictID")
+                                                    .HtmlAttributes((new { @class = "ddlDropdown DistrictId", data_value_primitive = "true", style = "width:100%;" })))*@
+                                            </div>
+
+                                        </div>
+
+                                        <div class="col-xs-12">
+                                            <div class="col-md-5 default-form-control-style">
+                                                @(Html.LabelFor(model => model.DestinationBlock, "Destination Block"))<br />
+                                                @Html.Label("(खनिज गंतव्य)")
+                                                <span class="text-danger">*</span>
+                                            </div>
+                                            <div class="col-md-7 col-lg-7 col-sm-7 default-form-control-style">
+                                                @*@(Html.Kendo().ComboBox()
+                                                                                            .Name("DestinationBlock")
+                                                                                            .DataSource(source =>
+                                                                                            {
+                                                                                                source.Read(read =>
+                                                                                                {
+                                                                                                    read.Action("GetBlock", "TransitPass", new { Area = "Transit" }).Type(HttpVerbs.Post).Data("GetDistrict");
+                                                                                                })
+                                                                                                .ServerFiltering(true);
+                                                                                            })
+                                                    //.BindTo(CHiMMS_MVC.Models.Generic.UtilityModel.GetLesseeLicenseeList("Lessee"))
+                                                                                            .DataTextField("BlockName")
+                                                                                            .DataValueField("BlockId")
+                                                                                            .ValuePrimitive(true)
+                                                                                            .Placeholder("Select Block")
+                                                                                            .Filter(FilterType.Contains)
+                                                                                            .CascadeFrom("DistrictId")
+                                                                                            .HtmlAttributes(new { style = "width:100%;" })
+                                                                )*@
+                                                @*@Html.DropDownListFor(m => m.DestinationBlock, ViewBag.Permit as IEnumerable<SelectListItem>, "Select", new { @class = "form-control form-control-sm searchableselect", onchange = "permitchange();" })*@
+                                                @Html.DropDownListFor(m => m.DestinationBlock, new SelectList(Enumerable.Empty<SelectListItem>(), "Value", "Text"), "Select Licensee Type", new { @class = "form-control form-control-sm searchableselect" })
+
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                    <div class="row">
+
+
+                                        <div class="col-md-5 default-form-control-style">
+
+                                            @(Html.LabelFor(model => model.Mineral_PurchaserName, "Mineral Purchaser Name", new { @id = "purchaserName" }))<br />
+                                            @Html.Label("(खनिज क्रेता का नाम)")
+
+                                            <span class="text-danger">*</span>
+                                        </div>
+                                        <div class="col-md-7 col-lg-7 col-sm-7 default-form-control-style">
+                                            @(Html.TextBoxFor(model => model.Mineral_PurchaserName, new { @readonly = "readonly", @class = "form-control", @style = "width:100%" }))
+                                        </div>
+
+
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-offset-5 col-md-7 col-xs-12">
+                                    @*<input type="button" id="btn_GenerateRPTP" onclick="return postFormDetails();" value="Generate RPTP Pass" class="k-button k-button-icontext k-primary" />*@
+                                    <input type="submit" value="Generate RPTP Pass" class="btn btn-primary" name="Submit" id="Cancel" />
+                                </div>
+                            </div>
+
+
+                        }
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+    <script>
+        function onBlurGrossWeight() {
+            var MineralType = $("#MineralTypeName").val();
+            var answer = (parseFloat($("#GrossWeight").val()) - parseFloat($("#TareWeight").val())).toFixed(2);
+            if (isNaN(answer)) {
+                answer = 0;
+            }
+
+            if (parseFloat(answer) > parseFloat(VehicleCarryingCapacity)) {
+                if (MineralType == "Major Mineral" && $("#MineralGrade").val() != 'Low Grade - Limestone') {
+                    swal("","This vehicle exceed the limit of carrying capacity " + VehicleCarryingCapacity + " !","warning");
+                    $("#NetWeight").val(answer);
+                    $('#btn_GenerateRPTP').hide();
+                    return false;
+                }
+                else {
+                    $("#NetWeight").val(answer);
+                    $('#btn_GenerateRPTP').show();
+                }
+            }
+            else {
+                if (answer <= 0 && $("#GrossWeight").val() != '') {
+                    answer = 0;
+                    $('#btn_GenerateRPTP').hide();
+                    swal("", "Gross weight should be greater than tare weight!", "warning");
+
+                    return false;
+                }
+
+                $("#NetWeight").val(answer);
+                $('#btn_GenerateRPTP').show();
+                return true;
+            }
+            if (parseFloat($("#GrossWeight").val()) > parseFloat($("#TareWeight").val())) {
+
+
+                if ((MineralType == 'Major Mineral' && $("#MineralGrade").val() != 'Low Grade - Limestone')) {
+
+                }
+                else {
+                    $("#NetWeight").val(answer);
+                    $('#btn_GenerateRPTP').show();
+                    return true;
+                }
+            }
+            else {
+                $("#NetWeight").val(0);
+                swal("","Gross weight should be greater than tare weight!", "warning");
+                $('#btn_GenerateRPTP').hide();
+                return false;
+            }
+
+        }
+
+        function onBlurTareWeight() {
+            if ($('#GrossWeight').val() == '' || $('#GrossWeight').val() <= 0) {
+                $("#GrossWeight").val(0);
+                $("#NetWeight").val(0);
+            }
+            var MineralType = $("#MineralTypeName").val();
+
+            var answer = 0;
+            if (parseFloat($("#GrossWeight").val()) < parseFloat($("#TareWeight").val())) {
+                answer = 0;
+                $("#NetWeight").val(answer.toFixed(2));
+                //return false;
+            }
+            else if ($("#TareWeight").val() == "") {
+                answer = 0;
+                $("#NetWeight").val(answer.toFixed(2));
+                //return false;
+            }
+            else {
+                answer = parseFloat(($("#GrossWeight").val()) - parseFloat($("#TareWeight").val()));
+                if (answer < 0) {
+                    answer = 0;
+                    $("#NetWeight").val(answer.toFixed(2));
+                    //return false;
+                }
+            }
+
+            $("#NetWeight").val(answer.toFixed(2));
+            if (answer > 0) {
+                $('#btn_GenerateRPTP').show();
+                return true;
+            }
+            else {
+                $('#btn_GenerateRPTP').hide();
+                return false;
+            }
+
+        }
+        var VehicleMaxWeight = 0;
+        var vvNoteQty = 0;
+        var TPOfflineWeight = 0;
+
+        function postFormDetails() {
+            debugger;
+            $("#TPOffline").val(1);
+
+            if ($('#VehicleIdAll').val() != "") {
+                $('#lblVehicleIdAll').text($('#VehicleIdAll').val())
+            }
+            else if ($("#UnRegistredVehicleTypeId").text() == "Tractor") {
+                $('#lblVehicleIdAll').text($('#UnRegistredWithTractorVehicleId').val())
+            }
+            else {
+                $('#lblVehicleIdAll').text($('#UnRegistredWithoutTractorVehicle').val())
+            }
+            $('#lblTareWeight_Qty').text($('#TareWeight').val())
+            $('#lblGrossWeight_Qty').text($('#GrossWeight').val())
+            $('#lblNetWeight_Qty').text($('#NetWeight').val())
+
+            var isSuccess = 1;
+            var vv1 = Number($("#Remaining_Qty").val());
+            var vv2 = Number($("#NetWeight").val());
+            var vvTotal = $("#TotalQty").val();
+            var vvRailQty = $("#RailQty").val();
+            var vv3 = vvNoteQty;
+
+            var vB = $("#BulkPermitId").val();
+            var VP = $("#PurchaserConsigneeId").val();
+            var vT = $("#TransporterId").val();
+            var vV = $("#VehicleId").val();
+            var vFN = $("#ForwardingNoteID").val();
+            var vRail = $("#RailwayId").val();
+            var MineralType = $("#MineralTypeName").val();
+            var DriverContactNumber = $("#DriverContactNumber").val();
+            var NameOfCarrierDriver = $("#NameOfCarrierDriver").val();
+            var re = new RegExp("(([A-Za-z]){2,3}(|-)(?:[0-9]){1,2}(|-)(?:[A-Za-z]){2}(|-)([0-9]){1,4})|(([A-Za-z]){2,3}(|-)([0-9]){1,4})");
+
+            var PurchaserType = $("input[name='PurchaserType']:checked").val();
+            var PurchaserSubType = $("input[name='PurchaserSubType']:checked").val();
+            //var PurchaserName = $('#PurchaserName').val();
+            var PurchaserName = $('#PurchaserConsigneeName').val();
+            var PurchaserContactNumber = $('#PurchaserContactNumber').val();
+            var SelectedVehicleType = $("#UnRegistredVehicleTypeId").text()
+
+
+            if ($("#MineralTypeName").val().toUpperCase() == 'MINOR MINERAL' || $("#MineralGrade").val() == "Low Grade - Limestone") {
+                var regex = /(([A-Za-z]){2,3}(?:[0-9]){1,2}(?:[A-Za-z]){2}([0-9]){1,4})/;
+
+                if (vB == null || vB == "" || vB == 0) {
+                    swal("", "Select E-Permit", "warning");
+
+                    isSuccess = 0;
+                    $("input[name='BulkPermitId']").focus();
+                    return false;
+                }
+                else if (PurchaserType == undefined) {
+                    swal("", "Select Purchaser Type", "warning");
+                    isSuccess = 0;
+                    $("input[name='PurchaserType']").focus();
+                    return false;
+                }
+                else if ($("input[name='PurchaserType']:checked").val() == 'Un-registered') {
+                    if (PurchaserSubType == undefined) {
+                        swal("", "Select Purchaser Type", "warning");
+                        isSuccess = 0;
+                        $("input[name='PurchaserSubType']").focus();
+                        return false;
+                    }
+                    else if (PurchaserName == undefined || PurchaserName == '') {
+                        swal("","Enter Purchaser/Cosignee Consignee Name", "warning");
+                        isSuccess = 0;
+                        $("input[name='PurchaserConsigneeName']").focus();
+                        return false;
+                    }
+                    else if (PurchaserContactNumber == undefined || PurchaserContactNumber == '') {
+                        swal("", "Enter Purchaser/Cosignee Mobile Number", "warning");
+                        isSuccess = 0;
+                        $("input[name='PurchaserContactNumber']").focus();
+                        return false;
+                    }
+                    else if (($("#UnRegistredVehicleTypeId").val() == undefined || $("#UnRegistredVehicleTypeId").val() == '') && $("#TPOffline").val() == 1) {
+                        swal("","Select Vehicle Type.", "warning");
+                        isSuccess = 0;
+                        $("input[name='UnRegistredVehicleTypeId']").focus();
+                        return false;
+                    }
+
+                    else if (SelectedVehicleType == "Tractor") {
+                        $('#UnRegistredWithoutTractorVehicleOwner').val('');
+                        $('#UnRegistredWithoutTractorVehicleId').val('');
+                        if ($("#UnRegistredWithTractorVehicleId").val() == undefined || $("#UnRegistredWithTractorVehicleId").val() == '') {
+                            swal("", "Please enter Vehicle Number.", "warning");
+                            isSuccess = 0;
+                            $("input[name='UnRegistredWithTractorVehicleId']").focus();
+                            return false;
+                        }
+                        else if ($("#UnRegistredWithTractorVehicleOwner").val() == undefined || $("#UnRegistredWithTractorVehicleOwner").val() == '') {
+                            swal("","Please enter Owner(Vehicle) Name.", "warning");
+                            isSuccess = 0;
+                            $("input[name='UnRegistredWithTractorVehicleOwner']").focus();
+                            return false;
+                        }
+                        if (regex.test($('#UnRegistredWithTractorVehicleId').val()) == false) {
+                            swal("","Invalid Vehicle Number", "warning");
+                            $('#UnRegistredWithTractorVehicleId').focus();
+                            $('#UnRegistredWithTractorVehicleId').val('');
+
+                            isSuccess = 0;
+                            return false;
+                        }
+                    }
+                    else if (SelectedVehicleType != "Tractor") {
+                        $('#UnRegistredWithTractorVehicleOwner').val('');
+                        $('#UnRegistredWithTractorVehicleId').val('');
+                        if (($("#UnRegistredWithoutTractorVehicle").val() == undefined || $("#UnRegistredWithoutTractorVehicle").val() == '') && $("#TPOffline").val() == 1) {
+                            alert("Please select Vehicle Number.");
+                            isSuccess = 0;
+                            $("input[name='UnRegistredWithoutTractorVehicle']").focus();
+                            return false;
+                        }
+
+
+                    }
+
+                    if ($("#DistrictId").val() == undefined || $("#DistrictId").val() == '') {
+                        swal("", "Please Select Destination District.", "warning");
+                        isSuccess = 0;
+                        $("input[name='DistrictId']").focus();
+                        return false;
+                    }
+                    else if ($("#DestinationBlock").val() == undefined || $("#DestinationBlock").val() == '') {
+                        swal("","Please Select Destination Block.", "warning");
+                        isSuccess = 0;
+                        $("input[name='DestinationBlock']").focus();
+                        return false;
+                    }
+                }
+                else if ($("input[name='PurchaserType']:checked").val() == 'Registered') {
+                    if (VP == null || VP == "" || VP == 0) {
+
+                         swal("", "Select Purchaser / Consignee", "warning");
+                        isSuccess = 0;
+                        return false;
+                    }
+                    else if ((vV == null || vV == "" || vV == 0) && $("#TPOffline").val() == 1) {
+                        swal("","Select Carrier No", "warning");
+                        isSuccess = 0;
+                        return false;
+                    }
+
+                }
+                if ($("#Mineral_PurchaserName").val() == null || $("#Mineral_PurchaserName").val() == "") {
+                    if ($("input[name='PurchaserType']:checked").val() == 'Un-registered') {
+                        swal("", "Enter Mineral User Name", "warning");
+                        sSuccess = 0;
+                        return false;
+                    }
+                    else {
+                        swal("","Enter Mineral Purchaser Name", "warning");
+                        sSuccess = 0;
+                        return false;
+                    }
+                }
+            }
+
+            if ($("#TransportationMode").val() == "Conveyor Belt" || $("#TransportationMode").val() == "MGR/ OWN Wagon"
+                || $("#TransportationMode").val() == "End Use Plant inside the lease area"
+                || $("#TransportationMode").val() == "Ropeway") {
+                if (vB == null || vB == "" || vB == 0) {
+                    swal("", "Select E-Permit", "warning");
+                    isSuccess = 0;
+                    return false;
+                }
+                else if ((MineralType == 'Major Mineral') && (VP == null || VP == "" || VP == 0)) {
+                     swal("", "Select Purchaser / Consignee", "warning");
+                    isSuccess = 0;
+                    return false;
+                }
+                else if (vvTotal == "" || vvTotal == 0) {
+                    swal("","Total Weight must be non-zero", "warning");
+                    isSuccess = 0;
+                    return false;
+                }
+                else if ($("#MineralSaleValue").val() == "") {
+                    swal("","Please Insert Mineral Sale Value", "warning");
+                    isSuccess = 0;
+                    return false;
+                }
+                else {
+                    if (vv1 >= Number(vvTotal)) {
+                        if (confirm("Do you want to generate RPTP Pass ?")) {
+                            //$("#btn_GenerateRPTP").disabled();
+                            //$("#formRPTPTransitPass").submit();
+                            //return true;
+                        }
+                        else {
+                            isSuccess = 0;
+                            return false;
+                        }
+                    }
+                    else {
+                        swal("","Remaining Permitted Qty is : " + $("#Remaining_Qty").val(), "warning");
+                        isSuccess = 0;
+                        return false;
+                    }
+                }
+            }
+            else if ($("#TransportationMode").val() == "Road-Rail") {
+                var isOff = $("#TPOffline").val();
+                isOff = 1;
+                if (isOff == 0) {
+                    if (vB == null || vB == "" || vB == 0) {
+                        swal("", "Select E-Permit", "warning");
+                        isSuccess = 0;
+                        return false;
+                    }
+                    else if ((MineralType == 'Major Mineral') && (VP == null || VP == "" || VP == 0)) {
+                         swal("", "Select Purchaser / Consignee", "warning");
+                        isSuccess = 0;
+                        return false;
+                    }
+                    else if (vFN == null || vFN == "" || vFN == 0) {
+                        swal("","Select Railway Transit Pass", "warning");
+                        isSuccess = 0;
+                        return false;
+                    }
+                    else if (vT == null || vT == "" || vT == 0) {
+                        swal("","Select Name Of Carrier/Carrier Owner", "warning");
+                        isSuccess = 0;
+                        return false;
+                    }
+                    else if (vV == null || vV == "" || vV == 0) {
+                        swal("", "Select Carrier No", "warning");
+                        isSuccess = 0;
+                        return false;
+                    }
+                    else if ($("#NetWeight").val() == "" || $("#NetWeight").val() == "0") {
+                        swal("","Net weight must be non-zero", "warning");
+                        isSuccess = 0;
+                        return false;
+                    }
+                    else if ($("#MineralSaleValue").val() == "") {
+                        swal("","Please Insert Sale Value of Mineral", "warning");
+                        isSuccess = 0;
+                        return false;
+                    }
+                    else if (DriverContactNumber == "") {
+                        swal("","Please Insert Driver Contact Number", "warning");
+                        isSuccess = 0;
+                        return false;
+                    }
+                    else if (NameOfCarrierDriver == "") {
+                        swal("","Please Insert Carrier Driver Name", "warning");
+                        isSuccess = 0;
+                        return false;
+                    }
+
+                    else if (vv1 < 0) {
+                        swal("","Net weight should not be 0 !", "warning");
+                        isSuccess = 0;
+                        return false;
+                    }
+                    else if ($("#ForwardingNoteID").val() > 0) {
+                        if (vv2 > vv3) {
+                            swal("","Remaining RTP Application Qty is : " + vv3 + " !", "warning");
+                            isSuccess = 0;
+                            return false;
+                        }
+                        else {
+                            if (confirm("Do you want to generate RPTP Pass ?")) {
+                                //$("#formRPTPTransitPass").submit();
+                                //return true;
+                            }
+                            else {
+                                isSuccess = 0;
+                                return false;
+                            }
+                        }
+                    }
+
+                    else if (Number(TPOfflineWeight) <= 0) {
+                        swal("","Offline Weight is not defined by Department!", "warning");
+                        isSuccess = 0;
+                        return false;
+                    }
+                    else {
+                        if (vv1 >= TPOfflineWeight) {
+                            if (confirm("Do you want to generate RPTP Pass ?")) {
+                                //$("#formRPTPTransitPass").submit();
+                                //return true;
+                            }
+                            else {
+                                isSuccess = 0;
+                                return false;
+                            }
+                        }
+                        else {
+                            swal("","Remaining Permitted Qty is : " + $("#Remaining_Qty").val(), "warning");
+                            isSuccess = 0;
+                            return false;
+                        }
+                    }
+                }
+                else {
+                    if (vB == null || vB == "" || vB == 0) {
+                        swal("", "Select E-Permit", "warning");
+                        isSuccess = 0;
+                        return false;
+                    }
+                    else if ((MineralType == 'Major Mineral') && (VP == null || VP == "" || VP == 0)) {
+                         swal("", "Select Purchaser / Consignee", "warning");
+                        isSuccess = 0;
+                        return false;
+                    }
+                    else if (vFN == null || vFN == "" || vFN == 0) {
+                        swal("","Select Railway Transit Pass", "warning");
+                        isSuccess = 0;
+                        return false;
+                    }
+                    else if (vT == null || vT == "" || vT == 0) {
+                        swal("","Select Vehicle Owner", "warning");
+                        isSuccess = 0;
+                        return false;
+                    }
+                    else if (vV == null || vV == "" || vV == 0) {
+                        swal("","Select Vehicle", "warning");
+                        isSuccess = 0;
+                        return false;
+                    }
+                    else if ($("#NetWeight").val() == "" || $("#NetWeight").val() == "0") {
+                        swal("","Net weight must be non-zero", "warning");
+                        isSuccess = 0;
+                        return false;
+                    }
+                    else if ($("#ForwardingNoteID").val() > 0) {
+                        if (vv2 > vv3) {
+                            swal("","Remaining RTP Application Qty is : " + vv3 + " !", "warning");
+                            isSuccess = 0;
+                            return false;
+                        }
+                        else {
+                            if (confirm("Do you want to generate RPTP Pass ?")) {
+                                //$("#formRPTPTransitPass").submit();
+                                //return true;
+                            }
+                            else {
+                                isSuccess = 0;
+                                return false;
+                            }
+                        }
+                    }
+                    else if (Number(vv2) <= 0) {
+                        swal("","Net weight should not be 0 !", "warning");
+                        isSuccess = 0;
+                        return false;
+                    }
+                    else if ($("#MineralSaleValue").val() == "") {
+                        swal("","Please Insert Mineral Sale Value", "warning");
+                        isSuccess = 0;
+                        return false;
+                    }
+                    else {
+                        if (vv1 >= vv2) {
+                            if (confirm("Do you want to generate RPTP Pass ?")) {
+                                //$("#formRPTPTransitPass").submit();
+                                //return true;
+                            }
+                            else {
+                                isSuccess = 0;
+                                return false;
+                            }
+                        }
+                        else {
+                            swal("", "Remaining Permitted Qty is : " + $("#Remaining_Qty").val(), "warning");
+                            isSuccess = 0;
+                            return false;
+                        }
+                    }
+                }
+            }
+            else if ($("#TransportationMode").val() == "Inside Railway Siding") {
+
+                if (vB == null || vB == "" || vB == 0) {
+                    swal("", "Select E-Permit", "warning");
+                    isSuccess = 0;
+                    return false;
+                }
+                else if ((MineralType == 'Major Mineral') && (VP == null || VP == "" || VP == 0)) {
+                     swal("", "Select Purchaser / Consignee", "warning");
+                    isSuccess = 0;
+                    return false;
+                }
+                else if (vRail == null || vRail == "" || vRail == 0) {
+                    swal("","Select Railway", "warning");
+                    isSuccess = 0;
+                    return false;
+                }
+                else if (vvRailQty == "" || vvRailQty == 0) {
+                    swal("", "Total Weight must be non-zero", "warning");
+                    isSuccess = 0;
+                    return false;
+                }
+                else if ($("#MineralSaleValue").val() == "") {
+                    swal("","Please Insert Mineral Sale Value", "warning");
+                    isSuccess = 0;
+                    return false;
+                }
+                else if (DriverContactNumber == "") {
+                    swal("", "Please Insert Driver Contact Number", "warning");
+                    isSuccess = 0;
+                    return false;
+                }
+                else if (NameOfCarrierDriver == "") {
+                    swal("","Please Insert Carrier Driver Name", "warning");
+                    isSuccess = 0;
+                    return false;
+                }
+                else {
+                    if (vv1 >= Number(vvRailQty)) {
+                        if (confirm("Do you want to generate RPTP Pass ?")) {
+                            //$("#formRPTPTransitPass").submit();
+                            //return true;
+                        }
+                        else {
+                            isSuccess = 0;
+                            return false;
+                        }
+                    }
+                    else {
+                        swal("","Remaining Permitted Qty is : " + $("#Remaining_Qty").val(), "warning");
+                        isSuccess = 0;
+                        return false;
+                    }
+                }
+            }
+            else {
+                var isOff = $("#TPOffline").val();
+                //if ($("#TPOffline").val() != '') {
+                //    isOff = 1;
+                //}
+                isOff = 1;
+
+                if ($("#PurchaserConsigneeId").val() == "" && MineralType == 'Major Mineral' && $("#MineralGrade").val() != 'Low Grade - Limestone') {
+                    swal("","Please select PurchaserConsignee.", "warning")
+                    isSuccess = 0;
+                    return false;
+                }
+                else if ($("#TransportationMode").val() == "" && MineralType == 'Major Mineral' && $("#MineralGrade").val() != 'Low Grade - Limestone') {
+                    swal("", "Please edit PurchaserConsignee and select Transportation Mode and try again!", "warning")
+                    isSuccess = 0;
+                    return false;
+                }
+                if (isOff == 0 || $("#TPOffline").val() == '') {
+                    if (vB == null || vB == "" || vB == 0) {
+                        swal("", "Select E-Permit", "warning");
+                        isSuccess = 0;
+                        return false;
+                    }
+
+                    else if (MineralType == 'Major Mineral' && $("#MineralGrade").val() != 'Low Grade - Limestone') {
+                        if (VP == null || VP == "" || VP == 0) {
+                             swal("", "Select Purchaser / Consignee", "warning");
+                            isSuccess = 0;
+                            return false;
+                        }
+                        else if (TPOfflineWeight == "" || TPOfflineWeight == 0) {
+                            swal("","Offline Weight is not defined by Department!", "warning");
+                            isSuccess = 0;
+                            return false;
+                        }
+                        else if ($("#MineralSaleValue").val() == "") {
+                            swal("", "Please Insert Mineral Sale Value", "warning");
+                            isSuccess = 0;
+                            return false;
+                        }
+                        else if ($("#ForwardingNoteID").val() > 0) {
+                            if (TPOfflineWeight > vv3) {
+                                swal("","Remaining RTP Application Qty is : " + vv3 + "" , "warning");
+                                isSuccess = 0;
+                                return false;
+                            }
+                            else {
+                                if (confirm("Do you want to generate RPTP Pass ?")) {
+                                    //$("#formRPTPTransitPass").submit();
+                                    //return true;
+                                }
+                                else {
+                                    isSuccess = 0;
+                                    return false;
+                                }
+                            }
+                        }
+                        else if (DriverContactNumber == "") {
+                            swal("","Please Insert Driver Contact Number", "warning");
+                            isSuccess = 0;
+                            return false;
+                        }
+                        else if (NameOfCarrierDriver == "") {
+                            swal("","Please Insert Carrier Driver Name", "warning");
+                            isSuccess = 0;
+                            return false;
+                        }
+                        else if (TPOfflineWeight < 0) {
+                            swal("","Offline Weight is not defined by Department!", "warning");
+                            isSuccess = 0;
+                            return false;
+                        }
+                    }
+
+                    else if (MineralType == "Minor Mineral" || $("#MineralGrade").val() == 'Low Grade - Limestone') {
+                        var data = $('#Minor_VehicleNumber').val();
+                        var lastFour = data.substr(data.length - 4);
+
+                        if ($("#PurchaserConsigneeName").val() == null || $("#PurchaserConsigneeName").val() == "") {
+                            swal("","Enter Purchaser Consignee Name", "warning");
+                            return false;
+                        }
+                        else if ($("#Minor_VehicleOwner").val() == null || $("#Minor_VehicleOwner").val() == "") {
+                            swal("","Enter Name of Carrier Owner", "warning");
+                            return false;
+                        }
+                        else if ($("#Minor_VehicleNumber").val() == null || $("#Minor_VehicleNumber").val() == "") {
+                            alert("","Enter Carrier No.", "warning");
+                            return false;
+                        }
+                        else if ($("#Minor_VehicleType").val() == null || $("#Minor_VehicleType").val() == "") {
+                            swal("","Enter Carrier Type", "warning");
+                            return false;
+                        }
+                        else if (NameOfCarrierDriver == "") {
+                            swal("","Please Enter Carrier Driver Name", "warning", "warning");
+                            isSuccess = 0;
+                            return false;
+                        }
+                        else if (DriverContactNumber == "") {
+                            swal("", "Please Enter Driver Contact Number", "warning");
+                            isSuccess = 0;
+                            return false;
+                        }
+                        else if ($("#NetWeight").val() == "" || $("#NetWeight").val() == "0") {
+                            swal("","Net weight must be non-zero", "warning");
+                            isSuccess = 0;
+                            return false;
+                        }
+                        else if ($("#MineralSaleValue").val() == "") {
+                            swal("","Please Insert Mineral Sale Value", "warning");
+                            isSuccess = 0;
+                            return false;
+                        }
+
+                        else if (data.length > 10) {
+                            swal("",'Length of the vehicle number must be less than or equal to 10 digit', "warning");
+                            //$('#btn_GenerateTP').hide();
+                            $('#Minor_VehicleNumber').focus();
+                            isSuccess = 0;
+                            return false;
+                        }
+
+                        else if (!($.isNumeric(lastFour))) {
+                            swal("",'Last 4 digit of vehicle number must be numeric.', "warning");
+                            //$('#btn_GenerateTP').hide();
+                            $('#Minor_VehicleNumber').focus();
+                            isSuccess = 0;
+                            return false;
+                        }
+                        else if (data != null && data != undefined) {
+                            if (re.test(data)) {
+
+                            } else {
+                                swal("","Vehicle number is invalid", "warning");
+                                $('#Minor_VehicleNumber').focus();
+                                return false;
+                            }
+                        }
+
+                        else if (vv1 < 0) {
+                            swal("","Net weight should not be 0 !", "warning");
+                            isSuccess = 0;
+                            return false;
+                        }
+                    }
+                    else {
+                        if (TPOfflineWeight >= vv2) {
+                            if (confirm("Do you want to generate RPTP Pass ?")) {
+                                //$("#formRPTPTransitPass").submit();
+                                //return true;
+                            }
+                            else {
+                                isSuccess = 0;
+                                return false;
+                            }
+                        }
+                        else {
+                            swal("","Remaining Permitted Qty is : " + $("#Remaining_Qty").val(), "warning");
+                            isSuccess = 0;
+                            return false;
+                        }
+                    }
+                }
+                else {
+                    if (vB == null || vB == "" || vB == 0) {
+                        swal("", "Select E-Permit", "warning");
+                        isSuccess = 0;
+                        return false;
+                    }
+                    else if (MineralType == 'Major Mineral' && $("#MineralGrade").val() != 'Low Grade - Limestone') {
+                        if (VP == null || VP == "" || VP == 0) {
+                             swal("", "Select Purchaser / Consignee", "warning");
+                            isSuccess = 0;
+                            return false;
+                        }
+
+                        else if (vV == null || vV == "" || vV == 0) {
+                             swal("", "Select Carrier No.", "warning");
+                            isSuccess = 0;
+                            return false;
+                        }
+                        else if (vT == null || vT == "" || vT == 0) {
+                            swal("", "Select Name Of Carrier Owner.", "warning");
+                            isSuccess = 0;
+                            return false;
+                        }
+                        else if ($("#NetWeight").val() == "" || $("#NetWeight").val() == "0") {
+                            swal("","Net weight must be non-zero", "warning");
+                            isSuccess = 0;
+                            return false;
+                        }
+                        else if ($("#MineralSaleValue").val() == "") {
+                            swal("", "Please Insert Mineral Sale Value", "warning");
+                            isSuccess = 0;
+                            return false;
+                        }
+                        else if (DriverContactNumber == "") {
+                            swal("","Please enter Driver Contact Number","warning");
+                            isSuccess = 0;
+                            return false;
+                        }
+                        else if (NameOfCarrierDriver == "") {
+                            swal("","Please enter Carrier Driver Name", "warning");
+                            isSuccess = 0;
+                            return false;
+                        }
+                        else if ($("#ForwardingNoteID").val() > 0) {
+                            if (vv2 > vv3) {
+                                swal("","Remaining RTP Application Qty is : " + vv3 + " !", "warning");
+                                isSuccess = 0;
+                                return false;
+                            }
+                            else {
+                                if (confirm("Do you want to generate RPTP Pass ?")) {
+                                    //$("#formRPTPTransitPass").submit();
+                                    //return true;
+                                }
+                                else {
+                                    isSuccess = 0;
+                                    return false;
+                                }
+                            }
+                        }
+                        else if (vv1 < 0) {
+                            swal("","Net weight should not be 0 !", "warning");
+                            isSuccess = 0;
+                            return false;
+                        }
+                    }
+
+                    else if (MineralType == "Minor Mineral" || $("#MineralGrade").val() == 'Low Grade - Limestone') {
+                        if (NameOfCarrierDriver == "") {
+                            swal("","Please Enter Carrier Driver Name", "warning");
+                            isSuccess = 0;
+                            return false;
+                        }
+                        else if (DriverContactNumber == "") {
+                            swal("","Please Enter Driver Contact Number", "warning");
+                            isSuccess = 0;
+                            return false;
+                        }
+                        else if ($("#MineralSaleValue").val() == "") {
+                            swal("","Please Insert Mineral Sale Value", "warning");
+                            isSuccess = 0;
+                            return false;
+                        }
+                        else if ($("#NetWeight").val() == "" || $("#NetWeight").val() == 0) {
+                            swal("","Net weight must be non-zero", "warning");
+                            isSuccess = 0;
+                            return false;
+                        }
+
+
+                        else if (vv1 < 0) {
+                            swal("", "Net weight should not be 0 !", "warning");
+                            isSuccess = 0;
+                            return false;
+                        }
+                        else if ($("input[name='PurchaserType']:checked").val() == 'Un-registered') {
+                            if ($("#UnRegistredVehicleTypeId").data("kendoDropDownList").text() == "Tractor") {
+                                var data = $('#UnRegistredWithTractorVehicleId').val();
+                                var lastFour = data.substr(data.length - 4);
+                                if (data.length > 10) {
+                                    swal("",'Length of the vehicle number must be less than or equal to 10 digit', "warning");
+                                    //$('#btn_GenerateTP').hide();
+                                    $('#Minor_VehicleNumber').focus();
+                                    isSuccess = 0;
+                                    return false;
+                                }
+
+
+                                else if (!($.isNumeric(lastFour))) {
+                                    swal("",'Last 4 digit of vehicle number must be numeric.', "warning");
+                                    //$('#btn_GenerateTP').hide();
+                                    $('#Minor_VehicleNumber').focus();
+                                    isSuccess = 0;
+                                    return false;
+                                }
+                                else if (data != null && data != undefined) {
+                                    if (re.test(data)) {
+
+                                    } else {
+                                        swal("","Vehicle number is invalid", "warning");
+                                        $('#Minor_VehicleNumber').focus();
+                                        return false;
+                                    }
+                                }
+                            }
+
+                        }
+                    }
+
+                    else {
+                        if (vv1 >= vv2) {
+                            if (confirm("Do you want to generate RPTP Pass ?")) {
+                                //$("#formRPTPTransitPass").submit();
+                                //return true;
+                            }
+                            else {
+                                isSuccess = 0;
+                                return false;
+                            }
+                        }
+                        else {
+                            swal("","Remaining Permitted Qty is : " + $("#Remaining_Qty").val(), "warning");
+                            isSuccess = 0;
+                            return false;
+                        }
+                    }
+                }
+            }
+            var answer = (parseFloat($("#GrossWeight").val()) - parseFloat($("#TareWeight").val()));
+            if (answer > VehicleCarryingCapacity) {
+                if (MineralType == "Major Mineral" && $("#MineralGrade").val() != 'Low Grade - Limestone') {
+                    swal("","This vehicle exceed the limit of carrying capacity " + VehicleCarryingCapacity + " !", "warning");
+                    $("#NetWeight").val(answer.toFixed(2));
+                    $('#btn_GenerateRPTP').hide();
+                    return false;
+                }
+            }
+
+            if (isSuccess == 1) {
+                if ($("#TransportationMode").val() == "Road" || $("#TransportationMode").val() == "Road-Rail") {
+                    var myWindow = $("#CheckFields");
+                    myWindow.data("kendoWindow").open().center();
+                }
+                else {
+                    $(".loader-wrap").show();
+                    $("#formRPTPTransitPass").submit();
+                }
+            }
+        }
+        function fnPurchaserType() {
+
+            $('#PurchaserName').val('');
+            $('#PurchaserContactNumber').val('');
+            document.getElementById('Mineral_PurchaserName').value = '';
+            if ($("input[name='PurchaserType']:checked").val() == 'Registered') {
+                $('.MinorMineralPurchaser').css("display", "none");
+                $("#DivPurchaserConsigneeId").show();
+                $('#divForMajorMineral').show();
+                $('#div-Un-registered').css("display", "none");
+                $('#Mineral_PurchaserName').attr("readonly", "readonly");
+                $('#divDestination').css("display", "none");
+                $('#purchaserName').text('Mineral Purchaser Name').trigger('change');
+                $('#hindipurchaserName').text('(खनिज क्रेता का नाम)').trigger('change');
+            }
+            else if ($("input[name='PurchaserType']:checked").val() == 'Un-registered') {
+
+                $('.MinorMineralPurchaser').css("display", "block");
+                $("#DivPurchaserConsigneeId").hide();
+                $('#divForMajorMineral').hide();
+                $('#div-Un-registered').css("display", "block");
+                $('#Mineral_PurchaserName').removeAttr("readonly")
+                $('#Mineral_PurchaserName').val('')
+                $('#divDestination').css("display", "block");
+                $('#purchaserName').text('Mineral User Name').trigger('change');
+                $('#hindipurchaserName').text('(खनिज उपयोगकर्ता का नाम)').trigger('change');
+
+                $("#divForwardingNote").hide();
+                $("#TransportationMode").val("Road");
+
+
+                $('#Mineral_Destination').val('').trigger("change");
+                $('#Mineral_PurchaserName').val('').trigger("change");
+                if ($("#UnRegistredVehicleTypeId").data("kendoDropDownList").text() == "Tractor") {
+                    $('#div-Un-registeredWithTractor').css("display", "block");
+                    $('#div-Un-registeredWithoutTractor').css("display", "none");
+                    alert("Tractor");
+                }
+                else {
+                    $('#div-Un-registeredWithoutTractor').css("display", "block");
+                    $('#div-Un-registeredWithTractor').css("display", "none");
+                }
+            }
+        }
+         function OnBulkPermitIdchange() {
+        var BulkPermitId = $("#BulkPermitId").val();
+        fnPurchaserType();
+             BindPurchaseconsignee();
+        if ($("input[name='PurchaserType']:checked").val() == 'Un-registered') {
+            $('#Registered').click();
+            $("#UnRegistered").prop("checked", false);
+            $("#Registered").prop("checked", false);
+        }
+
+        $.ajax({
+            type: "GET",
+            url: '@Url.Action("GetDataByBulkPermitId", "eTransitPass")',
+            data: {
+                Id: BulkPermitId
+            },
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            success: function (result) {
+
+                $("#MineralName").val(result.mineralName);
+                $("#MineralGrade").val(result.mineralGrade);
+                $("#MineralGradeId").val(result.mineralGradeId);
+                $("#ApprovedQty").val(result.approvedQty).trigger("change");
+                $("#MineralTypeName").val(result.mineralTypeName);
+                $("#MineralTypeId").val(result.mineralTypeId);
+                // $("#MineralSaleValue").val(result.MineralSaleValue);
+                $("#Address").val(result.address);
+                $("#Remaining_Qty").val(result.remaining_Qty);
+
+                if (result.MineralTypeName == 'Minor Mineral' || result.MineralGrade == 'Low Grade - Limestone') {
+                    //$("#DivPurchaserConsigneeId").hide();
+                    //$("#divForwardingNote").hide();
+                    //$("#divForMajorMineral").hide();
+                    //$("#DivPurchaserConsigneeId_Minor").show();
+                    //$("#divForMinorMineral").show();
+                    //$('#PurchaserType').css("display", "block");
+                    //$("#Mineral_PurchaserName").attr("readonly", true);
+
+
+                    $("#DivPurchaserConsigneeId").hide();
+                    $("#divForwardingNote").hide();
+                    $("#divForMajorMineral").hide();
+                    $("#DivPurchaserConsigneeId_Minor").show();
+                    $("#divForMinorMineral").show();
+                    $('#PurchaserType').css("display", "block");
+                    $("#Mineral_PurchaserName").attr("readonly", true);
+                }
+                else {
+                    $("#DivPurchaserConsigneeId_Minor").hide();
+                    $("#divForMinorMineral").hide();
+                    $("#DivPurchaserConsigneeId").show();
+                    $("#divForwardingNote").show();
+                    $("#divForMajorMineral").show();
+                    $('#PurchaserType').css("display", "none");
+                    $("#Mineral_PurchaserName").attr("readonly", true);
+                }
+
+
+            }
+        });
+        //});
+    }
+        var TransportationMode = "";
+    function OnPurchaserConsigneechange() {
+
+        var vvPurchaserConsigneeId = $("#PurchaserConsigneeId").val();
+        if (vvPurchaserConsigneeId != "") {
+            //var dropDown = $("#PurchaserConsigneeId").data("kendoDropDownList");
+            //var ddData = dropDown.dataSource.view()[dropDown.select() - 1];
+            var TransportationMode = $("#TransportationMode").val();
+            $("#TransportationMode").val(TransportationMode);
+            $("#TransportationMode2").val(TransportationMode);
+            $("#TransportationMode3").val(TransportationMode);
+            $("#TransportationModeName").val(TransportationMode);
+
+        }
+        else {
+            $("#Mineral_PurchaserName").val("");
+        }
+
+        if ($("#TransportationMode").val() == "Conveyor Belt" || $("#TransportationMode").val() == "MGR/ OWN Wagon"
+            || $("#TransportationMode").val() == "End Use Plant inside the lease area" || $("#TransportationMode").val() == "Ropeway") {
+
+            $("#divRoadRail").hide();
+            $("#divInsideRailway").hide();
+            $("#divForwardingNote").hide();
+            $("#divNonRoadRail").show();
+        }
+        else if ($("#TransportationMode").val() == "Road-Rail") {
+            $("#divInsideRailway").hide();
+            $("#divNonRoadRail").hide();
+            $("#divForwardingNote").show();
+            $("#divRoadRail").show();
+        }
+        else if ($("#TransportationMode").val() == "Inside Railway Siding") {
+            $("#divForwardingNote").hide();
+            $("#divNonRoadRail").hide();
+            $("#divRoadRail").hide();
+            $("#divInsideRailway").show();
+        }
+        else {
+            $("#divInsideRailway").hide();
+            $("#divForwardingNote").hide();
+            $("#divNonRoadRail").hide();
+
+            $("#divRoadRail").show();
+        }
+
+        var PcId = $("#PurchaserConsigneeId").val();
+        var bulkPermitId = $("#BulkPermitId").val();
+        debugger;
+        $.ajax({
+            type: "GET",
+            url: '@Url.Action("GetDataByPurchaserConsigneeIdRPTP", "eTransitPass")',
+            data: {
+                PcId: PcId,
+                bulkPermitId: bulkPermitId
+            },
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            success: function (result) {
+                $("#RouteName").val(result.routeName)
+                $("#Route").val(result.route)
+                if (result.TransportationModeName != null && result.TransportationModeName != "" && result.TransportationModeName != undefined) {
+                    $("#TransportationModeName").val(result.transportationModeName)
+                }
+                $("#Destination").val(result.destination)
+                $("#ModeOfTransportationId").val(result.modeOfTransportationId)
+
+                if ($("input[name='PurchaserType']:checked").val() == 'Un-registered') {
+                    $("#Mineral_PurchaserName").val("").change();
+                }
+                else {
+                    $("#Mineral_PurchaserName").val(result.mineral_PurchaserName).change();
+                }
+
+            }
+        });
+        //});
+    }
+        $("#PurchaserConsigneeName").keypress(function (e) {
+            var regex = new RegExp("^[a-zA-Z]+$");
+            var str = String.fromCharCode(!e.charCode ? e.which : e.charCode);
+            if (regex.test(str)) {
+                return true;
+            }
+            else {
+                e.preventDefault();
+                alert('Please Enter Alphabate');
+                return false;
+            }
+        });
+        $("#Destination").keypress(function (e) {
+            var regex = new RegExp("^[a-zA-Z]+$");
+            var str = String.fromCharCode(!e.charCode ? e.which : e.charCode);
+            if (regex.test(str)) {
+                return true;
+            }
+            else {
+                e.preventDefault();
+                alert('Please Enter Alphabate');
+                return false;
+            }
+        });
+
+        $('.numberCheck').keypress(function (event) {
+            var $this = $(this);
+            if ((event.which != 46 || $this.val().indexOf('.') != -1) &&
+                ((event.which < 48 || event.which > 57) &&
+                    (event.which != 0 && event.which != 8))) {
+                event.preventDefault();
+            }
+
+            var text = $(this).val();
+            if ((event.which == 46) && (text.indexOf('.') == -1)) {
+                setTimeout(function () {
+                    if ($this.val().substring($this.val().indexOf('.')).length > 4) {
+                        $this.val($this.val().substring(0, $this.val().indexOf('.') + 4));
+                    }
+                }, 1);
+            }
+
+            if ((text.indexOf('.') != -1) &&
+                (text.substring(text.indexOf('.')).length > 3) &&
+                (event.which != 0 && event.which != 8) &&
+                ($(this)[0].selectionStart >= text.length - 3)) {
+                event.preventDefault();
+            }
+        });
+
+        $('.numberCheck').bind("paste", function (e) {
+            var text = e.originalEvent.clipboardData.getData('Text');
+            if ($.isNumeric(text)) {
+                if ((text.substring(text.indexOf('.')).length > 3) && (text.indexOf('.') > -1)) {
+                    e.preventDefault();
+                    $(this).val(text.substring(0, text.indexOf('.') + 3));
+                }
+            }
+            else {
+                e.preventDefault();
+            }
+        });
+        function BindPurchaseconsignee() {
+
+            var bulkid = $('#BulkPermitId').val();
+
+                $.ajax({
+
+                    type: "GET",
+                    url: '@Url.Content("~/Epass/eTransitpass/GetCascadePurchaserConsigneeRPTP")',
+                    data: {
+                        Id: bulkid
+
+                    },
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    success: function (SList) {
+
+                        $('#PurchaserConsigneeId').empty().append('<option selected="selected" value="0">Select</option>');
+                        $.each(SList, function (i, item) {
+                            debugger;
+                            $("#PurchaserConsigneeId").append($("<option></option>").val(item.purchaserConsigneeId).html(item.purchaserConsigneeName));
+                            $("#TransportationMode").val(item.transportationMode);
+                            $("#TransportationMode").val(item.transportationMode);
+                        });
+                    },
+
+                    error: function () {
+                        alert('Error');
+
+                    }
+                });
+            }
+    </script>
+    <!-- MAIN CONTENT AREA ENDS -->
+</section>
+

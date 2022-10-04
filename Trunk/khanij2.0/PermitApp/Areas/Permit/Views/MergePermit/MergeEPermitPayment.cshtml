@@ -1,0 +1,940 @@
+﻿
+@model PermitEF.ePermitModel
+@{
+    ViewData["Title"] = "ePermitPayment";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    .form-check {
+        height: 25px;
+        width: 25px;
+        margin: 0 auto;
+    }
+
+    #leaseinformation .colon {
+        top: 6px;
+    }
+</style>
+
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        @Html.Partial("_navigation")
+
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="javascript:void(0);">
+                                Make Payment
+                            </a>
+                        </li>
+
+                    </ul>
+                    @Html.Partial("_util")
+                </div>
+
+                <section class="box form-container">
+                    <div class="content-body">
+                        @using (Html.BeginForm("MakeMergeEPermitPayment", "MergePermit", FormMethod.Post, new { enctype = "multipart/form-data", AUTOCOMPLETE = "Off", id = "__EUAntiForgeryForm", @Area = "Permit" }))
+                        {
+                            @Html.HiddenFor(model => model.ProposedQty)
+                            @Html.HiddenFor(model => model.BulkPermitId)
+                            @Html.HiddenFor(model => model.TotalPayableAmount)
+                            @Html.HiddenFor(model => model.MineralName)
+                            @Html.HiddenFor(model => model.MineralGradeName)
+                            @Html.HiddenFor(model => model.EmailId)
+                            @Html.HiddenFor(model => model.MobileNo)
+                            @Html.HiddenFor(model => model.TransactionalID)
+                            @Html.HiddenFor(model => model.ActiveStatus)
+                            @Html.HiddenFor(model => model.PaymentStatus)
+                            @(Html.HiddenFor(model => model.PaymentBank))
+                            @(Html.HiddenFor(model => model.PaymentMode))
+                            @(Html.HiddenFor(model => model.GeneratedBy))
+                            @(Html.HiddenFor(model => model.GeneratedDesignation))
+                            @(Html.HiddenFor(model => model.BulkPermitNo))
+                            @(Html.HiddenFor(model => model.ActiveStatus))
+                            @(Html.HiddenFor(model => model.TillDateBalanceUpfrontPayment))
+                            @(Html.HiddenFor(model => model.EAuctionType))
+
+                            @(Html.HiddenFor(model => model.PayableRoyalty))
+                            @(Html.HiddenFor(model => model.NMET))
+                            @(Html.HiddenFor(model => model.TCS))
+                            @(Html.HiddenFor(model => model.DMF))
+                            @(Html.HiddenFor(model => model.Cess))
+                            @(Html.HiddenFor(model => model.eCess))
+                            @(Html.HiddenFor(model => model.DistrictCode))
+                            @(Html.HiddenFor(model => model.P_Mode))
+
+                            @(Html.HiddenFor(model => model.ISAdjustmentCess))
+                            @(Html.HiddenFor(model => model.OrderOf))
+                            @(Html.HiddenFor(model => model.OrderDate))
+                            @(Html.HiddenFor(model => model.OrderNo))
+                            <div>
+                                <div class="col-md-12">
+                                    @if (Model.MineralName == "Coal" && Model.LesseeName.Contains("Hindalco") && Model.ISAdjustmentCess == 1)
+                                    {
+                                        <h5 class="text-brown font-weight-bold mt-0 text-center">
+                                            Calculation
+                                        </h5> <label style="color: red; font-size: 14px;">  [Note : This adjustment in Royalty is w.r.t to <b style="color: black">@Model.OrderOf </b>with order no <b style="color: black">@Model.OrderNo </b>on dated : <b style="color: black">@Model.OrderDate </b>. Total Payable Royalty = Payable Royalty - (Infrastructure Development  Cess + Environmental Cess) ]</label>
+                                        <hr />
+                                    }
+                                    else
+                                    {
+                                        <h5>Calculation</h5>
+                                        <hr />
+                                    }
+                                </div>
+                            </div>
+                            <h5 class="text-brown font-weight-bold mt-0 text-center">Calculation</h5>
+
+                            @if (Model.ActiveStatus == 6 || Model.ActiveStatus == 7 || Model.ActiveStatus == 11)
+                            {
+                                <h6 class="text-brown font-weight-bold">Online Paid</h6>
+                            }
+                            else
+                            {
+                                <h6 class="text-brown font-weight-bold">Payable Online</h6>
+                            }
+
+                            <div class="table-responsive">
+                                <table class="table table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th width="100px" class="font-weight-bolder">Classification</th>
+                                            <th width="50px" class="font-weight-bolder">Total Amount <small><i class="icon-rupee-sign-solid ml-1"></i></small></th>
+                                            @if (Model.ActiveStatus == 6 || Model.ActiveStatus == 7 || Model.ActiveStatus == 11)
+                                            {
+                                                <th width="100px" class="font-weight-bolder">Total Wallet Amount(At the time of Payment) <small><i class="icon-rupee-sign-solid ml-1"></i></small></th>
+                                            }
+                                            else
+                                            {
+                                                <th width="100px" class="font-weight-bolder">Total Wallet Amount <small><i class="icon-rupee-sign-solid ml-1"></i></small></th>
+
+                                            }
+                                            @if (Model.ActiveStatus == 6 || Model.ActiveStatus == 7 || Model.ActiveStatus == 11)
+                                            {
+                                                <th width="100px" class="font-weight-bolder">Paid by Wallet Amount <small><i class="icon-rupee-sign-solid ml-1"></i></small></th>
+                                            }
+                                            else
+                                            {
+                                                <th width="100px" class="font-weight-bolder">Pay by Wallet Amount <small><i class="icon-rupee-sign-solid ml-1"></i></small></th>
+
+                                            }
+                                            <th width="50px" class="font-weight-bolder"></th>
+                                            @if (Model.ActiveStatus == 6 || Model.ActiveStatus == 7 || Model.ActiveStatus == 11)
+                                            {
+                                                <th width="50px" class="font-weight-bolder">Paid Amount <small><i class="icon-rupee-sign-solid ml-1"></i></small></th>
+                                            }
+                                            else
+                                            {
+                                                <th width="50px" class="font-weight-bolder">Payable Amount <small><i class="icon-rupee-sign-solid ml-1"></i></small></th>
+                                            }
+
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+
+                                        @if (Model != null && Model.PaymentDetails != null && Model.PaymentDetails.Count > 0)
+                                        {
+                                            var A = 0.0;
+                                            var B = 0.0;
+                                            var C = 0.0;
+                                            var D = 0.0;
+
+                                            for (int i = 0; i < Model.PaymentDetails.Count; i++)
+                                            {
+                                                if (Model.PaymentDetails[i].IsApplicable == true)
+                                                {
+                                                    A += Convert.ToDouble(Model.PaymentDetails[i].TotalAmount);
+                                                    B += Convert.ToDouble(Model.PaymentDetails[i].AdjustmentAmount);
+                                                    if (Convert.ToDouble(Model.PaymentDetails[i].AdjustmentAmount) < Convert.ToDouble(Model.PaymentDetails[i].TotalAmount))
+                                                    {
+                                                        if (Model.PaymentDetails[i].IsWalletAdjusted == "1")
+                                                        {
+                                                            C += Convert.ToDouble(Model.PaymentDetails[i].MappingValue);
+                                                            D += Convert.ToDouble(Model.PaymentDetails[i].AdjustmentAmount);
+                                                        }
+                                                        else
+                                                        {
+                                                            C += Convert.ToDouble(Model.PaymentDetails[i].MappingValue);
+                                                        }
+
+                                                    }
+                                                    else
+                                                    {
+                                                        if (Model.PaymentDetails[i].IsWalletAdjusted == "1")
+                                                        {
+
+                                                            D += Convert.ToDouble(Model.PaymentDetails[i].TotalAmount);
+                                                        }
+                                                        C += Convert.ToDouble(Model.PaymentDetails[i].MappingValue);
+
+                                                    }
+                                                    <tr>
+                                                        <td>@Model.PaymentDetails[i].PaymentType</td>
+                                                        <td>@Model.PaymentDetails[i].TotalAmount</td>
+                                                        <td>@Model.PaymentDetails[i].AdjustmentAmount</td>
+                                                        @if (Convert.ToDouble(Model.PaymentDetails[i].AdjustmentAmount) < Convert.ToDouble(Model.PaymentDetails[i].TotalAmount))
+                                                        {
+
+                                                            if (Model.PaymentDetails[i].IsWalletAdjusted == "1")
+                                                            {
+                                                                <td>@Model.PaymentDetails[i].AdjustmentAmount</td>
+
+                                                            }
+                                                            else
+                                                            {
+                                                                <td>0</td>
+
+                                                            }
+                                                            <td>=</td>
+                                                            <td>@Model.PaymentDetails[i].MappingValue</td>
+                                                        }
+                                                        else
+                                                        {
+                                                            if (Model.PaymentDetails[i].IsWalletAdjusted == "1")
+                                                            {
+                                                                <td>@Model.PaymentDetails[i].TotalAmount</td>
+                                                            }
+                                                            else
+                                                            {
+                                                                <td>0</td>
+                                                            }
+                                                            <td>=</td>
+                                                            <td>@Model.PaymentDetails[i].MappingValue</td>
+                                                        }
+                                                    </tr>
+                                                }
+                                            }
+
+                                            <tr>
+                                                @if (Model.ActiveStatus == 6 || Model.ActiveStatus == 7 || Model.ActiveStatus == 11)
+                                                {
+                                                    <td class="font-weight-bold">Total Paid Amount</td>
+                                                }
+                                                else
+                                                {
+                                                    <td class="font-weight-bold">Total Payable Amount</td>
+                                                }
+                                                <td>@A</td>
+
+                                                <td>@B</td>
+                                                @if (B < A)
+                                                {
+                                                    <td>@D</td>
+                                                }
+                                                else
+                                                {
+                                                    if (Model.PaymentDetails[0].IsWalletAdjusted == "1")
+                                                    {
+                                                        <td>@D</td>
+                                                    }
+                                                    else
+                                                    {
+                                                        <td>0</td>
+                                                    }
+                                                }
+                                                <td>=</td>
+                                                <td>@C</td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div class="table-responsive">
+                                <table class="table table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th width="100px" class="font-weight-bolder">Classification</th>
+                                            <th width="50px" class="font-weight-bolder">Total Amount <small><i class="icon-rupee-sign-solid ml-1"></i></small></th>
+                                            @if (Model.ActiveStatus == 6 || Model.ActiveStatus == 7 || Model.ActiveStatus == 11)
+                                            {
+                                                <th width="100px" class="font-weight-bolder">Total Wallet Amount(At the time of Payment) <small><i class="icon-rupee-sign-solid ml-1"></i></small></th>
+                                            }
+                                            else
+                                            {
+                                                <th width="100px" class="font-weight-bolder">Total Wallet Amount <small><i class="icon-rupee-sign-solid ml-1"></i></small></th>
+
+                                            }
+                                            @if (Model.ActiveStatus == 6 || Model.ActiveStatus == 7 || Model.ActiveStatus == 11)
+                                            {
+                                                <th width="100px" class="font-weight-bolder">Paid by Wallet Amount <small><i class="icon-rupee-sign-solid ml-1"></i></small></th>
+                                            }
+                                            else
+                                            {
+                                                <th width="100px" class="font-weight-bolder">Pay by Wallet Amount <small><i class="icon-rupee-sign-solid ml-1"></i></small></th>
+
+                                            }
+                                            <th width="50px" class="font-weight-bolder"></th>
+                                            @if (Model.ActiveStatus == 6 || Model.ActiveStatus == 7 || Model.ActiveStatus == 11)
+                                            {
+                                                <th width="50px" class="font-weight-bolder">Paid Amount <small><i class="icon-rupee-sign-solid ml-1"></i></small></th>
+                                            }
+                                            else
+                                            {
+                                                <th width="50px" class="font-weight-bolder">Payable Amount <small><i class="icon-rupee-sign-solid ml-1"></i></small></th>
+                                            }
+
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+
+                                        @if (Model != null && Model.PaymentDetails != null && Model.PaymentDetails.Count > 0)
+                                        {
+                                            var A = 0.0;
+                                            var B = 0.0;
+                                            var C = 0.0;
+                                            var D = 0.0;
+                                            var isOffline = false;
+                                            for (int i = 0; i < Model.PaymentDetails.Count; i++)
+                                            {
+                                                if (isOffline == false)
+                                                {
+
+                                                    <h6 class="text-brown font-weight-bold">Shall be paid separately</h6>
+                                                    @*<div class="col-xs-12">
+                                        <div class="col-md-2 default-form-control-style">
+                                            <label style="color: red; font-size: 16px;">Shall be paid separately</label>
+                                        </div>
+                                        <div class="col-md-2 default-form-control-style">
+                                        </div>
+                                        <div class="col-md-offset-1 col-md-2 default-form-control-style">
+                                        </div>
+                                        <div class="col-md-offset-1 col-md-2 default-form-control-style">
+                                        </div>
+                                    </div>*@
+                                                    isOffline = true;
+                                                }
+
+
+
+                                                if (Model.PaymentDetails[i].IsApplicable == false)
+                                                {
+                                                    A += Convert.ToDouble(Model.PaymentDetails[i].TotalAmount);
+                                                    B += Convert.ToDouble(Model.PaymentDetails[i].AdjustmentAmount);
+                                                    if (Convert.ToDouble(Model.PaymentDetails[i].AdjustmentAmount) < Convert.ToDouble(Model.PaymentDetails[i].TotalAmount))
+                                                    {
+                                                        if (Model.PaymentDetails[i].IsWalletAdjusted == "1")
+                                                        {
+                                                            C += Convert.ToDouble(Model.PaymentDetails[i].MappingValue);
+                                                            D += Convert.ToDouble(Model.PaymentDetails[i].AdjustmentAmount);
+                                                        }
+                                                        else
+                                                        {
+                                                            C += Convert.ToDouble(Model.PaymentDetails[i].MappingValue);
+                                                        }
+
+                                                    }
+                                                    else
+                                                    {
+                                                        if (Model.PaymentDetails[i].IsWalletAdjusted == "1")
+                                                        {
+
+                                                            D += Convert.ToDouble(Model.PaymentDetails[i].TotalAmount);
+                                                        }
+                                                        C += Convert.ToDouble(Model.PaymentDetails[i].MappingValue);
+
+                                                    }
+
+                                                    <tr>
+
+                                                        <td>@Model.PaymentDetails[i].PaymentType</td>
+
+                                                        <td>@Model.PaymentDetails[i].TotalAmount</td>
+
+                                                        <td>@Model.PaymentDetails[i].AdjustmentAmount</td>
+
+                                                        @if (Convert.ToDouble(Model.PaymentDetails[i].AdjustmentAmount) < Convert.ToDouble(Model.PaymentDetails[i].TotalAmount))
+                                                        {
+
+                                                            if (Model.PaymentDetails[i].IsWalletAdjusted == "1")
+                                                            {
+                                                                <td>@Model.PaymentDetails[i].AdjustmentAmount</td>
+
+                                                            }
+                                                            else
+                                                            {
+                                                                <td>0</td>
+
+
+                                                            }
+                                                            <td>=</td>
+
+                                                            <td>@Model.PaymentDetails[i].MappingValue</td>
+                                                        }
+                                                        else
+                                                        {
+                                                            if (Model.PaymentDetails[i].IsWalletAdjusted == "1")
+                                                            {
+                                                                <td>@Model.PaymentDetails[i].TotalAmount</td>
+
+                                                            }
+                                                            else
+                                                            {
+                                                                <td>0</td>
+
+                                                            }
+                                                            <td>=</td>
+
+                                                            <td>@Model.PaymentDetails[i].MappingValue</td>
+
+                                                        }
+
+                                                    </tr>
+                                                }
+
+
+
+                                            }
+
+
+                                            <tr>
+                                                @if (Model.ActiveStatus == 6 || Model.ActiveStatus == 7 || Model.ActiveStatus == 11)
+                                                {
+                                                    <td class="font-weight-bold">Total Paid Amount</td>
+                                                }
+                                                else
+                                                {
+                                                    <td class="font-weight-bold">Total Payable Amount</td>
+                                                }
+
+                                                <td>@A</td>
+                                                <td>@B</td>
+
+                                                @if (B < A)
+                                                {
+                                                    <td>@D</td>
+
+                                                }
+                                                else
+                                                {
+                                                    if (Model.PaymentDetails[0].IsWalletAdjusted == "1")
+                                                    {
+                                                        <td>@D</td>
+
+                                                    }
+                                                    else
+                                                    {
+                                                        <td>0</td>
+
+                                                    }
+                                                }
+                                                <td>=</td>
+
+                                                <td>@C</td>
+
+                                            </tr>
+
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            if (ViewBag.Adjustment != null && ViewBag.Adjustment.ToString() == "NO")
+                            {
+                                <h4 class="mt-3">Payment information</h4>
+
+                                <hr />
+                            }
+                            if (Model.ActiveStatus == 6 || Model.ActiveStatus == 7 || Model.ActiveStatus == 11)
+                            {
+                                if (Model.ChallanNumber == "ONLINE PAYMENT")
+                                {
+                    <div class="row">
+
+                        <label class="col-lg-3 col-md-4 col-sm-12 col-form-label font-weight-bolder">Payment Mode</label>
+                        <div class="col-lg-3 col-md-8 col-sm-12">
+                            <span class="colon">:</span>
+                            @if (Model.ActiveStatus == 7)
+                            {
+                                @(Html.TextBoxFor(model => model.ChallanDate, new { @class = "form-control-plaintext", @Value = "Online Payment Awaited" }))
+                            }
+                            else
+                            {
+                                @(Html.TextBoxFor(model => model.ChallanDate, new { @class = "form-control-plaintext", @Value = "Online Payment" }))
+                            }
+                        </div>
+
+                        <label class="col-lg-3 col-md-4 col-sm-12 col-form-label font-weight-bolder">Payment Date</label>
+                        <div class="col-lg-3 col-md-8 col-sm-12">
+                            <span class="colon">:</span>
+                            @(Html.TextBoxFor(model => model.ChallanDate, new { @class = "form-control-plaintext" }))
+                        </div>
+
+                    </div>
+                                }
+                                else
+                                {
+                    <div class="row">
+                        <label class="col-lg-3 col-md-4 col-sm-12  col-form-label font-weight-bolder">Challan Number</label>
+                        <div class="col-lg-3 col-md-8 col-sm-12">
+                            <span class="colon">:</span>
+
+                            @(Html.TextBoxFor(model => model.ChallanNumber, new { @class = "form-control-plaintext" }))
+                        </div>
+
+
+
+
+                        <label class="col-lg-3 col-md-4 col-sm-12  col-form-label font-weight-bolder">Challan Date</label>
+                        <div class="col-lg-3 col-md-8 col-sm-12">
+                            <span class="colon">:</span>
+
+                            @(Html.TextBoxFor(model => model.ChallanDate, new { @class = "form-control", @readonly = "readonly" }))
+                        </div>
+
+
+
+
+                        <label class="col-lg-3 col-md-4 col-sm-12 col-form-label font-weight-bolder">Challan Copy</label>
+                        <div class="col-lg-3 col-md-8 col-sm-12">
+                            <span class="colon">:</span>
+
+                            <a href="@Url.Action("Download", "Application", new { Area = "Lessee", name = Model.ChallanFileName, path = Model.ChallanFileName })" target="_blank" class="file-download-licensee">
+                                @((Model.ChallanCopyFilePath != null) ? Model.ChallanCopyFilePath : "")
+                            </a>
+                        </div>
+                    </div>
+                                }
+                            }
+                            else
+                            {
+                                if (ViewBag.Adjustment != null && ViewBag.Adjustment.ToString() == "NO")
+                                {
+                                    <div class="row">
+                                        <div class="col-xs-12">
+                                            <div class="col-lg-11 col-md-4 col-sm-12 col-xs-12 bhoechie-tab-container">
+                                                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 bhoechie-tab-menu">
+                                                    <div class="list-group">
+                                                        <a href="#" class="list-group-item  active text-center" id="divOnlineOption">
+                                                            Online Payment
+                                                        </a>
+                                                        @* <a href="#" class="list-group-item  text-center" id="divOfflineOption">Offline Payment
+                                        </a>*@
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-9 col-md-9 col-sm-9 col-xs-9 bhoechie-tab">
+                                                    <!-- Online payment section -->
+                                                    <div class="bhoechie-tab-content active ">
+                                                        <div class="row" id="divPaymentOptionOnline">
+                                                            <div class="col-lg-9 col-md-4 col-xs-12">
+                                                                <div id="divOnlineChallanDetails">
+                                                                    <div class="col-xs-12">
+                                                                        <div class="col-md-4 default-form-control-style">
+                                                                            <img src="@Url.Content("~/Images/SBI.jpg")" alt="SBI" style="width:100px;height:50px;" />
+                                                                            @if (Model.ActiveStatus != 6)
+                                                                            {
+                                                                                <input name="BankSelection" type="radio" id="chkSBI" value="SBI" checked="checked" />
+                                                                            }
+                                                                        </div>
+                                                                        <div class="col-md-4 default-form-control-style" style="text-align: left;">
+                                                                            @*@(Html.Label("ICICI BANK"))*@
+                                                                            <img src="@Url.Content("~/Images/ICICI.png")" alt="ICICI" style="width:100px;height:50px;" />
+                                                                            @if (Model.ActiveStatus != 6)
+                                                                            {
+                                                                                <input name="BankSelection" type="radio" id="chkICICI" value="ICICI" />
+                                                                            }
+                                                                        </div>
+                                                                        <div class="col-md-4 default-form-control-style" style="display: none;">
+                                                                            @*@(Html.Label("HDFC BANK"))*@
+                                                                            <img src="@Url.Content("~/Images/HDFC.jpg")" alt="HDFC" style="width:100px;height:50px;" />
+                                                                            @if (Model.ActiveStatus != 6)
+                                                                            {
+                                                                                <input name="BankSelection" type="radio" id="chkHDFC" value="HDFC" />
+                                                                            }
+                                                                        </div>
+
+
+                                                                    </div>
+                                                                </div>
+                                                                <div class="row" id="divPaymentOption" style="display: none">
+                                                                    <div class="col-lg-12 col-md-12 col-xs-12">
+                                                                        <div id="divOnline">
+                                                                            <div class="col-xs-12">
+                                                                                <div class="col-md-4 default-form-control-style" style="text-align: left;">
+                                                                                    @(Html.Label("Net Banking"))
+                                                                                    <input name="ModeSelection" type="radio" id="chkICICINetBanking" value="NetBanking" />
+                                                                                </div>
+                                                                                <div class="col-md-4 default-form-control-style">
+                                                                                    @(Html.Label("NEFT/RTGS"))
+                                                                                    <input name="ModeSelection" type="radio" id="chkNEFT" value="NEFT" checked="checked" />
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="row" id="divNetBankingPayment" style="display: none">
+                                                                    <div class="col-lg-12 col-md-12 col-xs-12">
+                                                                        <div id="divNet">
+                                                                            <div class="col-xs-12">
+                                                                                <div class="col-md-4 default-form-control-style" style="text-align: left;">
+                                                                                    @(Html.Label("Corporate"))
+                                                                                    <input name="NetBankingSelection" type="radio" value="Corporate" checked="checked" />
+                                                                                </div>
+                                                                                <div class="col-md-4 default-form-control-style">
+                                                                                    @(Html.Label("Retail"))
+                                                                                    <input name="NetBankingSelection" type="radio" value="Retail" />
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <!-- Offlineline payment section -->
+
+                                                </div>
+                                            </div>
+                                            <br />
+                                        </div>
+                                    </div>
+                                }
+                            }
+
+                            <div class="row">
+                                <div class="col-md-12">
+                                    @if (Model.ActiveStatus == 6 || Model.ActiveStatus == 7 || Model.ActiveStatus == 11)
+                                    {
+                                        <div class="col-md-5 default-form-control-style">
+                                        </div>
+                                        <div class="col-sm-12 text-center">
+                                            @if (Model.BPLesseeDSCPath == null)
+                                            {
+                                                <input type="submit" value="Generate e-Permit" name="cmdPreview" class="btn btn-dark btn-md ml-0 waves-effect waves-light " />
+                                            }
+                                            @*<input type="button" id="back" onclick=" history.go(-1);" value="Back to List" class="k-button k-button-icontext k-primary" />*@
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <div class="col-md-5 default-form-control-style">
+                                        </div>
+                                        <div class="row mt-3">
+                                            <div class="col-sm-12 text-center">
+                                                @*  <input type="submit" value="Generate e-Permit" name="cmdPreview" class="k-button k-button-icontext k-primary" />*@
+                                                @if (ViewBag.Adjustment != null && ViewBag.Adjustment.ToString() == "NO")
+                                                {
+                                                    <input type="button" id="makePayment" onclick="return onMakePayment();" value="Make Payment" class="btn btn-dark btn-md ml-0 waves-effect waves-light " />
+                                                }
+                                                else
+                                                {
+                                                    <input type="button" id="SavePayment" onclick="return onSavePayment();" value="Save & Generate Permit" class="btn btn-primary btn-md ml-0 waves-effect waves-light " />
+                                                }
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+
+
+                        }
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+    <!-- MAIN CONTENT AREA ENDS -->
+</section>
+<div class="modal fade" id="leaseinformation" aria-modal="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title m-0">Lease/License information</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body pt-2">
+                <div class="row">
+                    <div class="col-sm-12">
+
+
+                        <div class="row">
+                            <div class="col-lg-12 col-md-12 col-sm-12">
+                                <div class="row form-group">
+                                    <label class="col-lg-5 col-md-12 col-form-label font-weight-bolder">Scheme of Coal Sale</label>
+                                    <div class="col-lg-7 col-md-12">
+                                        <span class="colon">:</span>
+
+                                        @(Html.LabelFor(model => model.TypeOfCoalDispatched, new { @class = "form-control-plaintext" }))
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-12 col-md-12 col-sm-12">
+                                <div class="row form-group">
+                                    <label class="col-lg-5 col-md-12 col-form-label font-weight-bolder">Name of lessee/ licensee</label>
+                                    <div class="col-lg-7 col-md-12">
+                                        <span class="colon">:</span>
+
+                                        @(Html.LabelFor(model => model.LesseeName, new { @class = "form-control-plaintext" }))
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-12 col-md-12 col-sm-12">
+                                <div class="row form-group">
+                                    <label class="col-lg-5 col-md-12 col-form-label font-weight-bolder">Address</label>
+                                    <div class="col-lg-7 col-md-12">
+                                        <span class="colon">:</span>
+                                        @(Html.LabelFor(model => model.LesseeAddress, new { @class = "form-control-plaintext" }))
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-12 col-md-12 col-sm-12">
+                                <div class="row form-group">
+                                    <label class="col-lg-5 col-md-12 col-form-label font-weight-bolder">Grant Order No.</label>
+                                    <div class="col-lg-7 col-md-12">
+                                        <span class="colon">:</span>
+                                        @(Html.LabelFor(model => model.GrantOrderNo, new { @class = "form-control-plaintext" }))
+                                        @(Html.HiddenFor(model => model.GrantOrderNo))
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-12 col-md-12 col-sm-12">
+                                <div class="row form-group">
+                                    <label class="col-lg-5 col-md-12 col-form-label font-weight-bolder">Grant Order Date</label>
+                                    <div class="col-lg-7 col-md-12">
+                                        <span class="colon">:</span>
+                                        @(Html.LabelFor(model => model.DateOfGrant, new { @class = "form-control-plaintext" }))
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-12 col-md-12 col-sm-12">
+                                <div class="row form-group">
+                                    <label class="col-lg-5 col-md-12 col-form-label font-weight-bolder">Period of Lease</label>
+                                    <div class="col-lg-7 col-md-12">
+                                        <span class="colon">:</span>
+                                        @(Html.LabelFor(model => model.PeriodOfLease, new { @class = "form-control-plaintext" }))
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-12 col-md-12 col-sm-12">
+                                <div class="row form-group">
+                                    <label class="col-lg-5 col-md-12 col-form-label font-weight-bolder">Mineral Name</label>
+                                    <div class="col-lg-7 col-md-12">
+                                        <span class="colon">:</span>
+                                        @(Html.LabelFor(model => model.MineralName, new { @class = "form-control-plaintext" }))
+                                        @(Html.HiddenFor(model => model.MineralId))
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-12 col-md-12 col-sm-12">
+                                <div class="row form-group">
+                                    <label class="col-lg-5 col-md-12 col-form-label font-weight-bolder">Mineral Form</label>
+                                    <div class="col-lg-7 col-md-12">
+                                        <span class="colon">:</span>
+                                        @(Html.LabelFor(model => model.MineralNature, new { @class = "form-control-plaintext" }))
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-12 col-md-12 col-sm-12">
+                                <div class="row form-group">
+                                    <label class="col-lg-5 col-md-12 col-form-label font-weight-bolder">Mineral Grade</label>
+                                    <div class="col-lg-7 col-md-12">
+                                        <span class="colon">:</span>
+                                        @(Html.LabelFor(model => model.MineralGradeName, new { @class = "form-control-plaintext" }))
+                                        @(Html.HiddenFor(model => model.MineralGradeId))
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-12 col-md-12 col-sm-12">
+                                <div class="row form-group">
+                                    <label class="col-lg-5 col-md-12 col-form-label font-weight-bolder">DO Number</label>
+                                    <div class="col-lg-7 col-md-12">
+                                        <span class="colon">:</span>
+                                        @(Html.LabelFor(model => model.DONumber, new { @class = "form-control-plaintext" }))
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-6 col-md-12 col-sm-12">
+                                <div class="row form-group">
+                                    <label class="col-lg-5 col-md-12 col-form-label font-weight-bolder">Quantity<small><i class="fas fa-rupee-sign ml-1"></i></small></label>
+                                    <div class="col-lg-7 col-md-12">
+                                        <span class="colon">:</span>
+                                        @(Html.LabelFor(model => model.ProposedQty, new { @class = "form-control-plaintext" }))
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-6 col-md-12 col-sm-12">
+                                <div class="row form-group">
+                                    <label class="col-lg-5 col-md-12 col-form-label font-weight-bolder">Unit</label>
+                                    <div class="col-lg-7 col-md-12">
+                                        <span class="colon">:</span>
+                                        @(Html.LabelFor(model => model.UnitName, new { @class = "form-control-plaintext" }))
+                                        @(Html.HiddenFor(model => model.UnitId))
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-12 col-md-12 col-sm-12">
+                                <div class="row form-group">
+                                    <label class="col-lg-5 col-md-12 col-form-label font-weight-bolder">Basic Price / Royalty Rate</label>
+                                    <div class="col-lg-7 col-md-12">
+                                        <span class="colon">:</span>
+                                        @if (Model != null && Model.PaymentDetails != null && Model.PaymentDetails.Count > 0)
+                                        {
+                                            for (int i = 0; i < Model.PaymentDetails.Count; i++)
+                                            {
+                                                if (Model.PaymentDetails[i].PaymentType.ToUpper().Contains("ROYALTY"))
+                                                {
+                                                    if (Model.PaymentDetails[i].CalType.ToUpper().Contains("%") == false)
+                                                    {
+                                                        <label class="form-control-plaintext" id="RoyaltyRate">@Model.PaymentDetails[i].CalValue  @Model.PaymentDetails[i].CalType</label>
+                                                    }
+                                                    else
+                                                    {
+                                                        <label class="form-control-plaintext" id="RoyaltyRate">@Model.PaymentDetails[i].CalValue (@Model.PaymentDetails[i].RoyaltyRate @Model.PaymentDetails[i].CalType Of @Model.PaymentDetails[i].BasisRate</label>
+                                                    }
+                                                }
+                                            }
+                                        }
+                                        else
+                                        {
+                                            @(Html.LabelFor(model => model.RoyaltyRate, new { @class = "form-control-plaintext" }))
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+<script>
+    backMe = "yes"
+    $(document).ready(function () {
+
+        loadNavigation('MakePaymentE-permit', 'glepermit', 'Epermit', 'tl', 'E-Permit', 'Make Payment', ' ');
+        $('.searchableselect').searchableselect();
+
+    });
+</script>
+<script>
+    indicateMe = "yes"
+    $(document).ready(function () {
+        loadNavigation('MakePaymentE-permit', 'glhelpdesk', 'plraiseticket', 'tl', 'E-Permit', 'Make Payment', ' ');
+        $('.datetime').datetimepicker({
+            format: "DD/MM/YYYY"
+        }).keydown(false);
+    });
+</script>
+<script>
+    function onSavePayment() {
+        debugger;
+        var id = $("#BulkPermitId").val();
+
+        if (parseInt(id) > 0) { // this check that if lessee / licensee have Balance payment . if yes then no need to go for online offline payment. its directly maintain from it.
+
+            if (confirm('Are you sure to save and generate e-Permit ?')) {
+                $.ajax({
+
+                    type: "POST",
+                    url:  "/Permit/MergePermit/SaveAndGenerateEpermit",
+                    //url: '@Url.Action("SaveAndGenerateEpermit", "MergePermit", new { Area = "Permit" })',
+                    data: { 'BulkPermitId': id },
+
+                    //contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    success: function (result) {
+                        if (result != null && result != "" && result == "SUCCESS") {
+
+                            alert("You have successfully save and generate e-permit.");
+                            location.reload();
+                        }
+
+                    }
+
+                });
+            }
+            else {
+                return false;
+            }
+        }
+
+    }
+
+    function onMakePayment() {
+        if (confirm('Are you sure to make payment ?')) {
+            var id = $("#BulkPermitId").val();
+            var isValid = 0;
+            if ($("#divOnlineOption").hasClass("active") == true) {
+                $("#PaymentMode").val(1); // set online payment mode
+                var bank = $("input:radio[name='BankSelection']:checked").val();
+                var mode = $("input:radio[name='ModeSelection']:checked").val();
+                var NetBanking = $("input:radio[name='NetBankingSelection']:checked").val();
+                if (bank == "HDFC") {
+                    $("#PaymentBank").val("HDFC");
+                    $("#__EUAntiForgeryForm").submit();
+                }
+                else if (bank == "ICICI") {
+                    $("#PaymentBank").val("ICICI");
+                    if (mode == "NetBanking") {
+                        $("#P_Mode").val("NetBanking")
+                        if (NetBanking == "Corporate") {
+                            $("#NetBanking_mode").val("Corporate");
+                            $("#__EUAntiForgeryForm").submit();
+                        }
+                        else if (NetBanking == "Retail") {
+                            $("#NetBanking_mode").val("Retail");
+                            $("#__EUAntiForgeryForm").submit();
+                        }
+                    }
+                    else {
+                        $("#P_Mode").val("NEFT")
+                        $("#__EUAntiForgeryForm").submit();
+                    }
+
+
+
+                }
+                else if (bank == "SBI") {
+                    $("#PaymentBank").val("SBI");
+                    $("#__EUAntiForgeryForm").submit();
+                }
+                else {
+                    alert("Please select bank to make payment !");
+                    return false;
+                }
+            }
+            else {
+
+                $("#PaymentMode").val(0); // set offline mode value
+                if ($("#ChallanNumber").val()) {
+                    if ($("#ChallanDate").val()) {
+                        if ($('input[name="ChallanCopyPath"]').val() != "") {
+                            if (filesize < 2048000) {
+                                if (confirm('Are you sure to make payment ?')) {
+                                    $("#__EUAntiForgeryForm").submit();
+                                }
+                            }
+                            else {
+                                alert("Please make sure your file is less than 2 MB!");
+                                return false;
+                            }
+                        }
+                        else {
+                            alert("Please select file!");
+                        }
+                    }
+                    else {
+                        lert("Please enter Challan Date!");
+                        $("#ChallanDate").focus();
+                    }
+                }
+                else {
+                    alert("Please enter Challan Number!");
+                    $("#ChallanNumber").focus();
+                }
+            }
+        }
+    }
+</script>

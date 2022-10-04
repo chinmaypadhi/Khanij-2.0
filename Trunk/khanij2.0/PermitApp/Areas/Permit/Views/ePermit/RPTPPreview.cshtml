@@ -1,0 +1,379 @@
+﻿@model PermitEF.LicenseInfoRPTP
+@using PermitApp.Web;
+@using PermitEF;
+@using PermitApp.Helper
+@using Microsoft.Extensions.Configuration;
+@using  Microsoft.AspNetCore.Http;
+@{
+    ViewData["Title"] = "RPTPPreview";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+@inject IConfiguration Configuration
+@inject IHttpContextAccessor HttpContextAccessor
+@{
+    UserLoginSession profile = HttpContextAccessor.HttpContext.Session.Get<UserLoginSession>(KeyHelper.UserKey);
+}
+<section class="wrapper main-wrapper row">
+
+    <div class="col-12">
+        @Html.Partial("_CMSnavigation")
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        @if (@profile.UserType == "Lessee" || @profile.UserType == "Licensee" || @profile.UserType == "End User")
+                        {
+                            @if (Model == null || (Model.DSCLesseeFilePath == null || Model.DSCLesseeFilePath == ""))
+                            {
+                                @if (Model.BultPermitId == 0 || Model.BultPermitId == null)
+                                {
+                                    <li class="nav-item">
+                                        <a class="nav-link active" href="#">
+                                            Save Draft Copy of RPTP
+                                            <img src="@Url.Content("~/CMSimg/1475779253_BT_printer.ico")" style="height:40px;width:40px; cursor:pointer;" onclick="DownloadForm();" />
+                                        </a>
+                                    </li>
+                                }
+                                else
+                                {
+                                    <li class="nav-item">
+                                        <a class="nav-link active" href="#">
+                                            Generate RPTP Permit
+                                            <img src="@Url.Content("~/CMSimg/1475779253_BT_printer.ico")" style="height:40px;width:40px; cursor:pointer;" onclick="getPDF();" />
+                                        </a>
+                                    </li>
+                                }
+                            }
+                            else
+                            {
+                                <li class="nav-item">
+                                    <a href="@Model.DSCLesseeFilePath" title="Download e-Permit" id="btnDownload" class="btn btn-success btn-md  mb-2  waves-effect waves-light rounded-0">Download RPTP Copy</a>
+                                </li>
+
+
+                            }
+                        }
+
+
+
+                    </ul>
+                    @Html.Partial("_CMSutil")
+                </div>
+
+                <section class="box form-container">
+
+
+                    <div class="content-body pt-0">
+                        @using (Html.BeginForm("", "", FormMethod.Post, new { enctype = "multipart/form-data", AUTOCOMPLETE = "Off", id = "__EUAntiForgeryForm", @Area = "Permit" }))
+                        {
+                            <input id="fName" type="hidden" />
+                            <input id="fid" type="hidden" />
+                            @(Html.HiddenFor(model => model.BultPermitId))
+                            @(Html.HiddenFor(model => model.BulkPermitNo))
+                            @(Html.HiddenFor(model => model.DSCLesseeFilePath))
+
+                            <div id="viewtable">
+                                <h5 class=" text-brown font-weight-bold pt-3">e-Permit for the @Model.MineralName</h5>
+                                @if (@profile.UserType == "Licensee")
+                                {
+                                    <table id="tablePRint" class="table table-bordered" style="width: 800px;margin: 0 auto;">
+                                        <tbody>
+                                            <tr>
+                                                <th colspan="2" style="text-align: center; border-top: 1px solid black; border-left: 1px solid black;">
+                                                    <img id="imgLogo" src="/CMSimg/LogoPrintNew.png" height="80" alt="LOGO">
+                                                </th>
+                                            </tr>
+                                            <tr>
+                                                <td class="font-weight-bold">Name of License</td>
+                                                <td>
+                                                    @(Html.DisplayFor(model => model.LicenseName))
+                                                </td>
+                                            </tr>
+
+                                            <tr>
+                                                <td class="font-weight-bold">Address</td>
+                                                <td>@(Html.DisplayFor(model => model.Address))</td>
+                                            </tr>
+
+                                            <tr>
+                                                <td class="font-weight-bold">Grant Order Number</td>
+                                                <td> @(Html.DisplayFor(model => model.GrantOrderNo))</td>
+                                            </tr>
+
+                                            <tr>
+                                                <td class="font-weight-bold">Grant Order Date</td>
+                                                <td> @(Html.DisplayFor(model => model.GrantOrderDate))</td>
+                                            </tr>
+
+                                            <tr>
+                                                <td class="font-weight-bold">e-Permit No.</td>
+                                                <td> @(Html.DisplayFor(model => model.BulkPermitNo))</td>
+
+                                            </tr>
+
+                                            <tr>
+                                                <td class="text-brown h5" colspan="4">Licensee information</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="font-weight-bold">Village</td>
+                                                <td> @(Html.DisplayFor(model => model.Village))</td>
+                                                @(Html.HiddenFor(model => model.Village))
+                                            </tr>
+
+                                            <tr>
+                                                <td class="font-weight-bold">Tehsil</td>
+                                                <td> @(Html.DisplayFor(model => model.Tehsil))</td>
+                                            </tr>
+
+                                            <tr>
+                                                <td class="font-weight-bold">  Police Station</td>
+                                                <td>@(Html.DisplayFor(model => model.PoliceStation)) </td>
+                                            </tr>
+
+                                            <tr>
+                                                <td class="font-weight-bold">Panchayat</td>
+                                                <td>Chhatauna</td>
+                                            </tr>
+
+                                            <tr>
+                                                <td class="font-weight-bold">District</td>
+                                                <td> @(Html.DisplayFor(model => model.District)) </td>
+                                            </tr>
+
+                                            <tr>
+                                                <td class="font-weight-bold">Mineral Name</td>
+                                                <td>@(Html.DisplayFor(model => model.MineralName)) </td>
+                                            </tr>
+
+                                            <tr>
+                                                <td class="font-weight-bold">Mineral Grade</td>
+                                                <td> @(Html.DisplayFor(model => model.MineralGrade))</td>
+                                            </tr>
+
+                                            <tr>
+                                                <td class="font-weight-bold">Mineral Form</td>
+                                                <td>@(Html.DisplayFor(model => model.MineralNature))</td>
+                                            </tr>
+
+                                            <tr>
+                                                <td class="font-weight-bold">Available Quantity in Stock (MT)</td>
+                                                <td>@(Html.DisplayFor(model => model.AvailableQuantityinStock))</td>
+                                            </tr>
+
+                                            <tr>
+
+                                                <td class="font-weight-bold">Quantity to be Dispatched (MT)</td>
+                                                <td>@(Html.DisplayFor(model => model.QuantitytobeDispatched))</td>
+                                            </tr>
+
+                                            <tr>
+                                                <td class="font-weight-bold">   Generated Date and Time</td>
+                                                <td><span>@(System.DateTime.Now.ToString("dd/MM/yyyy hh:mm:ss tt"))</span></td>
+                                            </tr>
+
+
+
+                                        </tbody>
+                                    </table>
+                                }
+                            </div>
+                        }
+                    </div>
+
+
+
+                </section>
+            </div>
+        </div>
+    </div>
+    <!-- MAIN CONTENT AREA ENDS -->
+</section>
+@*<uc1:footer runat="server" ID="footer" />*@
+<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.3.3/jspdf.min.js"></script>
+<script src="https://html2canvas.hertzen.com/dist/html2canvas.js"></script>
+
+<script>
+    function DownloadForm() {
+
+        var HTML_Width = $("#tablePRint").width();
+        var HTML_Height = $("#tablePRint").height();
+        var top_left_margin = 15;
+        var PDF_Width = HTML_Width + (top_left_margin * 2);
+        var PDF_Height = (PDF_Width * 1.5) + (top_left_margin * 2);
+        var canvas_image_width = HTML_Width;
+        var canvas_image_height = HTML_Height;
+
+        var totalPDFPages = Math.ceil(HTML_Height / PDF_Height) - 1;
+
+
+        html2canvas($("#tablePRint")[0], { allowTaint: true }).then(function (canvas) {
+
+            canvas.getContext('2d');
+
+            console.log(canvas.height + "  " + canvas.width);
+
+            // var data = canvas.toDataURL();
+            var data = canvas.toDataURL("image/JPEG", 1.0);
+            var pdf = new jsPDF('p', 'pt', [PDF_Width, PDF_Height]);
+            pdf.addImage(data, 'JPEG', top_left_margin, top_left_margin, canvas_image_width, canvas_image_height);
+
+
+            for (var i = 1; i <= totalPDFPages; i++) {
+                pdf.addPage(PDF_Width, PDF_Height);
+                pdf.addImage(data, 'JPEG', top_left_margin, -(PDF_Height * i) + (top_left_margin * 4), canvas_image_width, canvas_image_height);
+            }
+            //data = data.replace('data:image/png;base64,', '');
+            data = pdf.save($("#BultPermitId").val() + ".pdf");
+
+        });
+
+    }
+
+    function getPDF() {
+
+        var HTML_Width = $("#tablePRint").width();
+        var HTML_Height = $("#tablePRint").height();
+        var top_left_margin = 15;
+        var PDF_Width = HTML_Width + (top_left_margin * 2);
+        var PDF_Height = (PDF_Width * 1.5) + (top_left_margin * 2);
+        var canvas_image_width = HTML_Width;
+        var canvas_image_height = HTML_Height;
+
+        var totalPDFPages = Math.ceil(HTML_Height / PDF_Height) - 1;
+
+
+        html2canvas($("#tablePRint")[0], { allowTaint: true }).then(function (canvas) {
+
+            canvas.getContext('2d');
+
+            console.log(canvas.height + "  " + canvas.width);
+
+            // var data = canvas.toDataURL();
+            var data = canvas.toDataURL("image/JPEG", 1.0);
+            var pdf = new jsPDF('p', 'pt', [PDF_Width, PDF_Height]);
+            pdf.addImage(data, 'JPEG', top_left_margin, top_left_margin, canvas_image_width, canvas_image_height);
+
+
+            for (var i = 1; i <= totalPDFPages; i++) {
+                pdf.addPage(PDF_Width, PDF_Height);
+                pdf.addImage(data, 'JPEG', top_left_margin, -(PDF_Height * i) + (top_left_margin * 4), canvas_image_width, canvas_image_height);
+            }
+            //data = data.replace('data:image/png;base64,', '');
+            data = pdf.output("datauristring").replace('data:application/pdf;base64,', '');
+                    //-----------------
+                     try {
+                    var dt = new Date();
+                         var FNID = $("#BultPermitId").val();
+                         var FileName = "", _UpdateIn = "";
+                         $("#fid").val($("#BultPermitId").val()).change();
+                   if ('@profile.UserType.ToString()' == "End User") {
+                  FileName = "EU_RPTP_" + FNID + "_" + dt.getDate() + "" + (dt.getMonth() + 1) + "" + dt.getFullYear() + "_" + dt.getHours() + "_" + dt.getMinutes() + "_" + dt.getSeconds() + ".pdf";
+                  _UpdateIn = "EU_RPTP_PERMIT";
+              }
+              else {
+                  FileName = "RPTP_" + FNID + "_" + dt.getDate() + "" + (dt.getMonth() + 1) + "" + dt.getFullYear() + "_" + dt.getHours() + "_" + dt.getMinutes() + "_" + dt.getSeconds() + ".pdf";
+                  _UpdateIn = "RPTP_PERMIT";
+                         }
+                         $("#fName").val(FileName).change();
+                    $.ajax({
+                        url: "/Permit/Transit/SaveNormalPdfFile",
+                        data: { base64BinaryStr: data, fileName: $("#fName").val(), ID: $("#BultPermitId").val(), UpdateIn: _UpdateIn },
+                        type: "post",
+                        dataType:'json',
+                        success: function (msg) {
+
+                            if (msg == "SUCCESS") {
+
+                                var FPath = '@Configuration["DSCReadFilePath"]' + $("#fName").val();
+                                var OutPath = "";
+                                var Postdata = 'action=signpdf' + "\n" + 'datatosign=' + FPath + '' + "\n" + 'signaction=2' + "\n" + 'outputpath=' + OutPath + '' + "\n" + 'signtype=sign' + "\n" + 'expirycheck=false' + "\n" + 'coordinate=600,100,1300,50' + "\n" + 'issuername=' + "\n" + 'certtype=ALL' + "\n" + 'certclass=0';
+                                connection.send(Postdata);
+                                connection.onerror = function (error) {
+                                    alert('Please check the server connection: ' + error);
+                                    alert(error);
+                                };
+
+                                connection.onmessage = function (e) { // when DSC is success then following function executed.
+
+                                    if (e.data.indexOf("subProtocol") == -1) {
+
+                                        $.ajax(
+                                            {
+                                                url: "/Permit/Transit/CheckVerifyResponse",
+                                                type: "POST",
+                                                data: { contentType: "pkcs7", signDataBase64Encoded: e.data, responseType: "plain" },
+                                                async: false,
+                                                success: function (msg) {
+
+                                                    if (msg == "SUCCESS") {
+
+                                                        var FNID = $("#fName").val();
+                                                        var BulkPermitId = $("#BultPermitId").val();
+                                                        var signData = e.data;
+                                                        $.ajax({
+                                                            url:"/Permit/Transit/SavePdfFile",
+                                                            type: "POST",
+                                                            async: false,
+                                                            data: { base64BinaryStr: e.data, fileName: FNID, ID: BulkPermitId, UpdateIn: _UpdateIn},
+                                                            success: function (msg) {
+                                                                if (msg == "SUCCESS") {
+                                                                    alert("You have successfully generate permit.");
+                                                                    window.location.href = "/Permit/ePermit/RPTFFinal?id=GeneratePermit";
+                                                                }
+                                                                else {
+                                                                    alert(msg);
+                                                                }
+                                                            }
+                                                        });
+                                                    }
+                                                }
+                                            });
+                                    }
+                                    else {
+                                        alert(e.data);
+                                    }
+                                };
+                            }
+                            else {
+                                alert(msg);
+
+                            }
+                        }
+                    });
+                }
+                catch (e) {
+                    alert("Your DSC Connection is not working. Please try after some time.");
+                }
+                    //-------------------------
+
+
+
+        });
+
+
+
+    }
+    //following code is for DSC Signature
+    try {
+        var connection = new WebSocket('wss://localhost.emudhra.com:8080');
+
+        connection.onopen = function () {
+            console.log('Connection Opened');
+        };
+        connection.onerror = function (error) {
+            //  alert('Please check the DSC connection: ' + error);
+        };
+        connection.onmessage = function (e) {
+            if (e.data.indexOf("subProtocol") == -1) {
+                //  alert(e.data);
+            }
+        };
+    }
+    catch (e) {
+        alert("No DSC Connection Found");
+    }
+    //-----------------------------
+</script>
+

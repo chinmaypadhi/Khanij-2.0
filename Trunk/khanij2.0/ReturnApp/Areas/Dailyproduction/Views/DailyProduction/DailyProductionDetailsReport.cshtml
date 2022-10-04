@@ -1,0 +1,172 @@
+﻿@*// *********************************************************************************************************
+    //  View Name                : DailyProductionDetailsReport
+    //  Desciption               : Submit/Delete Daily production Details Report
+    //  Created By               : Debaraj Swain
+    //  Created On               : 12 April 2021
+    // ********************************************************************************************************
+*@
+@model ReturnEF.DailyProductionModel
+@{
+    ViewData["Title"] = "DailyProductionSummaryReport";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<section class="wrapper main-wrapper row">
+
+
+
+    @{if (ViewBag.submitmsgp != null)
+        {
+            <script>
+
+                swal("", "You have successfully applied for Registration with Khanij Online Portal. @ViewBag.submitmsgp. Please check your e-mail for details of registration.", "success");
+            </script>
+        }
+    }
+    @if (ViewBag.delmsg != null)
+    {
+        <script>
+                 swal("", "@ViewBag.delmsg", "success");
+        </script>
+
+    }
+
+
+
+    <div class="col-12">
+        @Html.Partial("_CMSnavigation")
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+
+                        </li>
+                        <li class="nav-item">
+
+                        </li>
+                    </ul>
+                    @Html.Partial("_CMSutil")
+                </div>
+
+                <section class="box form-container">
+
+                    <div class="content-body pt-0">
+
+                        @using (Html.BeginForm("DailyProductionDetailsReport", "DailyProduction", FormMethod.Post, new { AUTOCOMPLETE = "Off", id = "form1" }))
+                        {
+
+
+
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="col-md-1 default-form-control-style">
+                                        <input type="submit" id="btnSubmit" style="font-size: 1.2rem;" class="btn-primary btn-sm edit" value="Submit" />
+                                    </div>
+                                    <div class="col-md-11 default-form-control-style">
+                                        <label style="float: left;margin-bottom: 0;font-size: 1.2rem;font-weight: 700;color: #f00;padding: 5px 10px;width: 200%;">Note : Please submit the Daily Production of the Month till 10<sup>th</sup> of Succeeding Month.</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                        }
+
+
+
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div class="table-responsive" id="viewtable">
+
+
+
+
+                                    <table id="datatable" class="table table-sm table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th width="30"> Sl#</th>
+
+                                                <th>
+
+                                                    Date
+                                                </th>
+                                                <th>
+
+                                                    Mineral Name
+                                                </th>
+                                                <th>
+                                                    Mineral Form
+                                                </th>
+                                                <th>
+                                                    Mineral Grade
+                                                </th>
+                                                <th>
+                                                    Quantity ( In MT )
+                                                </th>
+                                                <th>
+
+                                                </th>
+
+
+
+                                            </tr>
+                                        </thead>
+
+
+
+
+                                        <tbody>
+
+                                            @{ int i = 1;
+                                            }
+                                            @foreach (var b in ViewBag.DailyProductionDetailsReport)
+                                            {
+
+                                                i = i + 1;
+                                                <tr class="active-row">
+                                                    <td>
+                                                        @b.SrNo
+                                                    </td>
+                                                    <td><p class="m-0">@b.Date.ToShortDateString()</p> </td>
+                                                    <td><p class="m-0">@b.MineralName</p> </td>
+                                                    <td><p class="m-0">@b.MineralNature</p> </td>
+                                                    <td><p class="m-0">@b.MineralGrade</p> </td>
+                                                    <td><p class="m-0">@b.Quantity</p> </td>
+                                                    <td>
+                                                        <a href="@Url.Content("~/DailyProduction/DailyProduction/Delete/")@b.DailyProductionMasterId"
+                                                           class="btn-floating btn-outline-danger btn-sm" onclick="return confirm('Are you sure to Delete?')"
+                                                           title="Delete"><i class="icon-trash-alt-solid"></i></a>
+                                                    </td>
+                                                </tr>
+                                            }
+
+                                    </table>
+                                </div>
+
+
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+</section>
+<script>
+    indicateMe = "yes"
+
+    $(document).ready(function () {
+        loadNavigation('AddUser', 'glRoleRes', 'plUser', 'tl', 'DailyProduction', 'DailyProduction Summary Report', ' ');
+
+
+        if (@ViewBag.tablerecordconnt != 0) {
+            $('#btnSubmit').show();
+        }
+                                                else
+        {
+             $('#btnSubmit').hide();
+        }
+    });
+
+
+</script>

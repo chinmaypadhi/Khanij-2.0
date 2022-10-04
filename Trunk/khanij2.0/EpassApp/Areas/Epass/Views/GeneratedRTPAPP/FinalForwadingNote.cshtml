@@ -1,0 +1,255 @@
+﻿@model IEnumerable<EpassEF.FinalForwadingNoteEF>;
+@{
+    ViewData["Title"] = "Generated RTP Application";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+@*@inject EpassApp.KhanijSecurity.KhanijIDataProtection protector;*@
+@if (TempData["Masg"] != null)
+{
+    <script>
+        swal("",'@TempData["Masg"]', "success");
+    </script>
+    TempData["Masg"] = null;
+}
+
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        @Html.Partial("_CMSnavigation")
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="@Url.Content("~/EPass/MineralReceive/MineralReceive")">
+                                Add
+                            </a>
+                        </li>
+                        <li class="nav-item">
+
+                            <a class="nav-link " href="javascript:void(0)">
+                                View
+                            </a>
+                        </li>
+                    </ul>
+
+                    @Html.Partial("_CMSutil")
+                </div>
+
+                <section class="box form-container">
+
+
+                    <div class="content-body pt-0">
+                        <div class="legend-box">
+                            <ul class="d-flex mb-1 justify-content-end list-unstyled">
+                                <li><span class="bg-success"></span> Active</li>
+                                <li><span class="bg-warning"></span> Inactive</li>
+                            </ul>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div class="table-responsive" id="viewtable">
+
+
+                                    <table id="datatable" class="table table-sm table-bordered">
+                                        <thead>
+                                            <tr>
+
+                                                <th width="30px">Sl#</th>
+                                                <th>e-Permit No.</th>
+                                                <th>RTP Application No.</th>
+                                                <th>RTP Application</th>
+                                                <th>RTP Request Date</th>
+                                                <th>Mineral Name</th>
+                                                <th>Mineral Form</th>
+
+                                                <th>Mineral Grade</th>
+                                                <th>RTP Application Qty</th>
+                                                <th>Dispatched Quantity</th>
+                                                <th>RTP Generated Quantity</th>
+                                                <th>Transportation Mode</th>
+
+                                                <th>Purchaser/Consignee</th>
+                                                <th>EDRM No.</th>
+                                                <th>EDRM Date</th>
+
+
+                                                <th>EDRM Copy</th>
+                                                <th>Trip Operation</th>
+                                               
+
+
+
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+
+                                            @{
+                                                var count = 0;
+                                                foreach (var item in Model)
+                                                {
+                                                    count++;
+                                                    <tr class="active-row">
+
+
+
+
+                                                        <td style="display:none">@item.ForwardingNoteId</td>
+
+                                                        <td>@item.SRNO</td>
+                                                        <td>@item.BulkPermitNumber</td>
+                                                        <td>@item.ForwardingNoteNumber</td>
+
+                                                        <td>@item.ForwardingNoteId</td>
+                                                        <td>@item.DateofSubmitedRTPRequest</td>
+                                                        <td>@item.MineralName</td>
+                                                        <td>@item.MineralNature</td>
+                                                        <td>@item.MineralGrade</td>
+
+                                                        <td>
+                                                            @if (item.isLable == 1)
+                                                            {
+                                                                <a href="@Url.Action("ePermitRoyaltyHistory", "Lessee", new { Area = "Report", id = item.BulkPermitNumber })">@item.DiffDisplay (<span>Royalty Changed</span>)</a>
+                                                            }
+                                                            else
+                                                            {
+                                                                @item.ReqQty
+                                                            }
+
+                                                        </td>
+                                                        <td>@item.TotalDispatchedQty</td>
+
+                                                        <td>@item.UnitName</td>
+                                                        <td>@item.BalanceQty</td>
+                                                        <td>@item.TransportationMode</td>
+                                                        <td>@item.EndUser</td>
+
+                                                        <td>@item.EDRMNumber</td>
+                                                        <td>@item.EDRMDate</td>
+
+                                                        <td>
+                                                            @if (item.EDRMCopyPath == "")
+                                                            {
+                                                                <span> -</span>
+                                                            }
+                                                            else
+                                                            {
+                                                                <a href="@item.EDRMCopyPath" target='_blank'>Download</a>
+                                                            }
+
+                                                        </td>
+
+                                                        <td>
+                                                            @if (item.CloseTripStatus == 0 && item.TransportationMode == "Road-Rail")
+                                                            {
+                                                                <span class=command style='color:red'>Dispatch Not Started</span>
+                                                            }
+                                                            @if (item.CloseTripStatus == 0 && item.TransportationMode == "Inside Railway Siding")
+                                                            {
+                                                                <input type='button' class='btn btn-primary' onclick='return ApplyRTP(@item.ForwardingNoteId)' value='Generate RTP'>
+                                                            }
+                                                            @if (item.GenerateRTPStatus == 4 && item.TransportationMode == "Inside Railway Siding")
+                                                            {
+                                                                <input type='button' class='btn btn-primary' onclick='return ApplyRTP(@item.ForwardingNoteId)' value='Generate RTP'>
+                                                            }
+                                                            @if (item.TransportationMode == "Inside Railway Siding" && item.CloseRTPStatus == 1)
+                                                            {
+                                                                <input type='button' class='btn btn-primary' onclick='return ApplyRTP(@item.ForwardingNoteId)' value='Generate RTP'>
+                                                            }
+                                                            @if (item.CloseTripStatus == 3 && item.GenerateRTPStatus == 3 && item.CloseRTPStatus == 3 && item.TransportationMode == "Inside Railway Siding")
+                                                            {
+                                                                <span class=command style='color:red'>RTP Closed</span>
+                                                            }
+                                                            @if (item.CloseTripStatus == 3 && item.GenerateRTPStatus == 3 && item.CloseRTPStatus == 0 && item.TransportationMode == "Road-Rail")
+                                                            {
+                                                                <span class=command style='color:red'>Dispatch Started</span>
+                                                            }
+                                                            @if (item.GenerateRTPStatus == 3 && item.CloseRTPStatus == 1 && item.TransportationMode == "Road-Rail")
+                                                            {
+                                                                <span class=command style='color:red'>Dispatch Stopped</span>
+                                                            }
+                                                            @if (item.CloseTripStatus == 3 && item.GenerateRTPStatus == 3 && item.CloseRTPStatus == 3 && item.TransportationMode == "Road-Rail")
+                                                            {
+                                                                <span class=command style='color:red'>RTP Closed</span>
+                                                            }
+                                                            @if (item.GenerateRTPStatus == 1 && item.TransportationMode == "Road-Rail" && item.CloseTripStatus == 1)
+                                                            {
+                                                                <input type='button' class='btn btn-primary' onclick='return CloseForwardingTrips(@item. ForwardingNoteId )' value='Close Trip'>
+                                                            }
+                                                            @if (item.GenerateRTPStatus == 1 && item.TransportationMode == "Road-Rail" && item.NoofRTP == 1)
+                                                            {
+                                                                <input type='button' class='btn btn-primary' onclick='return ApplyRTP(@item.ForwardingNoteId )' value='Generate RTP'>
+                                                            }
+                                                            @if (item.CloseRTPStatus == 1 && item.TransportationMode == "Road-Rail")
+                                                            {
+                                                                <input type='button' class='btn btn-primary' onclick='return CloseRTP(this)' value='Close RTP'>
+                                                            }
+                                                        </td>
+
+                                                    
+                                                    </tr>
+
+                                                }
+                                            }
+
+
+                                        </tbody>
+                                    </table>
+                                </div>
+
+
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+    <!-- MAIN CONTENT AREA ENDS -->
+</section>
+
+<script>
+    excelMe = "yes"
+    pdfMe = "yes"
+
+    $(document).ready(function () {
+        loadNavigation('Generated RTP Application', 'glempprofile', 'plofficetype', 'tl', 'RTP Application', 'Generated RTP Application', ' ');
+
+        $('.searchableselect').searchableselect();
+
+        $('#datatable').DataTable();
+
+        $('.shorting-lnk').click(function () {
+            $('.shorting-lnk i').toggleClass('fa-sort-amount-up-alt fa-sort-amount-down-alt ');
+        });
+
+
+
+    });
+     function CloseForwardingTrips(id) {
+        if (confirm("Are you sure you want to close trips?")) {
+            var url = '@Url.Action("RTPPassList", "ForwardingNote")?ForwardingNoteId=' + id;
+            window.location.href = url;
+        }
+     function ApplyRTP(id) {
+        if (confirm("Are you sure you want to Generate RTP?")) {
+            var url = '@Url.Action("GenerateRTPPass", "ForwardingNote")?ForwardingNoteId=' + id;
+            window.location.href = url;
+        }
+    }
+
+     function CloseRTP(obj) {
+        var row = $(obj).closest("tr");
+        var item = $("#FwdNote").data("kendoGrid").dataItem(row);
+
+        if (item != null) {
+            DispatchedQty = item.TotalDispatchedQty;
+            ForwardingNoteID = item.ForwardingNoteId;
+        }
+
+        if (confirm("Are you sure you want to close RTP?")) {
+            var url = '@Url.Action("CloseRTPPassList", "ForwardingNote")?ForwardingNoteId=' + ForwardingNoteID;
+            window.location.href = url;
+        }
+    }
+</script>

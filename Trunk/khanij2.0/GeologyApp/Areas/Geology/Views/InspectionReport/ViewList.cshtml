@@ -1,0 +1,141 @@
+﻿@*// *********************************************************************************************************
+    //  View Name                : View
+    //  Desciption               : To View,Delete Inspection Report Details
+    //  Created By               : Lingaraj Dalai
+    //  Created On               : 01 March 2021
+    // ********************************************************************************************************
+*@
+@model GeologyEF.InspectionReportmaster
+@using GeologyApp.Web
+@{
+    ViewData["Title"] = "ViewList";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+@if (TempData["msg"] != null)
+{
+    <script>
+        swal("",'@TempData["msg"]',"success");
+    </script>
+}
+<script>
+    $(document).ready(function () {
+        loadNavigation('ViewList', 'glgeology', 'plsubinsrep', 'tl', 'Geology', 'Inspection Report', ' ');
+        $('.searchableselect').searchableselect();
+        $('.shorting-lnk').click(function () {
+            $('.shorting-lnk i').toggleClass('fa-sort-amount-up-alt fa-sort-amount-down-alt ');
+        });
+        $('.filter-dropdown').hide();
+        $('.filter-lnk').click(function () {
+            $(this).toggleClass('active');
+            $(this).siblings('.filter-dropdown').slideToggle();
+        });
+        $('.filter-btn').click(function () {
+            $(this).parent('.shorting-cell .filter-dropdown').slideUp();
+            if ($(this).parent().parent('.shorting-cell').find('.filter-lnk').hasClass('active')) {
+                $(this).parent().siblings('.filter-lnk').removeClass('active');
+            }
+        });
+        $("#excelIcon").click(function () {
+            exportTableToExcel("datatable", "text")
+        });
+    });
+</script>
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        @Html.Partial("_CMSnavigation")
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link" href="~/Geology/InspectionReport/Add">
+                                Add
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="javascript:void(0);">
+                                View
+                            </a>
+                        </li>
+                    </ul>
+                    @Html.Partial("_CMSutil")
+                    @Html.AntiForgeryToken()
+                </div>
+                <section class="box form-container">
+                    <div class="content-body">
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div id="viewtable">
+                                    <table id="table-exports" class="table table-sm table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th>Sl#</th>
+                                                <th>FPO Code</th>
+                                                <th>FPO Name</th>
+                                                <th>FPO Date</th>
+                                                <th>Exploration Season</th>
+                                                <th>Date of Inspection</th>
+                                                <th>Inspecting Officer Name</th>
+                                                <th>Inspectng Officer Designation</th>
+                                                <th>Inspecting Officer's Email Id</th>
+                                                <th class="text-center noprint">Attachment</th>
+                                                <th width="100px" class="text-center noprint">Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @{ int i = 1;
+                                            }
+                                            @foreach (var b in ViewBag.ViewList)
+                                            {
+                                                <tr>
+                                                    <td>
+                                                        @i
+                                                        @{ i++; }
+                                                    </td>
+                                                    <td>@b.FPO_Code</td>
+                                                    <td>@b.FPO_Name</td>
+                                                    <td>@b.dateofissuance</td>
+                                                    <td>@b.season</td>
+                                                    <td>@b.DateOfInspection</td>
+                                                    <td>@b.ApplicantName</td>
+                                                    <td>@b.OfficerDesignation</td>
+                                                    <td>@b.EmailId</td>
+                                                    <td class="text-center noprint">
+                                                        @if (b.FileName != null)
+                                                        {
+                                                            <a href='~/@b.FilePath' target="_blank" height='30' width='30' title="Download Attachment">
+                                                                <i class="icon-download-solid" aria-hidden="true">
+                                                                </i>
+                                                            </a>
+                                                        }
+                                                    </td>
+                                                    <td class="noprint text-center">
+                                                        @*<a href="@Url.Content("~/Geology/InspectionReport/Add/")@b.MPR_ID"
+                                                               class="text-success btn-sm" title="Edit">
+                                                                <i class="icon-pencil-alt-solid"></i>
+                                                            </a>
+                                                            <a href="@Url.Content("~/Geology/InspectionReport/Delete/")@b.MPR_ID"
+                                                               class="text-danger btn-sm" title="Delete"
+                                                               onclick="return confirm('Are you sure to delete?')"><i class="icon-trash-alt-solid"></i></a>*@
+                                                        <a href="@CustomQueryStringHelper.EncryptString("Geology","Add","InspectionReport",new {id=@b.MPR_ID })" class="text-success btn-sm" title="Edit">
+                                                            <i class="icon-pencil-alt-solid"></i>
+                                                        </a>
+                                                        <a href="@CustomQueryStringHelper.EncryptString("Geology","Delete","InspectionReport",new {id=@b.MPR_ID })" class="text-danger btn-sm" title="Delete"
+                                                           onclick="return confirm('Are you sure to delete?')">
+                                                            <i class="icon-trash-alt-solid"></i>
+                                                        </a>
+                                                    </td>
+                                                </tr>
+                                            }
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+</section>
+

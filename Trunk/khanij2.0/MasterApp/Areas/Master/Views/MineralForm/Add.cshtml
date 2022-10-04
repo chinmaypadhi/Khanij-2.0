@@ -1,0 +1,201 @@
+﻿@model MasterEF.MineralNatureModel
+@using MasterEF
+@{
+    ViewData["Title"] = "Add";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+
+@if (ViewBag.msg != null)
+{
+    <script>
+
+ swal("",'@ViewBag.msg',"success");
+    </script>
+}
+@if (TempData["msg"] != null)
+{
+    <script>
+        swal("",'@TempData["msg"]',"success");
+    </script>
+}
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        @Html.Partial("_CMSnavigation")
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item"><a class="nav-link active" href="/Master/MineralForm/Add">Add</a></li>
+                        <li class="nav-item"><a class="nav-link" href="/Master/MineralForm/ViewList">View </a></li>
+                    </ul>
+                    @Html.Partial("_CMSutil")
+                </div>
+                <section class="box form-container">
+                    <div class="content-body">
+                        <form action="Add" method="post" autocomplete="off">
+                            @Html.AntiForgeryToken()
+                            <div class="row">
+                                <div class="col-lg-6 col-12">
+                                    <div class="form-group row">
+                                        <label for="inputLoginId" class="col-sm-4 col-form-label">Mineral Category  <span class="text-danger">*</span></label>
+                                        <div class="col-sm-7">
+                                            <select id="MineralTypeId" name="MineralTypeId" class="form-control searchableselect" title="Mineral Category">
+                                                <option value="">Select</option>
+                                                @{
+                                                    List<MineralGradeModel> listMineralType = (List<MineralGradeModel>)ViewData["MineralCategory"];
+                                                    if (listMineralType != null)
+                                                    {
+                                                        foreach (var item in listMineralType)
+                                                        {
+                                                            if (item.MineralTypeId == Model.MineralTypeId)
+                                                            {
+                                                                <option selected="selected" value="@item.MineralTypeId">@item.MineralTypeName</option>
+                                                            }
+                                                            else
+                                                            {
+                                                                <option value="@item.MineralTypeId">@item.MineralTypeName</option>
+                                                            }
+
+                                                        }
+                                                    }
+                                                }
+                                            </select>
+                                            <span class="text-danger">@Html.ValidationMessageFor(m => m.MineralTypeId)</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 col-12">
+                                    <div class="form-group row">
+                                        <label for="dropdownDepart" class="col-sm-4 col-form-label">Mineral Name <span class="text-danger">*</span></label>
+                                        <div class="col-sm-7">
+                                            <select id="MineralId" name="MineralId" class="form-control searchableselect" title="Mineral Name">
+                                                <option value="">Select</option>
+                                                @{
+                                                    List<MineralGradeModel> listMineralName = (List<MineralGradeModel>)ViewData["MineralName"];
+                                                    if (listMineralName != null)
+                                                    {
+                                                        foreach (var item in listMineralName)
+                                                        {
+                                                            if (item.MineralId == Model.MineralId)
+                                                            {
+                                                                <option selected="selected" value="@item.MineralId">@item.MineralName</option>
+                                                            }
+                                                            else
+                                                            {
+                                                                <option value="@item.MineralId">@item.MineralName</option>
+                                                            }
+
+                                                        }
+                                                    }
+                                                }
+                                            </select>
+                                            <span class="text-danger">@Html.ValidationMessageFor(m => m.MineralId)</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 col-12">
+                                    <div class="form-group row">
+                                        <label for="dropdownDepart" class="col-sm-4 col-form-label">Mineral Form  <span class="text-danger">*</span></label>
+                                        <div class="col-sm-7">
+                                            <input type="text" maxlength="50" id="txtMineralNatureName" name="MineralNature" title="Mineral Form" value="@Model.MineralNature" class="form-control" Onkeypress="return inputLimiter(event,'NameCharactersAndNumbers')" />
+                                            <input type="hidden" id="hdnMineralNatureId" name="MineralNatureId" value="@Model.MineralNatureId" />
+                                            <span class="text-danger">@Html.ValidationMessageFor(m => m.MineralNature)</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 col-12">
+                                    <div class="form-group row">
+                                        <label for="inputName" class="col-sm-4 col-form-label">Status <span class="text-danger">*</span></label>
+                                        <div class="col-sm-7">
+                                            <div class="py-2">
+                                                @Html.RadioButtonFor(n => n.IsActive, true, new { @checked = true, @class = "custom-radio", id = "Rdbtn_Active" })
+                                                <label class="radio-label">Active</label>
+                                                @Html.RadioButtonFor(n => n.IsActive, false, new { @class = "custom-radio", id = "Rdbtn_Inactive" })
+                                                <label class="radio-label">Inactive</label>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6 offset-lg-2 offset-md-4">
+                                    <input type="submit" value='@ViewBag.Button' class="btn btn-primary btn-md ml-0" name="Submit" id="Submit" />
+                                    <a href="/Master/MineralForm/Add" class="btn btn-danger btn-md">Reset</a>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+    <!-- MAIN CONTENT AREA ENDS -->
+</section>
+<input type="hidden" id="hdnMineralTypeId" value="@Model.MineralTypeId" />
+<input type="hidden" id="hdnMineralId" value="@Model.MineralId" />
+<script>
+    indicateMe = "yes"
+    $(document).ready(function () {
+        $('.searchableselect').searchableselect();
+        debugger;
+        loadNavigation('Add', 'glRoleRes', 'plUser', 'tl', 'Master', 'Mineral Form', ' ');
+        //--------------
+        if ($('#hdnMineralTypeId').val() != "") {
+            $('#MineralTypeId').val($('#hdnMineralTypeId').val());
+        }
+        if ($('#hdnMineralId').val() != "") {
+            $('#MineralId').val($('#hdnMineralId').val());
+        }
+        //---------------
+        $("#Submit").click(function () {
+            debugger;
+            if ($('#MineralTypeId').val() == "") {
+                swal("", "Please Select Mineral Category", "warning");
+                $("#MineralTypeId").focus();
+                return false;
+            }
+
+            if ($('#MineralId').val() == "") {
+                swal("", "Please Select Mineral", "warning");
+                $("#MineralId").focus();
+                return false;
+            }
+
+            if ($('#txtMineralNatureName').val() == "") {
+                swal("", "Please Enter Mineral Form", "warning");
+                $("#txtMineralNatureName").focus();
+                return false;
+            }
+
+        });
+        //------------On Mineral Category Change Bind Mineral Name--
+        $('#MineralTypeId').change(function () {
+            debugger;
+            if ($('#MineralTypeId').val() != "") {
+                $.ajax({
+                    type: "post",
+                    url: "/Master/MineralGrade/GetMineralMasterDataByMineralTypeId",
+                    data: { 'mineralType': $('#MineralTypeId').val() },
+                    datatype: "json",
+                    traditional: true,
+                    success: function (data) {
+                        debugger;
+                        $('#MineralId').html('');
+                        $('#MineralId').append('<option value="">Select Mineral Name</option>');
+                        $.each(data, function (ind, item) {
+                            $('#MineralId').append('<option value="' + item.mineralId + '">' + item.mineralName + '</option>');
+                        });
+                    }
+                });
+            }
+            else {
+                $('#MineralId').html('');
+                $('#MineralId').append('<option value="">Select Mineral Name</option>');
+            }
+        });
+        //------------End Here--------
+    });
+
+
+
+</script>

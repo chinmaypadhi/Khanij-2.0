@@ -1,0 +1,243 @@
+﻿@*// *********************************************************************************************************
+    //  View Name                : ExecuteQuery
+    //  Desciption               : Execute Query Details in view
+    //  Created By               : Lingaraj Dalai
+    //  Created On               : 30 Nov 2021
+    // ********************************************************************************************************
+*@
+@model HomeEF.QuerybuilderModel
+@{
+    ViewData["Title"] = "ExecuteQuery";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+<style>
+    th, td, p, input {
+        font: 14px Verdana;
+    }
+
+    table, th, td {
+        border: solid 1px #DDD;
+        border-collapse: collapse;
+        padding: 2px 3px;
+        text-align: left;
+    }
+
+    th {
+        font-weight: bold;
+    }
+
+    .tableFixHead {
+        overflow-y: auto;
+    }
+
+        .tableFixHead thead th {
+            position: sticky;
+            top: 0;
+        }
+
+    /* Just common table stuff. Really. */
+    table {
+        border-collapse: collapse;
+        width: 100%;
+    }
+
+    th, td {
+        padding: 8px 16px;
+    }
+
+    th {
+        background: #eee;
+    }
+</style>
+@if (TempData["Message"] != null)
+{
+    <script>
+        var vv = '@TempData["Message"]';
+        if (vv == 1) {
+            swal("", "Execute successfully.", "success");
+        }
+        else if (vv == 2){
+            swal("", "Please enter Valid Password !!", "warning");
+        }
+        else  {
+            swal("", "Something Errror occured. Please Try After Sometime!!", "error");
+        }
+
+    </script>
+}
+<script>
+    indicateMe = "yes"
+    $(document).ready(function () {
+        loadNavigation('ExecuteQuery', 'glhelpdesk', 'plraiseticket', 'tl', 'CMS', 'Execute Query', ' ');
+    });
+</script>
+<script>
+    function OnSubmit() {
+        var Payid = $("#txtUPwd").val();
+        var type;
+        if (!blankFieldValidation("txtqry", "Query")) {
+            return false;
+        }
+        else if (!blankFieldValidation("txtUPwd","Password")) {
+            return false;
+        }
+        var radioValue = $("input[name='qtype']:checked").val();
+        if (radioValue == 1) {
+            type = "Select";
+        }
+        else if (radioValue == 2) {
+            type = "Update";
+        }
+        var str1 = (document.getElementById("txtqry").value).toUpperCase();
+        var str2 = "DROP";var str3 = "TRUNCATE";
+        if (str1.indexOf(str2) != -1 || str1.indexOf(str3) != -1) {
+            swal("", "Restricted Command !!", "warning");
+            return false;
+        }
+        $(document).ready(function () {          
+            try {
+                $.ajax({
+                    type: "POST",
+                    url: '@Url.Action("GetData")',
+                    data: {
+                        "qry": document.getElementById("txtqry").value,
+                        "Payid": Payid,
+                        "qrytype": radioValue,
+                    },
+                    dataType: "json",
+                    success: function (result) {
+                        if (result == "2") {
+                            swal("", "Please enter Valid Password !!", "warning");
+                            document.getElementById("showData").innerHTML="";
+                            return false;
+                        }
+                        else if (result == "No rows found!")
+                        {
+                            var table = document.createElement("table");
+                            var th = document.createElement("th");
+                            var tr = table.insertRow(-1);
+                            th.innerHTML = result;
+                            tr.appendChild(th);
+                            var divContainer = document.getElementById("showData");
+                            divContainer.innerHTML = "";
+                            divContainer.appendChild(table);
+                        }
+                        else {
+                            if (radioValue == 1) {                               
+                                debugger;
+                                var obj = $.parseJSON(result);
+                                var col = [];
+                                for (var i = 0; i < obj.length; i++) {
+                                    for (var key in obj[i]) {
+                                        if (col.indexOf(key) === -1) {
+                                            col.push(key);
+                                        }
+                                    }
+                                }
+                                // CREATE DYNAMIC TABLE.
+                                var table = document.createElement("table");
+                                // CREATE HTML TABLE HEADER ROW USING THE EXTRACTED HEADERS ABOVE.
+                                var tr = table.insertRow(-1);                   // TABLE ROW.
+                                for (var i = 0; i < col.length; i++) {
+                                    var th = document.createElement("th");      // TABLE HEADER.
+                                    th.innerHTML = col[i];
+                                    tr.appendChild(th);
+                                }
+                                // ADD JSON DATA TO THE TABLE AS ROWS.
+                                for (var i = 0; i < obj.length; i++) {
+                                    tr = table.insertRow(-1);
+                                    for (var j = 0; j < col.length; j++) {
+                                        var tabCell = tr.insertCell(-1);
+                                        tabCell.innerHTML = obj[i][col[j]];
+                                    }
+                                }
+                                // FINALLY ADD THE NEWLY CREATED TABLE WITH JSON DATA TO A CONTAINER.
+                                var divContainer = document.getElementById("showData");
+                                divContainer.innerHTML = "";
+                                divContainer.appendChild(table);
+                            }
+                            else {
+                                debugger;
+                                var val1 = result + ' Rows Affected';
+                                var table = document.createElement("table");
+                                var th = document.createElement("th");
+                                var tr = table.insertRow(-1);
+                                th.innerHTML = val1;
+                                tr.appendChild(th);
+                                var divContainer = document.getElementById("showData");
+                                divContainer.innerHTML = "";
+                                divContainer.appendChild(table);
+                            }
+                        }
+                    },
+                    error: function (jqxhr, status, exception) {
+                        swal("",'Exception:', exception.alert,"error");
+                    }
+                });
+            }
+            catch (e) {
+
+            }
+        });
+    }
+</script>
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        @Html.Partial("_navigation")
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="javascript:void(0);">
+                                Update Query In Database
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                <section class="box form-container">
+                    <div class="content-body">
+                        <div class="row">
+                            <div class="col-lg-4  col-md-8">
+                                <label class="col-form-label">Select Query Type</label>
+                                <div class="form-group">
+                                    <input type="radio" name="qtype" value="1" checked>
+                                    View
+                                    <input type="radio" name="qtype" value="2">
+                                    Update
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <label class="col-form-label">Query <span class="text-danger">*</span></label>
+                                <div class="form-group">
+                                    @Html.TextAreaFor(m => m.VCH_QUERY_TEXT, new { @class = "form-control", @autofocus = "autofocus", @width = "400", @rows = "6", @id = "txtqry", @placeholder = "Enter Query" })
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-4 col-md-4">
+                                <label class="col-form-label">Enter Password <span class="text-danger">*</span></label>
+                                <div class="form-group">
+                                    <input type="password" class="form-control" id="txtUPwd">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12 col-sm-12">
+                                <input type="button" title="Execute  Query" value="Execute Query" id="btnSave" class="btn btn-primary" onclick="return OnSubmit();" />
+                                <a href="~/website/Qbuilder/ExecuteQuery" class="btn btn-danger btn-md ml-0 waves-effect waves-light btncancel">Cancel</a>
+                            </div>
+                        </div>
+                        <div class="row" style="margin-top: 10px;">
+                            <p id="showData" class="tableFixHead"></p>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+    <!-- MAIN CONTENT AREA ENDS -->
+</section>

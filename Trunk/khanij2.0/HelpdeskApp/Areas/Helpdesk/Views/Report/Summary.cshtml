@@ -1,0 +1,577 @@
+﻿@model HelpDeskEF.RaiseTicket
+@{
+    ViewData["Title"] = "Summary";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+<style>
+    .summary-details {
+        height: 256px;
+        overflow-y: auto;
+        padding: 15px;
+    }
+
+
+        .summary-details ul li {
+            list-style-type: none;
+            padding: 10px 0;
+            font-size: 15px;
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 1px dashed var(--input-border);
+            color: var(--font-color);
+        }
+
+            .summary-details ul li a {
+                font-size: 20px;
+                font-weight: 700
+            }
+
+    .report-summary-card {
+        border: 1px solid var(--input-border);
+        margin-bottom: 1rem;
+        border-radius: 5px;
+        overflow: hidden;
+    }
+
+    .report-summary-card-header {
+        padding: 10px 15px;
+        border-bottom: 1px solid var(--input-border);
+        color: #4e4e4e;
+    }
+
+    .report-summary-card h5 {
+        font-size: 18px;
+        margin: 0;
+        font-weight: 600;
+        color: var(--gray);
+    }
+</style>
+<script>
+    $(document).ready(function () {
+        loadNavigation('Add', 'glRoleRes', 'plUser', 'tl', 'Helpdesk', 'Summary', ' ');
+    });
+</script>
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        @Html.Partial("_CMSnavigation")
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="javascript:void(0);">
+                                Summary Report
+                            </a>
+                        </li>
+                    </ul>
+                    @Html.Partial("_CMSutil")
+                </div>
+                <section class="box form-container">
+                    <div class="searchform px-3 py-3">
+                        <div class="row">
+                            <div class="col-sm-12">
+                                @*<form asp-action="Summary" asp-controller="Report" method="post" enctype="multipart/form-data">*@
+                                <div class="row align-items-lg-center">
+                                    <label class="col-lg-1 col-md-4 col-sm-12 col-form-label">From Date</label>
+                                    <div class="col-lg-3 col-md-6 col-sm-12 mb-lg-0 mb-3">
+                                        <div class="input-group">
+                                            <input type="text" class="form-control datetime" name="fromdate" id="fromdate" />
+                                            <div class="input-group-prepend">
+                                                <label class="input-group-text" for="fromdate"><i class="icon-calendar-alt-solid"></i></label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <label class="col-lg-1 col-md-4 col-sm-12 col-form-label">To Date</label>
+                                    <div class="col-lg-3 col-md-6 col-sm-12 mb-lg-0 mb-3">
+                                        <div class="input-group">
+                                            <input type="text" class="form-control datetime" name="todate" id="todate" />
+                                            <div class="input-group-prepend">
+                                                <label class="input-group-text" for="todate"><i class="icon-calendar-alt-solid"></i></label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <label class="col-lg-1 col-md-4 col-sm-12 col-form-label" style="display:none;">Issue status</label>
+                                    <div class="col-lg-2 col-md-6 col-sm-12 mb-lg-0 mb-3" style="display:none;">
+                                        @Html.DropDownListFor(model => model.IssueStatus, new List<SelectListItem>
+                                        {
+                                            new SelectListItem{ Text="Select", Value = "" },
+                                            new SelectListItem{ Text="Pending", Value = "Pending" },
+                                            new SelectListItem{ Text="Closed", Value = "Closed" },
+                                            new SelectListItem{ Text="Total Issued", Value = "Total Issued" },
+                                         }, new { @class = "form-control", autofocus = "autofocus" })
+                                    </div>
+                                    <div class="col-sm-2">
+                                        <button class="btn btn-sm btn-success m-0" id="btnShow" onclick="getIssueSummaryReports();">Search</button>
+                                    </div>
+                                </div>
+                                @*</form>*@
+                            </div>
+                        </div>
+                    </div>
+                    <div class="content-body">
+                        <div class="report-summary mt-4">
+                            <div class="row">
+                                <div class="col-lg-4 col-md-6 col-sm-12">
+                                    <div class="report-summary-card">
+                                        <div class="report-summary-card-header"> <h5>HDS Summary</h5></div>
+                                        <div class="summary-details" id="HDSSummary"></div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-4 col-md-6 col-sm-12">
+                                    <div class="report-summary-card">
+                                        <div class="report-summary-card-header"> <h5>Software Issues</h5></div>
+                                        <div class="summary-details" id="SoftwareIssues">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-4 col-md-6 col-sm-12">
+                                    <div class="report-summary-card">
+                                        <div class="report-summary-card-header"> <h5>Hardware Issues</h5></div>
+                                        <div class="summary-details" id="HardwareIssues">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-4 col-md-6 col-sm-12">
+                                    <div class="report-summary-card">
+                                        <div class="report-summary-card-header"> <h5>Network Calls</h5></div>
+                                        <div class="summary-details" id="NetworkIssues">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-4 col-md-6 col-sm-12">
+                                    <div class="report-summary-card">
+                                        <div class="report-summary-card-header"> <h5>Other</h5></div>
+                                        <div class="summary-details" id="OtherIssues">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-4 col-md-6 col-sm-12">
+                                    <div class="report-summary-card">
+                                        <div class="report-summary-card-header"> <h5>Status wise Summary</h5></div>
+                                        <div class="summary-details" id="StatusSummary">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row d-none">
+                            <div class="table-responsive col-md-4">
+                                <table border="1" role="grid" class="table-se" style="width:100%">
+                                    <thead style="background-color: #CC6600">
+                                        <tr>
+                                            <td>Khanij Online HDS Summary</td>
+                                            <td id="SelectedDate">TOTAL</td>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="HDSSummary">
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="table-responsive col-md-4">
+                                <table border="1" role="grid" class="table-se" style="width:100%">
+                                    <thead style="background-color: #CC6600">
+                                        <tr>
+                                            <td>SOFTWARE ISSUES</td>
+                                            <td id="SelectedDate">TOTAL</td>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="SoftwareIssues">
+                                        <tr>
+                                            <td>Issue Logged</td>
+                                            <td>
+                                                <a target="_blank" href="/KhanijTest/HelpDesk/Report/LocationWiseDetailsReport?Type=Logged&amp;FromDate=&amp;ToDate=">13073</a>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>Total Call Resolved</td>
+                                            <td><a target="_blank" href="/KhanijTest/HelpDesk/Report/LocationWiseDetailsReport?Type=Resolved_Issues_On_Same_Day&amp;FromDate=&amp;ToDate=">8239</a></td>
+                                        </tr>
+                                        <tr>
+                                            <td>Current Open Issue</td>
+                                            <td>0</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="table-responsive col-md-4">
+                                <table border="1" role="grid" class="table-se" style="width:100%">
+                                    <thead style="background-color: #CC6600">
+                                        <tr>
+                                            <td>HARDWARE ISSUES</td>
+                                            <td>TOTAL</td>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="HardwareIssues"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div style="height:10px"></div>
+                        <div class="row d-none">
+                            <div class="table-responsive col-md-4">
+                                <table border="1" role="grid" class="table-se" style="width:100%">
+                                    <thead style="background-color: #CC6600">
+                                        <tr>
+                                            <td>NETWORK CALLS</td>
+                                            <td id="SelectedDate">TOTAL</td>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="NetworkIssues">
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="table-responsive col-md-4">
+                                <table border="1" role="grid" class="table-se" style="width:100%">
+                                    <thead style="background-color: #CC6600">
+                                        <tr>
+                                            <td>OTHER</td>
+                                            <td id="SelectedDate">TOTAL</td>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="OtherIssues"></tbody>
+                                </table>
+                            </div>
+                            <div class="table-responsive col-md-4">
+                                <table border="1" role="grid" class="table-se" style="width:100%">
+                                    <thead style="background-color: #CC6600">
+                                        <tr>
+                                            <td>Status Wise Summary</td>
+                                            <td id="SelectedDate">TOTAL</td>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="StatusSummary"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+</section>
+<script>
+    $(document).ready(function () {
+        $('.datetime').datetimepicker({
+            format: 'LT',
+            format: "DD/MM/YYYY",
+            daysOfWeekDisabled: [],
+            minDate: firstDay,
+            widgetPositioning: {
+                horizontal: 'auto',
+                vertical: 'bottom'
+            }
+        }).keydown(false);
+        var today = new Date();
+        var mm = today.getMonth() + 1; //January is 0!
+        var yyyy = today.getFullYear();
+        if (mm < 10) {
+            mm = '0' + mm;
+        }
+        var firstDay = '01' + '/' + mm + '/' + yyyy;
+        $("#fromdate").val(firstDay);
+        $("#IssueStatus").val('Pending');
+        getIssueSummaryReports();
+    });
+    function getIssueSummaryReports() {
+        var today = new Date();
+        var dd = today.getDate();
+        var mm = today.getMonth() + 1; //January is 0!
+        var yyyy = today.getFullYear();
+        if (dd < 10) {
+            dd = '0' + dd;
+        }
+        if (mm < 10) {
+            mm = '0' + mm;
+        }
+        var today = dd + '/' + mm + '/' + yyyy;
+        var FDate = $("#fromdate").val();
+        var TDate = $("#todate").val();
+        $.ajax({
+            type: "GET",
+            url: '@Url.Action("GetIssuesSummaryTables", "Report", new { Area = "HelpDesk" })',
+            data: { FromDate: FDate, ToDate: TDate, IssueStatus: $("#IssueStatus").val()},
+            contentType: "application/json; charset=utf-8",
+            dataType: "JSON",
+            success: function (result) {
+                debugger;
+                $("#IssueStatusSummary").empty();
+                $("#SoftwareIssues").empty();
+                $("#HardwareIssues").empty();
+                $("#NetworkIssues").empty();
+                $("#OtherIssues").empty();
+                $("#HDSSummary").empty();
+                $("#StatusSummary").empty();
+                if (result != null) {
+                    if (result.SOFTWARE_ISSUES != null) {
+                        debugger;
+                        for (i = 0; i < result.SOFTWARE_ISSUES.length; i++) {
+                            //$('#SoftwareIssues').append('<tr><td>' + result.SOFTWARE_ISSUES[i].Header + '</td><td>' + (result.SOFTWARE_ISSUES[i].Total) + '</td></tr>');
+                            if (result.SOFTWARE_ISSUES[i].Header == "Issue Logged") {
+                                if (result.SOFTWARE_ISSUES[i].Total != 0) {
+                                    @*$('#SoftwareIssues').append('<ul class="p-0 mb-0"><li><span>Issue Logged</span><span><a target="_blank" href="' + '@Url.Action("LocationWiseDetailsReport", "Report", new { Area = "HelpDesk" })' + '?Type=SoftwareIssuesLogged&FromDate=' + FDate + '&ToDate=' + TDate + '" data-original-title="" class="text-primary" title="">' + result.softwarE_ISSUES[i].Total + '</a></span></li></ul>');*@
+                                    $('#SoftwareIssues').append('<ul class="p-0 mb-0"><li><span>Issue Logged</span><span><a target="_blank" href="' + result.SoftwareIssueLoggedEncryptUrl + '" data-original-title="" class="text-primary" title="">' + result.SOFTWARE_ISSUES[i].Total + '</a></span></li></ul>');
+                                }
+                                else {
+                                    $('#SoftwareIssues').append('<ul class="p-0 mb-0"><li><span>' + result.SOFTWARE_ISSUES[i].Header + '</span><span class="text-primary">' + (result.SOFTWARE_ISSUES[i].Total) + '</span></li></ul>');
+                                }
+                                //$('#SoftwareIssues').append('</li>');
+                            }
+                            else if (result.SOFTWARE_ISSUES[i].Header == "Total Call Resolved") {
+                                if (result.SOFTWARE_ISSUES[i].Total != 0) {
+                                    @*$('#SoftwareIssues').append('<ul class="p-0 mb-0"><li><span>' + result.SOFTWARE_ISSUES[i].Header + '</span><span><a target="_blank" href="' + '@Url.Action("LocationWiseDetailsReport", "Report", new { Area = "HelpDesk" })' + '?Type=SoftwareIssuesTotalCallResolved&FromDate=' + FDate + '&ToDate=' + TDate + '" data-original-title="" class="text-success" title="">' + result.SOFTWARE_ISSUES[i].Total + '</a></span></li></ul>');*@
+                                    $('#SoftwareIssues').append('<ul class="p-0 mb-0"><li><span>' + result.SOFTWARE_ISSUES[i].Header + '</span><span><a target="_blank" href="' + result.SoftwareIssuesTotalCallResolvedEncryptUrl + '" data-original-title="" class="text-success" title="">' + result.SOFTWARE_ISSUES[i].Total + '</a></span></li></ul>');
+                                }
+                                else {
+                                    $('#SoftwareIssues').append('<ul class="p-0 mb-0"><li><span>' + result.SOFTWARE_ISSUES[i].Header + '</span><span class="text-success">' + (result.SOFTWARE_ISSUES[i].Total) + '</span></li></ul>');
+                                }
+                            }
+                            else if (result.SOFTWARE_ISSUES[i].Header == "Current Open Issue") {
+                                if (result.SOFTWARE_ISSUES[i].Total != 0) {
+                                    @*$('#SoftwareIssues').append('<ul class="p-0 mb-0"><li><span>' + result.SOFTWARE_ISSUES[i].Header + '</span><span><a target="_blank" href="' + '@Url.Action("LocationWiseDetailsReport", "Report", new { Area = "HelpDesk" })' + '?Type=SoftwareCurrentOpenIssue&FromDate=' + FDate + '&ToDate=' + TDate + '" data-original-title="" class="text-info" title="">' + result.SOFTWARE_ISSUES[i].Total + '</a></span></li></ul>');*@
+                                    $('#SoftwareIssues').append('<ul class="p-0 mb-0"><li><span>' + result.SOFTWARE_ISSUES[i].Header + '</span><span><a target="_blank" href="' + result.SoftwareCurrentOpenIssueEncryptUrl + '" data-original-title="" class="text-info" title="">' + result.SOFTWARE_ISSUES[i].Total + '</a></span></li></ul>');
+                                }
+                                else {
+                                    $('#SoftwareIssues').append('<ul class="p-0 mb-0"><li><span>' + result.SOFTWARE_ISSUES[i].Header + '</span><span class="text-info">' + (result.SOFTWARE_ISSUES[i].Total) + '</span></li></ul>');
+                                }
+                            }
+                        }
+                    }
+                    if (result.HARDWARE_ISSUES != null) {
+                        debugger;
+                        for (i = 0; i < result.HARDWARE_ISSUES.length; i++) {
+
+                            if (result.HARDWARE_ISSUES[i].Header == "Issue Logged") {
+                                if (result.HARDWARE_ISSUES[i].Total != 0) {
+                                    @*$('#HardwareIssues').append('<ul class="p-0 mb-0"><li><span>' + result.HARDWARE_ISSUES[i].Header + '</span><span><a target="_blank" href="' + '@Url.Action("LocationWiseDetailsReport", "Report", new { Area = "HelpDesk" })' + '?Type=HardwareIssues&FromDate=' + FDate + '&ToDate=' + TDate + '" data-original-title="" class="text-primary" title="">' + result.HARDWARE_ISSUES[i].Total + '</a></span></li></ul>');*@
+                                    $('#HardwareIssues').append('<ul class="p-0 mb-0"><li><span>' + result.HARDWARE_ISSUES[i].Header + '</span><span><a target="_blank" href="' + result.HardwareIssuesEncryptUrl + '" data-original-title="" class="text-primary" title="">' + result.HARDWARE_ISSUES[i].Total + '</a></span></li></ul>');
+                                }
+                                else {
+                                    $('#HardwareIssues').append('<ul class="p-0 mb-0"><li><span>' + result.HARDWARE_ISSUES[i].Header + '</span><span class="text-primary">' + (result.HARDWARE_ISSUES[i].Total) + '</span></li></ul>');
+                                }
+                            }
+                            else if (result.HARDWARE_ISSUES[i].Header == "Total Issues Resolved") {
+                                if (result.HARDWARE_ISSUES[i].Total != 0) {
+                                    @*$('#HardwareIssues').append('<ul class="p-0 mb-0"><li><span>' + result.HARDWARE_ISSUES[i].Header + '</span><span><a target="_blank" href="' + '@Url.Action("LocationWiseDetailsReport", "Report", new { Area = "HelpDesk" })' + '?Type=HardwareTotalIssuesResolved&FromDate=' + FDate + '&ToDate=' + TDate + '" data-original-title="" class="text-success" title="">' + result.HARDWARE_ISSUES[i].Total + '</a></span></li></ul>');*@
+                                    $('#HardwareIssues').append('<ul class="p-0 mb-0"><li><span>' + result.HARDWARE_ISSUES[i].Header + '</span><span><a target="_blank" href="' + result.HardwareTotalIssuesResolvedEncryptUrl + '" data-original-title="" class="text-success" title="">' + result.HARDWARE_ISSUES[i].Total + '</a></span></li></ul>');
+                                }
+                                else {
+                                    $('#HardwareIssues').append('<ul class="p-0 mb-0"><li><span>' + result.HARDWARE_ISSUES[i].Header + '</span><span class="text-success">' + (result.HARDWARE_ISSUES[i].Total) + '</span></li></ul>');
+
+                                }
+                            }
+                            else if (result.HARDWARE_ISSUES[i].Header == "Current Open Issue") {
+                                if (result.HARDWARE_ISSUES[i].Total != 0) {
+                                    @*$('#HardwareIssues').append('<ul class="p-0 mb-0"><li><span>' + result.HARDWARE_ISSUES[i].Header + '</span><span><a target="_blank" href="' + '@Url.Action("LocationWiseDetailsReport", "Report", new { Area = "HelpDesk" })' + '?Type=HardwareCurrentOpenIssue&FromDate=' + FDate + '&ToDate=' + TDate + '" data-original-title="" class="text-info" title="">' + result.HARDWARE_ISSUES[i].Total + '</a></span></li></ul>');*@
+                                    $('#HardwareIssues').append('<ul class="p-0 mb-0"><li><span>' + result.HARDWARE_ISSUES[i].Header + '</span><span><a target="_blank" href="' + result.HardwareCurrentOpenIssueEncryptUrl + '" data-original-title="" class="text-info" title="">' + result.HARDWARE_ISSUES[i].Total + '</a></span></li></ul>');
+
+                                }
+                                else {
+                                    $('#HardwareIssues').append('<ul class="p-0 mb-0"><li><span>' + result.HARDWARE_ISSUES[i].Header + '</span><span class="text-info">' + (result.HARDWARE_ISSUES[i].Total) + '</span></li></ul>');
+
+                                }
+                            }
+                        }
+                    }
+                    if (result.NETWORK_CALLS != null) {
+                        debugger;
+                        for (i = 0; i < result.NETWORK_CALLS.length; i++) {
+
+                            if (result.NETWORK_CALLS[i].Header == "Internet Connectivity at User Side") {
+                                if (result.NETWORK_CALLS[i].Total != 0) {
+                                    @*$('#NetworkIssues').append('<ul class="p-0 mb-0"><li><span>' + result.NETWORK_CALLS[i].Header + '</span><span><a target="_blank" href="' + '@Url.Action("LocationWiseDetailsReport", "Report", new { Area = "HelpDesk" })' + '?Type=NetworkInternetConnectivityAtUserSide&FromDate=' + FDate + '&ToDate=' + TDate + '" data-original-title="" class="text-primary" title="">' + result.NETWORK_CALLS[i].Total + '</a></span></li></ul>');*@
+                                    //$('#NetworkIssues').append('<tr><td style="font-weight:bold;">' + result.NETWORK_CALLS[i].Header + '</td><td><a target=_blank  href="' + '@Url.Action("LocationWiseDetailsReport", "Report", new { Area = "HelpDesk" })' + '?Type=NetworkInternetConnectivityAtUserSide&FromDate=' + FDate + '&ToDate=' + TDate + '">' + (result.NETWORK_CALLS[i].Total) + '</a></td></tr>');
+                                    $('#NetworkIssues').append('<ul class="p-0 mb-0"><li><span>' + result.NETWORK_CALLS[i].Header + '</span><span><a target="_blank" href="' + result.NetworkInternetConnectivityAtUserSideEncryptUrl + '" data-original-title="" class="text-primary" title="">' + result.NETWORK_CALLS[i].Total + '</a></span></li></ul>');
+                                }
+                                else {
+                                    $('#NetworkIssues').append('<ul class="p-0 mb-0"><li><span>' + result.NETWORK_CALLS[i].Header + '</span><span class="text-primary">' + (result.NETWORK_CALLS[i].Total) + '</span></li></ul>');
+                                }
+                            }
+                            else if (result.NETWORK_CALLS[i].Header == "Server Down") {
+                                if (result.NETWORK_CALLS[i].Total != 0) {
+                                    @*$('#NetworkIssues').append('<ul class="p-0 mb-0"><li><span>' + result.NETWORK_CALLS[i].Header + '</span><span><a target="_blank" href="' + '@Url.Action("LocationWiseDetailsReport", "Report", new { Area = "HelpDesk" })' + '?Type=NetworkServerDown&FromDate=' + FDate + '&ToDate=' + TDate + '" data-original-title="" class="text-success" title="">' + result.NETWORK_CALLS[i].Total + '</a></span></li></ul>');*@
+                                    //$('#NetworkIssues').append('<tr><td style="font-weight:bold;">' + result.NETWORK_CALLS[i].Header + '</td><td><a target=_blank  href="' + '@Url.Action("LocationWiseDetailsReport", "Report", new { Area = "HelpDesk" })' + '?Type=NetworkServerDown&FromDate=' + FDate + '&ToDate=' + TDate + '">' + (result.NETWORK_CALLS[i].Total) + '</a></td></tr>');
+                                    $('#NetworkIssues').append('<ul class="p-0 mb-0"><li><span>' + result.NETWORK_CALLS[i].Header + '</span><span><a target="_blank" href="' + result.NetworkServerDownEncryptUrl + '" data-original-title="" class="text-success" title="">' + result.NETWORK_CALLS[i].Total + '</a></span></li></ul>');
+                                }
+                                else {
+                                    $('#NetworkIssues').append('<ul class="p-0 mb-0"><li><span>' + result.NETWORK_CALLS[i].Header + '</span><span class="text-success">' + (result.NETWORK_CALLS[i].Total) + '</span></li></ul>');
+
+                                }
+                            }
+                        }
+                    }
+                    if (result.OTHERS != null) {
+                        for (i = 0; i < result.OTHERS.length; i++) {
+                            //$('#OtherIssues').append('<tr><td>' + result.OTHERS[i].Header + '</td><td>' + (result.OTHERS[i].Total) + '</td></tr>');
+                            if (result.OTHERS[i].Total != 0) {
+                                @*$('#OtherIssues').append('<ul class="p-0 mb-0"><li><span>' + result.OTHERS[i].Header + '</span><span><a target="_blank" href="' + '@Url.Action("LocationWiseDetailsReport", "Report", new { Area = "HelpDesk" })' + '?Type=OtherIssues&FromDate=' + FDate + '&ToDate=' + TDate + '" data-original-title="" class="text-success" title="">' + result.OTHERS[i].Total + '</a></span></li></ul>');*@
+                                //$('#OtherIssues').append('<tr><td style="font-weight:bold;">' + result.OTHERS[i].Header + '</td><td><a target=_blank  href="' + '@Url.Action("LocationWiseDetailsReport", "Report", new { Area = "HelpDesk" })' + '?Type=OtherIssues&FromDate=' + FDate + '&ToDate=' + TDate + '">' + (result.OTHERS[i].Total) + '</a></td></tr>');
+                                $('#OtherIssues').append('<ul class="p-0 mb-0"><li><span>' + result.OTHERS[i].Header + '</span><span><a target="_blank" href="' + result.OtherIssuesEncryptUrl + '" data-original-title="" class="text-success" title="">' + result.OTHERS[i].Total + '</a></span></li></ul>');
+                            }
+                            else {
+                                $('#OtherIssues').append('<ul class="p-0 mb-0"><li><span>' + result.OTHERS[i].Header + '</span><span class="text-success">' + (result.OTHERS[i].Total) + '</span></li></ul>');
+
+                            }
+                        }
+                    }
+                    if (result.StatusSummary != null) {
+                        debugger;
+                        for (i = 0; i < result.StatusSummary.length; i++) {
+                            //$('#StatusSummary').append('<tr><td>' + result.StatusSummary[i].Header + '</td><td>' + (result.StatusSummary[i].Total) + '</td></tr>');
+
+                            if (result.StatusSummary[i].Header.includes("Initiated")) {
+                                if (result.StatusSummary[i].Total != 0) {
+                                    @*$('#StatusSummary').append('<ul class="p-0 mb-0"><li><span>' + result.StatusSummary[i].Header + '</span><span><a target="_blank" href="' + '@Url.Action("LocationWiseDetailsReport", "Report", new { Area = "HelpDesk" })' + '?Type=StatusSummaryInitiated&FromDate=' + FDate + '&ToDate=' + TDate + '" data-original-title="" class="text-primary" title="">' + result.StatusSummary[i].Total + '</a></span></li></ul>');*@
+                                    //$('#StatusSummary').append('<tr><td style="font-weight:bold;">' + result.StatusSummary[i].Header + '</td><td><a target=_blank  href="' + '@Url.Action("LocationWiseDetailsReport", "Report", new { Area = "HelpDesk" })' + '?Type=StatusSummaryInitiated&FromDate=' + FDate + '&ToDate=' + TDate + '">' + (result.StatusSummary[i].Total) + '</a></td></tr>');
+                                    $('#StatusSummary').append('<ul class="p-0 mb-0"><li><span>' + result.StatusSummary[i].Header + '</span><span><a target="_blank" href="' + result.StatusSummaryInitiatedEncryptUrl + '" data-original-title="" class="text-primary" title="">' + result.StatusSummary[i].Total + '</a></span></li></ul>');
+                                }
+                                else {
+                                    $('#StatusSummary').append('<ul class="p-0 mb-0"><li><span>' + result.StatusSummary[i].Header + '</span><span class="text-success">' + (result.StatusSummary[i].Total) + '</span></li></ul>');
+
+                                    // $('#StatusSummary').append('<tr><td style="font-weight:bold;">' + result.StatusSummary[i].Header + '</td><td>' + (result.StatusSummary[i].Total) + '</td></tr>');
+                                }
+                            }
+                            else if (result.StatusSummary[i].Header.includes("FMS")) {
+                                if (result.StatusSummary[i].Total != 0) {
+                                    //$('#StatusSummary').append('<tr><td style="font-weight:bold;">' + result.StatusSummary[i].Header + '</td><td><a target=_blank  href="' + '@Url.Action("LocationWiseDetailsReport", "Report", new { Area = "HelpDesk" })' + '?Type=StatusSummaryFMS&FromDate=' + FDate + '&ToDate=' + TDate + '">' + (result.StatusSummary[i].Total) + '</a></td></tr>');
+                                    @*$('#StatusSummary').append('<ul class="p-0 mb-0"><li><span>' + result.StatusSummary[i].Header + '</span><span><a target="_blank" href="' + '@Url.Action("LocationWiseDetailsReport", "Report", new { Area = "HelpDesk" })' + '?Type=StatusSummaryFMS&FromDate=' + FDate + '&ToDate=' + TDate + '" data-original-title="" class="text-success" title="">' + result.StatusSummary[i].Total + '</a></span></li></ul>');*@
+                                    $('#StatusSummary').append('<ul class="p-0 mb-0"><li><span>' + result.StatusSummary[i].Header + '</span><span><a target="_blank" href="' + result.StatusSummaryFMSEncryptUrl + '" data-original-title="" class="text-success" title="">' + result.StatusSummary[i].Total + '</a></span></li></ul>');
+                                }
+                                else {
+                                    $('#StatusSummary').append('<ul class="p-0 mb-0"><li><span>' + result.StatusSummary[i].Header + '</span><span class="text-success">' + (result.StatusSummary[i].Total) + '</span></li></ul>');
+
+                                }
+                            }
+                            else if (result.StatusSummary[i].Header.includes("OSU")) {
+                                if (result.StatusSummary[i].Total != 0) {
+                                    $('#StatusSummary').append('<ul class="p-0 mb-0"><li><span>' + result.StatusSummary[i].Header + '</span><span><a target="_blank" href="' + '@Url.Action("LocationWiseDetailsReport", "Report", new { Area = "HelpDesk" })' + '?Type=StatusSummaryOSU&FromDate=' + FDate + '&ToDate=' + TDate + '" data-original-title="" class="text-success" title="">' + result.StatusSummary[i].Total + '</a></span></li></ul>');
+                                    //$('#StatusSummary').append('<tr><td style="font-weight:bold;">' + result.StatusSummary[i].Header + '</td><td><a target=_blank  href="' + '@Url.Action("LocationWiseDetailsReport", "Report", new { Area = "HelpDesk" })' + '?Type=StatusSummaryOSU&FromDate=' + FDate + '&ToDate=' + TDate + '">' + (result.StatusSummary[i].Total) + '</a></td></tr>');
+                                    $('#StatusSummary').append('<ul class="p-0 mb-0"><li><span>' + result.StatusSummary[i].Header + '</span><span><a target="_blank" href="' + result.StatusSummaryOSUEncryptUrl + '" data-original-title="" class="text-success" title="">' + result.StatusSummary[i].Total + '</a></span></li></ul>');
+                                }
+                                else {
+                                    $('#StatusSummary').append('<ul class="p-0 mb-0"><li><span>' + result.StatusSummary[i].Header + '</span><span class="text-success">' + (result.StatusSummary[i].Total) + '</span></li></ul>');
+
+                                }
+                            }
+                            else if (result.StatusSummary[i].Header.includes("Closed")) {
+                                if (result.StatusSummary[i].Total != 0) {
+                                    @*$('#StatusSummary').append('<ul class="p-0 mb-0"><li><span>' + result.StatusSummary[i].Header + '</span><span><a target="_blank" href="' + '@Url.Action("LocationWiseDetailsReport", "Report", new { Area = "HelpDesk" })' + '?Type=StatusSummaryClosed&FromDate=' + FDate + '&ToDate=' + TDate + '" data-original-title="" class="text-success" title="">' + result.StatusSummary[i].Total + '</a></span></li></ul>');*@
+                                    //$('#StatusSummary').append('<tr><td style="font-weight:bold;">' + result.StatusSummary[i].Header + '</td><td><a target=_blank  href="' + '@Url.Action("LocationWiseDetailsReport", "Report", new { Area = "HelpDesk" })' + '?Type=StatusSummaryClosed&FromDate=' + FDate + '&ToDate=' + TDate + '">' + (result.StatusSummary[i].Total) + '</a></td></tr>');
+                                    $('#StatusSummary').append('<ul class="p-0 mb-0"><li><span>' + result.StatusSummary[i].Header + '</span><span><a target="_blank" href="' + result.StatusSummaryClosedEncryptUrl + '" data-original-title="" class="text-success" title="">' + result.StatusSummary[i].Total + '</a></span></li></ul>');
+                                }
+                                else {
+                                    $('#StatusSummary').append('<ul class="p-0 mb-0"><li><span>' + result.StatusSummary[i].Header + '</span><span class="text-success">' + (result.StatusSummary[i].Total) + '</span></li></ul>');
+                                }
+                            }
+                            else if (result.StatusSummary[i].Header.includes("Reopen")) {
+                                if (result.StatusSummary[i].Total != 0) {
+                                    @*$('#StatusSummary').append('<ul class="p-0 mb-0"><li><span>' + result.StatusSummary[i].Header + '</span><span><a target="_blank" href="' + '@Url.Action("LocationWiseDetailsReport", "Report", new { Area = "HelpDesk" })' + '?Type=StatusSummaryReopen&FromDate=' + FDate + '&ToDate=' + TDate + '" data-original-title="" class="text-success" title="">' + result.StatusSummary[i].Total + '</a></span></li></ul>');*@
+                                    //$('#StatusSummary').append('<tr><td style="font-weight:bold;">' + result.StatusSummary[i].Header + '</td><td><a target=_blank  href="' + '@Url.Action("LocationWiseDetailsReport", "Report", new { Area = "HelpDesk" })' + '?Type=StatusSummaryReopen&FromDate=' + FDate + '&ToDate=' + TDate + '">' + (result.StatusSummary[i].Total) + '</a></td></tr>');
+                                    $('#StatusSummary').append('<ul class="p-0 mb-0"><li><span>' + result.StatusSummary[i].Header + '</span><span><a target="_blank" href="' + result.StatusSummaryReopenEncryptUrl + '" data-original-title="" class="text-success" title="">' + result.StatusSummary[i].Total + '</a></span></li></ul>');
+                                }
+                                else {
+                                    $('#StatusSummary').append('<ul class="p-0 mb-0"><li><span>' + result.StatusSummary[i].Header + '</span><span class="text-success">' + (result.StatusSummary[i].Total) + '</span></li></ul>');
+
+                                }
+                            }
+                            else if (result.StatusSummary[i].Header.includes("Total")) {
+                                if (result.StatusSummary[i].Total != 0) {
+                                    @*$('#StatusSummary').append('<ul class="p-0 mb-0"><li><span>' + result.StatusSummary[i].Header + '</span><span><a target="_blank" href="' + '@Url.Action("LocationWiseDetailsReport", "Report", new { Area = "HelpDesk" })' + '?Type=StatusSummaryTotal&FromDate=' + FDate + '&ToDate=' + TDate + '" data-original-title="" class="text-success" title="">' + result.StatusSummary[i].Total + '</a></span></li></ul>');*@
+                                    //$('#StatusSummary').append('<tr><td style="font-weight:bold;">' + result.StatusSummary[i].Header + '</td><td><a target=_blank  href="' + '@Url.Action("LocationWiseDetailsReport", "Report", new { Area = "HelpDesk" })' + '?Type=StatusSummaryTotal&FromDate=' + FDate + '&ToDate=' + TDate + '">' + (result.StatusSummary[i].Total) + '</a></td></tr>');
+                                    $('#StatusSummary').append('<ul class="p-0 mb-0"><li><span>' + result.StatusSummary[i].Header + '</span><span><a target="_blank" href="' + result.StatusSummaryTotalEncryptUrl + '" data-original-title="" class="text-success" title="">' + result.StatusSummary[i].Total + '</a></span></li></ul>');
+                                }
+                                else {
+                                    $('#StatusSummary').append('<ul class="p-0 mb-0"><li><span>' + result.StatusSummary[i].Header + '</span><span class="text-success">' + (result.StatusSummary[i].Total) + '</span></li></ul>');
+                                }
+                            }
+                        }
+                    }
+                    if (result.HDSSummary != null) {
+                        $('#SelectedDate').text("TOTAL");
+                        for (i = 0; i < result.HDSSummary.length; i++) {
+
+                            if (result.HDSSummary[i].Header == "Total Issues Resolved") {
+                                if (result.HDSSummary[i].Total != 0) {
+                                    @*$('#HDSSummary').append('<ul class="p-0 mb-0"><li><span>' + result.HDSSummary[i].Header + '</span><span><a target="_blank" href="' + '@Url.Action("LocationWiseDetailsReport", "Report", new { Area = "HelpDesk" })' + '?Type=TotalIssueReSolved&FromDate=' + FDate + '&ToDate=' + TDate + '" data-original-title="" class="text-success" title="">' + result.HDSSummary[i].Total + '</a></span></li></ul>');*@
+                                    //$('#HDSSummary').append('<tr><td style="font-weight:bold;">' + result.HDSSummary[i].Header + '</td><td><a target=_blank  href="' + '@Url.Action("LocationWiseDetailsReport", "Report", new { Area = "HelpDesk" })' + '?Type=TotalIssueReSolved&FromDate=' + FDate + '&ToDate=' + TDate + '">' + (result.HDSSummary[i].Total) + '</a></td></tr>');
+                                    $('#HDSSummary').append('<ul class="p-0 mb-0"><li><span>' + result.HDSSummary[i].Header + '</span><span><a target="_blank" href="' + result.TotalIssueReSolvedEncryptUrl + '" data-original-title="" class="text-success" title="">' + result.HDSSummary[i].Total + '</a></span></li></ul>');
+                                }
+                                else {
+                                    //$('#HDSSummary').append('<tr><td style="font-weight:bold;">' + result.HDSSummary[i].Header + '</td><td>' + (result.HDSSummary[i].Total) + '</td></tr>');
+                                    $('#HDSSummary').append('<ul class="p-0 mb-0"><li><span>' + result.HDSSummary[i].Header + '</span><span class="text-success">' + (result.HDSSummary[i].Total) + '</span></li></ul>');
+
+                                }
+                            }
+                            else if (result.HDSSummary[i].Header == "Total Pending Issues") {
+                                if (result.HDSSummary[i].Total != 0) {
+                                    @*$('#HDSSummary').append('<ul class="p-0 mb-0"><li><span>' + result.HDSSummary[i].Header + '</span><span><a target="_blank" href="' + '@Url.Action("LocationWiseDetailsReport", "Report", new { Area = "HelpDesk" })' + '?Type=TotalIssuePending&FromDate=' + FDate + '&ToDate=' + TDate + '" data-original-title="" class="text-success" title="">' + result.HDSSummary[i].Total + '</a></span></li></ul>');*@
+                                    //$('#HDSSummary').append('<tr><td style="font-weight:bold;">' + result.HDSSummary[i].Header + '</td><td><a target=_blank  href="' + '@Url.Action("LocationWiseDetailsReport", "Report", new { Area = "HelpDesk" })' + '?Type=TotalIssuePending&FromDate=' + FDate + '&ToDate=' + TDate + '">' + (result.HDSSummary[i].Total) + '</a></td></tr>');
+                                    $('#HDSSummary').append('<ul class="p-0 mb-0"><li><span>' + result.HDSSummary[i].Header + '</span><span><a target="_blank" href="' + result.TotalIssuePendingEncryptUrl + '" data-original-title="" class="text-success" title="">' + result.HDSSummary[i].Total + '</a></span></li></ul>');
+                                }
+                                else {
+                                    $('#HDSSummary').append('<ul class="p-0 mb-0"><li><span>' + result.HDSSummary[i].Header + '</span><span class="text-success">' + (result.HDSSummary[i].Total) + '</span></li></ul>');
+
+                                }
+                            }
+                            else if (result.HDSSummary[i].Header == "Issue Logged") {
+                                if (result.HDSSummary[i].Total != 0) {
+                                    @*$('#HDSSummary').append('<ul class="p-0 mb-0"><li><span>' + result.HDSSummary[i].Header + '</span><span><a target="_blank" href="' + '@Url.Action("LocationWiseDetailsReport", "Report", new { Area = "HelpDesk" })' + '?Type=Logged&FromDate=' + FDate + '&ToDate=' + TDate + '" data-original-title="" class="text-success" title="">' + result.HDSSummary[i].Total + '</a></span></li></ul>');*@
+                                    //$('#HDSSummary').append('<tr><td>' + result.HDSSummary[i].Header + '</td><td><a target=_blank  href="' + '@Url.Action("LocationWiseDetailsReport", "Report", new { Area = "HelpDesk" })' + '?Type=Logged&FromDate=' + FDate + '&ToDate=' + TDate + '">' + (result.HDSSummary[i].Total) + '</a></td></tr>');
+                                    $('#HDSSummary').append('<ul class="p-0 mb-0"><li><span>' + result.HDSSummary[i].Header + '</span><span><a target="_blank" href="' + result.LoggedEncryptUrl + '" data-original-title="" class="text-success" title="">' + result.HDSSummary[i].Total + '</a></span></li></ul>');
+                                }
+                                else {
+                                    $('#HDSSummary').append('<ul class="p-0 mb-0"><li><span>' + result.HDSSummary[i].Header + '</span><span class="text-success">' + (result.HDSSummary[i].Total) + '</span></li></ul>');
+
+                                }
+                            }
+                            else if (result.HDSSummary[i].Header == "Resolved Issues On Same Day") {
+                                if (result.HDSSummary[i].Total != 0) {
+                                    @*$('#HDSSummary').append('<ul class="p-0 mb-0"><li><span>' + result.HDSSummary[i].Header + '</span><span><a target="_blank" href="' + '@Url.Action("LocationWiseDetailsReport", "Report", new { Area = "HelpDesk" })' + '?Type=Resolved_Issues_On_Same_Day&FromDate=' + FDate + '&ToDate=' + TDate + '" data-original-title="" class="text-success" title="">' + result.HDSSummary[i].Total + '</a></span></li></ul>');*@
+                                    ///$('#HDSSummary').append('<tr><td>' + result.HDSSummary[i].Header + '</td><td><a target=_blank  href="' + '@Url.Action("LocationWiseDetailsReport", "Report", new { Area = "HelpDesk" })' + '?Type=Resolved_Issues_On_Same_Day&FromDate=' + FDate + '&ToDate=' + TDate + '">' + (result.HDSSummary[i].Total) + '</a></td></tr>');
+                                    $('#HDSSummary').append('<ul class="p-0 mb-0"><li><span>' + result.HDSSummary[i].Header + '</span><span><a target="_blank" href="' + result.Resolved_Issues_On_Same_DayEncryptUrl + '" data-original-title="" class="text-success" title="">' + result.HDSSummary[i].Total + '</a></span></li></ul>');
+                                }
+                                else {
+                                    $('#HDSSummary').append('<ul class="p-0 mb-0"><li><span>' + result.HDSSummary[i].Header + '</span><span class="text-success">' + (result.HDSSummary[i].Total) + '</span></li></ul>');
+
+                                }
+                            }
+                            else if (result.HDSSummary[i].Header == "Previous Pending Issues Resolved") {
+                                if (result.HDSSummary[i].Total != 0) {
+                                    @*$('#HDSSummary').append('<ul class="p-0 mb-0"><li><span>' + result.HDSSummary[i].Header + '</span><span><a target="_blank" href="' + '@Url.Action("LocationWiseDetailsReport", "Report", new { Area = "HelpDesk" })' + '?Type=PreviousPendingIssueSolved&FromDate=' + FDate + '&ToDate=' + TDate + '" data-original-title="" class="text-success" title="">' + result.HDSSummary[i].Total + '</a></span></li></ul>');*@
+                                    //$('#HDSSummary').append('<tr><td>' + result.HDSSummary[i].Header + '</td><td><a target=_blank  href="' + '@Url.Action("LocationWiseDetailsReport", "Report", new { Area = "HelpDesk" })' + '?Type=PreviousPendingIssueSolved&FromDate=' + FDate + '&ToDate=' + TDate + '">' + (result.HDSSummary[i].Total) + '</a></td></tr>');
+                                    $('#HDSSummary').append('<ul class="p-0 mb-0"><li><span>' + result.HDSSummary[i].Header + '</span><span><a target="_blank" href="' + result.PreviousPendingIssueSolvedEncryptUrl + '" data-original-title="" class="text-success" title="">' + result.HDSSummary[i].Total + '</a></span></li></ul>');
+                                }
+                                else {
+                                    $('#HDSSummary').append('<ul class="p-0 mb-0"><li><span>' + result.HDSSummary[i].Header + '</span><span class="text-success">' + (result.HDSSummary[i].Total) + '</span></li></ul>');
+                                }
+                            }
+                            else if (result.HDSSummary[i].Header == "Today's Pending Issues") {
+                                if (result.HDSSummary[i].Total != 0) {
+                                    @*$('#HDSSummary').append('<ul class="p-0 mb-0"><li><span>' + result.HDSSummary[i].Header + '</span><span><a target="_blank" href="' + '@Url.Action("LocationWiseDetailsReport", "Report", new { Area = "HelpDesk" })' + '?Type=TodaysPendingIssue&FromDate=' + FDate + '&ToDate=' + TDate + '" data-original-title="" class="text-success" title="">' + result.HDSSummary[i].Total + '</a></span></li></ul>');*@
+                                    //$('#HDSSummary').append('<tr><td>' + result.HDSSummary[i].Header + '</td><td><a target=_blank  href="' + '@Url.Action("LocationWiseDetailsReport", "Report", new { Area = "HelpDesk" })' + '?Type=TodaysPendingIssue&FromDate=' + FDate + '&ToDate=' + TDate + '">' + (result.HDSSummary[i].Total) + '</a></td></tr>');
+                                    $('#HDSSummary').append('<ul class="p-0 mb-0"><li><span>' + result.HDSSummary[i].Header + '</span><span><a target="_blank" href="' + result.TodaysPendingIssueEncryptUrl + '" data-original-title="" class="text-success" title="">' + result.HDSSummary[i].Total + '</a></span></li></ul>');
+                                }
+                                else {
+                                    $('#HDSSummary').append('<ul class="p-0 mb-0"><li><span>' + result.HDSSummary[i].Header + '</span><span class="text-success">' + (result.HDSSummary[i].Total) + '</span></li></ul>');
+                                }
+                            }
+                            else if (result.HDSSummary[i].hHeader == "Previous Pending Issue") {
+                                if (result.HDSSummary[i].Total != 0) {
+                                    @*$('#HDSSummary').append('<ul class="p-0 mb-0"><li><span>' + result.HDSSummary[i].Header + '</span><span><a target="_blank" href="' + '@Url.Action("LocationWiseDetailsReport", "Report", new { Area = "HelpDesk" })' + '?Type=PreviousPendingIssue&FromDate=' + FDate + '&ToDate=' + TDate + '" data-original-title="" class="text-success" title="">' + result.HDSSummary[i].Total + '</a></span></li></ul>');*@
+                                    //$('#HDSSummary').append('<tr><td>' + result.HDSSummary[i].Header + '</td><td><a target=_blank  href="' + '@Url.Action("LocationWiseDetailsReport", "Report", new { Area = "HelpDesk" })' + '?Type=PreviousPendingIssue&FromDate=' + FDate + '&ToDate=' + TDate + '">' + (result.HDSSummary[i].Total) + '</a></td></tr>');
+                                    $('#HDSSummary').append('<ul class="p-0 mb-0"><li><span>' + result.HDSSummary[i].Header + '</span><span><a target="_blank" href="' + result.PreviousPendingIssueEncryptUrl + '" data-original-title="" class="text-success" title="">' + result.HDSSummary[i].Total + '</a></span></li></ul>');
+                                }
+                                else {
+                                    $('#HDSSummary').append('<ul class="p-0 mb-0"><li><span>' + result.HDSSummary[i].Header + '</span><span class="text-success">' + (result.HDSSummary[i].Total) + '</span></li></ul>');
+                                }
+                            }
+                            else {
+                                //$('#HDSSummary').append('<tr><td>' + result.HDSSummary[i].Header + '</td><td>' + (result.HDSSummary[i].Total) + '</td></tr>');
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+</script>
+

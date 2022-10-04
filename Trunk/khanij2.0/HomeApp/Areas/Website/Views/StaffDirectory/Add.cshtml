@@ -1,0 +1,214 @@
+﻿@*// *********************************************************************************************************
+    //  View Name                : Add
+    //  Desciption               : To Save and Update Website Staff Directory Details
+    //  Created By               : Lingaraj Dalai
+    //  Created On               : 20 Oct 2021
+    // ********************************************************************************************************
+*@
+@model HomeEF.AddStaffDirectoryModel
+@{
+    ViewData["Title"] = "Add";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+@if (TempData["Message"] != null)
+{
+    <script>
+        var vv = '@TempData["Message"]';
+        if (vv == 1) {
+            swal("","Staff Directory created successfully.","success");
+        }
+        else if (vv == 2) {
+            swal("","Staff Directory already exists.","warning");
+        }
+        else if (vv == 3) {
+            swal("", "Something Errror occured. Please Try After Sometime!!", "error");
+        }
+    </script>
+}
+<script>
+    indicateMe = "yes"
+    $(document).ready(function () {
+        loadNavigation('Add', 'glhelpdesk', 'plraiseticket', 'tl', 'CMS', 'Staff Directory', ' ');
+        $('.searchableselect').searchableselect();
+        BindOfficeTypeData();
+    });
+    /*Bind Office Type details*/
+    function BindOfficeTypeData() {
+        debugger;
+        $.ajax({
+            url: '/Website/StaffDirectory/GetOfficeTypeDetails',
+            dataType: 'json',
+            type: 'post',
+            success: function (data) {
+                debugger;
+                $('#OfficeTypeId').html('');
+                $('#OfficeTypeId').append("<option value=''>Select</option>");
+                $.each(data, function (ind, item) {
+                    $('#OfficeTypeId').append("<option value='" + item.inT_OFFICE_TYPE_ID + "'>" + item.vcH_OFFICE_TYPE + "</option>");
+                });
+                if ($('#hfOfficeTypeId').val() != "") {
+                    $('#OfficeTypeId').val($('#hfOfficeTypeId').val());
+                }
+                if ($('#OfficeTypeId').val() == null) {
+                    $('#OfficeTypeId').html('');
+                    $('#OfficeTypeId').append("<option value=''>Select</option>");
+                    $.each(data, function (ind, item) {
+                        $('#OfficeTypeId').append("<option value='" + item.inT_OFFICE_TYPE_ID + "'>" + item.vcH_OFFICE_TYPE + "</option>");
+                    });
+                }
+            },
+            error: function (err) {
+            }
+        });
+    }
+    function validateEmail(emailid) {
+        var emailReg = /^([\w-\.]+@@([\w-]+\.)+[\w-]{2,4})?$/;
+        return emailReg.test(emailid);
+    }
+    function Validate() {
+        var Iss = false;
+        var mobileNum = $("#VCH_PHONE_NO").val();
+        var validateMobNum = /^\d*(?:\.\d{1,2})?$/;
+        if (!DropDownValidation("OfficeTypeId", "Department Type")) {
+            return false;
+        }
+        if (!blankFieldValidation("VCH_OFFICER_NAME", "Officer Name")) {
+            return false;
+        }
+        //else if (!blankFieldValidation("VCH_OFFICER_DESIG", "Officer Designation")) {
+        //    return false;
+        //}
+        if (!blankFieldValidation("VCH_PHONE_NO", "Mobile No")) {
+            return false;
+        }
+        else if (validateMobNum.test(mobileNum) && mobileNum.length != 10) {
+            swal("", "Please Enter valid Mobile No", "warning");
+            return false;
+        }
+        //else if (!blankFieldValidation("VCH_EMAIL", "Email Id")) {
+        //    return false;
+        //}
+        if (!validateEmail($('#VCH_EMAIL').val())) {
+            swal("", "Please Enter valid Email Id", "warning");
+            return false;
+        }
+        if ($("OfficeTypeId").val() == "3") {
+            if (!blankFieldValidation("VCH_LOCATION", "Location")) {
+                return false;
+            }
+        }
+        Iss = true;
+        return Iss;
+    }
+</script>
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+        @Html.Partial("_navigation")
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="javascript:void(0);">
+                                Add
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="~/Website/StaffDirectory/ViewList">
+                                View
+                            </a>
+                        </li>
+                    </ul>
+                    @Html.Partial("_util")
+                </div>
+                <section class="box form-container">
+                    <div class="content-body">
+                        <h5 class="text-brown font-weight-bold mt-0"> Staff Directory Details</h5>
+                        @using (Html.BeginForm("Add", "StaffDirectory", FormMethod.Post, new { enctype = "multipart/form-data", AUTOCOMPLETE = "Off", id = "form1" }))
+                        {
+                            <div class="row">
+                                <div class="col-lg-4 col-md-6">
+                                    <label class="col-form-label">Department Type <span class="text-danger">*</span></label>
+                                    <div class="form-group">
+                                        <select id="OfficeTypeId" name="INT_OFFICE_TYPE_ID" class="form-control searchableselect" autofocus="autofocus">
+                                            <option value="">Select</option>
+                                        </select>
+                                        @Html.HiddenFor(m => m.INT_OFFICE_TYPE_ID, new { @id = "hfOfficeTypeId" })
+                                        @Html.ValidationMessageFor(m => m.INT_OFFICE_TYPE_ID, "", new { @class = "text-danger" })
+                                        @Html.HiddenFor(m => m.INT_STAFFDIR_ID)
+                                    </div>
+                                </div>
+                                <div class="col-lg-4 col-md-6">
+                                    <label class="col-form-label">Officer Name <span class="text-danger">*</span></label>
+                                    <div class="form-group">
+                                        @Html.TextBoxFor(m => m.VCH_OFFICER_NAME, new { @class = "form-control", @autofocus = "autofocus", @maxlength = 100, @Onkeypress = "return inputLimiter(event,'NameCharacters')" })
+                                        @Html.ValidationMessageFor(m => m.VCH_OFFICER_NAME, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-4 col-md-6">
+                                    <label class="col-form-label">Officer Designation </label>
+                                    <div class="form-group">
+                                        @Html.TextBoxFor(m => m.VCH_OFFICER_DESIG, new { @class = "form-control", @autofocus = "autofocus", @maxlength = 200, @Onkeypress = "return inputLimiter(event,'NameCharacters')" })
+                                        @Html.ValidationMessageFor(m => m.VCH_OFFICER_DESIG, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                                <div class="col-lg-4 col-md-6">
+                                    <label class="col-form-label">Mobile No. <span class="text-danger">*</span></label>
+                                    <div class="form-group">
+                                        @Html.TextBoxFor(m => m.VCH_PHONE_NO, new { @class = "form-control", @autofocus = "autofocus", @maxlength = 10, @Onkeypress = "return inputLimiter(event,'Numbers')" })
+                                        @Html.ValidationMessageFor(m => m.VCH_PHONE_NO, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-4 col-md-6">
+                                    <label class="col-form-label">Email Id </label>
+                                    <div class="form-group">
+                                        @Html.TextBoxFor(m => m.VCH_EMAIL, new { @class = "form-control", @autofocus = "autofocus", @maxlength = 100 })
+                                        @Html.ValidationMessageFor(m => m.VCH_EMAIL, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                                <div class="col-lg-4 col-md-6">
+                                    <label class="col-form-label">Location </label>
+                                    <div class="form-group">
+                                        @Html.TextBoxFor(m => m.VCH_LOCATION, new { @class = "form-control", @autofocus = "autofocus", @maxlength = 50, @Onkeypress = "return inputLimiter(event,'NameCharacters')" })
+                                        @Html.ValidationMessageFor(m => m.VCH_LOCATION, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-4 col-md-6">
+                                    <label class="col-form-label pt-0">Status</label>
+                                    <div class="form-group">
+                                        @Html.RadioButtonFor(n => n.BIT_STATUS, true, new { @class = "custom-radio", id = "Rdbtn_Active", @checked = true })
+                                        <label class="radio-label mr-2">Publish</label>
+                                        @Html.RadioButtonFor(n => n.BIT_STATUS, false, new { @class = "custom-radio", id = "Rdbtn_Inactive" })
+                                        <label class="radio-label">Unpublish</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12 col-sm-12">
+                                    <input type="submit" value='@ViewBag.Button' name="Submit" class="btn btn-success btn-md ml-0 waves-effect waves-light  btnsave" id="Submit" onclick="return Validate()">
+                                    @if (ViewBag.Button == "Update")
+                                    {
+                                        <a href="~/Website/StaffDirectory/ViewList" class="btn btn-danger btn-md ml-0 waves-effect waves-light btncancel">Cancel</a>
+                                    }
+                                    else
+                                    {
+                                        <a href="~/Website/StaffDirectory/Add" class="btn btn-danger btn-md ml-0 waves-effect waves-light btncancel">Cancel</a>
+                                    }
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+    <!-- MAIN CONTENT AREA ENDS -->
+</section>
+

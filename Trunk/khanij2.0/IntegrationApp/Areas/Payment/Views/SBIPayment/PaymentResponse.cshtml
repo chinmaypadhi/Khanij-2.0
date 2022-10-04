@@ -1,0 +1,94 @@
+﻿@{
+    ViewBag.Title = "Payment Response";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@model IntegrationEF.PaymentTransaction
+<section class="wrapper main-wrapper row">
+    <div class="col-12" id="mainDiv">
+        @Html.Partial("_navigation")
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="#">
+                                E Permit
+                            </a>
+                        </li>
+
+                    </ul>
+                    @Html.Partial("_util")
+                </div>
+                <div class="row">
+                    <div class="col-lg-12 col-md-12 col-sm-12">
+                        @if (Model.TXN_STATUS != null && (Model.TXN_STATUS == "AWAITED" || Model.TXN_STATUS == "NEFT" || Model.TXN_STATUS == "PENDING FOR PAYMENT"))
+                        {
+                        <div id="paymentReceived" class="dialog">
+                            <div style="border-color: green">
+                                <div id="hide1">
+                                    <h2><span style="text-align: center">PAYMENT PROCESS IS COMPLETED!</span></h2>
+                                    <h2><span style="text-align: center">PAYMENT STATUS : PENDING!</span></h2>
+                                    @*<a href="#" onclick='return CheckPaymentStatus("@Model.CLNT_TXN_REF");'>Check Status</a>*@
+                                    <h1 class="h1"><span style="text-align: center">Transaction Details</span></h1>
+                                </div>
+                                <div id="hide2" style="display: none">
+                                    <h2><span style="text-align: center">PAYMENT SUCCESS..!</span></h2>
+                                    <h1 class="h1"><span style="text-align: center">Transaction Details</span></h1>
+                                </div>
+
+                            </div>
+
+                            <p>
+                                Applicant Transaction Number : @Model.CLNT_TXN_REF
+                                <br />
+                                Transaction Bank Code : @Model.TPSL_BANK_CD
+                                <br />
+                                Payment Transaction ID : @Model.TPSL_TXN_ID
+                                <br />
+                                Payment Transaction DateTime : @Model.TPSL_TXN_TIME
+                                <br />
+
+
+                                <br />
+                                <span style="font-weight: bold">Total Paid Amount : Rs. @Model.TXN_AMT</span>
+                            </p>
+                        </div>
+                        }
+                        </div>
+                    </div>
+                    </div>
+                </div>
+            </div>
+    <!-- MAIN CONTENT AREA ENDS -->
+</section>
+<uc1:footer runat="server" ID="footer" />
+<script>
+    excelMe = "yes"
+    pdfMe = "yes"
+    backMe = "yes"
+    $(document).ready(function () {
+        loadNavigation('balancequantitye-permit', 'glepermit', 'Payment', 'tl', 'Payment', 'Payment Response', ' ');
+        $('.searchableselect').searchableselect();
+
+        $('#datatable').DataTable();
+
+
+        $('.shorting-lnk').click(function () {
+            $('.shorting-lnk i').toggleClass('fa-sort-amount-up-alt fa-sort-amount-down-alt ');
+        });
+
+    });
+
+
+</script>
+<script>
+    $(document).ready(function () {
+        $('.datepicker').datetimepicker({
+            format: 'LT',
+            format: 'DD-MM-YYYY',
+
+        });
+    });
+</script>

@@ -1,0 +1,127 @@
+﻿@*// *********************************************************************************************************
+      View Name                : Add Holiday Type
+      Desciption               : To Holiday Type Details
+      Created By               : Suresh kumar behera
+      Created On               : 13-july-2021
+     ********************************************************************************************************
+*@
+
+@model EstablishmentEf.HolidayTypeMasterEF;
+@{
+    ViewData["Title"] = "Holiday Type Master";
+    Layout = "~/Views/Shared/_CMSLayout.cshtml";
+}
+
+@if (TempData["msg"] != null)
+{
+    <script>
+        var vv = '@TempData["msg"]';
+        if (vv == 1) {
+            swal("", "Holiday Type saved successfully.", "success");
+        }
+        else if (vv == 2) {
+            swal("", "Holiday Type allready exists.", "warning");
+        }
+        else if (vv == 3) {
+            swal("", "Holiday Type updated sucessfully", "success");
+        }
+        else if (vv == 4) {
+            swal("", "Holiday Type deleted sucessfully", "success");
+        }
+        else {
+            swal("", "Something Errror occured. Please Try After Sometime!!", "error");
+        }
+    </script>
+
+    TempData["msg"] = null;
+
+}
+<script>
+    $(document).ready(function () {
+
+        loadNavigation('AddHolidayType', 'glempprofile', 'plofficetype', 'tl', 'Leave Management', 'Add Holiday Type', ' ');
+
+        $("#Submit").click(function () {
+
+            if (!blankFieldValidation("HolidayTypeName", "HolidayType Name")) {
+                return false;
+            }
+
+        });
+
+        $("#Reset").click(function () {
+            window.location ="@Url.Content("~/LeaveManagement/LeaveManagement/AddHolidayType/")"
+        });
+
+    });
+</script>
+
+<section class="wrapper main-wrapper row">
+    <div class="col-12">
+
+        @*@Html.Partial("_navigation")*@
+        <!-- MAIN CONTENT AREA STARTS -->
+        <div class="row">
+            <div class="col-12">
+                <div class="main-tab">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="javascript:void(0);">
+                                Add Holiday Type
+                            </a>
+                        </li>
+                        <li class="nav-item">
+
+                            <a class="nav-link" href="@Url.Content("~/LeaveManagement/LeaveManagement/ViewHolidayType")">
+                                View Holiday Type
+                            </a>
+                        </li>
+                    </ul>
+
+                    @*@Html.Partial("_util")*@
+                </div>
+
+                <section class="box form-container">
+                    <div class="content-body">
+
+                        @using (Html.BeginForm("AddHolidayType", "LeaveManagement", FormMethod.Post, new { AUTOCOMPLETE = "Off", id = "form1" }))
+                        {
+                            @Html.AntiForgeryToken();
+                            <div class="row">
+
+                                <div class="col-lg-12 col-md-12 col-sm-12">
+                                    <div class="form-group row">
+                                        <label class="col-lg-2 col-md-4 col-sm-12 col-form-label font-weight-bolder">Holiday Type Name<span class="text-danger">*</span></label>
+                                        <div class="col-lg-4 col-md-6 col-sm-12">
+                                            @Html.TextBoxFor(m => m.HolidayTypeName, new { @class = "form-control", @maxlength = 200, Onkeypress = "return inputLimiter(event,'NameCharactersAndNumbers')" })
+                                            @Html.HiddenFor(m => m.HolidayTypeId)
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-12 col-md-12 col-sm-12">
+                                    <div class="form-group row">
+                                        <label class="col-lg-2 col-md-4 col-sm-12 col-form-label font-weight-bolder">Holiday Type<span class="text-danger">*</span></label>
+                                        <div class="col-lg-4 col-md-6 col-sm-12">
+                                            <div class="py-2">
+
+                                                @Html.RadioButtonFor(n => n.HolidayType, true, new { @checked = true, @class = "custom-radio", id = "Rdbtn_Optional" }) Optional
+                                                @Html.RadioButtonFor(n => n.HolidayType, false, new { @class = "custom-radio", id = "Rdbtn_Mandatory" })Mandatory
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6  offset-lg-2 offset-md-4">
+                                    <input type="submit" value='@ViewBag.Button' class="btn btn-primary btn-md ml-0" name="Submit" id="Submit" />
+                                    <input type="reset" id="Reset" name="Reset" class="btn btn-danger btn-md" value="Reset" />
+                                </div>
+                            </div>
+                        }
+
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+    <!-- MAIN CONTENT AREA ENDS -->
+</section>
